@@ -151,18 +151,18 @@ class PyCalendarComponent(PyCalendarComponentBase):
             lhs_txt += "."
             lhs_txt += str(PyCalendarComponent.uid_ctr)
             PyCalendarComponent.uid_ctr += 1
-            lhs = stringutils.md5(lhs_txt)
+            lhs = stringutils.md5digest(lhs_txt)
 
             # Get right side (domain) of message-id
             rhs = None
 
             # Use app name
             domain = "com.mulberrymail"
-            domain += PyCalendarComponent.uid_ctr
+            domain += str(PyCalendarComponent.uid_ctr)
 
             # Use first 24 chars of MD5 digest of the domain as the
             # right-side of message-id
-            rhs = stringutils.md5(domain)
+            rhs = stringutils.md5digest(domain)
 
             # Generate the UID string
             new_uid = lhs
@@ -212,7 +212,7 @@ class PyCalendarComponent(PyCalendarComponentBase):
             if dt is not None:
                 hash += dt.getText()
 
-            self.mRURL = stringutils.md5(hash)
+            self.mRURL = stringutils.md5digest(hash)
         else:
             # Strip off .ics
             if self.mRURL.endswith(".ics"):
