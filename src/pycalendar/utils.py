@@ -14,7 +14,7 @@
 #    limitations under the License.
 ##
 
-from cStringIO import cStringIO as StringIO
+import cStringIO as StringIO
 
 #from PyCalendarDateTime import PyCalendarDateTime
 
@@ -107,7 +107,7 @@ def writeTextValue( os, value ):
         pass
     
 def decodeTextValue(value):
-    os = StringIO()
+    os = StringIO.StringIO()
 
     start_pos = 0
     end_pos = find_first_of(value, "\\", start_pos)
