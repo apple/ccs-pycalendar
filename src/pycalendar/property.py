@@ -85,6 +85,16 @@ class PyCalendarProperty(object):
         elif isinstance(arg1, PyCalendarProperty) and (arg2 == None) and (arg3 == None):
             self._copy_PyCalendarProperty(arg1)
 
+    def __repr__(self):
+        os = StringIO.StringIO()
+        self.generate(os)
+        return os.getvalue()
+
+    def __str__(self):
+        os = StringIO.StringIO()
+        self.generate(os)
+        return os.getvalue()
+
     def getName(self):
         return self.mName
 
@@ -510,7 +520,7 @@ class PyCalendarProperty(object):
         self.setupValueAttribute();
 
         # Look for timezone
-        if not dt.isDateOnly() and not dt.floating():
+        if not dt.isDateOnly() and not dt.getTimezoneUTC() and dt.getTimezoneID():
             if self.mAttributes.has_key(definitions.cICalAttribute_TZID):
                 del self.mAttributes[definitions.cICalAttribute_TZID]
             self.mAttributes.setdefault(definitions.cICalAttribute_TZID, []).append(
