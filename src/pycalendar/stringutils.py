@@ -14,6 +14,8 @@
 #    limitations under the License.
 ##
 
+import md5
+
 def strduptokenstr(txt, tokens):
     
     result = None
@@ -98,5 +100,5 @@ def compareStringsSafe(s1, s2):
     else:
         return s1 == s2
 
-def md5(txt):
+def md5digest(txt):
     return md5.new(txt).hexdigest()
