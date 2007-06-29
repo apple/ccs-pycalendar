@@ -71,7 +71,7 @@ class PyCalendarPeriod(object):
                 self.mUseDuration = True
                 self.mEnd = self.mStart.add( self.mDuration )
             else:
-                self.mEnd.parse( data )
+                self.mEnd.parse( end )
                 self.mUseDuration = False
                 self.mDuration = self.mEnd.subtract( self.mStart )
 
