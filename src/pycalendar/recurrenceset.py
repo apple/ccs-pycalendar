@@ -160,7 +160,7 @@ class PyCalendarRecurrenceSet(object):
     def getExperiods(self):
         return self.mExperiods
 
-    def expand(self, start, range, items):
+    def expand(self, start, range, items, float_offset=0):
         # Now create list of items to include
         include = []
 
@@ -170,7 +170,7 @@ class PyCalendarRecurrenceSet(object):
 
         # RRULES
         for iter in self.mRrules:
-            iter.expand(start, range, include)
+            iter.expand(start, range, include, float_offset=float_offset)
 
         # RDATES
         for iter in self.mRdates:
@@ -189,7 +189,7 @@ class PyCalendarRecurrenceSet(object):
 
         # EXRULES
         for iter in self.mExrules:
-            iter.expand(start, range, exclude)
+            iter.expand(start, range, exclude, float_offset=float_offset)
 
         # EXDATES
         for iter in self.mExdates:

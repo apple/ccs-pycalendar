@@ -33,6 +33,7 @@ class PyCalendarVTimezoneElement(PyCalendarVTimezone):
             self.mStart = PyCalendarDateTime()
             self.mTZName = ""
             self.mUTCOffset = 0
+            self.mUTCOffsetFrom = 0
             self.mRecurrences = PyCalendarRecurrenceSet()
             self.mCachedExpandBelow = None
             self.mCachedExpandBelowItems = None
@@ -41,6 +42,7 @@ class PyCalendarVTimezoneElement(PyCalendarVTimezone):
             self.mStart = dt
             self.mTZName = ""
             self.mUTCOffset = offset
+            self.mUTCOffsetFrom = 0
             self.mRecurrences = PyCalendarRecurrenceSet()
             self.mCachedExpandBelow = None
             self.mCachedExpandBelowItems = None
@@ -49,6 +51,7 @@ class PyCalendarVTimezoneElement(PyCalendarVTimezone):
             self.mStart = PyCalendarDateTime(copyit.mStart)
             self.mTZName = copyit.mTZName
             self.mUTCOffset = copyit.mUTCOffset
+            self.mUTCOffsetFrom = copyit.mUTCOffsetFrom
             self.mRecurrences = copyit.mRecurrences
             self.mCachedExpandBelow = None
             self.mCachedExpandBelowItems = None
@@ -63,6 +66,11 @@ class PyCalendarVTimezoneElement(PyCalendarVTimezone):
         temp = self.loadValueInteger(definitions.cICalProperty_TZOFFSETTO, PyCalendarValue.VALUETYPE_UTC_OFFSET)
         if temp is not None:
             self.mUTCOffset = temp
+
+        # Get TZOFFSETFROM
+        temp = self.loadValueInteger(definitions.cICalProperty_TZOFFSETFROM, PyCalendarValue.VALUETYPE_UTC_OFFSET)
+        if temp is not None:
+            self.mUTCOffsetFrom = temp
 
         # Get TZNAME
         temps = self.loadValueString(definitions.cICalProperty_TZNAME)
@@ -84,10 +92,14 @@ class PyCalendarVTimezoneElement(PyCalendarVTimezone):
     def getUTCOffset(self):
         return self.mUTCOffset
 
+    def getUTCOffsetFrom(self):
+        return self.mUTCOffsetFrom
+
     def getTZName(self):
         return self.mTZName
 
     def expandBelow(self, below):
+        
         # Look for recurrences
         if not self.mRecurrences.hasRecurrence() or self.mStart.gt(below):
             # Return DTSTART even if it is newer
@@ -117,7 +129,7 @@ class PyCalendarVTimezoneElement(PyCalendarVTimezone):
             if temp.gt(self.mCachedExpandBelow):
                 self.mCachedExpandBelowItems.removeAllElements()
                 period = PyCalendarPeriod(self.mStart, temp)
-                self.mRecurrences.expand(self.mStart, period, self.mCachedExpandBelowItems)
+                self.mRecurrences.expand(self.mStart, period, self.mCachedExpandBelowItems, float_offset=self.mUTCOffsetFrom)
                 self.mCachedExpandBelow = temp
             
             if len(self.mCachedExpandBelowItems) != 0:
@@ -135,11 +147,12 @@ class PyCalendarVTimezoneElement(PyCalendarVTimezone):
             return self.mStart
 
     def expandAll(self, start, end):
+
         # Ignore if there is no change in offset
-        temp1 = self.loadValueInteger(definitions.cICalProperty_TZOFFSETTO, PyCalendarValue.VALUETYPE_UTC_OFFSET)
-        temp2 = self.loadValueInteger(definitions.cICalProperty_TZOFFSETFROM, PyCalendarValue.VALUETYPE_UTC_OFFSET)
-        if temp1 == temp2:
-            return ()
+        offsetto = self.loadValueInteger(definitions.cICalProperty_TZOFFSETTO, PyCalendarValue.VALUETYPE_UTC_OFFSET)
+        offsetfrom = self.loadValueInteger(definitions.cICalProperty_TZOFFSETFROM, PyCalendarValue.VALUETYPE_UTC_OFFSET)
+#        if offsetto == offsetfrom:
+#            return ()
 
         # Look for recurrences
         if self.mStart.gt(end):
@@ -148,7 +161,7 @@ class PyCalendarVTimezoneElement(PyCalendarVTimezone):
         elif not self.mRecurrences.hasRecurrence():
             # Return DTSTART even if it is newer
             if self.mStart.ge(start):
-                return ((self.mStart, temp1, temp2),)
+                return ((self.mStart, offsetfrom, offsetto),)
             else:
                 return ()
         else:
@@ -176,11 +189,11 @@ class PyCalendarVTimezoneElement(PyCalendarVTimezone):
             if temp.gt(self.mCachedExpandBelow):
                 self.mCachedExpandBelowItems = []
                 period = PyCalendarPeriod(start, end)
-                self.mRecurrences.expand(self.mStart, period, self.mCachedExpandBelowItems)
+                self.mRecurrences.expand(self.mStart, period, self.mCachedExpandBelowItems, float_offset=self.mUTCOffsetFrom)
                 self.mCachedExpandBelow = temp
             
             if len(self.mCachedExpandBelowItems) != 0:
                 # The last one in the list is the one we want
-                return [(dt, temp1, temp2,) for dt in self.mCachedExpandBelowItems]
+                return [(dt, offsetfrom, offsetto,) for dt in self.mCachedExpandBelowItems]
 
             return ()

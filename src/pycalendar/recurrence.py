@@ -626,7 +626,7 @@ class PyCalendarRecurrence(object):
         return result
 
 
-    def expand(self, start, range, items):
+    def expand(self, start, range, items, float_offset=0):
 
         # Must have recurrence list at this point
         if self.mRecurrences == 0:
@@ -652,9 +652,9 @@ class PyCalendarRecurrence(object):
 
             # Simple expansion is one where there is no BYXXX rule part
             if not self.hasBy():
-                self.mFullyCached = self.simpleExpand(start, cache_range, self.mRecurrences)
+                self.mFullyCached = self.simpleExpand(start, cache_range, self.mRecurrences, float_offset)
             else:
-                self.mFullyCached = self.complexExpand(start, cache_range, self.mRecurrences)
+                self.mFullyCached = self.complexExpand(start, cache_range, self.mRecurrences, float_offset)
 
             # Set cache values
             self.mCached = True
@@ -666,9 +666,15 @@ class PyCalendarRecurrence(object):
             if range.isDateWithinPeriod(iter):
                 items.append(iter)
     
-    def simpleExpand(self, start, range, items):
+    def simpleExpand(self, start, range, items, float_offset):
         start_iter = PyCalendarDateTime(copyit=start)
         ctr = 0
+
+        if self.mUseUntil:
+            float_until = PyCalendarDateTime(copyit=self.mUntil)
+            if start.floating():
+                float_until.setTimezoneID(0)
+                float_until.offsetSeconds(float_offset)
 
         while True:
             # Exit if after period we want
@@ -689,14 +695,19 @@ class PyCalendarRecurrence(object):
                     return True
             elif self.mUseUntil:
                 # Exit if next item is after until (its OK if its the same as
-                # UNTIL as
-                # UNTIL is inclusive)
-                if start_iter.gt(self.mUntil):
+                # UNTIL as UNTIL is inclusive)
+                if start_iter.gt(float_until):
                     return True
 
-    def complexExpand(self, start, range, items):
+    def complexExpand(self, start, range, items, float_offset):
         start_iter = PyCalendarDateTime(copyit=start)
         ctr = 0
+
+        if self.mUseUntil:
+            float_until = PyCalendarDateTime(copyit=self.mUntil)
+            if start.floating():
+                float_until.setTimezoneID(None)
+                float_until.offsetSeconds(float_offset)
 
         # Always add the initial instance DTSTART
         items.append(PyCalendarDateTime(copyit=start))
@@ -753,9 +764,8 @@ class PyCalendarRecurrence(object):
                 # Exit if beyond the UNTIL limit
                 if self.mUseUntil:
                     # Exit if next item is after until (its OK if its the same
-                    # as UNTIL as
-                    # UNTIL is inclusive)
-                    if iter.gt(self.mUntil):
+                    # as UNTIL as UNTIL is inclusive)
+                    if iter.gt(float_until):
                         return True
 
                 # Add current one to list
