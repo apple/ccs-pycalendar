@@ -19,6 +19,7 @@ from datetime import PyCalendarDateTime
 from freebusy import PyCalendarFreeBusy
 from period import PyCalendarPeriod
 from periodvalue import PyCalendarPeriodValue
+from property import PyCalendarProperty
 from value import PyCalendarValue
 import definitions
 import itipdefinitions
@@ -100,6 +101,24 @@ class PyCalendarVFreeBusy(PyCalendarComponent):
             self.mDuration = False
             self.mEnd = temp
 
+    def fixStartEnd(self):
+        # End is always greater than start if start exists
+        if self.mHasStart and self.mEnd.le(self.mStart):
+            # Use the start
+            self.mEnd = PyCalendarDateTime(self.mStart)
+            self.mDuration = False
+
+            # Adjust to approriate non-inclusive end point
+            if self.mStart.isDateOnly():
+                self.mEnd.offsetDay(1)
+
+                # For all day events it makes sense to use duration
+                self.mDuration = True
+            else:
+                # Use end of current day
+                self.mEnd.offsetDay(1)
+                self.mEnd.setHHMMSS(0, 0, 0)
+
     def getStart(self):
         return self.mStart
 
@@ -120,6 +139,67 @@ class PyCalendarVFreeBusy(PyCalendarComponent):
 
     def getBusyTime(self):
         return self.mBusyTime
+
+    def editTiming(self):
+        # Updated cached values
+        self.mHasStart = False
+        self.mHasEnd = False
+        self.mDuration = False
+        self.mStart.setToday()
+        self.mEnd.setToday()
+
+        # Remove existing DTSTART & DTEND & DURATION & DUE items
+        self.removeProperties(definitions.cICalProperty_DTSTART)
+        self.removeProperties(definitions.cICalProperty_DTEND)
+        self.removeProperties(definitions.cICalProperty_DURATION)
+
+    def editTimingStartEnd(self, start, end):
+        # Updated cached values
+        self.mHasStart = self.mHasEnd = True
+        self.mStart = start
+        self.mEnd = end
+        self.mDuration = False
+        self.fixStartEnd()
+
+        # Remove existing DTSTART & DTEND & DURATION & DUE items
+        self.removeProperties(definitions.cICalProperty_DTSTART)
+        self.removeProperties(definitions.cICalProperty_DTEND)
+        self.removeProperties(definitions.cICalProperty_DURATION)
+
+        # Now create properties
+        prop = PyCalendarProperty(definitions.cICalProperty_DTSTART, start)
+        self.addProperty(prop)
+
+        # If its an all day event and the end one day after the start, ignore it
+        temp = PyCalendarDateTime(start)
+        temp.offsetDay(1)
+        if not start.isDateOnly() or end.ne(temp):
+            prop = PyCalendarProperty(definitions.cICalProperty_DTEND, end)
+            self.addProperty(prop)
+
+    def editTimingStartDuration(self, start, duration):
+        # Updated cached values
+        self.mHasStart = True
+        self.mHasEnd = False
+        self.mStart = start
+        self.mEnd = start.add(duration)
+        self.mDuration = True
+
+        # Remove existing DTSTART & DTEND & DURATION & DUE items
+        self.removeProperties(definitions.cICalProperty_DTSTART)
+        self.removeProperties(definitions.cICalProperty_DTEND)
+        self.removeProperties(definitions.cICalProperty_DURATION)
+        self.removeProperties(definitions.cICalProperty_DUE)
+
+        # Now create properties
+        prop = PyCalendarProperty(definitions.cICalProperty_DTSTART, start)
+        self.addProperty(prop)
+
+        # If its an all day event and the duration is one day, ignore it
+        if (not start.isDateOnly() or (duration.getWeeks() != 0)
+                or (duration.getDays() > 1)):
+            prop = PyCalendarProperty(definitions.cICalProperty_DURATION, duration)
+            self.addProperty(prop)
 
     # Generating info
     def expandPeriodComp(self, period, list):
@@ -150,7 +230,7 @@ class PyCalendarVFreeBusy(PyCalendarComponent):
         min_start = PyCalendarDateTime()
         max_end = PyCalendarDateTime()
         props = self.getProperties()
-        result = props.find(definitions.cICalProperty_FREEBUSY)
+        result = props.get(definitions.cICalProperty_FREEBUSY, ())
         for iter in result:
 
             # Check the properties FBTYPE attribute
@@ -159,17 +239,17 @@ class PyCalendarVFreeBusy(PyCalendarComponent):
             if iter.hasAttribute(definitions.cICalAttribute_FBTYPE):
 
                 fbyype = iter.getAttributeValue(definitions.cICalAttribute_FBTYPE)
-                if fbyype.toupper() == definitions.cICalAttribute_FBTYPE_BUSY:
+                if fbyype.upper() == definitions.cICalAttribute_FBTYPE_BUSY:
 
                     is_busy = True
                     type = PyCalendarFreeBusy.BUSY
 
-                elif fbyype.toupper() == definitions.cICalAttribute_FBTYPE_BUSYUNAVAILABLE:
+                elif fbyype.upper() == definitions.cICalAttribute_FBTYPE_BUSYUNAVAILABLE:
 
                     is_busy = True
                     type = PyCalendarFreeBusy.BUSYUNAVAILABLE
 
-                elif fbyype.toupper() == definitions.cICalAttribute_FBTYPE_BUSYTENTATIVE:
+                elif fbyype.upper() == definitions.cICalAttribute_FBTYPE_BUSYTENTATIVE:
 
                     is_busy = True
                     type = PyCalendarFreeBusy.BUSYTENTATIVE
@@ -224,7 +304,7 @@ class PyCalendarVFreeBusy(PyCalendarComponent):
 
         
             # Sort the list by period
-            self.mBusyTime.sort()
+            self.mBusyTime.sort(cmp=lambda x,y: x.getPeriod().getStart().compareDateTime(y.getPeriod().getStart()))
 
             # Determine range
             start = PyCalendarDateTime()
