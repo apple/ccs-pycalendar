@@ -520,7 +520,7 @@ class PyCalendarProperty(object):
         self.setupValueAttribute();
 
         # Look for timezone
-        if not dt.isDateOnly() and not dt.getTimezoneUTC() and dt.getTimezoneID():
+        if not dt.isDateOnly() and not dt.floating():
             if self.mAttributes.has_key(definitions.cICalAttribute_TZID):
                 del self.mAttributes[definitions.cICalAttribute_TZID]
             self.mAttributes.setdefault(definitions.cICalAttribute_TZID, []).append(
@@ -543,8 +543,7 @@ class PyCalendarProperty(object):
         # Look for timezone
         if ((len(dtl) > 0)
                 and not dtl[0].isDateOnly()
-                and not dtl[0].getTimezoneUTC()
-                and (dtl[0].getTimezoneID() is not None)):
+                and not dtl[0].floating()):
             if self.mAttributes.has_key(definitions.cICalAttribute_TZID):
                 del self.mAttributes[definitions.cICalAttribute_TZID]
             self.mAttributes.setdefault(definitions.cICalAttribute_TZID, []).append(

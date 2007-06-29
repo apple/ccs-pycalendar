@@ -14,7 +14,7 @@
 #    limitations under the License.
 ##
 
-from cStringIO import cStringIO as StringIO
+import cStringIO as StringIO
 import time
 
 from duration import PyCalendarDuration
@@ -58,7 +58,7 @@ class PyCalendarDateTime(object):
         self.mDateOnly = False
 
         self.mTZUTC = True
-        self.mTZID = 0
+        self.mTZID = None
 
         self.mPosixTimeCached = False
         self.mPosixTime = 0
@@ -566,7 +566,7 @@ class PyCalendarDateTime(object):
         self.changed()
 
     def floating( self ):
-        return ( not self.mTZUTC ) and ( self.mTZID == 0 )
+        return ( not self.mTZUTC ) and not self.mTZID
 
     #public ICalendarTimezone getTimezone() {
     #    return mTimezone
@@ -670,7 +670,7 @@ class PyCalendarDateTime(object):
 
     def getLocaleDate( self, locale ):
 
-        buf = StringIO()
+        buf = StringIO.StringIO()
 
         if locale == PyCalendarDateTime.FULLDATE:
             buf.write( locale.getDay( self.getDayOfWeek(), locale.LONG ) )
@@ -715,7 +715,7 @@ class PyCalendarDateTime(object):
 
     def getTime( self, with_seconds, am_pm, tzid ):
 
-        buf = StringIO()
+        buf = StringIO.StringIO()
         adjusted_hour = self.mHours
 
         if am_pm:

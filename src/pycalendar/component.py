@@ -393,5 +393,5 @@ class PyCalendarComponent(PyCalendarComponentBase):
                 dtv = prop.getDateTimeValue()
                 if dtv is not None:
                     # Add timezone id if appropriate
-                    if dtv.getValue().getTimezoneID() is not None:
+                    if dtv.getValue().getTimezoneID():
                         tzids.add(dtv.getValue().getTimezoneID())

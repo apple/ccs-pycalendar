@@ -55,7 +55,7 @@ class PyCalendarTimezone(object):
 
     @staticmethod
     def is_float(utc, tzid):
-        return not utc and ((tzid is None) or (tzid == 0))
+        return not utc and not tzid
 
     def getUTC(self):
         return self.mUTC
@@ -70,17 +70,17 @@ class PyCalendarTimezone(object):
         self.mTimezone = tzid
 
     def floating(self):
-        return not self.mUTC and ((self.mTimezone == None) or (len(self.mTimezone) == 0))
+        return not self.mUTC and not self.mTimezone
 
     def hasTZID(self):
-        return not self.mUTC and (self.mTimezone is not None) and (len(self.mTimezone) != 0)
+        return not self.mUTC and self.mTimezone
 
     def timeZoneSecondsOffset(self, dt):
         from manager import PyCalendarManager
         from calendar import PyCalendar
         if self.mUTC:
             return 0
-        elif (self.mTimezone is None) or (len(self.mTimezone) == 0):
+        elif not self.mTimezone:
             return PyCalendar.sICalendar.getTimezoneOffsetSeconds(PyCalendarManager.sICalendarManager.getDefaultTimezone().getTimezoneID(), dt)
 
         # Look up timezone and resolve date using default timezones
@@ -91,7 +91,7 @@ class PyCalendarTimezone(object):
         from calendar import PyCalendar
         if self.mUTC:
             return "(UTC)"
-        elif (self.mTimezone is None) or (len(self.mTimezone) == 0):
+        elif not self.mTimezone:
             return PyCalendar.sICalendar.getTimezoneDescriptor(PyCalendarManager.sICalendarManager.getDefaultTimezone().getTimezoneID(), dt)
 
         # Look up timezone and resolve date using default timezones
