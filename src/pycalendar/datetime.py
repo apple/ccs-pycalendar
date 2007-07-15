@@ -565,6 +565,12 @@ class PyCalendarDateTime(object):
         self.mTZID = tzid
         self.changed()
 
+    def utc( self ):
+        return self.mTZUTC
+
+    def local( self ):
+        return ( not self.mTZUTC ) and self.mTZID
+
     def floating( self ):
         return ( not self.mTZUTC ) and not self.mTZID
 

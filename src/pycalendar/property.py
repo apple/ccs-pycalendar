@@ -117,7 +117,8 @@ class PyCalendarProperty(object):
         self.mAttributes.setdefault(attr.getName(), []).append(attr)
 
     def removeAttributes(self, attr):
-        self.mAttributes.erase(attr)
+        if self.mAttributes.has_key(attr):
+            del self.mAttributes[attr]
 
     def getValue(self):
         return self.mValue
@@ -520,7 +521,7 @@ class PyCalendarProperty(object):
         self.setupValueAttribute();
 
         # Look for timezone
-        if not dt.isDateOnly() and not dt.floating():
+        if not dt.isDateOnly() and dt.local():
             if self.mAttributes.has_key(definitions.cICalAttribute_TZID):
                 del self.mAttributes[definitions.cICalAttribute_TZID]
             self.mAttributes.setdefault(definitions.cICalAttribute_TZID, []).append(
@@ -586,4 +587,10 @@ if __name__ == '__main__':
     io = StringIO.StringIO()
     prop.generate(io)
     print io.getvalue()
+    
+    prop = PyCalendarProperty(definitions.cICalProperty_DTSTAMP,
+                              PyCalendarDateTime.getNowUTC())
+    prop.generate(io)
+    print io.getvalue()
+
     
