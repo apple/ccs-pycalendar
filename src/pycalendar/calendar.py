@@ -55,6 +55,9 @@ class PyCalendar(PyCalendarComponentBase):
     sICalendarRefCtr = 1
     sICalendar = None
 
+    sProdID = "-//mulberrymail.com//Mulberry v4.0//EN"
+    sDomain = "mulberrymail.com"
+
     @staticmethod
     def getICalendar(ref):
         if PyCalendar.sICalendars.has_key(ref):
@@ -65,6 +68,14 @@ class PyCalendar(PyCalendarComponentBase):
     @staticmethod
     def loadStatics():
         PyCalendar.initComponents()
+
+    @staticmethod
+    def setPRODID(prodid):
+        PyCalendar.sProdID = prodid
+
+    @staticmethod
+    def setDomain(domain):
+        PyCalendar.sDomain = domain
 
     def __init__(self):
         super(PyCalendar, self).__init__()
@@ -939,15 +950,13 @@ class PyCalendar(PyCalendarComponentBase):
             return -1
 
     def addDefaultProperties(self):
-        self.addProperty(PyCalendarProperty(definitions.cICalProperty_PRODID, "-//mulberrymail.com//Mulberry v4.0//EN"));
+        self.addProperty(PyCalendarProperty(definitions.cICalProperty_PRODID, PyCalendar.sProdID));
         self.addProperty(PyCalendarProperty(definitions.cICalProperty_VERSION, "2.0"));
         self.addProperty(PyCalendarProperty(definitions.cICalProperty_CALSCALE, "GREGORIAN"));
         
     def generateDB(self, os, components, for_cache):
         for comp in components:
             comp.generate(os, for_cache)
-
-    #def erase(self, components):
 
     def validProperty(self, prop):
         if prop.getName() == definitions.cICalProperty_VERSION:

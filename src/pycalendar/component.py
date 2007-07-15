@@ -157,7 +157,8 @@ class PyCalendarComponent(PyCalendarComponentBase):
             rhs = None
 
             # Use app name
-            domain = "com.mulberrymail"
+            from pycalendar.calendar import PyCalendar
+            domain = PyCalendar.sDomain
             domain += str(PyCalendarComponent.uid_ctr)
 
             # Use first 24 chars of MD5 digest of the domain as the
