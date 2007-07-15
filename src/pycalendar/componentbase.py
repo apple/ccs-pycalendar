@@ -69,6 +69,12 @@ class PyCalendarComponentBase(object):
     def generateFiltered(self, os, filter):
         raise NotImplemented
 
+    def loadValue(self, value_name):
+        if self.getProperties().has_key(value_name):
+            return self.getProperties()[value_name][0]
+
+        return None
+
     def loadValueInteger(self, value_name, type=None):
         if type:
             if self.getProperties().has_key(value_name):
