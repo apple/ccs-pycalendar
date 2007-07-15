@@ -135,7 +135,7 @@ class PyCalendarComponentRecur(PyCalendarComponent):
         super(PyCalendarComponentRecur, self).initDTSTAMP()
 
         # Get the new one
-        temp = self.loadValue(definitions.cICalProperty_DTSTAMP)
+        temp = self.loadValueDateTime(definitions.cICalProperty_DTSTAMP)
         self.mHasStamp = temp is not None
         if self.mHasStamp:
             self.mStamp = temp
