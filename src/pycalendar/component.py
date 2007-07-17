@@ -17,6 +17,7 @@
 from componentbase import PyCalendarComponentBase
 from datetime import PyCalendarDateTime
 from property import PyCalendarProperty
+import os
 import definitions
 import stringutils
 import time
@@ -144,10 +145,12 @@ class PyCalendarComponent(PyCalendarComponentBase):
         if len(uid) != 0:
             self.mUID = uid
         else:
-            # Get left-side of UID (first 24 chars of MD5 digest of time, clock
+            # Get left-side of UID (first 24 chars of MD5 digest of time, pid
             # and ctr)
             lhs_txt = ""
             lhs_txt += str(time.time())
+            lhs_txt += "."
+            lhs_txt += os.getpid()
             lhs_txt += "."
             lhs_txt += str(PyCalendarComponent.uid_ctr)
             PyCalendarComponent.uid_ctr += 1
