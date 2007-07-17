@@ -150,7 +150,7 @@ class PyCalendarComponent(PyCalendarComponentBase):
             lhs_txt = ""
             lhs_txt += str(time.time())
             lhs_txt += "."
-            lhs_txt += os.getpid()
+            lhs_txt += str(os.getpid())
             lhs_txt += "."
             lhs_txt += str(PyCalendarComponent.uid_ctr)
             PyCalendarComponent.uid_ctr += 1
