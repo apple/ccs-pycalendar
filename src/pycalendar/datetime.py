@@ -471,6 +471,20 @@ class PyCalendarDateTime(object):
 
         self.normalise()
 
+    def setNextDayOfWeek( self, start, day ):
+        # Set to first day in month
+        self.mDay = start
+
+        # Determine first weekday in month
+        first_day = self.getDayOfWeek()
+
+        if first_day > day:
+            self.mDay += 7
+
+        self.mDay += day - first_day
+            
+        self.normalise()
+
     def isDayOfWeekInMonth( self, offset, day ):
         # First of the actual day must match
         if self.getDayOfWeek() != day:
