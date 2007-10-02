@@ -207,7 +207,7 @@ class PyCalendarDuration(object):
 
     def generate(self, os):
         try:
-            if not self.mForward:
+            if not self.mForward and (self.mWeeks or self.mDays or self.mHours or self.mMinutes or self.mSeconds):
                 os.write("-")
             os.write("P")
 
@@ -222,16 +222,18 @@ class PyCalendarDuration(object):
                 if (self.mHours != 0) or (self.mMinutes != 0) or (self.mSeconds != 0):
                     os.write("T")
 
-                if self.mHours != 0:
-                    os.write(str(self.mHours))
-                    os.write("H")
-
-                if (self.mMinutes != 0) or ((self.mHours != 0) and (self.mSeconds != 0)):
-                    os.write(str(self.mMinutes))
-                    os.write("M")
-
-                if self.mSeconds != 0:
-                    os.write(str(self.mSeconds))
-                    os.write("S")
+                    if self.mHours != 0:
+                        os.write(str(self.mHours))
+                        os.write("H")
+    
+                    if (self.mMinutes != 0) or ((self.mHours != 0) and (self.mSeconds != 0)):
+                        os.write(str(self.mMinutes))
+                        os.write("M")
+    
+                    if self.mSeconds != 0:
+                        os.write(str(self.mSeconds))
+                        os.write("S")
+                elif self.mDays == 0:
+                    os.write("T0S")
         except:
             pass
