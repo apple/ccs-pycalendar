@@ -195,7 +195,7 @@ class PyCalendarProperty(object):
 
     def parse(self, data):
         # Look for attribute or value delimiter
-        prop_name, txt = stringutils.strduptokenstr(data, ";:");
+        prop_name, txt = stringutils.strduptokenstr(data, ";:")
         if prop_name is None or len(prop_name) == 0:
             return False
 
@@ -463,7 +463,7 @@ class PyCalendarProperty(object):
             self.mValue = PyCalendarMultiValue(type)
         else:
             # Create the type
-            self.mValue = PyCalendarValue.createFromType(type);
+            self.mValue = PyCalendarValue.createFromType(type)
 
             # Special post-create for some types
             if type in [PyCalendarValue.VALUETYPE_TIME, PyCalendarValue.VALUETYPE_DATETIME]:
@@ -474,7 +474,7 @@ class PyCalendarProperty(object):
                     self.mValue.getValue().setTimezoneID(None)
 
         # Now parse the data
-        self.mValue.parse(data);
+        self.mValue.parse(data)
 
 
     def setupValueAttribute(self):
@@ -486,7 +486,7 @@ class PyCalendarProperty(object):
             return
 
         # See if current type is default for this property
-        self._init_map();
+        self._init_map()
         found = self.sDefaultValueTypeMap.get(self.mName, None)
         if found is not None:
             default_type = found
@@ -498,27 +498,27 @@ class PyCalendarProperty(object):
     # Creation
     def _init_attr_value_int(self, ival):
         # Value
-        self.mValue = PyCalendarIntegerValue(value=ival);
+        self.mValue = PyCalendarIntegerValue(value=ival)
 
         # Attributes
-        self.setupValueAttribute();
+        self.setupValueAttribute()
 
 
     def _init_attr_value_text(self, txt, value_type):
         # Value
-        self.mValue = PyCalendarValue.createFromType(value_type);
+        self.mValue = PyCalendarValue.createFromType(value_type)
         if isinstance(self.mValue, PyCalendarPlainTextValue):
-            self.mValue.setValue(txt);
+            self.mValue.setValue(txt)
 
         # Attributes
-        self.setupValueAttribute();
+        self.setupValueAttribute()
 
     def _init_attr_value_datetime(self, dt):
         # Value
-        self.mValue = PyCalendarDateTimeValue(value=dt);
+        self.mValue = PyCalendarDateTimeValue(value=dt)
 
         # Attributes
-        self.setupValueAttribute();
+        self.setupValueAttribute()
 
         # Look for timezone
         if not dt.isDateOnly() and dt.local():
@@ -539,7 +539,7 @@ class PyCalendarProperty(object):
             self.mValue.addValue(PyCalendarDateTimeValue(dt))
 
         # Attributes
-        self.setupValueAttribute();
+        self.setupValueAttribute()
 
         # Look for timezone
         if ((len(dtl) > 0)
@@ -552,34 +552,34 @@ class PyCalendarProperty(object):
 
     def _init_attr_value_duration(self, du):
         # Value
-        self.mValue = PyCalendarDurationValue(value=du);
+        self.mValue = PyCalendarDurationValue(value=du)
 
         # Attributes
-        self.setupValueAttribute();
+        self.setupValueAttribute()
 
 
     def _init_attr_value_period(self, pe):
         # Value
-        self.mValue = PyCalendarPeriodValue(value=pe);
+        self.mValue = PyCalendarPeriodValue(value=pe)
 
         # Attributes
-        self.setupValueAttribute();
+        self.setupValueAttribute()
 
 
     def _init_attr_value_recur(self, recur):
         # Value
-        self.mValue = PyCalendarRecurrenceValue(value=recur);
+        self.mValue = PyCalendarRecurrenceValue(value=recur)
 
         # Attributes
-        self.setupValueAttribute();
+        self.setupValueAttribute()
 
     def _init_attr_value_utcoffset(self, utcoffset):
         # Value
-        self.mValue = PyCalendarUTCOffsetValue();
+        self.mValue = PyCalendarUTCOffsetValue()
         self.mValue.setValue(utcoffset.getValue())
 
         # Attributes
-        self.setupValueAttribute();
+        self.setupValueAttribute()
 
 if __name__ == '__main__':
     prop = PyCalendarProperty()

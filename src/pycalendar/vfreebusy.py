@@ -90,7 +90,7 @@ class PyCalendarVFreeBusy(PyCalendarComponent):
             # Try DURATION instead
             temp = self.loadValueDuration(definitions.cICalProperty_DURATION)
             if temp is not None:
-                self.mEnd = self.mStart.add(temp)
+                self.mEnd = self.mStart + temp
                 self.mDuration = True
             else:
                 # Force end to start, which will then be fixed to sensible
@@ -103,7 +103,7 @@ class PyCalendarVFreeBusy(PyCalendarComponent):
 
     def fixStartEnd(self):
         # End is always greater than start if start exists
-        if self.mHasStart and self.mEnd.le(self.mStart):
+        if self.mHasStart and self.mEnd <= self.mStart:
             # Use the start
             self.mEnd = PyCalendarDateTime(self.mStart)
             self.mDuration = False
@@ -173,7 +173,7 @@ class PyCalendarVFreeBusy(PyCalendarComponent):
         # If its an all day event and the end one day after the start, ignore it
         temp = PyCalendarDateTime(start)
         temp.offsetDay(1)
-        if not start.isDateOnly() or end.ne(temp):
+        if not start.isDateOnly() or end != temp:
             prop = PyCalendarProperty(definitions.cICalProperty_DTEND, end)
             self.addProperty(prop)
 
@@ -182,7 +182,7 @@ class PyCalendarVFreeBusy(PyCalendarComponent):
         self.mHasStart = True
         self.mHasEnd = False
         self.mStart = start
-        self.mEnd = start.add(duration)
+        self.mEnd = start + duration
         self.mDuration = True
 
         # Remove existing DTSTART & DTEND & DURATION & DUE items
@@ -290,9 +290,9 @@ class PyCalendarVFreeBusy(PyCalendarComponent):
 
                             else:
 
-                                if min_start.gt(period.getValue().getStart()):
+                                if min_start > period.getValue().getStart():
                                     min_start = period.getValue().getStart()
-                                if max_end.lt(period.getValue().getEnd()):
+                                if max_end < period.getValue().getEnd():
                                     max_end = period.getValue().getEnd()
 
         # If nothing present, empty the list

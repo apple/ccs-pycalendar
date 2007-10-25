@@ -25,21 +25,21 @@ class PyCalendarDurationValue(PyCalendarValue):
         elif copyit:
             self.mValue = PyCalendarDuration(duration=copyit.mValue)
         else:
-            self.mValue = PyCalendarDuration();
+            self.mValue = PyCalendarDuration()
 
     def getType(self):
-        return PyCalendarValue.VALUETYPE_DURATION;
+        return PyCalendarValue.VALUETYPE_DURATION
 
     def parse(self, data):
-        self.mValue.parse(data);
+        self.mValue.parse(data)
 
     def generate(self, os):
-        self.mValue.generate(os);
+        self.mValue.generate(os)
 
     def getValue(self):
-        return self.mValue;
+        return self.mValue
 
     def setValue(self,  value):
-        self.mValue = value;
+        self.mValue = value
 
 PyCalendarValue.registerType(PyCalendarValue.VALUETYPE_DURATION, PyCalendarDurationValue)

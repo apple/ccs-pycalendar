@@ -54,7 +54,7 @@ def strduptokenstr(txt, tokens):
 
         return result, txt
     else:
-        end = start;
+        end = start
         for end in range(end, maxlen): #@UnusedVariable
             if tokens.find(txt[end]) != -1:
                 # Grab portion of string upto delimiter

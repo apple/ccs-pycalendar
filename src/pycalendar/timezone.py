@@ -84,7 +84,7 @@ class PyCalendarTimezone(object):
             return PyCalendar.sICalendar.getTimezoneOffsetSeconds(PyCalendarManager.sICalendarManager.getDefaultTimezone().getTimezoneID(), dt)
 
         # Look up timezone and resolve date using default timezones
-        return PyCalendar.sICalendar.getTimezoneOffsetSeconds(self.mTimezone, dt);
+        return PyCalendar.sICalendar.getTimezoneOffsetSeconds(self.mTimezone, dt)
 
     def timeZoneDescriptor(self, dt):
         from manager import PyCalendarManager
@@ -98,6 +98,6 @@ class PyCalendarTimezone(object):
         return PyCalendar.sICalendar.getTimezoneDescriptor(self.mTimezone, dt)
 
     def _copy_PyCalendarTimezone(self, copy):
-        self.mUTC = copy.mUTC;
-        self.mTimezone = copy.mTimezone;
+        self.mUTC = copy.mUTC
+        self.mTimezone = copy.mTimezone
     

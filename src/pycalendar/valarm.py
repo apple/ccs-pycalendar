@@ -24,9 +24,9 @@ import definitions
 
 class PyCalendarVAlarm(PyCalendarComponent):
 
-    sBeginDelimiter = definitions.cICalComponent_BEGINVALARM;
+    sBeginDelimiter = definitions.cICalComponent_BEGINVALARM
 
-    sEndDelimiter = definitions.cICalComponent_ENDVALARM;
+    sEndDelimiter = definitions.cICalComponent_ENDVALARM
 
     # Classes for each action encapsulating action-specific data
     class PyCalendarVAlarmAction(object):
@@ -168,9 +168,9 @@ class PyCalendarVAlarm(PyCalendarComponent):
                 valarm.addProperty(prop)
 
         def remove(self, valarm):
-            valarm.removeProperties(definitions.cICalProperty_DESCRIPTION);
-            valarm.removeProperties(definitions.cICalProperty_SUMMARY);
-            valarm.removeProperties(definitions.cICalProperty_ATTENDEE);
+            valarm.removeProperties(definitions.cICalProperty_DESCRIPTION)
+            valarm.removeProperties(definitions.cICalProperty_SUMMARY)
+            valarm.removeProperties(definitions.cICalProperty_ATTENDEE)
 
         def getDescription(self):
             return self.mDescription
@@ -219,8 +219,8 @@ class PyCalendarVAlarm(PyCalendarComponent):
             super(PyCalendarVAlarm, self).__init__(calendar=calendar)
     
             self.mAction = definitions.eAction_VAlarm_Display
-            self.mTriggerAbsolute = False;
-            self.mTriggerOnStart = True;
+            self.mTriggerAbsolute = False
+            self.mTriggerOnStart = True
             self.mTriggerOn = PyCalendarDateTime()
     
             # Set duration default to 1 hour
@@ -301,28 +301,28 @@ class PyCalendarVAlarm(PyCalendarComponent):
 
     def added(self):
         # Added to calendar so add to calendar notifier
-        # calstore::CCalendarNotifier::sCalendarNotifier.AddAlarm(this);
+        # calstore::CCalendarNotifier::sCalendarNotifier.AddAlarm(this)
 
         # Do inherited
         super(PyCalendarVAlarm, self).added()
 
     def removed(self):
         # Removed from calendar so add to calendar notifier
-        # calstore::CCalendarNotifier::sCalendarNotifier.RemoveAlarm(this);
+        # calstore::CCalendarNotifier::sCalendarNotifier.RemoveAlarm(this)
 
         # Do inherited
         super(PyCalendarVAlarm, self).removed()
 
     def changed(self):
         # Always force recalc of trigger status
-        self.mStatusInit = False;
+        self.mStatusInit = False
 
         # Changed in calendar so change in calendar notifier
-        # calstore::CCalendarNotifier::sCalendarNotifier.ChangedAlarm(this);
+        # calstore::CCalendarNotifier::sCalendarNotifier.ChangedAlarm(this)
 
         # Do not do inherited as this is always a sub-component and we do not
         # do top-level component changes
-        # super.changed();
+        # super.changed()
 
     def finalise(self):
         # Do inherited
@@ -430,7 +430,7 @@ class PyCalendarVAlarm(PyCalendarComponent):
         elif self.mAction == definitions.eAction_VAlarm_Email:
             action_txt = definitions.cICalProperty_ACTION_EMAIL
         else:
-            action_txt = definitions.cICalProperty_ACTION_PROCEDURE;
+            action_txt = definitions.cICalProperty_ACTION_PROCEDURE
 
         prop = PyCalendarProperty(definitions.cICalProperty_ACTION, action_txt)
         self.addProperty(prop)
@@ -472,8 +472,8 @@ class PyCalendarVAlarm(PyCalendarComponent):
         self.removeProperties(definitions.cICalProperty_DURATION)
 
         # Updated cached values
-        self.mRepeats = repeat;
-        self.mRepeatInterval = interval;
+        self.mRepeats = repeat
+        self.mRepeatInterval = interval
 
         # Add new
         if self.mRepeats > 0:
@@ -497,7 +497,7 @@ class PyCalendarVAlarm(PyCalendarComponent):
         self.mLastTrigger.copy(dt)
 
         if self.mDoneCount < self.mRepeats:
-            self.mNextTrigger = self.mLastTrigger.add(self.mRepeatInterval)
+            self.mNextTrigger = self.mLastTrigger + self.mRepeatInterval
             dt.copy(self.mNextTrigger)
             self.mDoneCount += 1
             self.mAlarmStatus = definitions.eAlarm_Status_Pending
@@ -552,19 +552,19 @@ class PyCalendarVAlarm(PyCalendarComponent):
 
         while self.mDoneCount < self.mRepeats:
             # See if next trigger is later than now
-            next_trigger = trigger.add(self.mRepeatInterval)
-            if next_trigger.gt(nowutc):
+            next_trigger = trigger + self.mRepeatInterval
+            if next_trigger > nowutc:
                 break
             self.mDoneCount += 1
             trigger = next_trigger
 
         # Check for completion
-        if trigger.eq(self.mLastTrigger):
+        if trigger == self.mLastTrigger or (nowutc - trigger).getTotalSeconds() > 24 * 60 * 60:
             if self.mDoneCount == self.mRepeats:
                 self.mAlarmStatus = definitions.eAlarm_Status_Completed
                 return
             else:
-                trigger = trigger.add(self.mRepeatInterval)
+                trigger = trigger + self.mRepeatInterval
                 self.mDoneCount += 1
 
         self.mNextTrigger = trigger
@@ -582,4 +582,4 @@ class PyCalendarVAlarm(PyCalendarComponent):
                 trigger = (owner.getStart(), owner.getEnd())[not self.isTriggerOnStart()]
 
                 # Offset by duration
-                dt.copy(trigger.add(self.getTriggerDuration()))
+                dt.copy(trigger + self.getTriggerDuration())

@@ -119,11 +119,8 @@ class PyCalendarDateTime(object):
     def __hash__(self):
         return self.getPosixTime()
     
-    def __eq__(self, comp):
-        return self.eq(comp)
-
     # Operators
-    def add( self, duration ):
+    def __add__( self, duration ):
         # Add duration seconds to temp object and normalise it
         result = PyCalendarDateTime(copyit=self)
         result.mSeconds += duration.getTotalSeconds()
@@ -131,7 +128,7 @@ class PyCalendarDateTime(object):
         result.normalise()
         return result
  
-    def subtract( self, date ):
+    def __sub__( self, date ):
         # Look for floating
         if self.floating() or date.floating():
             # Adjust the floating ones to fixed
@@ -142,17 +139,17 @@ class PyCalendarDateTime(object):
                 # Set both to UTC and do comparison
                 copy1.setTimezoneUTC( True )
                 copy2.setTimezoneUTC( True )
-                return copy1.subtract( copy2 )
+                return copy1 - copy2
             elif copy1.floating():
                 # Set to be the same
                 copy1.setTimezoneUTC( copy2.getTimezoneUTC() )
                 copy1.setTimezoneID( copy2.getTimezoneID() )
-                return copy1.subtract( copy2 )
+                return copy1 - copy2
             else:
                 # Set to be the same
                 copy2.setTimezoneID( copy1.getTimezoneID() )
                 copy2.setTimezoneUTC( copy1.getTimezoneUTC() )
-                return copy1.subtract( copy2 )
+                return copy1 - copy2
  
         else:
             # Do diff of date-time in seconds
@@ -160,22 +157,22 @@ class PyCalendarDateTime(object):
             return PyCalendarDuration(duration=diff)
 
     # Comparators
-    def eq( self, comp ):
+    def __eq__( self, comp ):
         return self.compareDateTime( comp ) == 0
 
-    def ne( self, comp ):
+    def __ne__( self, comp ):
         return self.compareDateTime( comp ) != 0
 
-    def ge( self, comp ):
+    def __ge__( self, comp ):
         return self.compareDateTime( comp ) >= 0
 
-    def le( self, comp ):
+    def __le__( self, comp ):
         return self.compareDateTime( comp ) <= 0
 
-    def gt( self, comp ):
+    def __gt__( self, comp ):
         return self.compareDateTime( comp ) > 0
 
-    def lt( self, comp ):
+    def __lt__( self, comp ):
         return self.compareDateTime( comp ) < 0
 
     def compareDateTime( self, comp ):
@@ -281,6 +278,7 @@ class PyCalendarDateTime(object):
 
     def setDateOnly( self, date_only ):
         self.mDateOnly = date_only
+        self.changed()
 
     def getYear( self ):
         return self.mYear

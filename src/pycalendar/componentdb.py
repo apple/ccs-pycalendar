@@ -22,7 +22,7 @@ class PyCalendarComponentDB(object):
     def __init__(self, copyit=None):
         self.mItems = {}
         if copyit:
-            self.mRecurMap = None;
+            self.mRecurMap = None
             if (copyit.mRecurMap != None):
                 self.mRecurMap = {}
                 for key, value in copyit.mRecurMap.items():
@@ -31,7 +31,7 @@ class PyCalendarComponentDB(object):
                         list.append(PyCalendarDateTime(copyit=item))
                     self.mRecurMap[key] = list
         else:
-            self.mRecurMap = None;
+            self.mRecurMap = None
 
     def __iter__(self):
         return self.mItems.itervalues()
@@ -137,7 +137,7 @@ class PyCalendarComponentDB(object):
 
     def changedComponent(self, comp):
         # Tell component it is changed
-        comp.changed();
+        comp.changed()
 
     def getRecurrenceInstancesIds(self, uid, ids):
         if self.mRecurMap == None:
@@ -153,7 +153,7 @@ class PyCalendarComponentDB(object):
 
     def getRecurrenceInstanceItems(self, uid, items):
         if self.mRecurMap == None:
-            return;
+            return
 
         # Look for matching UID in recurrence instance map
         found = self.mRecurMap.get(uid, None)

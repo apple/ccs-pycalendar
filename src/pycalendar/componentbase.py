@@ -58,7 +58,7 @@ class PyCalendarComponentBase(object):
         return self.loadValueString(prop)
 
     def getProperty(self, prop, value):
-        return self.loadValue(prop, value);
+        return self.loadValue(prop, value)
 
     def finalise(self):
         raise NotImplemented
@@ -173,7 +173,7 @@ class PyCalendarComponentBase(object):
         if filter.isAllProperties():
             for props in self.mProperties.itervalues():
                 for prop in props:
-                    prop.generate(os);
+                    prop.generate(os)
         elif filter.hasPropertyFilters():
             for props in self.mProperties.itervalues():
                 for prop in props:

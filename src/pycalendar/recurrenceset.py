@@ -197,7 +197,7 @@ class PyCalendarRecurrenceSet(object):
                 exclude.append(iter)
         for iter in self.mExperiods:
             if range.isPeriodOverlap(iter):
-                exclude.append(iter.getStart());
+                exclude.append(iter.getStart())
 
         # Make sure the list is unique
         exclude = [x for x in set(exclude)]
@@ -224,7 +224,7 @@ class PyCalendarRecurrenceSet(object):
         # Remove RDATES on or after start
         self.mRdates.removeOnOrAfter(exclude)
         for iter in self.mRperiods:
-            if iter.gt(exclude):
+            if iter > exclude:
                 self.mRperiods.remove(iter)
 
     # UI operations

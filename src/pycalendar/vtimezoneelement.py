@@ -25,7 +25,7 @@ class PyCalendarVTimezoneElement(PyCalendarVTimezone):
 
     @staticmethod
     def sort_dtstart(e1, e2):
-        return e1.mStart.lt(e2.mStart);
+        return e1.mStart < e2.mStart
 
     def __init__(self, calendar=None, dt=None, offset=None, copyit=None):
         if calendar is not None and dt is None:
@@ -101,7 +101,7 @@ class PyCalendarVTimezoneElement(PyCalendarVTimezone):
     def expandBelow(self, below):
         
         # Look for recurrences
-        if not self.mRecurrences.hasRecurrence() or self.mStart.gt(below):
+        if not self.mRecurrences.hasRecurrence() or self.mStart > below:
             # Return DTSTART even if it is newer
             return self.mStart
         else:
@@ -126,7 +126,7 @@ class PyCalendarVTimezoneElement(PyCalendarVTimezone):
                 self.mCachedExpandBelowItems = []
             if self.mCachedExpandBelow is None:
                 self.mCachedExpandBelow = PyCalendarDateTime(self.mStart)
-            if temp.gt(self.mCachedExpandBelow):
+            if temp > self.mCachedExpandBelow:
                 self.mCachedExpandBelowItems.removeAllElements()
                 period = PyCalendarPeriod(self.mStart, temp)
                 self.mRecurrences.expand(self.mStart, period, self.mCachedExpandBelowItems, float_offset=self.mUTCOffsetFrom)
@@ -136,7 +136,7 @@ class PyCalendarVTimezoneElement(PyCalendarVTimezone):
                 # List comes back sorted so we pick the element just less than
                 # the dt value we want
                 for i in range(len(self.mCachedExpandBelowItems)):
-                    if self.mCachedExpandBelowItems[i].gt(below):
+                    if self.mCachedExpandBelowItems[i] > below:
                         if i != 0:
                             return self.mCachedExpandBelowItems[i - 1]
                         break
@@ -155,12 +155,12 @@ class PyCalendarVTimezoneElement(PyCalendarVTimezone):
 #            return ()
 
         # Look for recurrences
-        if self.mStart.gt(end):
+        if self.mStart > end:
             # Return nothing
             return ()
         elif not self.mRecurrences.hasRecurrence():
             # Return DTSTART even if it is newer
-            if self.mStart.ge(start):
+            if self.mStart >= start:
                 return ((self.mStart, offsetfrom, offsetto),)
             else:
                 return ()
@@ -186,7 +186,7 @@ class PyCalendarVTimezoneElement(PyCalendarVTimezone):
                 self.mCachedExpandBelowItems = []
             if self.mCachedExpandBelow is None:
                 self.mCachedExpandBelow = PyCalendarDateTime(self.mStart)
-            if temp.gt(self.mCachedExpandBelow):
+            if temp > self.mCachedExpandBelow:
                 self.mCachedExpandBelowItems = []
                 period = PyCalendarPeriod(start, end)
                 self.mRecurrences.expand(self.mStart, period, self.mCachedExpandBelowItems, float_offset=self.mUTCOffsetFrom)

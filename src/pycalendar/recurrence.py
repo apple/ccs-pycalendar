@@ -641,7 +641,7 @@ class PyCalendarRecurrence(object):
         # Is the current cache complete or does it extaned past the requested
         # range end
         if not self.mCached or not self.mFullyCached \
-                and ((self.mCacheUpto == 0) or self.mCacheUpto.lt(range.getEnd())):
+                and ((self.mCacheUpto == 0) or self.mCacheUpto < range.getEnd()):
             cache_range = PyCalendarPeriod(copyit=range)
 
             # If partially cached just cache from previous cache end up to new
@@ -696,7 +696,7 @@ class PyCalendarRecurrence(object):
             elif self.mUseUntil:
                 # Exit if next item is after until (its OK if its the same as
                 # UNTIL as UNTIL is inclusive)
-                if start_iter.gt(float_until):
+                if start_iter > float_until:
                     return True
 
     def complexExpand(self, start, range, items, float_offset):
@@ -754,7 +754,7 @@ class PyCalendarRecurrence(object):
                 # can go back in time from the real start, but we must exclude
                 # those when counting
                 # even if they are not within the requested range
-                if iter.lt(start):
+                if iter < start:
                     continue
 
                 # Exit if after period we want
@@ -765,8 +765,12 @@ class PyCalendarRecurrence(object):
                 if self.mUseUntil:
                     # Exit if next item is after until (its OK if its the same
                     # as UNTIL as UNTIL is inclusive)
-                    if iter.gt(float_until):
+                    if iter > float_until:
                         return True
+
+                # Special for start instance
+                if (ctr == 1) and (start == iter):
+                    continue
 
                 # Add current one to list
                 items.append(iter)

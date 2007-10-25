@@ -20,9 +20,9 @@ import definitions
 
 class PyCalendarVTimezone(PyCalendarComponent):
 
-    sBeginDelimiter = definitions.cICalComponent_BEGINVTIMEZONE;
+    sBeginDelimiter = definitions.cICalComponent_BEGINVTIMEZONE
 
-    sEndDelimiter = definitions.cICalComponent_ENDVTIMEZONE;
+    sEndDelimiter = definitions.cICalComponent_ENDVTIMEZONE
 
     @staticmethod
     def getVBegin():
@@ -98,7 +98,7 @@ class PyCalendarVTimezone(PyCalendarComponent):
                 utc_offset1 = self.mEmbedded[0].getUTCOffset()
 
                 # Presence of secondary is the next key
-                utc_offset2 = utc_offset1;
+                utc_offset2 = utc_offset1
                 if len(self.mEmbedded) > 1:
                     utc_offset2 = self.mEmbedded[1].getUTCOffset()
 
@@ -170,7 +170,7 @@ class PyCalendarVTimezone(PyCalendarComponent):
 
         if self.mEmbedded is not None:
             for item in self.mEmbedded:
-                if item.getStart().lt(temp):
+                if item.getStart() < temp:
                     if item.getType() == PyCalendarComponent.eVTIMEZONESTANDARD:
                         found_std = item
                     else:
@@ -182,17 +182,17 @@ class PyCalendarVTimezone(PyCalendarComponent):
 
         if found_std is not None:
             dt_item = found_std.expandBelow(temp)
-            if temp.ge(dt_item):
+            if temp >= dt_item:
                 found = found_std
                 dt_found = dt_item
 
         if found_day is not None:
             dt_item = found_day.expandBelow(temp)
-            if temp.ge(dt_item):
+            if temp >= dt_item:
                 if found is not None:
                     # Compare with the one previously cached and switch to this
                     # one if newer
-                    if dt_item.gt(dt_found):
+                    if dt_item > dt_found:
                         found = found_day
                         dt_found = dt_item
                 else:

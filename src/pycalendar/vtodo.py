@@ -35,9 +35,9 @@ class PyCalendarVToDo(PyCalendarComponentRecur):
 
     CANCELLED= 4
 
-    sBeginDelimiter = definitions.cICalComponent_BEGINVTODO;
+    sBeginDelimiter = definitions.cICalComponent_BEGINVTODO
 
-    sEndDelimiter = definitions.cICalComponent_ENDVTODO;
+    sEndDelimiter = definitions.cICalComponent_ENDVTODO
 
     @staticmethod
     def getVBegin():
@@ -68,12 +68,12 @@ class PyCalendarVToDo(PyCalendarComponentRecur):
         # If status is cancelled sort by start time
         if s1.self.mStatus == definitions.eStatus_VToDo_Cancelled:
             # Older ones at the bottom
-            return s1.mStart.gt(s2.mStart)
+            return s1.mStart > s2.mStart
 
         # If status is completed sort by completion time
         if s1.self.mStatus == definitions.eStatus_VToDo_Completed:
             # Older ones at the bottom
-            return s1.self.mCompleted.gt(s2.self.mCompleted)
+            return s1.self.mCompleted > s2.self.mCompleted
 
         # Check due date exists
         if s1.mHasEnd != s2.mHasEnd:
@@ -82,15 +82,15 @@ class PyCalendarVToDo(PyCalendarComponentRecur):
 
             # Ones with due dates after today below ones without due dates
             if s1.hasEnd():
-                return s1.mEnd.le(now)
+                return s1.mEnd <= now
             elif s2.hasEnd():
-                return now.lt(s2.mEnd)
+                return now < s2.mEnd
 
         # Check due dates if present
         if s1.mHasEnd:
-            if s1.mEnd.ne(s2.mEnd):
+            if s1.mEnd != s2.mEnd:
                 # Soonest dues dates above later ones
-                return s1.mEnd.lt(s2.mEnd)
+                return s1.mEnd < s2.mEnd
 
         # Check priority next
         if s1.self.mPriority != s2.self.mPriority:
@@ -98,7 +98,7 @@ class PyCalendarVToDo(PyCalendarComponentRecur):
             return s1.self.mPriority < s2.self.mPriority
 
         # Just use start time - older ones at the top
-        return s1.mStart.lt(s2.mStart)
+        return s1.mStart < s2.mStart
 
     def __init__(self, calendar=None, copyit=None):
         if calendar is not None:
@@ -156,19 +156,19 @@ class PyCalendarVToDo(PyCalendarComponentRecur):
                 # Check due date
                 today = PyCalendarDateTime()
                 today.setToday()
-                if self.getEnd().gt(today):
+                if self.getEnd() > today:
                     sout.append("Due: ")
-                    whendue = self.getEnd().subtract(today)
+                    whendue = self.getEnd() - today
                     if (whendue.getDays() > 0) and (whendue.getDays() <= 7):
                         sout.write(whendue.getDays())
                         sout.write(" days")
                     else:
                         sout.write(self.getEnd().getLocaleDate(PyCalendarDateTime.NUMERICDATE))
-                elif self.getEnd().eq(today):
+                elif self.getEnd() == today:
                     sout.write("Due today")
                 else:
-                    sout.write("Overdue: ");
-                    overdue = today.subtract(self.getEnd())
+                    sout.write("Overdue: ")
+                    overdue = today - self.getEnd()
                     if overdue.getWeeks() != 0:
                         sout.write(overdue.getWeeks())
                         sout.write(" weeks")
@@ -194,9 +194,9 @@ class PyCalendarVToDo(PyCalendarComponentRecur):
                 # Check due date
                 today = PyCalendarDateTime()
                 today.setToday()
-                if self.getEnd().gt(today):
+                if self.getEnd() > today:
                     return PyCalendarVToDo.DUE_LATER
-                elif self.getEnd().eq(today):
+                elif self.getEnd() == today:
                     return PyCalendarVToDo.DUE_NOW
                 else:
                     return PyCalendarVToDo.OVERDUE
@@ -221,7 +221,7 @@ class PyCalendarVToDo(PyCalendarComponentRecur):
 
     def finalise(self):
         # Do inherited
-        super(PyCalendarVToDo, self).finalise();
+        super(PyCalendarVToDo, self).finalise()
 
         # Get DUE
         temp = self.loadValueDateTime(definitions.cICalProperty_DUE)
@@ -229,7 +229,7 @@ class PyCalendarVToDo(PyCalendarComponentRecur):
             # Try DURATION instead
             temp = self.loadValueDuration(definitions.cICalProperty_DURATION)
             if temp is not None:
-                self.mEnd = self.mStart.add(temp)
+                self.mEnd = self.mStart + temp
                 self.mHasEnd = True
             else:
                 self.mHasEnd = False
@@ -276,12 +276,12 @@ class PyCalendarVToDo(PyCalendarComponentRecur):
             # Now create properties
             value = None
             if status == definitions.eStatus_VToDo_NeedsAction:
-                value = definitions.cICalProperty_STATUS_NEEDS_ACTION;
+                value = definitions.cICalProperty_STATUS_NEEDS_ACTION
             if status == definitions.eStatus_VToDo_Completed:
                 value = definitions.cICalProperty_STATUS_COMPLETED
                 # Add the completed item
-                self.mCompleted.setNowUTC();
-                self.mHasCompleted = True;
+                self.mCompleted.setNowUTC()
+                self.mHasCompleted = True
                 prop = PyCalendarProperty(definitions.cICalProperty_STATUS_COMPLETED, self.mCompleted)
                 self.addProperty(prop)
             elif status == definitions.eStatus_VToDo_InProcess:

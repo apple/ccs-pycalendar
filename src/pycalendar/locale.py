@@ -15,18 +15,18 @@
 ##
 
 
-LONG = 0;
-SHORT = 1;
-ABBREVIATED = 2;
+LONG = 0
+SHORT = 1
+ABBREVIATED = 2
 
-cLongDays = [ "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday" ];
+cLongDays = [ "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday" ]
 
-cShortDays = [ "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat" ];
+cShortDays = [ "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat" ]
 
-cAbbrevDays = [ "S", "M", "T", "W", "T", "F", "S" ];
+cAbbrevDays = [ "S", "M", "T", "W", "T", "F", "S" ]
 
 cLongMonths = [ "", "January", "February", "March", "April", "May", "June",
-                "July", "August", "September", "October", "November", "December" ];
+                "July", "August", "September", "October", "November", "December" ]
 
 cShortMonths = [ "", "Jan", "Feb", "Mar", "Apr", "May", "Jun",
                  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" ]
@@ -34,8 +34,8 @@ cShortMonths = [ "", "Jan", "Feb", "Mar", "Apr", "May", "Jun",
 cAbbrevMonths = [ "", "J", "F", "M", "A", "M", "J",
                   "J", "A", "S", "O", "N", "D" ]
 
-s24HourTime = False;
-sDDMMDate = False;
+s24HourTime = False
+sDDMMDate = False
 
 #     0..6 - Sunday - Saturday
 def getDay(day, strl):

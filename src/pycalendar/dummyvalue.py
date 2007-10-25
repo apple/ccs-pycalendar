@@ -21,8 +21,8 @@ from value import PyCalendarValue
 class PyCalendarDummyValue( PyCalendarValue ):
 
     def __init__( self, type ):
-        self.mType = type;
-        self.mValue = '';
+        self.mType = type
+        self.mValue = ''
 
     def getType( self ):
         return self.mType

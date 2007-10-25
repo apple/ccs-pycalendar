@@ -114,7 +114,7 @@ class PyCalendar(PyCalendarComponentBase):
 
     def remove(self):
         # Broadcast closing before removing components
-        # Broadcast_Message(eBroadcast_Closed, this);
+        # Broadcast_Message(eBroadcast_Closed, this)
     
         # Clean up the map items
         for v in self.mV:
@@ -138,13 +138,13 @@ class PyCalendar(PyCalendarComponentBase):
             
             # Now create properties
             if name.length():
-                self.ddProperty(PyCalendarProperty(definitions.cICalProperty_XWRCALNAME, name));
+                self.ddProperty(PyCalendarProperty(definitions.cICalProperty_XWRCALNAME, name))
             
             # Mark as dirty
-            self.setDirty();
+            self.setDirty()
             
             # Broadcast change
-            #Broadcast_Message(eBroadcast_Edit, this);
+            #Broadcast_Message(eBroadcast_Edit, this)
 
     def getDescription(self):
         return self.mDescription
@@ -155,20 +155,20 @@ class PyCalendar(PyCalendarComponentBase):
     def editDescription(self, description):
         if self.mDescription != description:
             # Updated cached value
-            self.mDescription = description;
+            self.mDescription = description
     
             # Remove existing items
-            self.removeProperties(definitions.cICalProperty_XWRCALDESC);
+            self.removeProperties(definitions.cICalProperty_XWRCALDESC)
             
             # Now create properties
             if description.length():
-                self.addProperty(PyCalendarProperty(definitions.cICalProperty_XWRCALDESC, description));
+                self.addProperty(PyCalendarProperty(definitions.cICalProperty_XWRCALDESC, description))
             
             # Mark as dirty
             self.setDirty()
             
             # Broadcast change
-            #Broadcast_Message(eBroadcast_Edit, this);
+            #Broadcast_Message(eBroadcast_Edit, this)
 
     def getMethod(self):
         result = ""
@@ -215,10 +215,10 @@ class PyCalendar(PyCalendarComponentBase):
                 # Look for start
                 if lines[0] == definitions.cICalComponent_BEGINVCALENDAR:
                     # Next state
-                    state = GET_PROPERTY_OR_COMPONENT;
+                    state = GET_PROPERTY_OR_COMPONENT
     
                     # Indicate success at this point
-                    result = True;
+                    result = True
 
             elif state == GET_PROPERTY_OR_COMPONENT:
 
@@ -291,7 +291,7 @@ class PyCalendar(PyCalendarComponentBase):
                     if (state != GET_SUB_COMPONENT_PROPERTY) and PyCalendar.sEmbeddedComponents.has_key(lines[0]):
 
                         # Start a new component (saving off the current one)
-                        prevcomp = comp;
+                        prevcomp = comp
                         comp = PyCalendar.makeComponent(PyCalendar.sEmbeddedComponents[lines[0]].mID, self.getRef())
     
                         # Reset state
@@ -415,7 +415,7 @@ class PyCalendar(PyCalendarComponentBase):
                     if (state != GET_SUB_COMPONENT_PROPERTY) and PyCalendar.sEmbeddedComponents.has_key(lines[0]):
 
                         # Start a new component (saving off the current one)
-                        prevcomp = comp;
+                        prevcomp = comp
                         comp = PyCalendar.makeComponent(PyCalendar.sEmbeddedComponents[lines[0]].mID, self.getRef())
     
                         # Reset state
@@ -430,14 +430,14 @@ class PyCalendar(PyCalendarComponentBase):
             
             # Exit if we have one - ignore all the rest
             if state == GOT_VCALENDAR:
-                break;
+                break
     
         # We need to store all timezones in the static object so they can be accessed by any date object
         # Only do this if we read in a timezone
         if got_timezone and (self is not PyCalendar.sICalendar):
-            PyCalendar.sICalendar.mergeTimezones(self);
+            PyCalendar.sICalendar.mergeTimezones(self)
     
-        return result;
+        return result
         
     def generate(self, os, for_cache = False):
         # Make sure all required timezones are in this object
@@ -448,7 +448,7 @@ class PyCalendar(PyCalendarComponentBase):
         os.write("\n")
         
         # Write properties (we always handle PRODID & VERSION)
-        self.writeProperties(os);
+        self.writeProperties(os)
         
         # Write out each type of component (not VALARMS which are embedded in others)
         # Do VTIMEZONES at the start
@@ -543,8 +543,8 @@ class PyCalendar(PyCalendarComponentBase):
 #    def needsSync(self):
 #        return not self.mRecordDB.empty()
 
-    #void    ParseCache(istream& is);
-    #void    GenerateCache(ostream& os) const;
+    #void    ParseCache(istream& is)
+    #void    GenerateCache(ostream& os) const
 
     # Get expanded components
     def getVEvents(self, period, list, all_day_at_top = True):
@@ -678,7 +678,7 @@ class PyCalendar(PyCalendarComponentBase):
                 fb.append(PyCalendarFreeBusy(PyCalendarFreeBusy.BUSY, PyCalendarPeriod(comp.getInstanceStart(), comp.getInstanceEnd())))
             elif status == definitions.eStatus_VEvent_Tentative:
                 fb.append(PyCalendarFreeBusy(PyCalendarFreeBusy.BUSYTENTATIVE, PyCalendarPeriod(comp.getInstanceStart(), comp.getInstanceEnd())))
-                break;
+                break
             elif status == definitions.eStatus_VEvent_Cancelled:
                 # Cancelled => does not contribute to busy time
                 pass
@@ -730,7 +730,7 @@ class PyCalendar(PyCalendarComponentBase):
         # Get all timezones in a list for sorting
         sorted = {}
         for tz in self.mV[PyCalendar.VTIMEZONE]:
-            sorted.setdefault(tz.getSortKey(), []).append(tz);
+            sorted.setdefault(tz.getSortKey(), []).append(tz)
     
         # Now add to list in sorted order
         for tzs in sorted.itervalues():
@@ -753,8 +753,8 @@ class PyCalendar(PyCalendarComponentBase):
         #PyCalendarComponentRecord.recordAction(self.mRecordDB, comp, PyCalendarComponentRecord.eChanged)
         
         # Broadcast change
-        #CComponentAction action(CComponentAction::eChanged, *this, *comp);
-        #Broadcast_Message(eBroadcast_ChangedComponent, &action);
+        #CComponentAction action(CComponentAction::eChanged, *this, *comp)
+        #Broadcast_Message(eBroadcast_ChangedComponent, &action)
         
 
     def addNewVEvent(self, vevent, moved = False):
@@ -778,7 +778,7 @@ class PyCalendar(PyCalendarComponentBase):
         
         # Broadcast change
         #action = CComponentAction(CComponentAction.eAdded, self, vevent)
-        #Broadcast_Message(eBroadcast_AddedComponent, &action);
+        #Broadcast_Message(eBroadcast_AddedComponent, &action)
 
     def removeVEvent(self, vevent, delete_it = True):
         # Record change  before delete occurs
@@ -792,7 +792,7 @@ class PyCalendar(PyCalendarComponentBase):
         
         # Broadcast change
         #action = CComponentAction(CComponentAction.eRemoved, self, vevent)
-        #Broadcast_Message(eBroadcast_RemovedComponent, &action);
+        #Broadcast_Message(eBroadcast_RemovedComponent, &action)
         
         # Delete it here after all changes
         if delete_it:
@@ -835,7 +835,7 @@ class PyCalendar(PyCalendarComponentBase):
         self.setDirty()
         
         # Broadcast change
-        #Broadcast_Message(eBroadcast_Edit, this);
+        #Broadcast_Message(eBroadcast_Edit, this)
 
 
     def addNewVToDo(self, vtodo, moved = False):
@@ -859,7 +859,7 @@ class PyCalendar(PyCalendarComponentBase):
         
         # Broadcast change
         #action = CComponentAction(CComponentAction.eAdded, self, vtodo)
-        #Broadcast_Message(eBroadcast_AddedComponent, &action);
+        #Broadcast_Message(eBroadcast_AddedComponent, &action)
         
     def removeVToDo(self, vtodo, delete_it = True):
         # Record change  before delete occurs
@@ -869,11 +869,11 @@ class PyCalendar(PyCalendarComponentBase):
         self.mVToDo.removeComponent(vtodo, False)
         
         # Calendar has changed
-        self.setDirty();
+        self.setDirty()
         
         # Broadcast change
         #action = CComponentAction(CComponentAction.eRemoved, self, vtodo)
-        #Broadcast_Message(eBroadcast_RemovedComponent, &action);
+        #Broadcast_Message(eBroadcast_RemovedComponent, &action)
         
         # Delete it here after all changes
         if delete_it:
@@ -910,7 +910,7 @@ class PyCalendar(PyCalendarComponentBase):
 
         for compdb in self.mV:
             if self.removeComponentByKeyDB(compdb, mapkey):
-                return;
+                return
         
 
     def isReadOnly(self):
@@ -950,9 +950,9 @@ class PyCalendar(PyCalendarComponentBase):
             return -1
 
     def addDefaultProperties(self):
-        self.addProperty(PyCalendarProperty(definitions.cICalProperty_PRODID, PyCalendar.sProdID));
-        self.addProperty(PyCalendarProperty(definitions.cICalProperty_VERSION, "2.0"));
-        self.addProperty(PyCalendarProperty(definitions.cICalProperty_CALSCALE, "GREGORIAN"));
+        self.addProperty(PyCalendarProperty(definitions.cICalProperty_PRODID, PyCalendar.sProdID))
+        self.addProperty(PyCalendarProperty(definitions.cICalProperty_VERSION, "2.0"))
+        self.addProperty(PyCalendarProperty(definitions.cICalProperty_CALSCALE, "GREGORIAN"))
         
     def generateDB(self, os, components, for_cache):
         for comp in components:
@@ -991,7 +991,7 @@ class PyCalendar(PyCalendarComponentBase):
             if tz is None:
 
                 # Find it in the static object
-                tz = PyCalendar.sICalendar.getTimezone(tzid);
+                tz = PyCalendar.sICalendar.getTimezone(tzid)
                 if tz is not None:
 
                     dup = PyCalendarVTimezone(tz)

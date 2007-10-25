@@ -28,18 +28,18 @@ class PyCalendarPeriodValue( PyCalendarValue ):
             self.mValue = PyCalendarPeriod()
 
     def getType( self ):
-        return PyCalendarValue.VALUETYPE_PERIOD;
+        return PyCalendarValue.VALUETYPE_PERIOD
 
     def parse( self, data ):
-        self.mValue.parse( data );
+        self.mValue.parse( data )
 
     def generate( self, os ):
-        self.mValue.generate( os );
+        self.mValue.generate( os )
 
     def getValue( self ):
-        return self.mValue;
+        return self.mValue
 
     def setValue( self, value ):
-        self.mValue = value;
+        self.mValue = value
 
 PyCalendarValue.registerType(PyCalendarValue.VALUETYPE_PERIOD, PyCalendarPeriodValue)

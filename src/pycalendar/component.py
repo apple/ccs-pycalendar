@@ -24,19 +24,19 @@ import time
 
 class PyCalendarComponent(PyCalendarComponentBase):
 
-    uid_ctr = 1;
+    uid_ctr = 1
 
-    eVCALENDAR = -1;
-    eVEVENT = 0;
-    eVTODO = 1;
-    eVJOURNAL = 2;
-    eVFREEBUSY = 3;
-    eVTIMEZONE = 4;
-    eVALARM = 5;
+    eVCALENDAR = -1
+    eVEVENT = 0
+    eVTODO = 1
+    eVJOURNAL = 2
+    eVFREEBUSY = 3
+    eVTIMEZONE = 4
+    eVALARM = 5
 
     # Pseudo components
-    eVTIMEZONESTANDARD = 6;
-    eVTIMEZONEDAYLIGHT = 7;
+    eVTIMEZONESTANDARD = 6
+    eVTIMEZONEDAYLIGHT = 7
 
     def __init__(self, calendar=None, copyit=None):
         
@@ -294,12 +294,12 @@ class PyCalendarComponent(PyCalendarComponentBase):
         self.setSeq(self.getSeq() + 1)
 
         # Update last-modified
-        self.updateLastModified();
+        self.updateLastModified()
 
         # Also change sub-components
         if self.mEmbedded != None:
             for iter in self.mEmbedded:
-                iter.changed();
+                iter.changed()
 
         self.mChanged = True
 
@@ -311,12 +311,12 @@ class PyCalendarComponent(PyCalendarComponentBase):
 
     def finalise(self):
         # Get UID
-        temps = self.loadValueString(definitions.cICalProperty_UID);
+        temps = self.loadValueString(definitions.cICalProperty_UID)
         if temps != None:
             self.mUID = temps
 
         # Get SEQ
-        temp = self.loadValueInteger(definitions.cICalProperty_SEQUENCE);
+        temp = self.loadValueInteger(definitions.cICalProperty_SEQUENCE)
         if temp != None:
             self.mSeq = temp
 
@@ -326,7 +326,7 @@ class PyCalendarComponent(PyCalendarComponentBase):
         self.mOriginalSeq = self.mSeq
 
         # Get CalDAV info if present
-        temps = self.loadPrivateValue(definitions.cICalProperty_X_PRIVATE_RURL);
+        temps = self.loadPrivateValue(definitions.cICalProperty_X_PRIVATE_RURL)
         if temps != None:
             self.mRURL = temps
         temps = self.loadPrivateValue(definitions.cICalProperty_X_PRIVATE_ETAG)

@@ -76,7 +76,7 @@ class PyCalendarVEvent(PyCalendarComponentRecur):
 
     def finalise(self):
         # Do inherited
-        super(PyCalendarVEvent, self).finalise();
+        super(PyCalendarVEvent, self).finalise()
 
         temp = self.loadValueString(definitions.cICalProperty_STATUS)
         if temp is not None:

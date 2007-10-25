@@ -24,7 +24,7 @@ class PyCalendarIntegerValue( PyCalendarValue ):
         if value:
             self.mValue = value
         else:
-            self.mValue = 0;
+            self.mValue = 0
 
     def getType(self):
         return PyCalendarValue.VALUETYPE_INTEGER

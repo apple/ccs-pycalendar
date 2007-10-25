@@ -26,12 +26,12 @@ class PyCalendarPeriod(object):
         if (start is not None) and (end is not None):
             self.mStart = start
             self.mEnd = end
-            self.mDuration = self.mEnd.subtract( self.mStart )
+            self.mDuration = self.mEnd - self.mStart
             self.mUseDuration = False
         elif (start is not None) and (duration is not None):
             self.mStart = start
             self.mDuration = duration
-            self.mEnd = self.mStart.add( self.mDuration )
+            self.mEnd = self.mStart + self.mDuration
             self.mUseDuration = True
         elif (copyit is not None):
             self.mStart = PyCalendarDateTime(copyit=copyit.mStart)
@@ -49,15 +49,15 @@ class PyCalendarPeriod(object):
         self.generate(os)
         return os.getvalue()
 
-    def equals( self, comp ):
-        return self.mStart.equals( comp.mStart ) and self.mEnd.equals( comp.mEnd )
+    def __eq__( self, comp ):
+        return self.mStart == comp.mStart and self.mEnd == comp.mEnd
 
-    def gt( self, comp ):
-        return self.mStart.gt( comp )
+    def __gt__( self, comp ):
+        return self.mStart > comp
 
-    def lt( self, comp ):
-        return self.mStart.lt( comp.mStart ) \
-                or ( self.mStart.eq( comp.mStart ) and self.mEnd.lt( comp.mEnd ) )
+    def __lt__( self, comp ):
+        return self.mStart <  comp.mStart  \
+                or ( self.mStart == comp.mStart ) and self.mEnd < comp.mEnd
 
     def parse( self, data ):
         slash_pos = data.find( '/' )
@@ -73,7 +73,7 @@ class PyCalendarPeriod(object):
             else:
                 self.mEnd.parse( end )
                 self.mUseDuration = False
-                self.mDuration = self.mEnd.subtract( self.mStart )
+                self.mDuration = self.mEnd - self.mStart
 
     def generate( self, os ):
         try:
@@ -97,19 +97,19 @@ class PyCalendarPeriod(object):
 
     def isDateWithinPeriod( self, dt ):
         # Inclusive start, exclusive end
-        return dt.ge( self.mStart ) and dt.lt( self.mEnd )
+        return dt >= self.mStart and dt < self.mEnd
 
     def isDateBeforePeriod( self, dt ):
         # Inclusive start
-        return dt.lt( self.mStart )
+        return dt < self.mStart
 
     def isDateAfterPeriod( self, dt ):
         # Exclusive end
-        return dt.ge( self.mEnd )
+        return dt >= self.mEnd
 
     def isPeriodOverlap( self, p ):
         # Inclusive start, exclusive end
-        return not ( self.mStart.ge( p.mEnd ) or self.mEnd.le( p.mStart ) )
+        return not ( self.mStart >= p.mEnd or self.mEnd <= p.mStart )
 
     def describeDuration( self ):
         return ""

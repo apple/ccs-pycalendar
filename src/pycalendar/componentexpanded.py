@@ -22,31 +22,31 @@ class PyCalendarComponentExpanded(object):
     def sort_by_dtstart_allday(e1, e2):
 
         if e1.mInstanceStart.isDateOnly() and e2.mInstanceStart.isDateOnly():
-            return e1.mInstanceStart.lt(e2.mInstanceStart)
+            return e1.mInstanceStart < e2.mInstanceStart
         elif e1.mInstanceStart.isDateOnly():
-            return True;
+            return True
         elif e2.mInstanceStart.isDateOnly():
-            return False;
-        elif e1.mInstanceStart.eq(e2.mInstanceStart):
-            if e1.mInstanceEnd.eq(e2.mInstanceEnd):
+            return False
+        elif e1.mInstanceStart == e2.mInstanceStart:
+            if e1.mInstanceEnd == e2.mInstanceEnd:
                 # Put ones created earlier in earlier columns in day view
-                return e1.getOwner().getStamp().lt(e2.getOwner().getStamp())
+                return e1.getOwner().getStamp() < e2.getOwner().getStamp()
             else:
                 # Put ones that end later in earlier columns in day view
-                return e1.mInstanceEnd.gt(e2.mInstanceEnd)
+                return e1.mInstanceEnd > e2.mInstanceEnd
         else:
-            return e1.mInstanceStart.lt(e2.mInstanceStart)
+            return e1.mInstanceStart < e2.mInstanceStart
 
     @staticmethod
     def sort_by_dtstart(e1, e2):
-        if e1.mInstanceStart.eq(e2.mInstanceStart):
+        if e1.mInstanceStart == e2.mInstanceStart:
             if (e1.mInstanceStart.isDateOnly() and not e2.mInstanceStart.isDateOnly() or
                 not e1.mInstanceStart.isDateOnly() and e2.mInstanceStart.isDateOnly()):
                 return e1.mInstanceStart.isDateOnly()
             else:
                 return False
         else:
-            return e1.mInstanceStart.lt(e2.mInstanceStart)
+            return e1.mInstanceStart < e2.mInstanceStart
 
     def __init__(self, owner=None, rid=None, copyit=None):
 
@@ -58,7 +58,7 @@ class PyCalendarComponentExpanded(object):
 
     def close(self):
         # Clean-up
-        self.mOwner = None;
+        self.mOwner = None
 
     def getOwner(self):
         return self.mOwner
@@ -81,7 +81,7 @@ class PyCalendarComponentExpanded(object):
     def isNow(self):
         # Check instance start/end against current date-time
         now = PyCalendarDateTime.getNowUTC()
-        return self.mInstanceStart.le(now) and self.mInstanceEnd.gt(now)
+        return self.mInstanceStart <= now and self.mInstanceEnd > now
 
     def initFromOwner(self, rid):
         # There are four possibilities here:
@@ -114,7 +114,7 @@ class PyCalendarComponentExpanded(object):
 
             # End is based on original events settings
             if self.mOwner.hasEnd():
-                self.mInstanceEnd = self.mInstanceStart.add(self.mOwner.getEnd().subtract(self.mOwner.getStart()))
+                self.mInstanceEnd = self.mInstanceStart + (self.mOwner.getEnd() - self.mOwner.getStart())
             else:
                 self.mInstanceEnd = PyCalendarDateTime(copyit=self.mInstanceStart)
 
@@ -122,7 +122,7 @@ class PyCalendarComponentExpanded(object):
 
         # If the owner is a recurrence item and the passed in rid is the same
         # as the component rid we have case 3
-        elif rid.eq(self.mOwner.getRecurrenceID()):
+        elif rid == self.mOwner.getRecurrenceID():
             # Derive start/end directly from the owner
             self.mInstanceStart = self.mOwner.getStart()
             self.mInstanceEnd = self.mOwner.getEnd()
@@ -134,10 +134,10 @@ class PyCalendarComponentExpanded(object):
             # We need to use the rid as the starting point, but adjust it by
             # the offset between the slave's
             # rid and its start
-            self.mInstanceStart = rid.add(self.mOwner.getStart().subtract(self.mOwner.getRecurrenceID()))
+            self.mInstanceStart = rid + (self.mOwner.getStart() - self.mOwner.getRecurrenceID())
 
             # End is based on duration of owner
-            self.mInstanceEnd = self.mInstanceStart.add(self.mOwner.getEnd().subtract(self.mOwner.getStart()))
+            self.mInstanceEnd = self.mInstanceStart + (self.mOwner.getEnd() - self.mOwner.getStart())
 
             self.mRecurring = True
 
