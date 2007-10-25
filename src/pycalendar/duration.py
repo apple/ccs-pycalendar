@@ -212,27 +212,22 @@ class PyCalendarDuration(object):
             os.write("P")
 
             if self.mWeeks != 0:
-                os.write(str(self.mWeeks))
-                os.write("W")
+                os.write("%dW" % (self.mWeeks,))
             else:
                 if self.mDays != 0:
-                    os.write(str(self.mDays))
-                    os.write("D")
+                    os.write("%dD" % (self.mDays,))
 
                 if (self.mHours != 0) or (self.mMinutes != 0) or (self.mSeconds != 0):
                     os.write("T")
 
                     if self.mHours != 0:
-                        os.write(str(self.mHours))
-                        os.write("H")
+                        os.write("%dH" % (self.mHours,))
     
                     if (self.mMinutes != 0) or ((self.mHours != 0) and (self.mSeconds != 0)):
-                        os.write(str(self.mMinutes))
-                        os.write("M")
+                        os.write("%dM" % (self.mMinutes,))
     
                     if self.mSeconds != 0:
-                        os.write(str(self.mSeconds))
-                        os.write("S")
+                        os.write("%dS" % (self.mSeconds,))
                 elif self.mDays == 0:
                     os.write("T0S")
         except:
