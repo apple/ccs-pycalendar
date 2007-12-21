@@ -100,10 +100,23 @@ ePartRole_Required = 1
 ePartRole_Optional = 2
 ePartRole_Non = 3
 
-cICalAttribute_ROLE_CHAIR = "CHAIR"
+cICalAttribute_ROLE_CHAIR    = "CHAIR"
 cICalAttribute_ROLE_REQ_PART = "REQ-PARTICIPANT"
 cICalAttribute_ROLE_OPT_PART = "OPT-PARTICIPANT"
 cICalAttribute_ROLE_NON_PART = "NON-PARTICIPANT"
+
+#     2445 Section 4.2.3
+eCutype_Individual = 0
+eCutype_Group = 1
+eCutype_Resource = 2
+eCutype_Room = 3
+eCutype_Unknown = 4
+
+cICalAttribute_CUTYPE_INDIVIDUAL = "INDIVIDUAL"
+cICalAttribute_CUTYPE_GROUP      = "GROUP"
+cICalAttribute_CUTYPE_RESOURCE   = "RESOURCE"
+cICalAttribute_CUTYPE_ROOM       = "ROOM"
+cICalAttribute_CUTYPE_UNKNOWN    = "UNKNOWN"
 
 #     2445 Value types
 
