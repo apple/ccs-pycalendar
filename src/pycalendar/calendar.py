@@ -524,8 +524,7 @@ class PyCalendar(PyCalendarComponentBase):
 
     def getAllDBs(self, list):
         
-        for v in self.mV:
-            list.append(v)
+        list.extend(self.mV)
 
     # Disconnected support
     def getETag(self):
