@@ -25,4 +25,3 @@ class PyCalendarCalAddressValue( PyCalendarPlainTextValue ):
         return PyCalendarValue.VALUETYPE_CALADDRESS
 
 PyCalendarValue.registerType(PyCalendarValue.VALUETYPE_CALADDRESS, PyCalendarCalAddressValue)
- 
