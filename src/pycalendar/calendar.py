@@ -97,7 +97,7 @@ class PyCalendar(PyCalendarComponentBase):
             self.initDefaultTimezones()
 
         self.mV = []
-        for i in range(PyCalendar.MAXV):
+        for _ignore_i in range(PyCalendar.MAXV):
             self.mV.append(PyCalendarComponentDB())
 
         # Special init for static item
@@ -583,7 +583,8 @@ class PyCalendar(PyCalendarComponentBase):
                 elif not vtodo.hasEnd() and (today > upto_due_date):
                     continue
     
-            list.append(PyCalendarComponentExpandedShared(PyCalendarComponentExpanded(vtodo, None)))
+            # TODO: fix this
+            #list.append(PyCalendarComponentExpandedShared(PyCalendarComponentExpanded(vtodo, None)))
         
     def getRecurrenceInstancesItems(self, type, uid, items):
         # Get instances from list
@@ -601,7 +602,8 @@ class PyCalendar(PyCalendarComponentBase):
         
     def getVFreeBusyFB(self, period, fb):
         # First create expanded set
-        list = PyCalendarExpandedComponents()
+        # TODO: fix this
+        #list = PyCalendarExpandedComponents()
         self.getVEvents(period, list)
         if len(list) == 0:
             return
