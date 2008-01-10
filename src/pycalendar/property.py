@@ -465,17 +465,22 @@ class PyCalendarProperty(object):
             # Create the type
             self.mValue = PyCalendarValue.createFromType(type)
 
-            # Special post-create for some types
-            if type in [PyCalendarValue.VALUETYPE_TIME, PyCalendarValue.VALUETYPE_DATETIME]:
-                # Look for TZID attribute
-                if (self.hasAttribute(definitions.cICalAttribute_TZID)):
-                    self.mValue.getValue().setTimezoneID(self.getAttributeValue(definitions.cICalAttribute_TZID))
-                else:
-                    self.mValue.getValue().setTimezoneID(None)
-
         # Now parse the data
         self.mValue.parse(data)
 
+        # Special post-create for some types
+        if type in [PyCalendarValue.VALUETYPE_TIME, PyCalendarValue.VALUETYPE_DATETIME]:
+            # Look for TZID attribute
+            tzid = None
+            if (self.hasAttribute(definitions.cICalAttribute_TZID)):
+                tzid = self.getAttributeValue(definitions.cICalAttribute_TZID)
+                
+            if isinstance(self.mValue, PyCalendarDateTimeValue):
+                self.mValue.getValue().setTimezoneID(tzid)
+            elif isinstance(self.mValue, PyCalendarMultiValue):
+                for item in self.mValue.getValues():
+                    if isinstance(item, PyCalendarDateTimeValue):
+                        item.getValue().setTimezoneID(tzid)
 
     def setupValueAttribute(self):
         if self.mAttributes.has_key(definitions.cICalAttribute_VALUE):
