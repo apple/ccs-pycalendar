@@ -22,14 +22,18 @@ def strduptokenstr(txt, tokens):
     start = 0
 
     # First punt over any leading space
-    maxlen = len(txt)
-    while (start < maxlen) and (txt[start] == ' '):
-        start += 1
-    if start == maxlen:
+    for s in txt:
+        if s == " ":
+            start += 1
+        else:
+            break
+    else:
         return None, ""
 
     # Handle quoted string
     if txt[start] == '\"':
+        
+        maxlen = len(txt)
         # Punt leading quote
         start += 1
         end = start
@@ -54,17 +58,14 @@ def strduptokenstr(txt, tokens):
 
         return result, txt
     else:
-        end = start
-        for end in range(end, maxlen): #@UnusedVariable
-            if tokens.find(txt[end]) != -1:
-                # Grab portion of string upto delimiter
-                if end > start:
-                    result = txt[start:end]
+        for relend, s in enumerate(txt[start:]):
+            if s in tokens:
+                if relend:
+                    result = txt[start:start+relend]
                 else:
                     result = ""
-                txt = txt[end:]
+                txt = txt[start+relend:]
                 return result, txt
-
         result = txt[start:]
         txt = ""
 

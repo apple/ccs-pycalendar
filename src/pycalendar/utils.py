@@ -22,39 +22,45 @@ def readFoldedLine( ins, lines ):
     fail = False
 
     # If line2 already has data, transfer that into line1
-    if len( lines[1] ) != 0:
+    if lines[1]:
         lines[0] = lines[1]
     else:
         # Fill first line
         try:
-            lines[0] = ins.readline()
-            if lines[0][-1] == "\n":
-                lines[0] = lines[0][:-1]
-            if lines[0][-1] == "\r":
-                lines[0] = lines[0][:-1]
+            lines[0] = myline = ins.readline()
+            if myline[-1] == "\n":
+                if myline[-2] == "\r":
+                    lines[0] = myline[:-2]
+                else:
+                    lines[0] = myline[:-1]
+            elif myline[-1] == "\r":
+                lines[0] = myline[:-1]
         except:
             fail = True
 
-        if ( fail or ( lines[0] == 0 ) or ( len( lines[0] ) == 0 ) ):
+        if fail or not lines[0]:
             return False
  
     # Now loop looking ahead at the next line to see if it is folded
     while True:
         # Get next line
         try:
-            lines[1] = ins.readline()
-            if lines[1][-1] == "\n":
-                lines[1] = lines[1][:-1]
-            if lines[1][-1] == "\r":
-                lines[1] = lines[1][:-1]
+            lines[1] = myline = ins.readline()
+            if myline[-1] == "\n":
+                if myline[-2] == "\r":
+                    lines[1] = myline[:-2]
+                else:
+                    lines[1] = myline[:-1]
+            elif myline[-1] == "\r":
+                lines[1] = myline[:-1]
         except:
             fail = True
 
-        if fail or ( lines[1] == 0 ):
+        if fail or not lines[1]:
             return True
 
         # Does it start with a space => folded
-        if ( len( lines[1] ) != 0 ) and lines[1][0].isspace():
+        if lines[1][0].isspace():
             # Copy folded line (without space) to current line and cycle
             # for more
             lines[0] = lines[0] + lines[1][1:]

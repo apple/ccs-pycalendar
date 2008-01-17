@@ -63,22 +63,16 @@ class PyCalendarDateTime(object):
         self.mPosixTimeCached = False
         self.mPosixTime = 0
 
-        if (year is not None) and (month is not None) and (day is not None) and \
-           (hours is not None) and (minutes is not None) and (seconds is not None):
+        if (year is not None) and (month is not None) and (day is not None):
             self.mYear = year
             self.mMonth = month
             self.mDay = day
-            self.mHours = hours
-            self.mMinutes = minutes
-            self.mSeconds = seconds
-            if tzid:
-                self.mTZUTC = tzid.getUTC()
-                self.mTZID = tzid.getTimezoneID()
-        elif (year is not None) and (month is not None) and (day is not None):
-            self.mYear = year
-            self.mMonth = month
-            self.mDay = day
-            self.mDateOnly = True
+            if (hours is not None) and (minutes is not None) and (seconds is not None):
+                self.mHours = hours
+                self.mMinutes = minutes
+                self.mSeconds = seconds
+            else:
+                self.mDateOnly = True
             if tzid:
                 self.mTZUTC = tzid.getUTC()
                 self.mTZID = tzid.getTimezoneID()
@@ -798,7 +792,8 @@ class PyCalendarDateTime(object):
         # parse format YYYYMMDD[THHMMSS[Z]]
 
         # Size must be at least 8
-        if len( data ) < 8:
+        dlen = len(data)
+        if dlen < 8:
             return
 
         # Get year
@@ -814,7 +809,7 @@ class PyCalendarDateTime(object):
         self.mDay = int( buf )
 
         # Now look for more
-        if ( len( data ) >= 15 ) and ( data[8] == 'T' ):
+        if ( dlen >= 15 ) and ( data[8] == 'T' ):
             # Get hours
             buf = data[9:11]
             self.mHours = int( buf )
@@ -829,7 +824,7 @@ class PyCalendarDateTime(object):
 
             self.mDateOnly = False
 
-            if len(data) > 15:
+            if dlen > 15:
                 self.mTZUTC = ( data[15] == 'Z' )
             else:
                 self.mTZUTC = False

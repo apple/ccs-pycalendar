@@ -191,9 +191,7 @@ class PyCalendar(PyCalendarComponentBase):
             self.mDescription = temps
 
     def parse(self, ins):
-        # Always init rhe component maps
-        self.initComponents()
-    
+
         result = False
     
         LOOK_FOR_VCALENDAR = 0
@@ -263,7 +261,7 @@ class PyCalendar(PyCalendarComponentBase):
                     comp.finalise()
     
                     # Check whether this is embedded
-                    if prevcomp != None:
+                    if prevcomp is not None:
 
                         # Embed component in parent and reset to use parent
                         if not prevcomp.addComponent(comp):
@@ -312,9 +310,6 @@ class PyCalendar(PyCalendarComponentBase):
     
     def parseComponent(self, ins, rurl, etag):
         
-        # Always init rhe component maps
-        self.initComponents()
-    
         result = None
     
         LOOK_FOR_VCALENDAR = 0
@@ -1092,4 +1087,5 @@ class PyCalendar(PyCalendarComponentBase):
         # Add default timezones to this (static) calendar
         pass
 
+PyCalendar.loadStatics()
 PyCalendar.sICalendar = PyCalendar()
