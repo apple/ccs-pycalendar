@@ -19,7 +19,6 @@ import cStringIO as StringIO
 #from PyCalendarDateTime import PyCalendarDateTime
 
 def readFoldedLine( ins, lines ):
-    fail = False
 
     # If line2 already has data, transfer that into line1
     if lines[1]:
@@ -27,7 +26,7 @@ def readFoldedLine( ins, lines ):
     else:
         # Fill first line
         try:
-            lines[0] = myline = ins.readline()
+            myline = ins.readline()
             if myline[-1] == "\n":
                 if myline[-2] == "\r":
                     lines[0] = myline[:-2]
@@ -35,17 +34,20 @@ def readFoldedLine( ins, lines ):
                     lines[0] = myline[:-1]
             elif myline[-1] == "\r":
                 lines[0] = myline[:-1]
+            else:
+                lines[0] = myline
         except:
-            fail = True
+            lines[0] = ""
+            return False
 
-        if fail or not lines[0]:
+        if not lines[0]:
             return False
  
     # Now loop looking ahead at the next line to see if it is folded
     while True:
         # Get next line
         try:
-            lines[1] = myline = ins.readline()
+            myline = ins.readline()
             if myline[-1] == "\n":
                 if myline[-2] == "\r":
                     lines[1] = myline[:-2]
@@ -53,10 +55,13 @@ def readFoldedLine( ins, lines ):
                     lines[1] = myline[:-1]
             elif myline[-1] == "\r":
                 lines[1] = myline[:-1]
+            else:
+                lines[1] = myline
         except:
-            fail = True
+            lines[1] = ""
+            return True
 
-        if fail or not lines[1]:
+        if not lines[1]:
             return True
 
         # Does it start with a space => folded
@@ -71,9 +76,9 @@ def readFoldedLine( ins, lines ):
     return True
 
 def find_first_of( text, tokens, offset ):
-    for i in range( offset, len( text ) ):
-        if tokens.find( text[i] ) != -1:
-            return i
+    for ctr, c in enumerate(text[offset:]):
+        if c in tokens:
+            return offset + ctr
     return -1
     
 def writeTextValue( os, value ):

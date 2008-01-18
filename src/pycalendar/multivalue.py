@@ -38,7 +38,10 @@ class PyCalendarMultiValue( PyCalendarValue ):
 
     def parse( self, data ):
         # Tokenize on comma
-        tokens = data.split( "," )
+        if "," in data:
+            tokens = data.split( "," )
+        else:
+            tokens = (data,)
         for token in tokens:
             # Create single value, and parse data
             value = PyCalendarValue.createFromType( self.mType )

@@ -197,5 +197,5 @@ class PyCalendarComponentBase(object):
         self.removeProperties(propname)
 
         # Now create properties
-        if (propvalue != None) and (len(propvalue) != 0):
+        if propvalue:
             self.addProperty(PyCalendarProperty(name=propname, value=propvalue))

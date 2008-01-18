@@ -60,10 +60,10 @@ class PyCalendarPeriod(object):
                 or ( self.mStart == comp.mStart ) and self.mEnd < comp.mEnd
 
     def parse( self, data ):
-        slash_pos = data.find( '/' )
-        if slash_pos != -1:
-            start = data[0:slash_pos]
-            end = data[slash_pos + 1:]
+        splits = data.split( '/', 1 )
+        if len(splits) == 2:
+            start = splits[0]
+            end = splits[1]
 
             self.mStart.parse( start )
             if end[0] == 'P':

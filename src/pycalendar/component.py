@@ -142,7 +142,7 @@ class PyCalendarComponent(PyCalendarComponentBase):
         return self.mUID
 
     def setUID(self, uid):
-        if len(uid) != 0:
+        if uid:
             self.mUID = uid
         else:
             # Get left-side of UID (first 24 chars of MD5 digest of time, pid
@@ -346,11 +346,11 @@ class PyCalendarComponent(PyCalendarComponentBase):
 
         # Do private properties if caching
         if for_cache:
-            if (self.mRURL is not None) and (len(self.mRURL) != 0):
+            if self.mRURL:
                 self.writePrivateProperty(os,
                         definitions.cICalProperty_X_PRIVATE_RURL,
                         self.mRURL)
-            if (self.mETag is not None) and (len(self.mETag) != 0):
+            if self.mETag:
                 self.writePrivateProperty(os,
                         definitions.cICalProperty_X_PRIVATE_ETAG,
                         self.mETag)

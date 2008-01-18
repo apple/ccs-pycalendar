@@ -386,24 +386,28 @@ class PyCalendarRecurrence(object):
                 self.mWeekstart = index        
 
     def parseList(self, txt, list):
-        tokens = txt.split(",")
+        
+        if "," in txt:
+            tokens = txt.split(",")
+        else:
+            tokens = (txt,)
 
-        while len(tokens):
-            num = int(tokens.pop())
-            list.append(num)
+        for token in tokens:
+            list.append(int(token))
 
     def parseListDW(self, txt, list):
-        tokens = txt.split(",")
 
-        while len(tokens):
+        if "," in txt:
+            tokens = txt.split(",")
+        else:
+            tokens = (txt,)
+
+        for token in tokens:
             # Get number if present
-            token = tokens.pop()
             num = 0
-            if ((len(token) > 0) and
-                (token[0].isdigit() or (token[0] == '+') or (token[0] == '-'))):
+            if (len(token) > 0) and token[0] in "+-1234567890":
                 offset = 0
-                while ((offset < len(token)) and
-                       (token[offset].isdigit() or (token[offset] == '+') or (token[offset] == '-'))):
+                while (offset < len(token)) and token[offset] in "+-1234567890":
                     offset += 1
             
                 num = int(token[0:offset])

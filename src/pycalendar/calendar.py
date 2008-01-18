@@ -204,14 +204,18 @@ class PyCalendar(PyCalendarComponentBase):
         # Get lines looking for start of calendar
         lines = ["", ""]
         comp = None
+        compend = None
         prevcomp = None
+        prevcompend = None
         compmap = None
     
         while readFoldedLine(ins, lines):
+            
+            line = lines[0]
             if state == LOOK_FOR_VCALENDAR:
 
                 # Look for start
-                if lines[0] == definitions.cICalComponent_BEGINVCALENDAR:
+                if line == definitions.cICalComponent_BEGINVCALENDAR:
                     # Next state
                     state = GET_PROPERTY_OR_COMPONENT
     
@@ -221,18 +225,19 @@ class PyCalendar(PyCalendarComponentBase):
             elif state == GET_PROPERTY_OR_COMPONENT:
 
                 # Parse property or look for start of component
-                if PyCalendar.sComponents.has_key(lines[0]):
+                if PyCalendar.sComponents.has_key(line):
 
                     # Start a new component
-                    comp = PyCalendar.makeComponent(PyCalendar.sComponents[lines[0]].mID, self.getRef())
+                    comp = PyCalendar.makeComponent(PyCalendar.sComponents[line].mID, self.getRef())
+                    compend = comp.getEndDelimiter()
     
                     # Set the marker for the end of this component and the map to store it in
-                    compmap = self.getComponents(PyCalendar.sComponents[lines[0]].mType)
+                    compmap = self.getComponents(PyCalendar.sComponents[line].mType)
     
                     # Change state
                     state = GET_COMPONENT_PROPERTY
 
-                elif lines[0] == definitions.cICalComponent_ENDVCALENDAR:
+                elif line == definitions.cICalComponent_ENDVCALENDAR:
 
                     # Finalise the current calendar
                     self.finalise()
@@ -244,7 +249,7 @@ class PyCalendar(PyCalendarComponentBase):
 
                     # Parse attribute/value for top-level calendar item
                     prop = PyCalendarProperty()
-                    if prop.parse(lines[0]):
+                    if prop.parse(line):
 
                         # Check for valid property
                         if not self.validProperty(prop):
@@ -255,7 +260,7 @@ class PyCalendar(PyCalendarComponentBase):
             elif state in (GET_COMPONENT_PROPERTY, GET_SUB_COMPONENT_PROPERTY):
 
                 # Look for end of current component
-                if lines[0] == comp.getEndDelimiter():
+                if line == compend:
 
                     # Finalise the component (this caches data from the properties)
                     comp.finalise()
@@ -264,10 +269,11 @@ class PyCalendar(PyCalendarComponentBase):
                     if prevcomp is not None:
 
                         # Embed component in parent and reset to use parent
-                        if not prevcomp.addComponent(comp):
-                            comp = None
+                        prevcomp.addComponent(comp)
                         comp = prevcomp
+                        compend = prevcompend
                         prevcomp = None
+                        prevcompend = None
     
                         # Reset state
                         state = GET_COMPONENT_PROPERTY
@@ -275,9 +281,9 @@ class PyCalendar(PyCalendarComponentBase):
                     else:
 
                         # Check for valid component
-                        if not compmap.addComponent(comp):
-                            comp = None
+                        compmap.addComponent(comp)
                         comp = None
+                        compend = None
                         compmap = None
     
                         # Reset state
@@ -286,11 +292,13 @@ class PyCalendar(PyCalendarComponentBase):
                 else:
 
                     # Look for start of embedded component (can only do once)
-                    if (state != GET_SUB_COMPONENT_PROPERTY) and PyCalendar.sEmbeddedComponents.has_key(lines[0]):
+                    if (state != GET_SUB_COMPONENT_PROPERTY) and PyCalendar.sEmbeddedComponents.has_key(line):
 
                         # Start a new component (saving off the current one)
                         prevcomp = comp
-                        comp = PyCalendar.makeComponent(PyCalendar.sEmbeddedComponents[lines[0]].mID, self.getRef())
+                        prevcompend = compend
+                        comp = PyCalendar.makeComponent(PyCalendar.sEmbeddedComponents[line].mID, self.getRef())
+                        compend = comp.getEndDelimiter()
     
                         # Reset state
                         state = GET_SUB_COMPONENT_PROPERTY
@@ -299,7 +307,7 @@ class PyCalendar(PyCalendarComponentBase):
 
                         # Parse attribute/value and store in component
                         prop = PyCalendarProperty()
-                        if prop.parse(lines[0]):
+                        if prop.parse(line):
                             comp.addProperty(prop)
     
         # We need to store all timezones in the static object so they can be accessed by any date object

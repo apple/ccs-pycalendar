@@ -53,10 +53,7 @@ def strduptokenstr(txt, tokens):
             if end >= maxlen:
                 return None, txt
 
-        result = txt[start:end]
-        txt = txt[end + 1:]
-
-        return result, txt
+        return txt[start:end], txt[end + 1:]
     else:
         for relend, s in enumerate(txt[start:]):
             if s in tokens:
@@ -64,12 +61,8 @@ def strduptokenstr(txt, tokens):
                     result = txt[start:start+relend]
                 else:
                     result = ""
-                txt = txt[start+relend:]
-                return result, txt
-        result = txt[start:]
-        txt = ""
-
-        return result, txt
+                return result, txt[start+relend:]
+        return txt[start:], ""
 
 def strindexfind(s, ss, default_index):
     if s and ss:

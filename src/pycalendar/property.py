@@ -209,8 +209,7 @@ class PyCalendarProperty(object):
         # TODO: Try to use static string for the name
 
         # Now loop getting data
-        done = False
-        while not done and len(txt) != 0:
+        while txt:
             if txt[0] == ';':
                 # Parse attribute
 
@@ -240,7 +239,7 @@ class PyCalendarProperty(object):
             elif txt[0] == ':':
                 txt = txt[1:]
                 self.createValue(txt)
-                done = True
+                txt = None
 
         # We must have a value of some kind
         return self.mValue is not None
