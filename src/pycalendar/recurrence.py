@@ -1268,7 +1268,7 @@ class PyCalendarRecurrence(object):
 
                     # Determine amount of offset from the start of the week to
                     # the day we want (forwards)
-                    day_in_week_offset = (iter2).second - self.mWeekstart
+                    day_in_week_offset = iter2[1] - self.mWeekstart
                     if day_in_week_offset < 0:
                         day_in_week_offset += 7
 
