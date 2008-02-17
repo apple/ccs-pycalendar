@@ -163,19 +163,29 @@ class PyCalendarComponentBase(object):
             return False
 
     def writeProperties(self, os):
-        for props in self.mProperties.itervalues():
+        # Sort properties by name
+        keys = self.mProperties.keys()
+        keys.sort()
+        for key in keys:
+            props = self.mProperties[key]
             for prop in props:
                 prop.generate(os)
 
     def writePropertiesFiltered(self, os, filter):
 
+        # Sort properties by name
+        keys = self.mProperties.keys()
+        keys.sort()
+
         # Shortcut for all properties
         if filter.isAllProperties():
-            for props in self.mProperties.itervalues():
+            for key in keys:
+                props = self.mProperties[key]
                 for prop in props:
                     prop.generate(os)
         elif filter.hasPropertyFilters():
-            for props in self.mProperties.itervalues():
+            for key in keys:
+                props = self.mProperties[key]
                 for prop in props:
                     prop.generateFiltered(os, filter)
 
