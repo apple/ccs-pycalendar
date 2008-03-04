@@ -20,10 +20,10 @@ class PyCalendarTimezone(object):
     
     def __init__(self, utc=None, tzid=None, copyit=None):
         
-        if utc:
+        if utc is not None:
             self.mUTC = utc
             self.mTimezone = tzid
-        elif copyit:
+        elif copyit is not None:
             self._copy_PyCalendarTimezone(copyit)
         else:
             self.mUTC = True

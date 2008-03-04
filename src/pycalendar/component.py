@@ -48,6 +48,8 @@ class PyCalendarComponent(PyCalendarComponentBase):
             self.mOriginalSeq = 0
             self.mEmbedder = None
             self.mEmbedded = None
+            self.mETag = None
+            self.mRURL = None
             self.mChanged = False
         elif copyit:
             super(PyCalendarComponent, self).__init__(copyit=copyit)
@@ -77,7 +79,6 @@ class PyCalendarComponent(PyCalendarComponentBase):
         if (self.mEmbedded != None):
             for iter in self.mEmbedded:
                 iter.close()
-            self.mEmbedded.removeAllElements()
             self.mEmbedded = None
 
     def clone_it(self):
@@ -376,10 +377,10 @@ class PyCalendarComponent(PyCalendarComponentBase):
             if self.mEmbedded != None:
                 # Shortcut for alll sub-components
                 if filter.isAllSubComponents():
-                    for iter in self.mEmbedded.elements():
+                    for iter in self.mEmbedded:
                         iter.generate(os, False)
                 elif filter.hasSubComponentFilters():
-                    for iter in self.mEmbedded.elements():
+                    for iter in self.mEmbedded:
                         subcomp = iter
                         subfilter = filter.getSubComponentFilter(self.getType())
                         if subfilter != None:

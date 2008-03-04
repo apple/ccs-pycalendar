@@ -24,8 +24,9 @@ class PyCalendarComponentBase(object):
     def __init__(self, copyit=None):
         if copyit:
             self.mProperties = {}
-            for prop in copyit.mProperties:
-                self.mProperties.setdefault(prop.getName(), []).append(PyCalendarProperty(copyit=prop))
+            for propname, props in copyit.mProperties.iteritems():
+                for prop in props:
+                    self.mProperties.setdefault(propname, []).append(PyCalendarProperty(prop))
         else:
             self.mProperties = {}
 

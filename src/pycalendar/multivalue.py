@@ -30,6 +30,9 @@ class PyCalendarMultiValue( PyCalendarValue ):
     def getType( self ):
         return self.mType
 
+    def getRealType(self):
+        return PyCalendarValue.VALUETYPE_MULTIVALUE
+
     def getValues( self ):
         return self.mValues
 
@@ -59,4 +62,6 @@ class PyCalendarMultiValue( PyCalendarValue ):
                 iter.generate( os )
         except:
             pass
+
+PyCalendarValue.registerType(PyCalendarValue.VALUETYPE_MULTIVALUE, PyCalendarMultiValue)
             

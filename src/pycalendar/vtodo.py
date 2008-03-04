@@ -113,7 +113,7 @@ class PyCalendarVToDo(PyCalendarComponentRecur):
             self.mPriority = copyit.mPriority
             self.mStatus = copyit.mStatus
             self.mPercentComplete = copyit.mPercentComplete
-            self.mCompleted = PyCalendarDateTime(copyit.mCompleted)
+            self.mCompleted = PyCalendarDateTime(copyit=copyit.mCompleted)
             self.mHasCompleted = copyit.mHasCompleted
 
     def clone_it(self):
@@ -297,7 +297,7 @@ class PyCalendarVToDo(PyCalendarComponentRecur):
         self.mHasCompleted = False
 
         # Always UTC
-        self.mCompleted = PyCalendarDateTime(completed)
+        self.mCompleted = PyCalendarDateTime(copyit=completed)
         self.mCompleted.adjustToUTC()
         self.mHasCompleted = True
         prop = PyCalendarProperty(definitions.cICalProperty_STATUS_COMPLETED, self.mCompleted)

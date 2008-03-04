@@ -143,6 +143,6 @@ class PyCalendarComponentExpanded(object):
 
     def _copy_ICalendarComponentExpanded(self, copy):
         self.mOwner = copy.self.mOwner
-        self.mInstanceStart = PyCalendarDateTime(copy.mInstanceStart)
-        self.mInstanceEnd = PyCalendarDateTime(copy.mInstanceEnd)
+        self.mInstanceStart = PyCalendarDateTime(copyit=copy.mInstanceStart)
+        self.mInstanceEnd = PyCalendarDateTime(copyit=copy.mInstanceEnd)
         self.mRecurring = copy.mRecurring

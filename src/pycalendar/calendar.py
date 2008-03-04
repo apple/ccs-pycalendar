@@ -311,7 +311,7 @@ class PyCalendar(PyCalendarComponentBase):
                             comp.addProperty(prop)
     
         # We need to store all timezones in the static object so they can be accessed by any date object
-        if self is PyCalendar.sICalendar:
+        if self is not PyCalendar.sICalendar:
             PyCalendar.sICalendar.mergeTimezones(self)
     
         return result
@@ -703,13 +703,13 @@ class PyCalendar(PyCalendarComponentBase):
     # Timezone lookups
     def mergeTimezones(self, cal):
         # Merge each timezone from other calendar
-        for tz in  cal.mV[PyCalendar.VTIMEZONE]:
+        for tz in cal.mV[PyCalendar.VTIMEZONE]:
 
             # See whether matching item is already installed
             if not self.mV[PyCalendar.VTIMEZONE].has_key(tz.getMapKey()):
 
                 # Item does not already exist - so copy and add it
-                copy = PyCalendarVTimezone(tz)
+                copy = PyCalendarVTimezone(copyit=tz)
                 self.mV[PyCalendar.VTIMEZONE].addComponent(copy)
 
             else:
@@ -814,7 +814,7 @@ class PyCalendar(PyCalendarComponentBase):
             master = vevent.getTrueMaster()
 
             # NB the vevent will be deleted as part of this so cache the instance start before
-            exclude = PyCalendarDateTime(vevent.getInstanceStart())
+            exclude = PyCalendarDateTime(copyit=vevent.getInstanceStart())
 
             # The start instance is the RECURRENCE-ID to exclude
             master.excludeRecurrence(exclude)
@@ -827,7 +827,7 @@ class PyCalendar(PyCalendarComponentBase):
             master = vevent.getTrueMaster()
 
             # NB the vevent will be deleted as part of this so cache the instance start before
-            exclude = PyCalendarDateTime(vevent.getInstanceStart())
+            exclude = PyCalendarDateTime(copyit=vevent.getInstanceStart())
 
             # The DTSTART specifies the recurrence that we exclude
             master.excludeFutureRecurrence(exclude)
@@ -998,7 +998,7 @@ class PyCalendar(PyCalendarComponentBase):
                 tz = PyCalendar.sICalendar.getTimezone(tzid)
                 if tz is not None:
 
-                    dup = PyCalendarVTimezone(tz)
+                    dup = PyCalendarVTimezone(copyit=tz)
                     self.mV[PyCalendar.VTIMEZONE].addComponent(dup)
         
     def includeTimezonesDB(self, components, tzids):

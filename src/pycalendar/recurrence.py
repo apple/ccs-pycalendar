@@ -107,6 +107,8 @@ class PyCalendarRecurrence(object):
         self.mWeekstart = definitions.eRecurrence_WEEKDAY_MO
 
         self.mCached = False
+        self.mCacheStart = 0
+        self.mCacheUpto = 0
         self.mFullyCached = False
         self.mRecurrences = 0
 
@@ -145,11 +147,17 @@ class PyCalendarRecurrence(object):
         self.mCached = copy.mCached
         if copy.mCacheStart != 0:
             self.mCacheStart = PyCalendarDateTime(copyit=copy.mCacheStart)
+        else:
+            self.mCacheStart = 0
         if copy.mCacheUpto != 0:
             self.mCacheUpto = PyCalendarDateTime(copyit=copy.mCacheUpto)
+        else:
+            self.mCacheUpto = 0
         self.mFullyCached = copy.mFullyCached
         if copy.mRecurrences != 0:
             self.mRecurrences = copy.mRecurrences[:]
+        else:
+            self.mRecurrences = 0
 
     def equals(self, comp):
         return (self.mFreq == comp.mFreq) and (self.mCount == comp.mCount) \

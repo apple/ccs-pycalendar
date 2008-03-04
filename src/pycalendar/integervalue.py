@@ -20,9 +20,11 @@ from value import PyCalendarValue
 
 class PyCalendarIntegerValue( PyCalendarValue ):
 
-    def __init__(self, value = None):
+    def __init__(self, value = None, copyit = None):
         if value:
             self.mValue = value
+        elif copyit:
+            self.mValue = copyit.mValue
         else:
             self.mValue = 0
 

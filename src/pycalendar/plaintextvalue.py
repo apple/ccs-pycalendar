@@ -20,8 +20,12 @@ from value import PyCalendarValue
 
 class PyCalendarPlainTextValue( PyCalendarValue ):
 
-    def __init__(self):
-        self.mValue = ''
+    def __init__(self, copyit=None):
+        
+        if copyit:
+            self.mValue = copyit.mValue
+        else:
+            self.mValue = ''
 
     def parse( self, data ):
         # No decoding required

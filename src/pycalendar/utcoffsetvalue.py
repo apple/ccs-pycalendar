@@ -20,8 +20,12 @@ from value import PyCalendarValue
 
 class PyCalendarUTCOffsetValue( PyCalendarValue ):
 
-    def __init__( self ):
-        self.mValue = 0
+    def __init__( self, copyit = None ):
+        
+        if copyit:
+            self.mValue = copyit.mValue
+        else:
+            self.mValue = 0
 
     def getType( self ):
         return PyCalendarValue.VALUETYPE_UTC_OFFSET

@@ -105,7 +105,7 @@ class PyCalendarVFreeBusy(PyCalendarComponent):
         # End is always greater than start if start exists
         if self.mHasStart and self.mEnd <= self.mStart:
             # Use the start
-            self.mEnd = PyCalendarDateTime(self.mStart)
+            self.mEnd = PyCalendarDateTime(copyit=self.mStart)
             self.mDuration = False
 
             # Adjust to approriate non-inclusive end point
@@ -171,7 +171,7 @@ class PyCalendarVFreeBusy(PyCalendarComponent):
         self.addProperty(prop)
 
         # If its an all day event and the end one day after the start, ignore it
-        temp = PyCalendarDateTime(start)
+        temp = PyCalendarDateTime(copyit=start)
         temp.offsetDay(1)
         if not start.isDateOnly() or end != temp:
             prop = PyCalendarProperty(definitions.cICalProperty_DTEND, end)

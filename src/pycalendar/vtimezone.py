@@ -161,43 +161,26 @@ class PyCalendarVTimezone(PyCalendarComponent):
         temp = PyCalendarDateTime(copyit=dt)
         temp.setTimezoneID(None)
 
-        # New scheme to avoid unneccessary timezone recurrence expansion:
-
-        # Look for the standard and daylight components with a start time just
-        # below the requested date-time
-        found_std = None
-        found_day = None
-
-        if self.mEmbedded is not None:
-            for item in self.mEmbedded:
-                if item.getStart() < temp:
-                    if item.getType() == PyCalendarComponent.eVTIMEZONESTANDARD:
-                        found_std = item
-                    else:
-                        found_day = item
+        # Had to rework this because some VTIMEZONEs have sub-components where the DST instances are interleaved. That
+        # means we have to evaluate each and every sub-component to find the instance immediately less than the time we are checking.
 
         # Now do the expansion for each one found and pick the lowest
         found = None
         dt_found = PyCalendarDateTime()
 
-        if found_std is not None:
-            dt_item = found_std.expandBelow(temp)
-            if temp >= dt_item:
-                found = found_std
-                dt_found = dt_item
-
-        if found_day is not None:
-            dt_item = found_day.expandBelow(temp)
-            if temp >= dt_item:
-                if found is not None:
-                    # Compare with the one previously cached and switch to this
-                    # one if newer
-                    if dt_item > dt_found:
-                        found = found_day
+        if self.mEmbedded is not None:
+            for item in self.mEmbedded:
+                dt_item = item.expandBelow(temp)
+                if temp >= dt_item:
+                    if found is not None:
+                        # Compare with the one previously cached and switch to this
+                        # one if newer
+                        if dt_item > dt_found:
+                            found = item
+                            dt_found = dt_item
+                    else:
+                        found = item
                         dt_found = dt_item
-                else:
-                    found = found_day
-                    dt_found = dt_item
 
         return found
 

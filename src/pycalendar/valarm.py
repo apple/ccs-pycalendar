@@ -143,7 +143,7 @@ class PyCalendarVAlarm(PyCalendarComponent):
             self.mDescription = valarm.loadValueString(definitions.cICalProperty_DESCRIPTION)
             self.mSummary = valarm.loadValueString(definitions.cICalProperty_SUMMARY)
 
-            self.mAttendees.removeAllElements()
+            self.mAttendees = []
             if valarm.hasProperty(definitions.cICalProperty_ATTENDEE):
                 # Get each attendee
                 range = valarm.getProperties().findItems(definitions.cICalProperty_ATTENDEE)

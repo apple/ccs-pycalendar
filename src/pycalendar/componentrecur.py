@@ -106,10 +106,10 @@ class PyCalendarComponentRecur(PyCalendarComponent):
             self.mAdjustFuture = copyit.mAdjustFuture
             self.mAdjustPrior = copyit.mAdjustPrior
             if copyit.mRecurrenceID != None:
-                self.mRecurrenceID = PyCalendarDateTime(copyit.mRecurrenceID)
+                self.mRecurrenceID = PyCalendarDateTime(copyit=copyit.mRecurrenceID)
     
             if copyit.mRecurrences != None:
-                self.mRecurrences = PyCalendarRecurrenceSet(copyit.mRecurrences)
+                self.mRecurrences = PyCalendarRecurrenceSet(copyit=copyit.mRecurrences)
 
     def canGenerateInstance(self):
         return not self.mHasRecurrenceID
@@ -237,7 +237,7 @@ class PyCalendarComponentRecur(PyCalendarComponent):
             else:
                 # If no end or duration then use the start
                 self.mHasEnd = False
-                self.mEnd = PyCalendarDateTime(self.mStart)
+                self.mEnd = PyCalendarDateTime(copyit=self.mStart)
                 self.mDuration = False
         else:
             self.mHasEnd = True
@@ -302,7 +302,7 @@ class PyCalendarComponentRecur(PyCalendarComponent):
         # End is always greater than start if start exists
         if self.mHasStart and self.mEnd <= self.mStart:
             # Use the start
-            self.mEnd = PyCalendarDateTime(self.mStart)
+            self.mEnd = PyCalendarDateTime(copyit=self.mStart)
             self.mDuration = False
 
             # Adjust to approriate non-inclusive end point
@@ -479,7 +479,7 @@ class PyCalendarComponentRecur(PyCalendarComponent):
         self.addProperty(prop)
 
         # If its an all day event and the end one day after the start, ignore it
-        temp = PyCalendarDateTime(start)
+        temp = PyCalendarDateTime(copyit=start)
         temp.offsetDay(1)
         if not start.isDateOnly() or end != temp:
             prop = PyCalendarProperty(definitions.cICalProperty_DTEND, end)
