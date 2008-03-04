@@ -107,10 +107,10 @@ class PyCalendarRecurrence(object):
         self.mWeekstart = definitions.eRecurrence_WEEKDAY_MO
 
         self.mCached = False
-        self.mCacheStart = 0
-        self.mCacheUpto = 0
+        self.mCacheStart = None
+        self.mCacheUpto = None
         self.mFullyCached = False
-        self.mRecurrences = 0
+        self.mRecurrences = None
 
     def copy_PyCalendarRecurrence(self, copy):
         self.init_PyCalendarRecurrence()
@@ -145,19 +145,19 @@ class PyCalendarRecurrence(object):
         self.mWeekstart = copy.mWeekstart
 
         self.mCached = copy.mCached
-        if copy.mCacheStart != 0:
+        if copy.mCacheStart:
             self.mCacheStart = PyCalendarDateTime(copyit=copy.mCacheStart)
         else:
-            self.mCacheStart = 0
-        if copy.mCacheUpto != 0:
+            self.mCacheStart = None
+        if copy.mCacheUpto:
             self.mCacheUpto = PyCalendarDateTime(copyit=copy.mCacheUpto)
         else:
-            self.mCacheUpto = 0
+            self.mCacheUpto = None
         self.mFullyCached = copy.mFullyCached
-        if copy.mRecurrences != 0:
+        if copy.mRecurrences:
             self.mRecurrences = copy.mRecurrences[:]
         else:
-            self.mRecurrences = 0
+            self.mRecurrences = None
 
     def equals(self, comp):
         return (self.mFreq == comp.mFreq) and (self.mCount == comp.mCount) \
@@ -641,7 +641,7 @@ class PyCalendarRecurrence(object):
     def expand(self, start, range, items, float_offset=0):
 
         # Must have recurrence list at this point
-        if self.mRecurrences == 0:
+        if self.mRecurrences is None:
             self.mRecurrences = []
 
         # Wipe cache if start is different
@@ -653,14 +653,13 @@ class PyCalendarRecurrence(object):
         # Is the current cache complete or does it extaned past the requested
         # range end
         if not self.mCached or not self.mFullyCached \
-                and ((self.mCacheUpto == 0) or self.mCacheUpto < range.getEnd()):
+                and (self.mCacheUpto is None or self.mCacheUpto < range.getEnd()):
             cache_range = PyCalendarPeriod(copyit=range)
 
             # If partially cached just cache from previous cache end up to new
             # end
             if self.mCached:
-                cache_range = PyCalendarPeriod()
-                cache_range.init_start_end(self.mCacheUpto, range.getEnd())
+                cache_range = PyCalendarPeriod(self.mCacheUpto, range.getEnd())
 
             # Simple expansion is one where there is no BYXXX rule part
             if not self.hasBy():
@@ -804,7 +803,7 @@ class PyCalendarRecurrence(object):
     def clear(self):
         self.mCached = False
         self.mFullyCached = False
-        if self.mRecurrences != 0:
+        if self.mRecurrences is not None:
             self.mRecurrences = []
 
 
