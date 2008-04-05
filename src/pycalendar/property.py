@@ -472,12 +472,12 @@ class PyCalendarProperty(object):
             if (self.hasAttribute(definitions.cICalAttribute_TZID)):
                 tzid = self.getAttributeValue(definitions.cICalAttribute_TZID)
                 
-            if isinstance(self.mValue, PyCalendarDateTimeValue):
-                self.mValue.getValue().setTimezoneID(tzid)
-            elif isinstance(self.mValue, PyCalendarMultiValue):
-                for item in self.mValue.getValues():
-                    if isinstance(item, PyCalendarDateTimeValue):
-                        item.getValue().setTimezoneID(tzid)
+                if isinstance(self.mValue, PyCalendarDateTimeValue):
+                    self.mValue.getValue().setTimezoneID(tzid)
+                elif isinstance(self.mValue, PyCalendarMultiValue):
+                    for item in self.mValue.getValues():
+                        if isinstance(item, PyCalendarDateTimeValue):
+                            item.getValue().setTimezoneID(tzid)
 
     def setupValueAttribute(self):
         if self.mAttributes.has_key(definitions.cICalAttribute_VALUE):
