@@ -120,7 +120,7 @@ class PyCalendarRecurrence(object):
         self.mUseCount = copy.mUseCount
         self.mCount = copy.mCount
         self.mUseUntil = copy.mUseUntil
-        if copy.mUntil != 0:
+        if self.mUseUntil:
             self.mUntil = PyCalendarDateTime(copyit=copy.mUntil)
 
         self.mInterval = copy.mInterval
