@@ -146,7 +146,7 @@ class PyCalendarVAlarm(PyCalendarComponent):
             self.mAttendees = []
             if valarm.hasProperty(definitions.cICalProperty_ATTENDEE):
                 # Get each attendee
-                range = valarm.getProperties().findItems(definitions.cICalProperty_ATTENDEE)
+                range = valarm.getProperties().get(definitions.cICalProperty_ATTENDEE, ())
                 for iter in range:
                     # Get the attendee value
                     attendee = iter.getCalAddressValue()
