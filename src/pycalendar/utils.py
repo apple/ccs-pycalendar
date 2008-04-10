@@ -253,13 +253,10 @@ def getMonthTable(month, year, weekstart, table, today_index):
     for day in range( 1, max_day + 1):
         # Insert new row if we are at the start of a row
         if (col == 0) or (day == 1):
-            row_data = []
-            for i in range(0, 7):
-                row_data.extend(0)
-            table.extend(row_data)
+            table.extend([0] * 7)
             row += 1
 
-        # Set the table item to the curret day
+        # Set the table item to the current day
         table[row][col] = packDate(temp.getYear(), temp.getMonth(), day)
 
         # Check on today
@@ -299,6 +296,8 @@ def getMonthTable(month, year, weekstart, table, today_index):
                                                               
             back_col -= 1
             day -= 1
+
+    return table, today_index
 
 def set_difference(v1, v2):
     if len(v1) == 0 or len(v2) == 0:
