@@ -255,8 +255,6 @@ class PyCalendarComponentRecur(PyCalendarComponent):
         # Get RECURRENCE-ID
         self.mHasRecurrenceID = (self.countProperty(definitions.cICalProperty_RECURRENCE_ID) != 0)
         if self.mHasRecurrenceID:
-            if self.mRecurrenceID is None:
-                self.mRecurrenceID = PyCalendarDateTime()
             self.mRecurrenceID = self.loadValueDateTime(definitions.cICalProperty_RECURRENCE_ID)
 
         # Update the map key
@@ -351,7 +349,7 @@ class PyCalendarComponentRecur(PyCalendarComponent):
                             future.append(iter)
 
                     # Check for special behaviour
-                    if prior.isEmpty() and future.isEmpty():
+                    if len(prior) + len(future) == 0:
                         # Add each expanded item
                         for iter in items:
                             list.append(self.createExpanded(self, iter))
@@ -401,7 +399,7 @@ class PyCalendarComponentRecur(PyCalendarComponent):
         if ((self.mRecurrences != None) and self.mRecurrences.hasRecurrence()):
             items = []
             self.mRecurrences.expand(self.mStart, period, items)
-            return not items.isEmpty()
+            return len(items) != 0
         else:
             # Does event span the period (assume self.mEnd > self.mStart)
             # Check start (inclusive) and end (exclusive)
@@ -568,78 +566,6 @@ class PyCalendarComponentRecur(PyCalendarComponent):
         for iter in  self.mRecurrences.getDates():
             prop = PyCalendarProperty(definitions.cICalProperty_RDATE, iter)
             self.addProperty(prop)
-
-    # These are overridden to allow missing properties to come from the master
-    # component
-    def loadValueInteger(self, value_name, type=None):
-        # Try to load from this component
-        result = super(PyCalendarComponentRecur, self).loadValueInteger(value_name, type)
-
-        # Try to load from master if we didn't get it from this component
-        if (result is None) and (self.mMaster is not None) and (self.mMaster != self):
-            result = self.mMaster.loadValueInteger(value_name, type)
-
-        return result
-
-    def loadValueString(self, value_name):
-        # Try to load from this component
-        result = super(PyCalendarComponentRecur, self).loadValueString(value_name)
-
-        # Try to load from master if we didn't get it from this component
-        if (result is None) and (self.mMaster is not None) and (self.mMaster != self):
-            result = self.mMaster.loadValueString(value_name)
-
-        return result
-
-    def loadValueDateTime(self, value_name):
-        # Try to load from this component
-        result = super(PyCalendarComponentRecur, self).loadValueDateTime(value_name)
-
-        # Try to load from master if we didn't get it from this component
-        if not result and (self.mMaster is not None) and (self.mMaster is not self):
-            result = self.mMaster.loadValueDateTime(value_name)
-
-        return result
-
-    def loadValueDuration(self, value_name):
-        # Try to load from this component
-        result = super(PyCalendarComponentRecur, self).loadValueDuration(value_name)
-
-        # Try to load from master if we didn't get it from this component
-        if not result and (self.mMaster is not None) and (self.mMaster is not self):
-
-            result = self.mMaster.loadValueDuration(value_name)
-        return result
-
-    def loadValuePeriod(self, value_name):
-        # Try to load from this component
-        result = super(PyCalendarComponentRecur, self).loadValuePeriod(value_name)
-
-        # Try to load from master if we didn't get it from this component
-        if not result and (self.mMaster is not None) and (self.mMaster is not self):
-            result = self.mMaster.loadValuePeriod(value_name)
-
-        return result
-
-    def loadValueRRULE(self, value_name, value, add):
-        # Try to load from this component
-        result = super(PyCalendarComponentRecur, self).loadValueRRULE(value_name, value, add)
-
-        # Try to load from master if we didn't get it from this component
-        if not result and (self.mMaster is not None) and (self.mMaster is not self):
-            result = self.mMaster.loadValueRRULE(value_name, value, add)
-
-        return result
-
-    def loadValueRDATE(self, value_name, value, add):
-        # Try to load from this component
-        result = super(PyCalendarComponentRecur, self).loadValueRDATE(value_name, value, add)
-
-        # Try to load from master if we didn't get it from this component
-        if not result and (self.mMaster is not None) and (self.mMaster is not self):
-            result = self.mMaster.loadValueRDATE(value_name, value, add)
-
-        return result
 
     def initFromMaster(self):
         # Only if not master
