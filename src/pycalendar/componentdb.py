@@ -39,6 +39,9 @@ class PyCalendarComponentDB(object):
     def __getitem__(self, i):
         return self.mItems[i]
 
+    def size(self):
+        return len(self.mItems)
+
     def has_key(self, k):
         return self.mItems.has_key(k)
 
