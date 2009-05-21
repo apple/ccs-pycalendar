@@ -144,17 +144,18 @@ class PyCalendarComponentDB(object):
 
     def getRecurrenceInstancesIds(self, uid, ids):
         if self.mRecurMap == None:
-            return []
+            return
 
         # Look for matching UID in recurrence instance map
         found = self.mRecurMap.get(uid, None)
         if found != None:
             # Return the recurrence ids
-            return found
+            ids.extend(found)
+            return
 
-        return []
+        return
 
-    def getRecurrenceInstanceItems(self, uid, items):
+    def getRecurrenceInstancesItems(self, uid, items):
         if self.mRecurMap == None:
             return
 
