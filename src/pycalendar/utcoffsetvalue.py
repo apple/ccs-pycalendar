@@ -48,7 +48,7 @@ class PyCalendarUTCOffsetValue( PyCalendarValue ):
         # Get seconds if present
         secs = 0
         if ( len( data ) == 7 ):
-            secs = int( data[6:] )
+            secs = int( data[5:] )
 
 
         self.mValue = ( ( hours * 60 ) + mins ) * 60 + secs
