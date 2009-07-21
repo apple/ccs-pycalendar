@@ -23,10 +23,6 @@ import definitions
 
 class PyCalendarVTimezoneElement(PyCalendarVTimezone):
 
-    @staticmethod
-    def sort_dtstart(e1, e2):
-        return e1.mStart < e2.mStart
-
     def __init__(self, calendar=None, dt=None, offset=None, copyit=None):
         if calendar is not None and dt is None:
             super(PyCalendarVTimezoneElement, self).__init__(calendar=calendar)

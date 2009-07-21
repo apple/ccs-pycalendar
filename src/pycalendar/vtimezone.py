@@ -81,8 +81,7 @@ class PyCalendarVTimezone(PyCalendarComponent):
 
         # Sort sub-components by DTSTART
         if self.mEmbedded is not None:
-            from pycalendar.vtimezoneelement import PyCalendarVTimezoneElement
-            self.mEmbedded.sort(PyCalendarVTimezoneElement.sort_dtstart)
+            self.mEmbedded.sort(key=lambda x:x.getStart())
 
         # Do inherited
         super(PyCalendarVTimezone, self).finalise()
