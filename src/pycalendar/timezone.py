@@ -1,5 +1,5 @@
 ##
-#    Copyright (c) 2007 Cyrus Daboo. All rights reserved.
+#    Copyright (c) 2007-2011 Cyrus Daboo. All rights reserved.
 #    
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -22,6 +22,9 @@ class PyCalendarTimezone(object):
         
         if utc is not None:
             self.mUTC = utc
+            self.mTimezone = tzid
+        elif tzid is not None:
+            self.mUTC = False
             self.mTimezone = tzid
         else:
             self.mUTC = True
@@ -80,23 +83,23 @@ class PyCalendarTimezone(object):
 
     def timeZoneSecondsOffset(self, dt):
         from manager import PyCalendarManager
-        from calendar import PyCalendar
+        from timezonedb import PyCalendarTimezoneDatabase
         if self.mUTC:
             return 0
         elif not self.mTimezone:
-            return PyCalendar.sICalendar.getTimezoneOffsetSeconds(PyCalendarManager.sICalendarManager.getDefaultTimezone().getTimezoneID(), dt)
+            return PyCalendarTimezoneDatabase.getTimezoneOffsetSeconds(PyCalendarManager.sICalendarManager.getDefaultTimezone().getTimezoneID(), dt)
 
         # Look up timezone and resolve date using default timezones
-        return PyCalendar.sICalendar.getTimezoneOffsetSeconds(self.mTimezone, dt)
+        return PyCalendarTimezoneDatabase.getTimezoneOffsetSeconds(self.mTimezone, dt)
 
     def timeZoneDescriptor(self, dt):
         from manager import PyCalendarManager
-        from calendar import PyCalendar
+        from timezonedb import PyCalendarTimezoneDatabase
         if self.mUTC:
             return "(UTC)"
         elif not self.mTimezone:
-            return PyCalendar.sICalendar.getTimezoneDescriptor(PyCalendarManager.sICalendarManager.getDefaultTimezone().getTimezoneID(), dt)
+            return PyCalendarTimezoneDatabase.getTimezoneDescriptor(PyCalendarManager.sICalendarManager.getDefaultTimezone().getTimezoneID(), dt)
 
         # Look up timezone and resolve date using default timezones
-        return PyCalendar.sICalendar.getTimezoneDescriptor(self.mTimezone, dt)
+        return PyCalendarTimezoneDatabase.getTimezoneDescriptor(self.mTimezone, dt)
     

@@ -1,5 +1,5 @@
 ##
-#    Copyright (c) 2007 Cyrus Daboo. All rights reserved.
+#    Copyright (c) 2007-2011 Cyrus Daboo. All rights reserved.
 #    
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -19,7 +19,6 @@ import cStringIO as StringIO
 from datetime import PyCalendarDateTime
 from period import PyCalendarPeriod
 import definitions
-import stringutils
 
 def WeekDayNumCompare_compare(w1, w2):
 
@@ -40,41 +39,42 @@ def WeekDayNumSort_less_than(w1, w2):
 
 class PyCalendarRecurrence(object):
 
-    cFreqMap = [
-                definitions.cICalValue_RECUR_SECONDLY,
-                definitions.cICalValue_RECUR_MINUTELY,
-                definitions.cICalValue_RECUR_HOURLY,
-                definitions.cICalValue_RECUR_DAILY,
-                definitions.cICalValue_RECUR_WEEKLY,
-                definitions.cICalValue_RECUR_MONTHLY,
-                definitions.cICalValue_RECUR_YEARLY,
-                0]
+    cFreqMap = {
+        definitions.cICalValue_RECUR_SECONDLY : definitions.eRecurrence_SECONDLY,
+        definitions.cICalValue_RECUR_MINUTELY : definitions.eRecurrence_MINUTELY,
+        definitions.cICalValue_RECUR_HOURLY   : definitions.eRecurrence_HOURLY,
+        definitions.cICalValue_RECUR_DAILY    : definitions.eRecurrence_DAILY,
+        definitions.cICalValue_RECUR_WEEKLY   : definitions.eRecurrence_WEEKLY,
+        definitions.cICalValue_RECUR_MONTHLY  : definitions.eRecurrence_MONTHLY,
+        definitions.cICalValue_RECUR_YEARLY   : definitions.eRecurrence_YEARLY,
+    }
     
-    cRecurMap = [
-                definitions.cICalValue_RECUR_UNTIL,
-                definitions.cICalValue_RECUR_COUNT,
-                definitions.cICalValue_RECUR_INTERVAL,
-                definitions.cICalValue_RECUR_BYSECOND,
-                definitions.cICalValue_RECUR_BYMINUTE,
-                definitions.cICalValue_RECUR_BYHOUR,
-                definitions.cICalValue_RECUR_BYDAY,
-                definitions.cICalValue_RECUR_BYMONTHDAY,
-                definitions.cICalValue_RECUR_BYYEARDAY,
-                definitions.cICalValue_RECUR_BYWEEKNO,
-                definitions.cICalValue_RECUR_BYMONTH,
-                definitions.cICalValue_RECUR_BYSETPOS,
-                definitions.cICalValue_RECUR_WKST,
-                0]
+    cRecurMap = {
+        definitions.cICalValue_RECUR_FREQ       : definitions.eRecurrence_FREQ,
+        definitions.cICalValue_RECUR_UNTIL      : definitions.eRecurrence_UNTIL,
+        definitions.cICalValue_RECUR_COUNT      : definitions.eRecurrence_COUNT,
+        definitions.cICalValue_RECUR_INTERVAL   : definitions.eRecurrence_INTERVAL,
+        definitions.cICalValue_RECUR_BYSECOND   : definitions.eRecurrence_BYSECOND,
+        definitions.cICalValue_RECUR_BYMINUTE   : definitions.eRecurrence_BYMINUTE,
+        definitions.cICalValue_RECUR_BYHOUR     : definitions.eRecurrence_BYHOUR,
+        definitions.cICalValue_RECUR_BYDAY      : definitions.eRecurrence_BYDAY,
+        definitions.cICalValue_RECUR_BYMONTHDAY : definitions.eRecurrence_BYMONTHDAY,
+        definitions.cICalValue_RECUR_BYYEARDAY  : definitions.eRecurrence_BYYEARDAY,
+        definitions.cICalValue_RECUR_BYWEEKNO   : definitions.eRecurrence_BYWEEKNO,
+        definitions.cICalValue_RECUR_BYMONTH    : definitions.eRecurrence_BYMONTH,
+        definitions.cICalValue_RECUR_BYSETPOS   : definitions.eRecurrence_BYSETPOS,
+        definitions.cICalValue_RECUR_WKST       : definitions.eRecurrence_WKST,
+    }
     
-    cWeekdayMap = [
-                definitions.cICalValue_RECUR_WEEKDAY_SU,
-                definitions.cICalValue_RECUR_WEEKDAY_MO,
-                definitions.cICalValue_RECUR_WEEKDAY_TU,
-                definitions.cICalValue_RECUR_WEEKDAY_WE,
-                definitions.cICalValue_RECUR_WEEKDAY_TH,
-                definitions.cICalValue_RECUR_WEEKDAY_FR,
-                definitions.cICalValue_RECUR_WEEKDAY_SA,
-                0]
+    cWeekdayMap = {
+        definitions.cICalValue_RECUR_WEEKDAY_SU : definitions.eRecurrence_WEEKDAY_SU,
+        definitions.cICalValue_RECUR_WEEKDAY_MO : definitions.eRecurrence_WEEKDAY_MO,
+        definitions.cICalValue_RECUR_WEEKDAY_TU : definitions.eRecurrence_WEEKDAY_TU,
+        definitions.cICalValue_RECUR_WEEKDAY_WE : definitions.eRecurrence_WEEKDAY_WE,
+        definitions.cICalValue_RECUR_WEEKDAY_TH : definitions.eRecurrence_WEEKDAY_TH,
+        definitions.cICalValue_RECUR_WEEKDAY_FR : definitions.eRecurrence_WEEKDAY_FR,
+        definitions.cICalValue_RECUR_WEEKDAY_SA : definitions.eRecurrence_WEEKDAY_SA,
+    }
                 
     cUnknownIndex = -1
 
@@ -93,23 +93,23 @@ class PyCalendarRecurrence(object):
             other.mUntil = self.mUntil.duplicate()
 
         other.mInterval = self.mInterval
-        if self.mBySeconds != 0:
+        if self.mBySeconds is not None:
             other.mBySeconds = self.mBySeconds[:]
-        if self.mByMinutes != 0:
+        if self.mByMinutes is not None:
             other.mByMinutes = self.mByMinutes[:]
-        if self.mByHours != 0:
+        if self.mByHours is not None:
             other.mByHours = self.mByHours[:]
-        if self.mByDay != 0:
+        if self.mByDay is not None:
             other.mByDay = self.mByDay[:]
-        if self.mByMonthDay != 0:
+        if self.mByMonthDay is not None:
             other.mByMonthDay = self.mByMonthDay[:]
-        if self.mByYearDay != 0:
+        if self.mByYearDay is not None:
             other.mByYearDay = self.mByYearDay[:]
-        if self.mByWeekNo != 0:
+        if self.mByWeekNo is not None:
             other.mByWeekNo = self.mByWeekNo[:]
-        if self.mByMonth != 0:
+        if self.mByMonth is not None:
             other.mByMonth = self.mByMonth[:]
-        if self.mBySetPos != 0:
+        if self.mBySetPos is not None:
             other.mBySetPos = self.mBySetPos[:]
         other.mWeekstart = self.mWeekstart
 
@@ -131,18 +131,18 @@ class PyCalendarRecurrence(object):
         self.mCount = 0
 
         self.mUseUntil = False
-        self.mUntil = 0
+        self.mUntil = None
 
         self.mInterval = 1
-        self.mBySeconds = 0
-        self.mByMinutes = 0
-        self.mByHours = 0
-        self.mByDay = 0
-        self.mByMonthDay = 0
-        self.mByYearDay = 0
-        self.mByWeekNo = 0
-        self.mByMonth = 0
-        self.mBySetPos = 0
+        self.mBySeconds = None
+        self.mByMinutes = None
+        self.mByHours = None
+        self.mByDay = None
+        self.mByMonthDay = None
+        self.mByYearDay = None
+        self.mByWeekNo = None
+        self.mByMonth = None
+        self.mBySetPos = None
         self.mWeekstart = definitions.eRecurrence_WEEKDAY_MO
 
         self.mCached = False
@@ -151,8 +151,14 @@ class PyCalendarRecurrence(object):
         self.mFullyCached = False
         self.mRecurrences = None
 
+    def __ne__(self, other): return not self.__eq__(other)
+    def __eq__(self, other):
+        if not isinstance(other, PyCalendarRecurrence): return False
+        return self.equals(other)
+
     def equals(self, comp):
-        return (self.mFreq == comp.mFreq) and (self.mCount == comp.mCount) \
+        return (self.mFreq == comp.mFreq) \
+                and (self.mUseCount == comp.mUseCount) and (self.mCount == comp.mCount) \
                 and (self.mUseUntil == comp.mUseUntil) and (self.mUntil == comp.mUntil) \
                 and (self.mInterval == comp.mInterval) \
                 and self.equalsNum(self.mBySeconds, comp.mBySeconds) \
@@ -168,6 +174,10 @@ class PyCalendarRecurrence(object):
 
     def equalsNum(self, items1, items2):
         # Check sizes first
+        if items1 is None:
+            items1 = []
+        if items2 is None:
+            items2 = []
         if len(items1) != len(items2):
             return False
         elif len(items1) == 0:
@@ -186,6 +196,10 @@ class PyCalendarRecurrence(object):
 
     def equalsDayNum(self, items1, items2):
         # Check sizes first
+        if items1 is None:
+            items1 = []
+        if items2 is None:
+            items2 = []
         if len(items1) != len(items2):
             return False
         elif len(items1) == 0:
@@ -275,123 +289,126 @@ class PyCalendarRecurrence(object):
         # Tokenise using ''
         tokens = data.split(";")
         tokens.reverse()
-
-        # Look for FREQ= with delimiter
            
         if len(tokens) == 0:
-            return
-        token = tokens.pop()
-
-        # Make sure it is the token we expect
-        if not token.startswith(definitions.cICalValue_RECUR_FREQ):
-            return
-        q = token[definitions.cICalValue_RECUR_FREQ_LEN:]
-
-        # Get the FREQ value
-        index = stringutils.strindexfind(q, PyCalendarRecurrence.cFreqMap, PyCalendarRecurrence.cUnknownIndex)
-        if index == PyCalendarRecurrence.cUnknownIndex:
-            return
-        self.mFreq = index
-    
+            raise ValueError("PyCalendarRecurrence: Invalid recurrence rule value")
 
         while len(tokens) != 0:
             # Get next token
             token = tokens.pop()
+            try:
+                tname, tvalue = token.split("=")
+            except ValueError:
+                raise ValueError("PyCalendarRecurrence: Invalid token '%s'" % (token,))
 
             # Determine token type
-            index = stringutils.strnindexfind(token, PyCalendarRecurrence.cRecurMap, PyCalendarRecurrence.cUnknownIndex)
+            index = PyCalendarRecurrence.cRecurMap.get(tname, PyCalendarRecurrence.cUnknownIndex)
             if index == PyCalendarRecurrence.cUnknownIndex:
-                return
+                raise ValueError("PyCalendarRecurrence: Invalid token '%s'" % (tname,))
 
             # Parse remainder based on index
-            q = token[token.find('=') + 1:]
+            if index == definitions.eRecurrence_FREQ:
+                # Get the FREQ value
+                index = PyCalendarRecurrence.cFreqMap.get(tvalue, PyCalendarRecurrence.cUnknownIndex)
+                if index == PyCalendarRecurrence.cUnknownIndex:
+                    raise ValueError("PyCalendarRecurrence: Invalid FREQ value")
+                self.mFreq = index
 
-            if index == 0: # UNTIL
+            elif index == definitions.eRecurrence_UNTIL:
                 if self.mUseCount:
-                    return
+                    raise ValueError("PyCalendarRecurrence: Can't have both UNTIL and COUNT")
                 self.mUseUntil = True
-                if self.mUntil == 0:
+                if self.mUntil is None:
                     self.mUntil = PyCalendarDateTime()
-                self.mUntil.parse(q)
+                try:
+                    self.mUntil.parse(tvalue)
+                except ValueError:
+                    raise ValueError("PyCalendarRecurrence: Invalid UNTIL value")
 
-            elif index == 1: # COUNT
+            elif index == definitions.eRecurrence_COUNT:
                 if self.mUseUntil:
-                    return
+                    raise ValueError("PyCalendarRecurrence: Can't have both UNTIL and COUNT")
                 self.mUseCount = True
-                self.mCount = int(q)
+                try:
+                    self.mCount = int(tvalue)
+                except ValueError:
+                    raise ValueError("PyCalendarRecurrence: Invalid COUNT value")
 
                 # Must not be less than one
                 if self.mCount < 1:
-                    self.mCount = 1
+                    raise ValueError("PyCalendarRecurrence: Invalid COUNT value")
 
-            elif index == 2: # INTERVAL
-                self.mInterval = int(q)
+            elif index == definitions.eRecurrence_INTERVAL:
+                try:
+                    self.mInterval = int(tvalue)
+                except ValueError:
+                    raise ValueError("PyCalendarRecurrence: Invalid INTERVAL value")
 
                 # Must NOT be less than one
                 if self.mInterval < 1:
-                    self.mInterval = 1
+                    raise ValueError("PyCalendarRecurrence: Invalid INTERVAL value")
  
-            elif index == 3: # BYSECOND
-                if self.mBySeconds != 0:
-                    return
+            elif index == definitions.eRecurrence_BYSECOND:
+                if self.mBySeconds is not None:
+                    raise ValueError("PyCalendarRecurrence: Only one BYSECOND allowed")
                 self.mBySeconds = []
-                self.parseList(q, self.mBySeconds)
+                self.parseList(tvalue, self.mBySeconds, 0, 60, errmsg="PyCalendarRecurrence: Invalid BYSECOND value")
 
-            elif index == 4: # BYMINUTE
-                if self.mByMinutes != 0:
-                    return
+            elif index == definitions.eRecurrence_BYMINUTE:
+                if self.mByMinutes is not None:
+                    raise ValueError("PyCalendarRecurrence: Only one BYMINUTE allowed")
                 self.mByMinutes = []
-                self.parseList(q, self.mByMinutes)
+                self.parseList(tvalue, self.mByMinutes, 0, 59, errmsg="PyCalendarRecurrence: Invalid BYMINUTE value")
 
-            elif index == 5: # BYHOUR
-                if self.mByHours != 0:
-                    return
+            elif index == definitions.eRecurrence_BYHOUR:
+                if self.mByHours is not None:
+                    raise ValueError("PyCalendarRecurrence: Only one BYHOUR allowed")
                 self.mByHours = []
-                self.parseList(q, self.mByHours)
+                self.parseList(tvalue, self.mByHours, 0, 23, errmsg="PyCalendarRecurrence: Invalid BYHOUR value")                    
 
-            elif index == 6: # BYDAY
-                if self.mByDay != 0:
-                    return
+            elif index == definitions.eRecurrence_BYDAY:
+                if self.mByDay is not None:
+                    raise ValueError("PyCalendarRecurrence: Only one BYDAY allowed")
                 self.mByDay = []
-                self.parseListDW(q, self.mByDay)
+                self.parseListDW(tvalue, self.mByDay, errmsg="PyCalendarRecurrence: Invalid BYDAY value")                    
 
-            elif index == 7: # BYMONTHDAY
-                if self.mByMonthDay != 0:
-                    return
+            elif index == definitions.eRecurrence_BYMONTHDAY:
+                if self.mByMonthDay is not None:
+                    raise ValueError("PyCalendarRecurrence: Only one BYMONTHDAY allowed")
                 self.mByMonthDay = []
-                self.parseList(q, self.mByMonthDay)
+                self.parseList(tvalue, self.mByMonthDay, 1, 31, True, errmsg="PyCalendarRecurrence: Invalid BYMONTHDAY value")                    
 
-            elif index == 8: # BYYEARDAY
-                if self.mByYearDay != 0:
-                    return
+            elif index == definitions.eRecurrence_BYYEARDAY:
+                if self.mByYearDay is not None:
+                    raise ValueError("PyCalendarRecurrence: Only one BYYEARDAY allowed")
                 self.mByYearDay = []
-                self.parseList(q, self.mByYearDay)
+                self.parseList(tvalue, self.mByYearDay, 1, 366, True, errmsg="PyCalendarRecurrence: Invalid BYYEARDAY value")                    
 
-            elif index == 9: # BYWEEKNO
-                if self.mByWeekNo != 0:
-                    return
+            elif index == definitions.eRecurrence_BYWEEKNO:
+                if self.mByWeekNo is not None:
+                    raise ValueError("PyCalendarRecurrence: Only one BYWEEKNO allowed")
                 self.mByWeekNo = []
-                self.parseList(q, self.mByWeekNo)
+                self.parseList(tvalue, self.mByWeekNo, 1, 53, True, errmsg="PyCalendarRecurrence: Invalid BYWEEKNO value")                    
 
-            elif index == 10: # BYMONTH
-                if self.mByMonth != 0:
-                    return
+            elif index == definitions.eRecurrence_BYMONTH:
+                if self.mByMonth is not None:
+                    raise ValueError("PyCalendarRecurrence: Only one BYMONTH allowed")
                 self.mByMonth = []
-                self.parseList(q, self.mByMonth)
+                self.parseList(tvalue, self.mByMonth, 1, 12, errmsg="PyCalendarRecurrence: Invalid BYMONTH value")                    
 
-            elif index == 11: # BYSETPOS
-                if self.mBySetPos != 0:
-                    return
+            elif index == definitions.eRecurrence_BYSETPOS:
+                if self.mBySetPos is not None:
+                    raise ValueError("PyCalendarRecurrence: Only one BYSETPOS allowed")
                 self.mBySetPos = []
-                self.parseList(q, self.mBySetPos)
+                self.parseList(tvalue, self.mBySetPos, allowNegative=True, errmsg="PyCalendarRecurrence: Invalid BYSETPOS value")                    
 
-            elif index == 12: # WKST
-                index = stringutils.strindexfind(q, PyCalendarRecurrence.cWeekdayMap, PyCalendarRecurrence.cUnknownIndex)
+            elif index == definitions.eRecurrence_WKST:
+                index = PyCalendarRecurrence.cWeekdayMap.get(tvalue, PyCalendarRecurrence.cUnknownIndex)
                 if (index == PyCalendarRecurrence.cUnknownIndex):
-                    return
+                    raise ValueError("PyCalendarRecurrence: Invalid WKST value")
                 self.mWeekstart = index        
 
-    def parseList(self, txt, list):
+    def parseList(self, txt, list, min=None, max=None, allowNegative=False, errmsg=""):
         
         if "," in txt:
             tokens = txt.split(",")
@@ -399,9 +416,17 @@ class PyCalendarRecurrence(object):
             tokens = (txt,)
 
         for token in tokens:
-            list.append(int(token))
+            value = int(token)
+            if not allowNegative and value < 0:
+                raise ValueError(errmsg)
+            avalue = abs(value)
+            if min is not None and avalue < min:
+                raise ValueError(errmsg)
+            if max is not None  and avalue > max:
+                raise ValueError(errmsg)
+            list.append(value)
 
-    def parseListDW(self, txt, list):
+    def parseListDW(self, txt, list, errmsg=""):
 
         if "," in txt:
             tokens = txt.split(",")
@@ -418,19 +443,30 @@ class PyCalendarRecurrence(object):
             
                 num = int(token[0:offset])
                 token = token[offset:]
-        
+                
+                anum = abs(num)
+                if anum < 1:
+                    raise ValueError(errmsg)
+                if anum > 53:
+                    raise ValueError(errmsg)
 
             # Get day
-            index = stringutils.strnindexfind(token, PyCalendarRecurrence.cWeekdayMap, PyCalendarRecurrence.cUnknownIndex)
+            index = PyCalendarRecurrence.cWeekdayMap.get(token, PyCalendarRecurrence.cUnknownIndex)
             if (index == PyCalendarRecurrence.cUnknownIndex):
-                return
+                raise ValueError(errmsg)
             wday = index
 
             list.append((num, wday))
     
+    def getText(self):
+        os = StringIO.StringIO()
+        self.generate(os)
+        return os.getvalue()
+
     def generate(self, os):
         try:
             os.write(definitions.cICalValue_RECUR_FREQ)
+            os.write("=")
 
             if self.mFreq ==  definitions.eRecurrence_SECONDLY:
                 os.write(definitions.cICalValue_RECUR_SECONDLY)
@@ -456,16 +492,19 @@ class PyCalendarRecurrence(object):
             if self.mUseCount:
                 os.write(";")
                 os.write(definitions.cICalValue_RECUR_COUNT)
+                os.write("=")
                 os.write(str(self.mCount))
             elif (self.mUseUntil):
                 os.write(";")
                 os.write(definitions.cICalValue_RECUR_UNTIL)
+                os.write("=")
                 self.mUntil.generate(os)
         
 
             if self.mInterval > 1:
                 os.write(";")
                 os.write(definitions.cICalValue_RECUR_INTERVAL)
+                os.write("=")
                 os.write(str(self.mInterval))
         
 
@@ -473,9 +512,10 @@ class PyCalendarRecurrence(object):
             self.generateList(os, definitions.cICalValue_RECUR_BYMINUTE, self.mByMinutes)
             self.generateList(os, definitions.cICalValue_RECUR_BYHOUR, self.mByHours)
 
-            if (self.mByDay != 0) and (len(self.mByDay) != 0):
+            if (self.mByDay is not None) and (len(self.mByDay) != 0):
                 os.write(";")
                 os.write(definitions.cICalValue_RECUR_BYDAY)
+                os.write("=")
                 comma = False
                 for iter in self.mByDay:
                     if comma:
@@ -516,6 +556,7 @@ class PyCalendarRecurrence(object):
             if self.mWeekstart != definitions.eRecurrence_WEEKDAY_MO:
                 os.write(";")
                 os.write(definitions.cICalValue_RECUR_WKST)
+                os.write("=")
 
                 if self.mWeekstart ==  definitions.eRecurrence_WEEKDAY_SU:
                     os.write(definitions.cICalValue_RECUR_WEEKDAY_SU)
@@ -543,9 +584,10 @@ class PyCalendarRecurrence(object):
 
     def generateList(self, os, title, list):
 
-        if (list != 0) and (len(list) != 0):
+        if (list != None) and (len(list) != 0):
             os.write(";")
             os.write(title)
+            os.write("=")
             comma = False
             for e in list:
                 if comma:
@@ -554,15 +596,15 @@ class PyCalendarRecurrence(object):
                 os.write(str(e))
 
     def hasBy(self):
-        return (self.mBySeconds != 0) and (len(self.mBySeconds) != 0) \
-                or (self.mByMinutes != 0) and (len(self.mByMinutes) != 0) \
-                or (self.mByHours != 0) and (len(self.mByHours) != 0) \
-                or (self.mByDay != 0) and (len(self.mByDay) != 0) \
-                or (self.mByMonthDay != 0) and (len(self.mByMonthDay) != 0) \
-                or (self.mByYearDay != 0) and (len(self.mByYearDay) != 0) \
-                or (self.mByWeekNo != 0) and (len(self.mByWeekNo) != 0) \
-                or (self.mByMonth != 0) and (len(self.mByMonth) != 0) \
-                or (self.mBySetPos != 0) and (len(self.mBySetPos) != 0)
+        return (self.mBySeconds is not None) and (len(self.mBySeconds) != 0) \
+                or (self.mByMinutes is not None) and (len(self.mByMinutes) != 0) \
+                or (self.mByHours is not None) and (len(self.mByHours) != 0) \
+                or (self.mByDay is not None) and (len(self.mByDay) != 0) \
+                or (self.mByMonthDay is not None) and (len(self.mByMonthDay) != 0) \
+                or (self.mByYearDay is not None) and (len(self.mByYearDay) != 0) \
+                or (self.mByWeekNo is not None) and (len(self.mByWeekNo) != 0) \
+                or (self.mByMonth is not None) and (len(self.mByMonth) != 0) \
+                or (self.mBySetPos is not None) and (len(self.mBySetPos) != 0)
 
 
     def isSimpleRule(self):
@@ -579,21 +621,21 @@ class PyCalendarRecurrence(object):
         # no others
 
         # First checks the ones we do not handle at all
-        if ((self.mBySeconds != 0) and (len(self.mBySeconds) != 0) \
-                or (self.mByMinutes != 0) and (len(self.mByMinutes) != 0) \
-                or (self.mByHours != 0) and (len(self.mByHours) != 0) \
-                or (self.mByYearDay != 0) and (len(self.mByYearDay) != 0) \
-                or (self.mByWeekNo != 0) and (len(self.mByWeekNo) != 0)):
+        if ((self.mBySeconds is not None) and (len(self.mBySeconds) != 0) \
+                or (self.mByMinutes is not None) and (len(self.mByMinutes) != 0) \
+                or (self.mByHours is not None) and (len(self.mByHours) != 0) \
+                or (self.mByYearDay is not None) and (len(self.mByYearDay) != 0) \
+                or (self.mByWeekNo is not None) and (len(self.mByWeekNo) != 0)):
             return False
 
         # Check BYMONTHDAY numbers (we can handle -7...-1, 1..31)
-        if self.mByMonthDay != 0:
+        if self.mByMonthDay is not None:
             for iter in self.mByMonthDay:
                 if (iter < -7) or (iter > 31) or (iter == 0):
                     return False
 
         # Check BYDAY numbers
-        if self.mByDay != 0:
+        if self.mByDay is not None:
             number = 0
             first = True
             for iter in self.mByDay:
@@ -613,7 +655,7 @@ class PyCalendarRecurrence(object):
                     return False
 
         # Check BYSETPOS numbers
-        if self.mBySetPos != 0:
+        if self.mBySetPos is not None:
             if len(self.mBySetPos) > 1:
                 return False
             if (len(self.mBySetPos) == 1) and (self.mBySetPos[0] != -1) and (self.mBySetPos[0] != 1):
@@ -648,7 +690,7 @@ class PyCalendarRecurrence(object):
             self.mFullyCached = False
             self.mRecurrences = []
     
-        # Is the current cache complete or does it extaned past the requested
+        # Is the current cache complete or does it extend past the requested
         # range end
         if not self.mCached or not self.mFullyCached \
                 and (self.mCacheUpto is None or self.mCacheUpto < range.getEnd()):
@@ -671,9 +713,13 @@ class PyCalendarRecurrence(object):
             self.mCacheUpto = range.getEnd()
     
         # Just return the cached items in the requested range
+        limited = not self.mFullyCached
         for iter in self.mRecurrences:
             if range.isDateWithinPeriod(iter):
                 items.append(iter)
+            else:
+                limited = True
+        return limited
     
     def simpleExpand(self, start, range, items, float_offset):
         start_iter = start.duplicate()
@@ -753,7 +799,8 @@ class PyCalendarRecurrence(object):
                 self.generateYearlySet(start_iter, set_items)        
 
             # Always sort the set as BYxxx rules may not be sorted
-            set_items.sort(cmp=PyCalendarDateTime.sort)
+            #set_items.sort(cmp=PyCalendarDateTime.sort)
+            set_items.sort(key=lambda x:x.getPosixTime())
 
             # Process each one in the generated set
             for iter in set_items:
@@ -842,49 +889,49 @@ class PyCalendarRecurrence(object):
         # Start with initial date-time
         items.append(start.duplicate())
 
-        if (self.mByMonth != 0) and (len(self.mByMonth) != 0):
+        if (self.mByMonth is not None) and (len(self.mByMonth) != 0):
             items[:] = self.byMonthExpand(items)
     
 
-        if (self.mByWeekNo != 0) and (len(self.mByWeekNo) != 0):
+        if (self.mByWeekNo is not None) and (len(self.mByWeekNo) != 0):
             items[:] = self.byWeekNoExpand(items)
     
 
-        if (self.mByYearDay != 0) and (len(self.mByYearDay) != 0):
+        if (self.mByYearDay is not None) and (len(self.mByYearDay) != 0):
             items[:] = self.byYearDayExpand(items)
     
 
-        if (self.mByMonthDay != 0) and (len(self.mByMonthDay) != 0):
+        if (self.mByMonthDay is not None) and (len(self.mByMonthDay) != 0):
             items[:] = self.byMonthDayExpand(items)
     
 
-        if (self.mByDay != 0) and (len(self.mByDay) != 0):
+        if (self.mByDay is not None) and (len(self.mByDay) != 0):
             # BYDAY is complicated:
             # if BYDAY is included with BYYEARDAY or BYMONTHDAY then it
             # contracts the recurrence set
             # else it expands it, but the expansion depends on the frequency
             # and other BYxxx periodicities
 
-            if ((self.mByYearDay != 0) and (len(self.mByYearDay) != 0)) \
-                    or ((self.mByMonthDay != 0) and (len(self.mByMonthDay) != 0)):
+            if ((self.mByYearDay is not None) and (len(self.mByYearDay) != 0)) \
+                    or ((self.mByMonthDay is not None) and (len(self.mByMonthDay) != 0)):
                 items[:] = self.byDayLimit(items)
-            elif (self.mByWeekNo != 0) and (len(self.mByWeekNo) != 0):
+            elif (self.mByWeekNo is not None) and (len(self.mByWeekNo) != 0):
                 items[:] = self.byDayExpandWeekly(items)
-            elif (self.mByMonth != 0) and (len(self.mByMonth) != 0):
+            elif (self.mByMonth is not None) and (len(self.mByMonth) != 0):
                 items[:] = self.byDayExpandMonthly(items)
             else:
                 items[:] = self.byDayExpandYearly(items)
 
-        if (self.mByHours != 0) and (len(self.mByHours) != 0):
+        if (self.mByHours is not None) and (len(self.mByHours) != 0):
             items[:] = self.byHourExpand(items)
     
-        if (self.mByMinutes != 0) and (len(self.mByMinutes) != 0):
+        if (self.mByMinutes is not None) and (len(self.mByMinutes) != 0):
             items[:] = self.byMinuteExpand(items)
     
-        if (self.mBySeconds != 0) and (len(self.mBySeconds) != 0):
+        if (self.mBySeconds is not None) and (len(self.mBySeconds) != 0):
             items[:] = self.bySecondExpand(items)
     
-        if (self.mBySetPos != 0) and (len(self.mBySetPos) != 0):
+        if (self.mBySetPos is not None) and (len(self.mBySetPos) != 0):
             items[:] = self.bySetPosLimit(items)
     
     def generateMonthlySet(self, start, items):
@@ -893,7 +940,7 @@ class PyCalendarRecurrence(object):
         # Start with initial date-time
         items.append(start.duplicate())
 
-        if (self.mByMonth != 0) and (len(self.mByMonth) != 0):
+        if (self.mByMonth is not None) and (len(self.mByMonth) != 0):
             # BYMONTH limits the range of possible values
             items[:] = self.byMonthLimit(items)
             if (len(items) == 0):
@@ -903,32 +950,32 @@ class PyCalendarRecurrence(object):
 
         # No BYYEARDAY
 
-        if (self.mByMonthDay != 0) and (len(self.mByMonthDay) != 0):
+        if (self.mByMonthDay is not None) and (len(self.mByMonthDay) != 0):
             items[:] = self.byMonthDayExpand(items)
     
-        if (self.mByDay != 0) and (len(self.mByDay) != 0):
+        if (self.mByDay is not None) and (len(self.mByDay) != 0):
             # BYDAY is complicated:
             # if BYDAY is included with BYYEARDAY or BYMONTHDAY then it
             # contracts the recurrence set
             # else it expands it, but the expansion depends on the frequency
             # and other BYxxx periodicities
 
-            if ((self.mByYearDay != 0) and (len(self.mByYearDay) != 0)) \
-                    or ((self.mByMonthDay != 0) and (len(self.mByMonthDay) != 0)):
+            if ((self.mByYearDay is not None) and (len(self.mByYearDay) != 0)) \
+                    or ((self.mByMonthDay is not None) and (len(self.mByMonthDay) != 0)):
                 items[:] = self.byDayLimit(items)
             else:
                 items[:] = self.byDayExpandMonthly(items)
     
-        if ((self.mByHours != 0) and (len(self.mByHours) != 0)):
+        if ((self.mByHours is not None) and (len(self.mByHours) != 0)):
             items[:] = self.byHourExpand(items)
     
-        if ((self.mByMinutes != 0) and (len(self.mByMinutes) != 0)):
+        if ((self.mByMinutes is not None) and (len(self.mByMinutes) != 0)):
             items[:] = self.byMinuteExpand(items)
     
-        if ((self.mBySeconds != 0) and (len(self.mBySeconds) != 0)):
+        if ((self.mBySeconds is not None) and (len(self.mBySeconds) != 0)):
             items[:] = self.bySecondExpand(items)
     
-        if ((self.mBySetPos != 0) and (len(self.mBySetPos) != 0)):
+        if ((self.mBySetPos is not None) and (len(self.mBySetPos) != 0)):
             items[:] = self.bySetPosLimit(items)
     
     def generateWeeklySet(self, start,  items):
@@ -937,13 +984,13 @@ class PyCalendarRecurrence(object):
         # Start with initial date-time
         items.append(start.duplicate())
 
-        if (self.mByMonth != 0) and (len(self.mByMonth) != 0):
+        if (self.mByMonth is not None) and (len(self.mByMonth) != 0):
             # BYMONTH limits the range of possible values
             items[:] = self.byMonthLimit(items)
             if (len(items) == 0):
                 return
     
-        if (self.mByWeekNo != 0) and (len(self.mByWeekNo) != 0):
+        if (self.mByWeekNo is not None) and (len(self.mByWeekNo) != 0):
             items[:] = self.byWeekNoLimit(items)
             if (len(items) == 0):
                 return
@@ -952,19 +999,19 @@ class PyCalendarRecurrence(object):
 
         # No BYMONTHDAY
 
-        if (self.mByDay != 0) and (len(self.mByDay) != 0):
+        if (self.mByDay is not None) and (len(self.mByDay) != 0):
             items[:] = self.byDayExpandWeekly(items)
     
-        if (self.mByHours != 0) and (len(self.mByHours) != 0):
+        if (self.mByHours is not None) and (len(self.mByHours) != 0):
             items[:] = self.byHourExpand(items)
     
-        if (self.mByMinutes != 0) and (len(self.mByMinutes) != 0):
+        if (self.mByMinutes is not None) and (len(self.mByMinutes) != 0):
             items[:] = self.byMinuteExpand(items)
     
-        if (self.mBySeconds != 0) and (len(self.mBySeconds) != 0):
+        if (self.mBySeconds is not None) and (len(self.mBySeconds) != 0):
             items[:] = self.bySecondExpand(items)
     
-        if (self.mBySetPos != 0) and (len(self.mBySetPos) != 0):
+        if (self.mBySetPos is not None) and (len(self.mBySetPos) != 0):
             items[:] = self.bySetPosLimit(items)
     
     def generateDailySet(self, start,  items):
@@ -973,14 +1020,14 @@ class PyCalendarRecurrence(object):
         # Start with initial date-time
         items.append(start.duplicate())
 
-        if (self.mByMonth != 0) and (len(self.mByMonth) != 0):
+        if (self.mByMonth is not None) and (len(self.mByMonth) != 0):
             # BYMONTH limits the range of possible values
             items[:] = self.byMonthLimit(items)
             if (len(items) == 0):
                 return
     
 
-        if (self.mByWeekNo != 0) and (len(self.mByWeekNo) != 0):
+        if (self.mByWeekNo is not None) and (len(self.mByWeekNo) != 0):
             items[:] = self.byWeekNoLimit(items)
             if (len(items) == 0):
                 return
@@ -988,31 +1035,31 @@ class PyCalendarRecurrence(object):
 
         # No BYYEARDAY
 
-        if (self.mByMonthDay != 0) and (len(self.mByMonthDay) != 0):
+        if (self.mByMonthDay is not None) and (len(self.mByMonthDay) != 0):
             items[:] = self.byMonthDayLimit(items)
             if (len(items) == 0):
                 return
     
 
-        if (self.mByDay != 0) and (len(self.mByDay) != 0):
+        if (self.mByDay is not None) and (len(self.mByDay) != 0):
             items[:] = self.byDayLimit(items)
             if (len(items) == 0):
                 return
     
 
-        if (self.mByHours != 0) and (len(self.mByHours) != 0):
+        if (self.mByHours is not None) and (len(self.mByHours) != 0):
             items[:] = self.byHourExpand(items)
     
 
-        if (self.mByMinutes != 0) and (len(self.mByMinutes) != 0):
+        if (self.mByMinutes is not None) and (len(self.mByMinutes) != 0):
             items[:] = self.byMinuteExpand(items)
     
 
-        if (self.mBySeconds != 0) and (len(self.mBySeconds) != 0):
+        if (self.mBySeconds is not None) and (len(self.mBySeconds) != 0):
             items[:] = self.bySecondExpand(items)
     
 
-        if (self.mBySetPos != 0) and (len(self.mBySetPos) != 0):
+        if (self.mBySetPos is not None) and (len(self.mBySetPos) != 0):
             items[:] = self.bySetPosLimit(items)
     
     def generateHourlySet(self, start, items):
@@ -1021,14 +1068,14 @@ class PyCalendarRecurrence(object):
         # Start with initial date-time
         items.append(start.duplicate())
 
-        if (self.mByMonth != 0) and (len(self.mByMonth) != 0):
+        if (self.mByMonth is not None) and (len(self.mByMonth) != 0):
             # BYMONTH limits the range of possible values
             items[:] = self.byMonthLimit(items)
             if (len(items) == 0):
                 return
     
 
-        if (self.mByWeekNo != 0) and (len(self.mByWeekNo) != 0):
+        if (self.mByWeekNo is not None) and (len(self.mByWeekNo) != 0):
             items[:] = self.byWeekNoLimit(items)
             if (len(items) == 0):
                 return
@@ -1036,32 +1083,32 @@ class PyCalendarRecurrence(object):
 
         # No BYYEARDAY
 
-        if (self.mByMonthDay != 0) and (len(self.mByMonthDay) != 0):
+        if (self.mByMonthDay is not None) and (len(self.mByMonthDay) != 0):
             items[:] = self.byMonthDayLimit(items)
             if (len(items) == 0):
                 return
     
 
-        if (self.mByDay != 0) and (len(self.mByDay) != 0):
+        if (self.mByDay is not None) and (len(self.mByDay) != 0):
             items[:] = self.byDayLimit(items)
             if (len(items) == 0):
                 return
     
 
-        if (self.mByHours != 0) and (len(self.mByHours) != 0):
+        if (self.mByHours is not None) and (len(self.mByHours) != 0):
             items[:] = self.byHourLimit(items)
             if (len(items) == 0):
                 return
     
-        if (self.mByMinutes != 0) and (len(self.mByMinutes) != 0):
+        if (self.mByMinutes is not None) and (len(self.mByMinutes) != 0):
             items[:] = self.byMinuteExpand(items)
     
 
-        if (self.mBySeconds != 0) and (len(self.mBySeconds) != 0):
+        if (self.mBySeconds is not None) and (len(self.mBySeconds) != 0):
             items[:] = self.bySecondExpand(items)
     
 
-        if (self.mBySetPos != 0) and (len(self.mBySetPos) != 0):
+        if (self.mBySetPos is not None) and (len(self.mBySetPos) != 0):
             items[:] = self.bySetPosLimit(items)
 
     def generateMinutelySet(self, start, items):
@@ -1070,43 +1117,43 @@ class PyCalendarRecurrence(object):
         # Start with initial date-time
         items.append(start.duplicate())
 
-        if (self.mByMonth != 0) and (len(self.mByMonth) != 0):
+        if (self.mByMonth is not None) and (len(self.mByMonth) != 0):
             # BYMONTH limits the range of possible values
             items[:] = self.byMonthLimit(items)
             if (len(items) == 0):
                 return
     
-        if (self.mByWeekNo != 0) and (len(self.mByWeekNo) != 0):
+        if (self.mByWeekNo is not None) and (len(self.mByWeekNo) != 0):
             items[:] = self.byWeekNoLimit(items)
             if (len(items) == 0):
                 return
     
         # No BYYEARDAY
 
-        if (self.mByMonthDay != 0) and (len(self.mByMonthDay) != 0):
+        if (self.mByMonthDay is not None) and (len(self.mByMonthDay) != 0):
             items[:] = self.byMonthDayLimit(items)
             if (len(items) == 0):
                 return
     
-        if (self.mByDay != 0) and (len(self.mByDay) != 0):
+        if (self.mByDay is not None) and (len(self.mByDay) != 0):
             items[:] = self.byDayLimit(items)
             if (len(items) == 0):
                 return
     
-        if (self.mByHours != 0) and (len(self.mByHours) != 0):
+        if (self.mByHours is not None) and (len(self.mByHours) != 0):
             items[:] = self.byHourLimit(items)
             if (len(items) == 0):
                 return
     
-        if (self.mByMinutes != 0) and (len(self.mByMinutes) != 0):
+        if (self.mByMinutes is not None) and (len(self.mByMinutes) != 0):
             items[:] = self.byMinuteLimit(items)
             if (len(items) == 0):
                 return
     
-        if (self.mBySeconds != 0) and (len(self.mBySeconds) != 0):
+        if (self.mBySeconds is not None) and (len(self.mBySeconds) != 0):
             items[:] = self.bySecondExpand(items)
     
-        if (self.mBySetPos != 0) and (len(self.mBySetPos) != 0):
+        if (self.mBySetPos is not None) and (len(self.mBySetPos) != 0):
             items[:] = self.bySetPosLimit(items)
     
     def generateSecondlySet(self, start,  items):
@@ -1115,45 +1162,45 @@ class PyCalendarRecurrence(object):
         # Start with initial date-time
         items.append(start.duplicate())
 
-        if (self.mByMonth != 0) and (len(self.mByMonth) != 0):
+        if (self.mByMonth is not None) and (len(self.mByMonth) != 0):
             # BYMONTH limits the range of possible values
             items[:] = self.byMonthLimit(items)
             if (len(items) == 0):
                 return
     
-        if (self.mByWeekNo != 0) and (len(self.mByWeekNo) != 0):
+        if (self.mByWeekNo is not None) and (len(self.mByWeekNo) != 0):
             items[:] = self.byWeekNoLimit(items)
             if (len(items) == 0):
                 return
     
         # No BYYEARDAY
 
-        if (self.mByMonthDay != 0) and (len(self.mByMonthDay) != 0):
+        if (self.mByMonthDay is not None) and (len(self.mByMonthDay) != 0):
             items[:] = self.byMonthDayLimit(items)
             if (len(items) == 0):
                 return
     
-        if (self.mByDay != 0) and (len(self.mByDay) != 0):
+        if (self.mByDay is not None) and (len(self.mByDay) != 0):
             items[:] = self.byDayLimit(items)
             if (len(items) == 0):
                 return
     
-        if (self.mByHours != 0) and (len(self.mByHours) != 0):
+        if (self.mByHours is not None) and (len(self.mByHours) != 0):
             items[:] = self.byHourLimit(items)
             if (len(items) == 0):
                 return
     
-        if (self.mByMinutes != 0) and (len(self.mByMinutes) != 0):
+        if (self.mByMinutes is not None) and (len(self.mByMinutes) != 0):
             items[:] = self.byMinuteLimit(items)
             if (len(items) == 0):
                 return
     
-        if (self.mBySeconds != 0) and (len(self.mBySeconds) != 0):
+        if (self.mBySeconds is not None) and (len(self.mBySeconds) != 0):
             items[:] = self.bySecondLimit(items)
             if (len(items) == 0):
                 return
     
-        if (self.mBySetPos != 0) and (len(self.mBySetPos) != 0):
+        if (self.mBySetPos is not None) and (len(self.mBySetPos) != 0):
             items[:] = self.bySetPosLimit(items)
 
     def byMonthExpand(self, dates):
@@ -1437,7 +1484,8 @@ class PyCalendarRecurrence(object):
 
     def bySetPosLimit(self, dates):
         # The input dates MUST be sorted in order for this to work properly
-        dates.sort(cmp=PyCalendarDateTime.sort)
+        #dates.sort(cmp=PyCalendarDateTime.sort)
+        dates.sort(key=lambda x:x.getPosixTime())
 
         # Loop over each BYSETPOS and extract the relevant component from the
         # input array and add to the output

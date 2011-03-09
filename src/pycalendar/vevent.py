@@ -1,5 +1,5 @@
 ##
-#    Copyright (c) 2007 Cyrus Daboo. All rights reserved.
+#    Copyright (c) 2007-2011 Cyrus Daboo. All rights reserved.
 #    
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -14,7 +14,6 @@
 #    limitations under the License.
 ##
 
-from component import PyCalendarComponent
 from componentrecur import PyCalendarComponentRecur
 from property import PyCalendarProperty
 import definitions
@@ -22,49 +21,27 @@ import itipdefinitions
 
 class PyCalendarVEvent(PyCalendarComponentRecur):
 
-    sBeginDelimiter = definitions.cICalComponent_BEGINVEVENT
-
-    sEndDelimiter = definitions.cICalComponent_ENDVEVENT
-
-    @staticmethod
-    def getVBegin():
-        return PyCalendarVEvent.sBeginDelimiter
-
-    @staticmethod
-    def getVEnd():
-        return PyCalendarVEvent.sEndDelimiter
-
-    def __init__(self, calendar):
-        super(PyCalendarVEvent, self).__init__(calendar=calendar)
+    def __init__(self, parent=None):
+        super(PyCalendarVEvent, self).__init__(parent=parent)
         self.mStatus = definitions.eStatus_VEvent_None
 
-    def duplicate(self, calendar):
-        other = super(PyCalendarVEvent, self).duplicate(calendar)
+    def duplicate(self, parent=None):
+        other = super(PyCalendarVEvent, self).duplicate(parent=parent)
         other.mStatus = self.mStatus
         return other
 
     def getType(self):
-        return PyCalendarComponent.eVEVENT
-
-    def getBeginDelimiter(self):
-        return PyCalendarVEvent.sBeginDelimiter
-
-    def getEndDelimiter(self):
-        return PyCalendarVEvent.sEndDelimiter
+        return definitions.cICalComponent_VEVENT
 
     def getMimeComponentName(self):
         return itipdefinitions.cICalMIMEComponent_VEVENT
 
     def addComponent(self, comp):
         # We can embed the alarm components only
-        if comp.getType() == PyCalendarComponent.eVALARM:
-            if self.mEmbedded is None:
-                self.mEmbedded = []
-            self.mEmbedded.append(comp)
-            comp.setEmbedder(self)
-            return True
+        if comp.getType() == definitions.cICalComponent_VALARM:
+            super(PyCalendarVEvent, self).addComponent(comp)
         else:
-            return False
+            raise ValueError
 
     def getStatus(self):
         return self.mStatus
@@ -111,3 +88,12 @@ class PyCalendarVEvent(PyCalendarComponentRecur):
             if value is not None:
                 prop = PyCalendarProperty(definitions.cICalProperty_STATUS, value)
                 self.addProperty(prop)
+
+    def sortedPropertyKeyOrder(self):
+        return (
+            definitions.cICalProperty_UID,
+            definitions.cICalProperty_RECURRENCE_ID,
+            definitions.cICalProperty_DTSTART,
+            definitions.cICalProperty_DURATION,
+            definitions.cICalProperty_DTEND,
+        )

@@ -1,5 +1,5 @@
 ##
-#    Copyright (c) 2007 Cyrus Daboo. All rights reserved.
+#    Copyright (c) 2007-2011 Cyrus Daboo. All rights reserved.
 #    
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -16,6 +16,8 @@
 
 # ICalendar Value class
 
+from cStringIO import StringIO
+
 class PyCalendarValue(object):
 
     VALUETYPE_BINARY = 0
@@ -29,15 +31,24 @@ class PyCalendarValue(object):
     VALUETYPE_INTEGER = 8
     VALUETYPE_PERIOD = 9
     VALUETYPE_RECUR = 10
-    VALUETYPE_TEXT = 11
-    VALUETYPE_TIME = 12
-    VALUETYPE_URI = 13
-    VALUETYPE_UTC_OFFSET = 14
-    VALUETYPE_MULTIVALUE = 15
-    VALUETYPE_XNAME = 16
+    VALUETYPE_REQUEST_STATUS = 11
+    VALUETYPE_TEXT = 12
+    VALUETYPE_TIME = 13
+    VALUETYPE_URI = 14
+    VALUETYPE_UTC_OFFSET = 15
+    VALUETYPE_MULTIVALUE = 16
+    VALUETYPE_XNAME = 17
     
     _typeMap = {}
     
+    def __str__(self):
+        return self.getText()
+        
+    def __ne__(self, other): return not self.__eq__(other)
+    def __eq__(self, other):
+        if not isinstance(other, PyCalendarValue): return False
+        return self.getValue() == other.getValue()
+
     @classmethod
     def registerType(clz, type, cls):
         clz._typeMap[type] = cls
@@ -63,3 +74,7 @@ class PyCalendarValue(object):
     def generate(self, os):
         raise NotImplementedError
     
+    def getText(self):
+        os = StringIO()
+        self.generate(os)
+        return os.getvalue()

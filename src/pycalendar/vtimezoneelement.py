@@ -1,5 +1,5 @@
 ##
-#    Copyright (c) 2007 Cyrus Daboo. All rights reserved.
+#    Copyright (c) 2007-2011 Cyrus Daboo. All rights reserved.
 #    
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -23,8 +23,8 @@ import definitions
 
 class PyCalendarVTimezoneElement(PyCalendarVTimezone):
 
-    def __init__(self, calendar=None, dt=None, offset=None):
-        super(PyCalendarVTimezoneElement, self).__init__(calendar=calendar)
+    def __init__(self, parent=None, dt=None, offset=None):
+        super(PyCalendarVTimezoneElement, self).__init__(parent=parent)
         self.mStart = dt if dt is not None else PyCalendarDateTime()
         self.mTZName = ""
         self.mUTCOffset = offset if offset is not None else 0
@@ -33,8 +33,8 @@ class PyCalendarVTimezoneElement(PyCalendarVTimezone):
         self.mCachedExpandBelow = None
         self.mCachedExpandBelowItems = None
 
-    def duplicate(self, calendar):
-        other = super(PyCalendarVTimezoneElement, self).duplicate(calendar)
+    def duplicate(self, parent=None):
+        other = super(PyCalendarVTimezoneElement, self).duplicate(parent=parent)
         other.mStart = self.mStart.duplicate()
         other.mTZName = self.mTZName
         other.mUTCOffset = self.mUTCOffset
@@ -176,12 +176,12 @@ class PyCalendarVTimezoneElement(PyCalendarVTimezone):
                 self.mCachedExpandBelow = self.mStart.duplicate()
             if temp > self.mCachedExpandBelow:
                 self.mCachedExpandBelowItems = []
-                period = PyCalendarPeriod(start, end)
+                period = PyCalendarPeriod(self.mStart, end)
                 self.mRecurrences.expand(self.mStart, period, self.mCachedExpandBelowItems, float_offset=self.mUTCOffsetFrom)
                 self.mCachedExpandBelow = temp
             
             if len(self.mCachedExpandBelowItems) != 0:
-                # The last one in the list is the one we want
-                return [(dt, offsetfrom, offsetto,) for dt in self.mCachedExpandBelowItems]
+                # Return them all within the range
+                return [(dt, offsetfrom, offsetto,) for dt in self.mCachedExpandBelowItems if dt >= start and dt < end]
 
             return ()

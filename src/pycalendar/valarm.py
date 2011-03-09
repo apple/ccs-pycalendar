@@ -1,5 +1,5 @@
 ##
-#    Copyright (c) 2007 Cyrus Daboo. All rights reserved.
+#    Copyright (c) 2007-2011 Cyrus Daboo. All rights reserved.
 #    
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -23,10 +23,6 @@ from value import PyCalendarValue
 import definitions
 
 class PyCalendarVAlarm(PyCalendarComponent):
-
-    sBeginDelimiter = definitions.cICalComponent_BEGINVALARM
-
-    sEndDelimiter = definitions.cICalComponent_ENDVALARM
 
     # Classes for each action encapsulating action-specific data
     class PyCalendarVAlarmAction(object):
@@ -175,21 +171,13 @@ class PyCalendarVAlarm(PyCalendarComponent):
         def remove(self, valarm):
             pass
 
-    @staticmethod
-    def getVBegin():
-        return PyCalendarVAlarm.sBeginDelimiter
-
-    @staticmethod
-    def getVEnd():
-        return PyCalendarVAlarm.sEndDelimiter
-
     def getMimeComponentName(self):
         # Cannot be sent as a separate MIME object
         return None
 
-    def __init__(self, calendar):
+    def __init__(self, parent=None):
         
-        super(PyCalendarVAlarm, self).__init__(calendar=calendar)
+        super(PyCalendarVAlarm, self).__init__(parent=parent)
 
         self.mAction = definitions.eAction_VAlarm_Display
         self.mTriggerAbsolute = False
@@ -215,8 +203,8 @@ class PyCalendarVAlarm(PyCalendarComponent):
         # Create action data
         self.mActionData = PyCalendarVAlarm.PyCalendarVAlarmDisplay("")
 
-    def duplicate(self, calendar):
-        other = super(PyCalendarVAlarm, self).duplicate(calendar)
+    def duplicate(self, parent=None):
+        other = super(PyCalendarVAlarm, self).duplicate(parent=parent)
         other.mAction = self.mAction
         other.mTriggerAbsolute = self.mTriggerAbsolute
         other.mTriggerOn = self.mTriggerOn.duplicate()
@@ -237,13 +225,7 @@ class PyCalendarVAlarm(PyCalendarComponent):
         return other
 
     def getType(self):
-        return PyCalendarComponent.eVALARM
-
-    def getBeginDelimiter(self):
-        return PyCalendarVAlarm.sBeginDelimiter
-
-    def getEndDelimiter(self):
-        return PyCalendarVAlarm.sEndDelimiter
+        return definitions.cICalComponent_VALARM
 
     def getAction(self):
         return self.mAction

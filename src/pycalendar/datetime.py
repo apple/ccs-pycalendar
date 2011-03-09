@@ -1,5 +1,5 @@
 ##
-#    Copyright (c) 2007 Cyrus Daboo. All rights reserved.
+#    Copyright (c) 2007-2011 Cyrus Daboo. All rights reserved.
 #    
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -14,14 +14,15 @@
 #    limitations under the License.
 ##
 
-import cStringIO as StringIO
-import time
 
 from duration import PyCalendarDuration
 from timezone import PyCalendarTimezone
 import definitions
 import locale
 import utils
+
+import cStringIO as StringIO
+import time
 
 class PyCalendarDateTime(object):
 
@@ -57,7 +58,7 @@ class PyCalendarDateTime(object):
 
         self.mDateOnly = False
 
-        self.mTZUTC = True
+        self.mTZUTC = False
         self.mTZID = None
 
         self.mPosixTimeCached = False
@@ -103,8 +104,16 @@ class PyCalendarDateTime(object):
         other.mPosixTime = self.mPosixTime
         
         return other
-        
+    
+    def duplicateAsUTC(self):
+        other = self.duplicate()
+        other.adjustToUTC()
+        return other
+
     def __repr__(self):
+        return "PyCalendarDateTime: %s" % (self.getText(),)
+
+    def __str__(self):
         return self.getText()
 
     def __hash__(self):
@@ -115,37 +124,51 @@ class PyCalendarDateTime(object):
         # Add duration seconds to temp object and normalise it
         result = self.duplicate()
         result.mSeconds += duration.getTotalSeconds()
-        result.changed()
         result.normalise()
         return result
  
-    def __sub__( self, date ):
-        # Look for floating
-        if self.floating() or date.floating():
-            # Adjust the floating ones to fixed
-            copy1 = self.duplicate()
-            copy2 = date.duplicate()
-
-            if copy1.floating() and copy2.floating():
-                # Set both to UTC and do comparison
-                copy1.setTimezoneUTC( True )
-                copy2.setTimezoneUTC( True )
-                return copy1 - copy2
-            elif copy1.floating():
-                # Set to be the same
-                copy1.setTimezoneUTC( copy2.getTimezoneUTC() )
-                copy1.setTimezoneID( copy2.getTimezoneID() )
-                return copy1 - copy2
+    def __sub__( self, dateorduration ):
+        
+        if isinstance(dateorduration, PyCalendarDateTime):
+            
+            date = dateorduration
+    
+            # Look for floating
+            if self.floating() or date.floating():
+                # Adjust the floating ones to fixed
+                copy1 = self.duplicate()
+                copy2 = date.duplicate()
+    
+                if copy1.floating() and copy2.floating():
+                    # Set both to UTC and do comparison
+                    copy1.setTimezoneUTC( True )
+                    copy2.setTimezoneUTC( True )
+                    return copy1 - copy2
+                elif copy1.floating():
+                    # Set to be the same
+                    copy1.setTimezoneID( copy2.getTimezoneID() )
+                    copy1.setTimezoneUTC( copy2.getTimezoneUTC() )
+                    return copy1 - copy2
+                else:
+                    # Set to be the same
+                    copy2.setTimezoneID( copy1.getTimezoneID() )
+                    copy2.setTimezoneUTC( copy1.getTimezoneUTC() )
+                    return copy1 - copy2
+     
             else:
-                # Set to be the same
-                copy2.setTimezoneID( copy1.getTimezoneID() )
-                copy2.setTimezoneUTC( copy1.getTimezoneUTC() )
-                return copy1 - copy2
- 
-        else:
-            # Do diff of date-time in seconds
-            diff = self.getPosixTime() - date.getPosixTime()
-            return PyCalendarDuration(duration=diff)
+                # Do diff of date-time in seconds
+                diff = self.getPosixTime() - date.getPosixTime()
+                return PyCalendarDuration(duration=diff)
+
+        elif isinstance(dateorduration, PyCalendarDuration):
+            
+            duration = dateorduration
+            result = self.duplicate()
+            result.mSeconds -= duration.getTotalSeconds()
+            result.normalise()
+            return result
+        
+        raise ValueError
 
     # Comparators
     def __eq__( self, comp ):
@@ -167,6 +190,8 @@ class PyCalendarDateTime(object):
         return self.compareDateTime( comp ) < 0
 
     def compareDateTime( self, comp ):
+        if comp is None:
+            return 1
         # If either are date only, then just do date compare
         if self.mDateOnly or comp.mDateOnly:
             if self.mYear == comp.mYear:
@@ -258,7 +283,7 @@ class PyCalendarDateTime(object):
             # Adjust for timezone offset
             result -= self.timeZoneSecondsOffset()
 
-            # Now indcate cache state
+            # Now indicate cache state
             self.mPosixTimeCached = True
             self.mPosixTime = result
  
@@ -558,7 +583,9 @@ class PyCalendarDateTime(object):
         return self.mTZUTC
 
     def setTimezoneUTC( self, utc ):
-        self.mTZUTC = utc
+        if self.mTZID != utc:
+            self.mTZUTC = utc
+            self.changed()
 
     def getTimezoneID( self ):
         return self.mTZID
@@ -577,9 +604,8 @@ class PyCalendarDateTime(object):
     def floating( self ):
         return ( not self.mTZUTC ) and not self.mTZID
 
-    #public ICalendarTimezone getTimezone() {
-    #    return mTimezone
-    #}
+    def getTimezone(self):
+        return PyCalendarTimezone(utc=self.mTZUTC, tzid=self.mTZID)
 
     def setTimezone( self, tzid ):
         self.mTZUTC = tzid.getUTC()
@@ -594,9 +620,10 @@ class PyCalendarDateTime(object):
             self.setTimezone( tzid )
             offset_to = self.timeZoneSecondsOffset()
             self.offsetSeconds( offset_to - offset_from )
+        return self
 
     def adjustToUTC( self ):
-        if not self.mTZUTC:
+        if self.local() and not self.mDateOnly:
             utc = PyCalendarTimezone(utc=True)
 
             offset_from = self.timeZoneSecondsOffset()
@@ -604,8 +631,8 @@ class PyCalendarDateTime(object):
             offset_to = self.timeZoneSecondsOffset()
 
             self.offsetSeconds( offset_to - offset_from )
+        return self
 
-    #def getAdjustedTime( self, tzid = PyCalendarManager.sPyCalendarManager.getDefaultTimezone() ):
     def getAdjustedTime( self, tzid = None ):
         # Copy this and adjust to input timezone
         adjusted = self.duplicate()
@@ -617,7 +644,7 @@ class PyCalendarDateTime(object):
         self.copy_ICalendarDateTime( self.getToday( tz ) )
 
     @staticmethod
-    def getToday( tzid ):
+    def getToday( tzid=None ):
         # Get from posix time
         now = time.time()
         now_tm = time.localtime( now )
@@ -645,8 +672,7 @@ class PyCalendarDateTime(object):
         now_tm = time.gmtime( now )
         tzid = PyCalendarTimezone(utc=True)
     
-        temp = PyCalendarDateTime(year=now_tm.tm_year, month=now_tm.tm_mon, day=now_tm.tm_mday, hours=now_tm.tm_hour, minutes=now_tm.tm_min, seconds=now_tm.tm_sec, tzid=tzid )
-        return temp
+        return PyCalendarDateTime(year=now_tm.tm_year, month=now_tm.tm_mon, day=now_tm.tm_mday, hours=now_tm.tm_hour, minutes=now_tm.tm_min, seconds=now_tm.tm_sec, tzid=tzid )
 
     def recur( self, freq, interval ):
         # Add appropriate interval
@@ -776,13 +802,18 @@ class PyCalendarDateTime(object):
     def getText( self ):
     
         if self.mDateOnly:
-            buf = "%4d%02d%02d" % ( self.mYear, self.mMonth, self.mDay )
+            return "%4d%02d%02d" % ( self.mYear, self.mMonth, self.mDay )
         else:
             if self.mTZUTC:
-                buf = "%4d%02d%02dT%02d%02d%02dZ" % ( self.mYear, self.mMonth, self.mDay, self.mHours, self.mMinutes, self.mSeconds )
+                return "%4d%02d%02dT%02d%02d%02dZ" % ( self.mYear, self.mMonth, self.mDay, self.mHours, self.mMinutes, self.mSeconds )
             else:
-                buf = "%4d%02d%02dT%02d%02d%02d" % ( self.mYear, self.mMonth, self.mDay, self.mHours, self.mMinutes, self.mSeconds )
-        return buf
+                return "%4d%02d%02dT%02d%02d%02d" % ( self.mYear, self.mMonth, self.mDay, self.mHours, self.mMinutes, self.mSeconds )
+
+    @classmethod
+    def parseText(cls, data):
+        dt = cls()
+        dt.parse(data)
+        return dt
 
     def parse( self, data ):
 
@@ -790,39 +821,45 @@ class PyCalendarDateTime(object):
 
         # Size must be at least 8
         dlen = len(data)
-        if dlen < 8:
-            return
+        if dlen not in (8, 15, 16):
+            raise ValueError
 
         # Get year
         buf = data[0:4]
-        self.mYear = int( buf )
+        self.mYear = int(buf)
 
         # Get month
         buf = data[4:6]
-        self.mMonth = int( buf )
+        self.mMonth = int(buf)
 
         # Get day
         buf = data[6:8]
-        self.mDay = int( buf )
+        self.mDay = int(buf)
 
         # Now look for more
-        if ( dlen >= 15 ) and ( data[8] == 'T' ):
+        if dlen >= 15:
+            
+            if data[8] != 'T':
+                raise ValueError
+
             # Get hours
             buf = data[9:11]
-            self.mHours = int( buf )
+            self.mHours = int(buf)
 
             # Get minutes
             buf = data[11:13]
-            self.mMinutes = int( buf )
+            self.mMinutes = int(buf)
 
             # Get seconds
             buf = data[13:15]
-            self.mSeconds = int( buf )
+            self.mSeconds = int(buf)
 
             self.mDateOnly = False
 
             if dlen > 15:
-                self.mTZUTC = ( data[15] == 'Z' )
+                if data[15] != 'Z':
+                    raise ValueError
+                self.mTZUTC = True
             else:
                 self.mTZUTC = False
         else:
@@ -916,7 +953,7 @@ class PyCalendarDateTime(object):
         self.mPosixTimeCached = False
 
     def daysSince1970( self ):
-        # Add days betweenn 1970 and current year (ignoring leap days)
+        # Add days between 1970 and current year (ignoring leap days)
         result = ( self.mYear - 1970 ) * 365
 
         # Add leap days between years

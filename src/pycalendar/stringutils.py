@@ -1,5 +1,5 @@
 ##
-#    Copyright (c) 2007 Cyrus Daboo. All rights reserved.
+#    Copyright (c) 2007-2011 Cyrus Daboo. All rights reserved.
 #    
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
 #    limitations under the License.
 ##
 
-import md5
+from hashlib import md5
 
 def strduptokenstr(txt, tokens):
     
@@ -63,6 +63,24 @@ def strduptokenstr(txt, tokens):
                     result = ""
                 return result, txt[start+relend:]
         return txt[start:], ""
+
+def strtoul(s, offset=0):
+    
+    max = len(s)
+    startoffset = offset
+    while offset < max:
+        if s[offset] in "0123456789":
+            offset += 1
+            continue
+        elif offset == 0:
+            raise ValueError
+        else:
+            return int(s[startoffset:offset]), offset
+    else:
+        if offset == 0:
+            raise ValueError
+        else:
+            return int(s[startoffset:]), offset
 
 def strindexfind(s, ss, default_index):
     if s and ss:

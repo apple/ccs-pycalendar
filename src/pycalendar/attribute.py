@@ -1,5 +1,5 @@
 ##
-#    Copyright (c) 2007 Cyrus Daboo. All rights reserved.
+#    Copyright (c) 2007-2011 Cyrus Daboo. All rights reserved.
 #    
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -28,9 +28,14 @@ class PyCalendarAttribute(object):
 
     def duplicate(self):
         other = PyCalendarAttribute(self.mName, [i for i in self.mValues])
-        other.mValues = [i for i in self.mValues]
+        other.mValues = self.mValues[:]
         return other
         
+    def __ne__(self, other): return not self.__eq__(other)
+    def __eq__(self, other):
+        if not isinstance(other, PyCalendarAttribute): return False
+        return self.mName == other.mName and self.mValues == other.mValues
+
     def getName( self ):
         return self.mName
 
@@ -48,6 +53,10 @@ class PyCalendarAttribute(object):
 
     def addValue( self, value ):
         self.mValues.append( value )
+
+    def removeValue( self, value ):
+        self.mValues.remove( value )
+        return len(self.mValues)
 
     def generate( self, os ):
         try:

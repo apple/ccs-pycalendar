@@ -1,5 +1,5 @@
 ##
-#    Copyright (c) 2007 Cyrus Daboo. All rights reserved.
+#    Copyright (c) 2007-2011 Cyrus Daboo. All rights reserved.
 #    
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -14,39 +14,20 @@
 #    limitations under the License.
 ##
 
-from component import PyCalendarComponent
 from componentrecur import PyCalendarComponentRecur
 import definitions
 import itipdefinitions
 
 class PyCalendarVJournal(PyCalendarComponentRecur):
 
-    sBeginDelimiter = definitions.cICalComponent_BEGINVJOURNAL
+    def __init__(self, parent=None):
+        super(PyCalendarVJournal, self).__init__(parent=parent)
 
-    sEndDelimiter = definitions.cICalComponent_ENDVJOURNAL
-
-    @staticmethod
-    def getVBegin():
-        return PyCalendarVJournal.sBeginDelimiter
-
-    @staticmethod
-    def getVEnd():
-        return PyCalendarVJournal.sEndDelimiter
-
-    def __init__(self, calendar):
-        super(PyCalendarVJournal, self).__init__(calendar=calendar)
-
-    def duplicate(self, calendar):
-        return super(PyCalendarVJournal, self).duplicate(calendar)
+    def duplicate(self, parent=None):
+        return super(PyCalendarVJournal, self).duplicate(parent=parent)
 
     def getType(self):
-        return PyCalendarComponent.eVJOURNAL
-
-    def getBeginDelimiter(self):
-        return PyCalendarVJournal.sBeginDelimiter
-
-    def getEndDelimiter(self):
-        return PyCalendarVJournal.sEndDelimiter
+        return definitions.cICalComponent_VJOURNAL
 
     def getMimeComponentName(self):
         return itipdefinitions.cICalMIMEComponent_VJOURNAL

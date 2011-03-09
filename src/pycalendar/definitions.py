@@ -1,5 +1,5 @@
 ##
-#    Copyright (c) 2007 Cyrus Daboo. All rights reserved.
+#    Copyright (c) 2007-2011 Cyrus Daboo. All rights reserved.
 #    
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -14,30 +14,21 @@
 #    limitations under the License.
 ##
 
-#     2445 Component Header/Footer
+#     2445 (and extension) Components
 
-cICalComponent_BEGINVCALENDAR = "BEGIN:VCALENDAR"
-cICalComponent_ENDVCALENDAR = "END:VCALENDAR"
-cICalComponent_BEGINVEVENT = "BEGIN:VEVENT"
-cICalComponent_ENDVEVENT = "END:VEVENT"
-cICalComponent_BEGINVTODO = "BEGIN:VTODO"
-cICalComponent_ENDVTODO = "END:VTODO"
-cICalComponent_BEGINVJOURNAL = "BEGIN:VJOURNAL"
-cICalComponent_ENDVJOURNAL = "END:VJOURNAL"
-cICalComponent_BEGINVFREEBUSY = "BEGIN:VFREEBUSY"
-cICalComponent_ENDVFREEBUSY = "END:VFREEBUSY"
-cICalComponent_BEGINVTIMEZONE = "BEGIN:VTIMEZONE"
-cICalComponent_ENDVTIMEZONE = "END:VTIMEZONE"
-cICalComponent_BEGINVALARM = "BEGIN:VALARM"
-cICalComponent_ENDVALARM = "END:VALARM"
+cICalComponent_VCALENDAR = "VCALENDAR"
+cICalComponent_VEVENT = "VEVENT"
+cICalComponent_VTODO = "VTODO"
+cICalComponent_VJOURNAL = "VJOURNAL"
+cICalComponent_VFREEBUSY = "VFREEBUSY"
+cICalComponent_VTIMEZONE = "VTIMEZONE"
+cICalComponent_VAVAILABILITY = "VAVAILABILITY"
+cICalComponent_VALARM = "VALARM"
+cICalComponent_AVAILABLE = "AVAILABLE"
+cICalComponent_STANDARD = "STANDARD"
+cICalComponent_DAYLIGHT = "DAYLIGHT"
 
-#     Pseudo components
-cICalComponent_BEGINSTANDARD = "BEGIN:STANDARD"
-cICalComponent_ENDSTANDARD = "END:STANDARD"
-cICalComponent_BEGINDAYLIGHT = "BEGIN:DAYLIGHT"
-cICalComponent_ENDDAYLIGHT = "END:DAYLIGHT"
-
-#     2445 Calendar Property Atrributes
+#     2445 Calendar Property Attributes
 
 #     2445 Section 4.2
 cICalAttribute_ALTREP = "ALTREP"
@@ -225,7 +216,22 @@ eRecurrence_WEEKLY = 4
 eRecurrence_MONTHLY = 5
 eRecurrence_YEARLY = 6
 
-cICalValue_RECUR_FREQ = "FREQ="
+eRecurrence_FREQ       = 0
+eRecurrence_UNTIL      = 1
+eRecurrence_COUNT      = 2
+eRecurrence_INTERVAL   = 3
+eRecurrence_BYSECOND   = 4
+eRecurrence_BYMINUTE   = 5
+eRecurrence_BYHOUR     = 6
+eRecurrence_BYDAY      = 7
+eRecurrence_BYMONTHDAY = 8
+eRecurrence_BYYEARDAY  = 9
+eRecurrence_BYWEEKNO   = 10
+eRecurrence_BYMONTH    = 11
+eRecurrence_BYSETPOS   = 12
+eRecurrence_WKST       = 13
+
+cICalValue_RECUR_FREQ = "FREQ"
 cICalValue_RECUR_FREQ_LEN = 5
 
 cICalValue_RECUR_SECONDLY = "SECONDLY"
@@ -236,20 +242,20 @@ cICalValue_RECUR_WEEKLY = "WEEKLY"
 cICalValue_RECUR_MONTHLY = "MONTHLY"
 cICalValue_RECUR_YEARLY = "YEARLY"
 
-cICalValue_RECUR_UNTIL = "UNTIL="
-cICalValue_RECUR_COUNT = "COUNT="
+cICalValue_RECUR_UNTIL = "UNTIL"
+cICalValue_RECUR_COUNT = "COUNT"
 
-cICalValue_RECUR_INTERVAL = "INTERVAL="
-cICalValue_RECUR_BYSECOND = "BYSECOND="
-cICalValue_RECUR_BYMINUTE = "BYMINUTE="
-cICalValue_RECUR_BYHOUR = "BYHOUR="
-cICalValue_RECUR_BYDAY = "BYDAY="
-cICalValue_RECUR_BYMONTHDAY = "BYMONTHDAY="
-cICalValue_RECUR_BYYEARDAY = "BYYEARDAY="
-cICalValue_RECUR_BYWEEKNO = "BYWEEKNO="
-cICalValue_RECUR_BYMONTH = "BYMONTH="
-cICalValue_RECUR_BYSETPOS = "BYSETPOS="
-cICalValue_RECUR_WKST = "WKST="
+cICalValue_RECUR_INTERVAL = "INTERVAL"
+cICalValue_RECUR_BYSECOND = "BYSECOND"
+cICalValue_RECUR_BYMINUTE = "BYMINUTE"
+cICalValue_RECUR_BYHOUR = "BYHOUR"
+cICalValue_RECUR_BYDAY = "BYDAY"
+cICalValue_RECUR_BYMONTHDAY = "BYMONTHDAY"
+cICalValue_RECUR_BYYEARDAY = "BYYEARDAY"
+cICalValue_RECUR_BYWEEKNO = "BYWEEKNO"
+cICalValue_RECUR_BYMONTH = "BYMONTH"
+cICalValue_RECUR_BYSETPOS = "BYSETPOS"
+cICalValue_RECUR_WKST = "WKST"
 
 eRecurrence_WEEKDAY_SU = 0
 eRecurrence_WEEKDAY_MO = 1
@@ -307,9 +313,6 @@ cICalProperty_ACTION_PROCEDURE = "PROCEDURE"
 
 
 #     Mulberry extensions
-cICalProperty_X_PRIVATE_RURL = "X-MULBERRY-PRIVATE-RURL"
-cICalProperty_X_PRIVATE_ETAG = "X-MULBERRY-PRIVATE-ETAG"
-
 cICalProperty_ACTION_X_SPEAKTEXT = "X-MULBERRY-SPEAK-TEXT"
 cICalProperty_ALARM_X_LASTTRIGGER = "X-MULBERRY-LAST-TRIGGER"
 

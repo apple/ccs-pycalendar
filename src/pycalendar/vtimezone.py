@@ -1,5 +1,5 @@
 ##
-#    Copyright (c) 2007 Cyrus Daboo. All rights reserved.
+#    Copyright (c) 2007-2011 Cyrus Daboo. All rights reserved.
 #    
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -20,37 +20,19 @@ import definitions
 
 class PyCalendarVTimezone(PyCalendarComponent):
 
-    sBeginDelimiter = definitions.cICalComponent_BEGINVTIMEZONE
-
-    sEndDelimiter = definitions.cICalComponent_ENDVTIMEZONE
-
-    @staticmethod
-    def getVBegin():
-        return PyCalendarVTimezone.sBeginDelimiter
-
-    @staticmethod
-    def getVEnd():
-        return PyCalendarVTimezone.sEndDelimiter
-
-    def __init__(self, calendar):
-        super(PyCalendarVTimezone, self).__init__(calendar=calendar)
+    def __init__(self, parent=None):
+        super(PyCalendarVTimezone, self).__init__(parent=parent)
         self.mID = ""
         self.mSortKey = 1
 
-    def duplicate(self, calendar):
-        other = super(PyCalendarVTimezone, self).duplicate(calendar)
+    def duplicate(self, parent=None):
+        other = super(PyCalendarVTimezone, self).duplicate(parent=parent)
         other.mID = self.mID
         other.mSortKey = self.mSortKey
         return other
 
     def getType(self):
-        return PyCalendarComponent.eVTIMEZONE
-
-    def getBeginDelimiter(self):
-        return PyCalendarVTimezone.sBeginDelimiter
-
-    def getEndDelimiter(self):
-        return PyCalendarVTimezone.sEndDelimiter
+        return definitions.cICalComponent_VTIMEZONE
 
     def getMimeComponentName(self):
         # Cannot be sent as a separate MIME object
@@ -58,15 +40,11 @@ class PyCalendarVTimezone(PyCalendarComponent):
 
     def addComponent(self, comp):
         # We can embed the timezone components only
-        if ((comp.getType() == PyCalendarComponent.eVTIMEZONESTANDARD)
-                or (comp.getType() == PyCalendarComponent.eVTIMEZONEDAYLIGHT)):
-            if self.mEmbedded is None:
-                self.mEmbedded = []
-            self.mEmbedded.append(comp)
-            comp.setEmbedder(self)
-            return True
+        if ((comp.getType() == definitions.cICalComponent_STANDARD)
+                or (comp.getType() == definitions.cICalComponent_DAYLIGHT)):
+            super(PyCalendarVTimezone, self).addComponent(comp)
         else:
-            return False
+            raise ValueError
 
     def getMapKey(self):
         return self.mID
@@ -78,8 +56,7 @@ class PyCalendarVTimezone(PyCalendarComponent):
             self.mID = temp
 
         # Sort sub-components by DTSTART
-        if self.mEmbedded is not None:
-            self.mEmbedded.sort(key=lambda x:x.getStart())
+        self.mComponents.sort(key=lambda x:x.getStart())
 
         # Do inherited
         super(PyCalendarVTimezone, self).finalise()
@@ -90,14 +67,14 @@ class PyCalendarVTimezone(PyCalendarComponent):
     def getSortKey(self):
         if self.mSortKey == 1:
             # Take time from first element
-            if (self.mEmbedded is not None) and (len(self.mEmbedded) > 0):
+            if len(self.mComponents) > 0:
                 # Initial offset provides the primary key
-                utc_offset1 = self.mEmbedded[0].getUTCOffset()
+                utc_offset1 = self.mComponents[0].getUTCOffset()
 
                 # Presence of secondary is the next key
                 utc_offset2 = utc_offset1
-                if len(self.mEmbedded) > 1:
-                    utc_offset2 = self.mEmbedded[1].getUTCOffset()
+                if len(self.mComponents) > 1:
+                    utc_offset2 = self.mComponents[1].getUTCOffset()
 
                 # Create key
                 self.mSortKey = (utc_offset1 + utc_offset2) / 2
@@ -125,7 +102,7 @@ class PyCalendarVTimezone(PyCalendarComponent):
 
         # Get it
         if found is not None:
-            if found.getTZName().length() == 0:
+            if len(found.getTZName()) == 0:
                 tzoffset = found.getUTCOffset()
                 negative = False
                 if tzoffset < 0:
@@ -165,38 +142,41 @@ class PyCalendarVTimezone(PyCalendarComponent):
         found = None
         dt_found = PyCalendarDateTime()
 
-        if self.mEmbedded is not None:
-            for item in self.mEmbedded:
-                dt_item = item.expandBelow(temp)
-                if temp >= dt_item:
-                    if found is not None:
-                        # Compare with the one previously cached and switch to this
-                        # one if newer
-                        if dt_item > dt_found:
-                            found = item
-                            dt_found = dt_item
-                    else:
+        for item in self.mComponents:
+            dt_item = item.expandBelow(temp)
+            if temp >= dt_item:
+                if found is not None:
+                    # Compare with the one previously cached and switch to this
+                    # one if newer
+                    if dt_item > dt_found:
                         found = item
                         dt_found = dt_item
+                else:
+                    found = item
+                    dt_found = dt_item
 
         return found
 
     def expandAll(self, start, end):
         results = []
-        if self.mEmbedded is not None:
-            for item in self.mEmbedded:
-                results.extend(item.expandAll(start, end))
+        for item in self.mComponents:
+            results.extend(item.expandAll(start, end))
         results = [x for x in set(results)]
-        def sortit(e1, e2):
-            return PyCalendarDateTime.sort(e1[0], e2[0])
-        results.sort(cmp=sortit)
+        results.sort(key=lambda x:x[0].getPosixTime())
         return results
+
+    def sortedPropertyKeyOrder(self):
+        return (
+            definitions.cICalProperty_TZID,
+            definitions.cICalProperty_LAST_MODIFIED,
+            definitions.cICalProperty_TZURL,
+        )
 
     @staticmethod
     def sortComparator(tz1, tz2):
-            sort1 = tz1.getSortKey()
-            sort2 = tz2.getSortKey()
-            if sort1 == sort2:
-                return tz1.getID().compareToIgnoreCase(tz2.getID())
-            else:
-                return (1, -1)[sort1 < sort2]
+        sort1 = tz1.getSortKey()
+        sort2 = tz2.getSortKey()
+        if sort1 == sort2:
+            return tz1.getID().compareToIgnoreCase(tz2.getID())
+        else:
+            return (1, -1)[sort1 < sort2]

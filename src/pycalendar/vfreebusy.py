@@ -1,5 +1,5 @@
 ##
-#    Copyright (c) 2007 Cyrus Daboo. All rights reserved.
+#    Copyright (c) 2007-2011 Cyrus Daboo. All rights reserved.
 #    
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -26,20 +26,8 @@ import itipdefinitions
 
 class PyCalendarVFreeBusy(PyCalendarComponent):
 
-    sBeginDelimiter = definitions.cICalComponent_BEGINVFREEBUSY
-
-    sEndDelimiter = definitions.cICalComponent_ENDVFREEBUSY
-
-    @staticmethod
-    def getVBegin():
-        return PyCalendarVFreeBusy.sBeginDelimiter
-
-    @staticmethod
-    def gGetVEnd():
-        return PyCalendarVFreeBusy.sEndDelimiter
-
-    def __init__(self, calendar):
-        super(PyCalendarVFreeBusy, self).__init__(calendar=calendar)
+    def __init__(self, parent=None):
+        super(PyCalendarVFreeBusy, self).__init__(parent=parent)
         self.mStart = PyCalendarDateTime()
         self.mHasStart = False
         self.mEnd = PyCalendarDateTime()
@@ -49,8 +37,8 @@ class PyCalendarVFreeBusy(PyCalendarComponent):
         self.mSpanPeriod = None
         self.mBusyTime = None
 
-    def duplicate(self, calendar):
-        other = super(PyCalendarVFreeBusy, self).duplicate(calendar)
+    def duplicate(self, parent=None):
+        other = super(PyCalendarVFreeBusy, self).duplicate(parent=parent)
         other.mStart = self.mStart.duplicate()
         other.mHasStart = self.mHasStart
         other.mEnd = self.mEnd.duplicate()
@@ -61,13 +49,7 @@ class PyCalendarVFreeBusy(PyCalendarComponent):
         return other
 
     def getType(self):
-        return PyCalendarComponent.eVFREEBUSY
-
-    def getBeginDelimiter(self):
-        return PyCalendarVFreeBusy.sBeginDelimiter
-
-    def getEndDelimiter(self):
-        return PyCalendarVFreeBusy.sEndDelimiter
+        return definitions.cICalComponent_VFREEBUSY
 
     def getMimeComponentName(self):
         return itipdefinitions.cICalMIMEComponent_VFREEBUSY
@@ -319,3 +301,11 @@ class PyCalendarVFreeBusy(PyCalendarComponent):
             self.mSpanPeriod = PyCalendarPeriod(start, end)
         
         self.mCachedBusyTime = True
+
+    def sortedPropertyKeyOrder(self):
+        return (
+            definitions.cICalProperty_UID,
+            definitions.cICalProperty_DTSTART,
+            definitions.cICalProperty_DURATION,
+            definitions.cICalProperty_DTEND,
+        )

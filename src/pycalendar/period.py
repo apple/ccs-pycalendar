@@ -1,5 +1,5 @@
 ##
-#    Copyright (c) 2007 Cyrus Daboo. All rights reserved.
+#    Copyright (c) 2007-2011 Cyrus Daboo. All rights reserved.
 #    
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -23,19 +23,18 @@ class PyCalendarPeriod(object):
 
     def __init__( self, start = None, end = None, duration = None ):
         
-        if (start is not None) and (end is not None):
-            self.mStart = start
+        self.mStart = start if start is not None else PyCalendarDateTime()
+            
+        if end is not None:
             self.mEnd = end
             self.mDuration = self.mEnd - self.mStart
             self.mUseDuration = False
-        elif (start is not None) and (duration is not None):
-            self.mStart = start
+        elif duration is not None:
             self.mDuration = duration
             self.mEnd = self.mStart + self.mDuration
             self.mUseDuration = True
         else:
-            self.mStart = PyCalendarDateTime()
-            self.mEnd = PyCalendarDateTime()
+            self.mEnd = self.mStart.duplicate()
             self.mDuration = PyCalendarDuration()
             self.mUseDuration = False
 
@@ -45,9 +44,10 @@ class PyCalendarPeriod(object):
         return other
 
     def __repr__(self):
-        os = StringIO.StringIO()
-        self.generate(os)
-        return os.getvalue()
+        return "PyCalendarPeriod %s" % (self.getText(),)
+
+    def __str__(self):
+        return self.getText()
 
     def __eq__( self, comp ):
         return self.mStart == comp.mStart and self.mEnd == comp.mEnd
@@ -69,11 +69,18 @@ class PyCalendarPeriod(object):
             if end[0] == 'P':
                 self.mDuration.parse( end )
                 self.mUseDuration = True
-                self.mEnd = self.mStart.add( self.mDuration )
+                self.mEnd = self.mStart + self.mDuration
             else:
                 self.mEnd.parse( end )
                 self.mUseDuration = False
                 self.mDuration = self.mEnd - self.mStart
+        else:
+            raise ValueError
+
+    def getText(self):
+        os = StringIO.StringIO()
+        self.generate(os)
+        return os.getvalue()
 
     def generate( self, os ):
         try:
@@ -95,6 +102,12 @@ class PyCalendarPeriod(object):
     def getDuration( self ):
         return self.mDuration
 
+    def getUseDuration(self):
+        return self.mUseDuration
+
+    def setUseDuration(self, use):
+        self.mUseDuration = use
+
     def isDateWithinPeriod( self, dt ):
         # Inclusive start, exclusive end
         return dt >= self.mStart and dt < self.mEnd
@@ -110,6 +123,10 @@ class PyCalendarPeriod(object):
     def isPeriodOverlap( self, p ):
         # Inclusive start, exclusive end
         return not ( self.mStart >= p.mEnd or self.mEnd <= p.mStart )
+
+    def adjustToUTC(self):
+        self.mStart.adjustToUTC()
+        self.mEnd.adjustToUTC()
 
     def describeDuration( self ):
         return ""

@@ -1,5 +1,5 @@
 ##
-#    Copyright (c) 2007-2011 Cyrus Daboo. All rights reserved.
+#    Copyright (c) 2011 Cyrus Daboo. All rights reserved.
 #    
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -14,16 +14,25 @@
 #    limitations under the License.
 ##
 
-from vtimezoneelement import PyCalendarVTimezoneElement
+from componentrecur import PyCalendarComponentRecur
 import definitions
 
-class PyCalendarVTimezoneStandard(PyCalendarVTimezoneElement):
+class PyCalendarAvailable(PyCalendarComponentRecur):
 
     def __init__(self, parent=None):
-        super(PyCalendarVTimezoneStandard, self).__init__(parent=parent)
+        super(PyCalendarAvailable, self).__init__(parent=parent)
 
     def duplicate(self, parent=None):
-        return super(PyCalendarVTimezoneStandard, self).duplicate(parent=parent)
+        return super(PyCalendarAvailable, self).duplicate(parent=parent)
 
     def getType(self):
-        return definitions.cICalComponent_STANDARD
+        return definitions.cICalComponent_AVAILABLE
+
+    def sortedPropertyKeyOrder(self):
+        return (
+            definitions.cICalProperty_UID,
+            definitions.cICalProperty_RECURRENCE_ID,
+            definitions.cICalProperty_DTSTART,
+            definitions.cICalProperty_DURATION,
+            definitions.cICalProperty_DTEND,
+        )

@@ -1,5 +1,5 @@
 ##
-#    Copyright (c) 2007-2011 Cyrus Daboo. All rights reserved.
+#    Copyright (c) 2011 Cyrus Daboo. All rights reserved.
 #    
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -14,16 +14,17 @@
 #    limitations under the License.
 ##
 
-from vtimezoneelement import PyCalendarVTimezoneElement
-import definitions
+class PyCalendarInvalidData(Exception):
 
-class PyCalendarVTimezoneStandard(PyCalendarVTimezoneElement):
+    def __init__(self, reason, data):
+        self.mReason = reason
+        self.mData = data
 
-    def __init__(self, parent=None):
-        super(PyCalendarVTimezoneStandard, self).__init__(parent=parent)
+class PyCalendarInvalidProperty(PyCalendarInvalidData):
+    pass
 
-    def duplicate(self, parent=None):
-        return super(PyCalendarVTimezoneStandard, self).duplicate(parent=parent)
+class PyCalendarNoTimezoneInDatabase(Exception):
 
-    def getType(self):
-        return definitions.cICalComponent_STANDARD
+    def __init__(self, dbpath, tzid):
+        self.mTZDBpath = dbpath
+        self.mTZID = tzid

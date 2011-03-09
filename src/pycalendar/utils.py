@@ -1,5 +1,5 @@
 ##
-#    Copyright (c) 2007 Cyrus Daboo. All rights reserved.
+#    Copyright (c) 2007-2011 Cyrus Daboo. All rights reserved.
 #    
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -139,15 +139,22 @@ def decodeTextValue(value):
                 os.write('\r')
             elif c == 'n':
                 os.write('\n')
+            elif c == 'N':
+                os.write('\n')
             elif c == '':
                 os.write('')
             elif c == '\\':
                 os.write('\\')
             elif c == ',':
                 os.write(',')
+            elif c == ';':
+                os.write(';')
+            elif decodeTextValue.raiseOnInvalidEscape:
+                raise ValueError
+            elif decodeTextValue.fixInvalidEscape:
+                os.write(c)
 
-            # Bump past escapee and look for next segment (not past the
-            # end)
+            # Bump past escapee and look for next segment (not past the end)
             start_pos = end_pos + 1
             if start_pos >= size_pos:
                 break
@@ -161,6 +168,10 @@ def decodeTextValue(value):
         os.write(value)
 
     return os.getvalue()
+
+# Use these to control the parsing of illegal escape characters
+decodeTextValue.raiseOnInvalidEscape = True
+decodeTextValue.fixInvalidEscape = True
 
 # Date/time calcs
 days_in_month      = ( 0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 )
@@ -185,30 +196,37 @@ def daysUptoMonth(month, year):
     else:
         return days_upto_month[month]
 
+cachedLeapYears = {}
 def isLeapYear(year):
-    if year <= 1752:
-        return (year % 4 == 0)
-    else:
-        return ((year % 4 == 0) and (year % 100 != 0)) or (year % 400 == 0)
+    
+    try:
+        return cachedLeapYears[year]
+    except KeyError:
+        if year <= 1752:
+            result = (year % 4 == 0)
+        else:
+            result = ((year % 4 == 0) and (year % 100 != 0)) or (year % 400 == 0)
+        cachedLeapYears[year] = result
+        return result
 
+cachedLeapDaysSince1970 = {}
 def leapDaysSince1970(year_offset):
-    if year_offset > 2:
-        return (year_offset + 1) / 4
-    elif year_offset < -1:
-        # Python will round down negative numbers (i.e. -5/4 = -2, but we want -1), so
-        # what is (year_offset - 2) in C code is actually (year_offset - 2 + 3) in Python.
-        return (year_offset + 1) / 4
-    else:
-        return 0
+    
+    try:
+        return cachedLeapDaysSince1970[year_offset]
+    except KeyError:
+        if year_offset > 2:
+            result = (year_offset + 1) / 4
+        elif year_offset < -1:
+            # Python will round down negative numbers (i.e. -5/4 = -2, but we want -1), so
+            # what is (year_offset - 2) in C code is actually (year_offset - 2 + 3) in Python.
+            result = (year_offset + 1) / 4
+        else:
+            result = 0
+        cachedLeapDaysSince1970[year_offset] = result
+        return result
 
-#    public static int getLocalTimezoneOffsetSeconds() {
-#        Calendar rightNow = Calendar.getInstance()
-#        int tzoffset = rightNow.get(Calendar.ZONE_OFFSET)
-#        int dstoffset = rightNow.get(Calendar.DST_OFFSET)
-#        return -(tzoffset + dstoffset) / 1000
-#    }
-
-    # Packed date
+# Packed date
 def packDate(year, month, day):
     return (year << 16) | (month << 8) | (day + 128)
 
