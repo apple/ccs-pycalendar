@@ -643,22 +643,3 @@ class PyCalendarProperty(object):
 
         # Attributes
         self.setupValueAttribute()
-
-if __name__ == '__main__':
-    prop = PyCalendarProperty()
-    prop.parse("DTSTART;TZID=\"US/Eastern\":20060226T120000")
-    io = StringIO.StringIO()
-    prop.generate(io)
-    print io.getvalue()
-    
-    prop = PyCalendarProperty(definitions.cICalProperty_DTSTAMP,
-                              PyCalendarDateTime.getNowUTC())
-    prop.generate(io)
-    print io.getvalue()
-
-    prop1 = PyCalendarProperty()
-    prop1.parse("DTSTART;TZID=\"US/Eastern\":20060226T120000")
-    prop2 = PyCalendarProperty()
-    prop2.parse("DTSTART;TZID=\"US/Eastern\":20060226T120000")
-    if prop1 == prop2:
-        print "OK"
