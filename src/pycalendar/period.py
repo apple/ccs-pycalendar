@@ -43,6 +43,9 @@ class PyCalendarPeriod(object):
         other.mUseDuration = self.mUseDuration
         return other
 
+    def __hash__(self):
+        return hash((self.mStart, self.mEnd,))
+
     def __repr__(self):
         return "PyCalendarPeriod %s" % (self.getText(),)
 

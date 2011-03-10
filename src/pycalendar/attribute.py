@@ -30,7 +30,10 @@ class PyCalendarAttribute(object):
         other = PyCalendarAttribute(self.mName, [i for i in self.mValues])
         other.mValues = self.mValues[:]
         return other
-        
+
+    def __hash__(self):
+        return hash((self.mName, tuple(self.mValues)))
+
     def __ne__(self, other): return not self.__eq__(other)
     def __eq__(self, other):
         if not isinstance(other, PyCalendarAttribute): return False

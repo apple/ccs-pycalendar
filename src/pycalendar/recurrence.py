@@ -151,6 +151,26 @@ class PyCalendarRecurrence(object):
         self.mFullyCached = False
         self.mRecurrences = None
 
+    def __hash__(self):
+        return hash((
+            self.mFreq,
+            self.mUseCount,
+            self.mCount,
+            self.mUseUntil,
+            self.mUntil,
+            self.mInterval,
+            tuple(self.mBySeconds) if self.mBySeconds else None,
+            tuple(self.mByMinutes) if self.mByMinutes else None,
+            tuple(self.mByHours) if self.mByHours else None,
+            tuple(self.mByDay) if self.mByDay else None,
+            tuple(self.mByMonthDay) if self.mByMonthDay else None,
+            tuple(self.mByYearDay) if self.mByYearDay else None,
+            tuple(self.mByWeekNo) if self.mByWeekNo else None,
+            tuple(self.mByMonth) if self.mByMonth else None,
+            tuple(self.mBySetPos) if self.mBySetPos else None,
+            self.mWeekstart,
+        ))
+
     def __ne__(self, other): return not self.__eq__(other)
     def __eq__(self, other):
         if not isinstance(other, PyCalendarRecurrence): return False

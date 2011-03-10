@@ -23,6 +23,9 @@ class PyCalendarMultiValue( PyCalendarValue ):
         self.mType = type
         self.mValues = []
 
+    def __hash__(self):
+        return hash(tuple(self.mValues))
+
     def duplicate(self):
         other = PyCalendarMultiValue(self.mType)
         other.mValues = [i.duplicate() for i in self.mValues]

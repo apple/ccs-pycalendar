@@ -45,6 +45,9 @@ class PyCalendarDuration(object):
 
         return other
 
+    def __hash__(self):
+        return hash(self.getTotalSeconds())
+
     def __eq__( self, comp ):
         return self.getTotalSeconds() == comp.getTotalSeconds()
 

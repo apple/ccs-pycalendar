@@ -119,7 +119,7 @@ class PyCalendarComponentRecur(PyCalendarComponent):
         return not self.mHasRecurrenceID
 
     def recurring(self):
-        return (self.mMaster != None) and (self.mMaster != self)
+        return (self.mMaster is not None) and (self.mMaster is not self)
 
     def setMaster(self, master):
         self.mMaster = master

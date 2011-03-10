@@ -27,7 +27,7 @@ class TestProperty(unittest.TestCase):
         "ORGANIZER:mailto:jdoe@example.com",
         "DTSTART;TZID=US/Eastern:20060226T120000",
         "DTSTART;VALUE=DATE:20060226",
-        "DTSTART:20060226T120000Z",
+        "DTSTART:20060226T130000Z",
         "X-FOO:BAR",
         "DURATION:PT10M",
         "SEQUENCE:1",
@@ -41,7 +41,6 @@ class TestProperty(unittest.TestCase):
         
         # Various parameters
         "DTSTART;TZID=\"Somewhere, else\":20060226T120000",
-        "DTSTART;VALUE=DATE:20060226",
         "ATTENDEE;PARTSTAT=ACCEPTED;ROLE=CHAIR:mailto:jdoe@example.com",
     )
     
@@ -85,3 +84,15 @@ class TestProperty(unittest.TestCase):
             prop = PyCalendarProperty()
             print data
             self.assertRaises(PyCalendarInvalidProperty, prop.parse, data)
+    
+    def testHash(self):
+        
+        hashes = []
+        for item in TestProperty.test_data:
+            prop = PyCalendarProperty()
+            prop.parse(item)
+            hashes.append(hash(prop))
+            print item, hashes[-1]
+        hashes.sort()
+        for i in range(1, len(hashes)):
+            self.assertNotEqual(hashes[i-1], hashes[i])

@@ -43,7 +43,10 @@ class PyCalendarValue(object):
     
     def __str__(self):
         return self.getText()
-        
+
+    def __hash__(self):
+        return hash((self.getType(), self.getValue()))
+
     def __ne__(self, other): return not self.__eq__(other)
     def __eq__(self, other):
         if not isinstance(other, PyCalendarValue): return False
@@ -78,3 +81,9 @@ class PyCalendarValue(object):
         os = StringIO()
         self.generate(os)
         return os.getvalue()
+
+    def getValue( self ):
+        raise NotImplementedError
+
+    def setValue( self, value ):
+        raise NotImplementedError

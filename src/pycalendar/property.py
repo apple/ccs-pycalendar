@@ -206,7 +206,11 @@ class PyCalendarProperty(object):
         return other
 
     def __hash__(self):
-        return hash(self.getText())
+        return hash((
+            self.mName,
+            tuple([tuple(values) for values in self.mAttributes.values()]),
+            self.mValue,
+        ))
 
     def __ne__(self, other): return not self.__eq__(other)
     def __eq__(self, other):
@@ -534,13 +538,13 @@ class PyCalendarProperty(object):
             return
 
         # See if current type is default for this property
-        found = self.sDefaultValueTypeMap.get(self.mName, None)
-        if found is not None:
-            default_type = found
-            if default_type != self.mValue.getType():
-                found2 = self.sTypeValueMap.get(self.mValue.getType(), None)
-                if found2 is not None:
-                    self.mAttributes.setdefault(definitions.cICalAttribute_VALUE, []).append(PyCalendarAttribute(name=definitions.cICalAttribute_VALUE, value=found2))
+        default_type = self.sDefaultValueTypeMap.get(self.mName)
+        if default_type is not None:
+            actual_type = self.mValue.getType()
+            if default_type != actual_type:
+                actual_value = self.sTypeValueMap.get(actual_type)
+                if actual_value is not None:
+                    self.mAttributes.setdefault(definitions.cICalAttribute_VALUE, []).append(PyCalendarAttribute(name=definitions.cICalAttribute_VALUE, value=actual_value))
 
     # Creation
     def _init_attr_value_int(self, ival):

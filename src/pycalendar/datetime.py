@@ -117,7 +117,7 @@ class PyCalendarDateTime(object):
         return self.getText()
 
     def __hash__(self):
-        return self.getPosixTime()
+        return hash(self.getPosixTime())
     
     # Operators
     def __add__( self, duration ):

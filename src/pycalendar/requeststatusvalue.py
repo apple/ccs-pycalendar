@@ -27,6 +27,9 @@ class PyCalendarRequestStatusValue( PyCalendarValue ):
     def __init__(self, value = None):
         self.mValue = value if value is not None else ["2.0", "Success"]
 
+    def __hash__(self):
+        return hash(tuple(self.mValue))
+
     def duplicate(self):
         return PyCalendarRequestStatusValue(self.mValue[:])
 
