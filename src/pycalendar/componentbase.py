@@ -240,7 +240,7 @@ class PyCalendarComponentBase(object):
         elif filter.hasSubComponentFilters():
             for subcomp in self.sortedcomponents():
                 subfilter = filter.getSubComponentFilter(subcomp.getType())
-                if subfilter != None:
+                if subfilter is not None:
                     subcomp.generateFiltered(os, subfilter)
         
     def loadValue(self, value_name):
@@ -254,11 +254,11 @@ class PyCalendarComponentBase(object):
             if self.hasProperty(value_name):
                 if type == PyCalendarValue.VALUETYPE_INTEGER:
                     ivalue = self.findFirstProperty(value_name).getIntegerValue()
-                    if ivalue != None:
+                    if ivalue is not None:
                         return ivalue.getValue()
                 elif type == PyCalendarValue.VALUETYPE_UTC_OFFSET:
                     uvalue = self.findFirstProperty(value_name).getUTCOffsetValue()
-                    if (uvalue != None):
+                    if (uvalue is not None):
                         return uvalue.getValue()
     
             return None
@@ -268,7 +268,7 @@ class PyCalendarComponentBase(object):
     def loadValueString(self, value_name):
         if self.hasProperty(value_name):
             tvalue = self.findFirstProperty(value_name).getTextValue()
-            if (tvalue != None):
+            if (tvalue is not None):
                 return tvalue.getValue()
 
         return None
@@ -276,7 +276,7 @@ class PyCalendarComponentBase(object):
     def loadValueDateTime(self, value_name):
         if self.hasProperty(value_name):
             dtvalue = self.findFirstProperty(value_name).getDateTimeValue()
-            if dtvalue != None:
+            if dtvalue is not None:
                 return dtvalue.getValue()
 
         return None
@@ -284,7 +284,7 @@ class PyCalendarComponentBase(object):
     def loadValueDuration(self, value_name):
         if self.hasProperty(value_name):
             dvalue = self.findFirstProperty(value_name).getDurationValue()
-            if (dvalue != None):
+            if (dvalue is not None):
                 return dvalue.getValue()
 
         return None
@@ -292,7 +292,7 @@ class PyCalendarComponentBase(object):
     def loadValuePeriod(self, value_name):
         if self.hasProperty(value_name):
             pvalue = self.findFirstProperty(value_name).getPeriodValue()
-            if (pvalue != None):
+            if (pvalue is not None):
                 return pvalue.getValue()
 
         return None
@@ -303,7 +303,7 @@ class PyCalendarComponentBase(object):
             items = self.getProperties()[value_name]
             for iter in items:
                 rvalue = iter.getRecurrenceValue()
-                if (rvalue != None):
+                if (rvalue is not None):
                     if add:
                         value.addRule(rvalue.getValue())
                     else:
@@ -317,7 +317,7 @@ class PyCalendarComponentBase(object):
         if self.hasProperty(value_name):
             for iter in self.getProperties(value_name):
                 mvalue = iter.getMultiValue()
-                if (mvalue != None):
+                if (mvalue is not None):
                     for obj in mvalue.getValues():
                         # cast to date-time
                         if isinstance(obj, PyCalendarDateTimeValue):
@@ -377,7 +377,7 @@ class PyCalendarComponentBase(object):
         # Read it in from properties list and then delete the property from the
         # main list
         result = self.loadValueString(value_name)
-        if (result != None):
+        if (result is not None):
             self.removeProperties(value_name)
         return result
 

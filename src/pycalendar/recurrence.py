@@ -604,7 +604,7 @@ class PyCalendarRecurrence(object):
 
     def generateList(self, os, title, list):
 
-        if (list != None) and (len(list) != 0):
+        if (list is not None) and (len(list) != 0):
             os.write(";")
             os.write(title)
             os.write("=")

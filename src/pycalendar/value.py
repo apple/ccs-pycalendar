@@ -50,7 +50,7 @@ class PyCalendarValue(object):
     def __ne__(self, other): return not self.__eq__(other)
     def __eq__(self, other):
         if not isinstance(other, PyCalendarValue): return False
-        return self.getValue() == other.getValue()
+        return self.getType() == other.getType() and self.getValue() == other.getValue()
 
     @classmethod
     def registerType(clz, type, cls):

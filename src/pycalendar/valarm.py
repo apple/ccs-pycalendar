@@ -123,7 +123,7 @@ class PyCalendarVAlarm(PyCalendarComponent):
                 for iter in range:
                     # Get the attendee value
                     attendee = iter.getCalAddressValue()
-                    if attendee != None:
+                    if attendee is not None:
                         self.mAttendees.append(attendee.getValue())
 
         def add(self, valarm):

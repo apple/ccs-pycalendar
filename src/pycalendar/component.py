@@ -144,12 +144,12 @@ class PyCalendarComponent(PyCalendarComponentBase):
     def finalise(self):
         # Get UID
         temps = self.loadValueString(definitions.cICalProperty_UID)
-        if temps != None:
+        if temps is not None:
             self.mUID = temps
 
         # Get SEQ
         temp = self.loadValueInteger(definitions.cICalProperty_SEQUENCE)
-        if temp != None:
+        if temp is not None:
             self.mSeq = temp
 
         # Cache the original sequence when the component is read in.

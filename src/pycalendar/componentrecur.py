@@ -181,7 +181,7 @@ class PyCalendarComponentRecur(PyCalendarComponent):
         return self.mRecurrenceID
 
     def isRecurring(self):
-        return (self.mRecurrences != None) and self.mRecurrences.hasRecurrence()
+        return (self.mRecurrences is not None) and self.mRecurrences.hasRecurrence()
 
     def getRecurrenceSet(self):
         return self.mRecurrences
@@ -395,7 +395,7 @@ class PyCalendarComponentRecur(PyCalendarComponent):
 
     def withinPeriod(self, period):
         # Check for recurrence
-        if ((self.mRecurrences != None) and self.mRecurrences.hasRecurrence()):
+        if ((self.mRecurrences is not None) and self.mRecurrences.hasRecurrence()):
             items = []
             self.mRecurrences.expand(self.mStart, period, items)
             return len(items) != 0
