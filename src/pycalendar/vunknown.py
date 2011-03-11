@@ -41,3 +41,10 @@ class PyCalendarUnknownComponent(PyCalendarComponent):
 
     def getMapKey(self):
         return self.mMapKey
+
+    def getSortKey(self):
+        """
+        We do not want unknown components sorted.
+        """
+        return ""
+

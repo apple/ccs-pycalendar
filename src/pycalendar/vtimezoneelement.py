@@ -74,6 +74,12 @@ class PyCalendarVTimezoneElement(PyCalendarVTimezone):
         # Do inherited
         super(PyCalendarVTimezoneElement, self).finalise()
 
+    def getSortKey(self):
+        """
+        We do not want these components sorted.
+        """
+        return ""
+
     def getStart(self):
         return self.mStart
 

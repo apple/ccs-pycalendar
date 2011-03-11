@@ -62,6 +62,9 @@ class PyCalendarComponent(PyCalendarComponentBase):
             self.mMapKey = str(uuid.uuid4())
             return self.mMapKey
 
+    def getSortKey(self):
+        return self.getMapKey()
+
     def getMasterKey(self):
         return self.mUID
 

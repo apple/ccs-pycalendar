@@ -208,7 +208,7 @@ class PyCalendarProperty(object):
     def __hash__(self):
         return hash((
             self.mName,
-            tuple([tuple(values) for values in self.mAttributes.values()]),
+            tuple([tuple(self.mAttributes[attrname]) for attrname in sorted(self.mAttributes.keys())]),
             self.mValue,
         ))
 

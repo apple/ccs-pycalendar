@@ -23,12 +23,12 @@ class PyCalendarVTimezone(PyCalendarComponent):
     def __init__(self, parent=None):
         super(PyCalendarVTimezone, self).__init__(parent=parent)
         self.mID = ""
-        self.mSortKey = 1
+        self.mUTCOffsetSortKey = None
 
     def duplicate(self, parent=None):
         other = super(PyCalendarVTimezone, self).duplicate(parent=parent)
         other.mID = self.mID
-        other.mSortKey = self.mSortKey
+        other.mUTCOffsetSortKey = self.mUTCOffsetSortKey
         return other
 
     def getType(self):
@@ -64,8 +64,8 @@ class PyCalendarVTimezone(PyCalendarComponent):
     def getID(self):
         return self.mID
 
-    def getSortKey(self):
-        if self.mSortKey == 1:
+    def getUTCOffsetSortKey(self):
+        if self.mUTCOffsetSortKey is None:
             # Take time from first element
             if len(self.mComponents) > 0:
                 # Initial offset provides the primary key
@@ -77,11 +77,11 @@ class PyCalendarVTimezone(PyCalendarComponent):
                     utc_offset2 = self.mComponents[1].getUTCOffset()
 
                 # Create key
-                self.mSortKey = (utc_offset1 + utc_offset2) / 2
+                self.mUTCOffsetSortKey = (utc_offset1 + utc_offset2) / 2
             else:
-                self.mSortKey = 0
+                self.mUTCOffsetSortKey = 0
 
-        return self.mSortKey
+        return self.mUTCOffsetSortKey
 
     def getTimezoneOffsetSeconds(self, dt):
         # Get the closet matching element to the time
@@ -173,9 +173,9 @@ class PyCalendarVTimezone(PyCalendarComponent):
         )
 
     @staticmethod
-    def sortComparator(tz1, tz2):
-        sort1 = tz1.getSortKey()
-        sort2 = tz2.getSortKey()
+    def sortByUTCOffsetComparator(tz1, tz2):
+        sort1 = tz1.getUTCOffsetSortKey()
+        sort2 = tz2.getUTCOffsetSortKey()
         if sort1 == sort2:
             return tz1.getID().compareToIgnoreCase(tz2.getID())
         else:
