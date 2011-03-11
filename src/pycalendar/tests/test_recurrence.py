@@ -104,7 +104,6 @@ class TestRecurrence(unittest.TestCase):
             recur = PyCalendarRecurrence()
             recur.parse(item)
             hashes.append(hash(recur))
-            print item, hashes[-1]
         hashes.sort()
         for i in range(1, len(hashes)):
             self.assertNotEqual(hashes[i-1], hashes[i])

@@ -48,10 +48,7 @@ class TestProperty(unittest.TestCase):
         
         for data in TestProperty.test_data:
             prop = PyCalendarProperty()
-            try:
-                prop.parse(data)
-            except Exception, e:
-                print data, e
+            prop.parse(data)
             propstr = str(prop)
             self.assertEqual(propstr[:-2], data, "Failed parse/generate: %s to %s" % (data, propstr,))
     
@@ -82,7 +79,6 @@ class TestProperty(unittest.TestCase):
         )
         for data in test_bad_data:
             prop = PyCalendarProperty()
-            print data
             self.assertRaises(PyCalendarInvalidProperty, prop.parse, data)
     
     def testHash(self):
@@ -92,7 +88,6 @@ class TestProperty(unittest.TestCase):
             prop = PyCalendarProperty()
             prop.parse(item)
             hashes.append(hash(prop))
-            print item, hashes[-1]
         hashes.sort()
         for i in range(1, len(hashes)):
             self.assertNotEqual(hashes[i-1], hashes[i])
