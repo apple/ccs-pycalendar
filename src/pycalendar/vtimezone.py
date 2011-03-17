@@ -24,6 +24,7 @@ class PyCalendarVTimezone(PyCalendarComponent):
         super(PyCalendarVTimezone, self).__init__(parent=parent)
         self.mID = ""
         self.mUTCOffsetSortKey = None
+        self.mCachedExpandAllMax = None
 
     def duplicate(self, parent=None):
         other = super(PyCalendarVTimezone, self).duplicate(parent=parent)
@@ -84,15 +85,32 @@ class PyCalendarVTimezone(PyCalendarComponent):
         return self.mUTCOffsetSortKey
 
     def getTimezoneOffsetSeconds(self, dt):
-        # Get the closet matching element to the time
-        found = self.findTimezoneElement(dt)
+        """
+        Caching implementation of expansion. We cache the entire set of transitions up to one year ahead
+        of the requested time.
+        """
+        
+        # Need to make the incoming date-time relative to the DTSTART in the
+        # timezone component for proper comparison.
+        # This means making the incoming date-time a floating (no timezone)
+        # item
+        temp = dt.duplicate()
+        temp.setTimezoneID(None)
 
-        # Return it
-        if found is None:
-            return 0
-        else:
-            # Get its offset
-            return found.getUTCOffset()
+        # Check whether we need to recache
+        if self.mCachedExpandAllMax is None or temp > self.mCachedExpandAllMax:
+            cacheMax = temp.duplicate()
+            cacheMax.offsetYear(1)
+            self.mCachedExpandAll = self.expandAll(None, cacheMax)
+            self.mCachedExpandAllMax = cacheMax
+            
+        # Now search for the transition just below the time we want
+        if len(self.mCachedExpandAll):
+            i = PyCalendarVTimezone.tuple_bisect_right(self.mCachedExpandAll, temp)
+            if i != 0:
+                return self.mCachedExpandAll[i-1][2]
+
+        return 0
 
     def getTimezoneDescriptor(self, dt):
         result = ""
@@ -126,6 +144,21 @@ class PyCalendarVTimezone(PyCalendarComponent):
 
     def mergeTimezone(self, tz):
         pass
+
+    @staticmethod
+    def tuple_bisect_right(a, x):
+        """
+        Same as bisect_right except that the values being compared are the first elements
+        of a tuple.
+        """
+    
+        lo = 0
+        hi = len(a)
+        while lo < hi:
+            mid = (lo+hi)//2
+            if x < a[mid][0]: hi = mid
+            else: lo = mid+1
+        return lo
 
     def findTimezoneElement(self, dt):
         # Need to make the incoming date-time relative to the DTSTART in the

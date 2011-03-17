@@ -20,6 +20,7 @@ from recurrenceset import PyCalendarRecurrenceSet
 from value import PyCalendarValue
 from vtimezone import PyCalendarVTimezone
 import definitions
+from bisect import bisect_right
 
 class PyCalendarVTimezoneElement(PyCalendarVTimezone):
 
@@ -109,11 +110,7 @@ class PyCalendarVTimezoneElement(PyCalendarVTimezone):
             # that the recurrence
             # cache is invalidated less frequently
 
-            temp = below.duplicate()
-            temp.setMonth(1)
-            temp.setDay(1)
-            temp.setHHMMSS(0, 0, 0)
-            temp.offsetYear(1)
+            temp = PyCalendarDateTime(below.getYear(), 1, 1, 0, 0, 0)
 
             # Use cache of expansion
             if self.mCachedExpandBelowItems is None:
@@ -129,18 +126,19 @@ class PyCalendarVTimezoneElement(PyCalendarVTimezone):
             if len(self.mCachedExpandBelowItems) != 0:
                 # List comes back sorted so we pick the element just less than
                 # the dt value we want
-                for i in range(len(self.mCachedExpandBelowItems)):
-                    if self.mCachedExpandBelowItems[i] > below:
-                        if i != 0:
-                            return self.mCachedExpandBelowItems[i - 1]
-                        break
+                i = bisect_right(self.mCachedExpandBelowItems, below)
+                if i != 0:
+                    return self.mCachedExpandBelowItems[i - 1]
                 
-                # The last one in the list is the one we want
-                return self.mCachedExpandBelowItems[len(self.mCachedExpandBelowItems) - 1]
+                # The first one in the list is the one we want
+                return self.mCachedExpandBelowItems[0]
 
             return self.mStart
 
     def expandAll(self, start, end):
+
+        if start is None:
+            start = self.mStart
 
         # Ignore if there is no change in offset
         offsetto = self.loadValueInteger(definitions.cICalProperty_TZOFFSETTO, PyCalendarValue.VALUETYPE_UTC_OFFSET)
@@ -169,11 +167,7 @@ class PyCalendarVTimezoneElement(PyCalendarVTimezone):
             # that the recurrence
             # cache is invalidated less frequently
 
-            temp = end.duplicate()
-            temp.setMonth(1)
-            temp.setDay(1)
-            temp.setHHMMSS(0, 0, 0)
-            temp.offsetYear(1)
+            temp = PyCalendarDateTime(end.getYear(), 1, 1, 0, 0, 0)
 
             # Use cache of expansion
             if self.mCachedExpandBelowItems is None:
