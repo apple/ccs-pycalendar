@@ -46,7 +46,7 @@ class PyCalendarDateTime(object):
 
         return e1.compareDateTime(e2)
 
-    def __init__( self, year = None, month = None, day = None, hours = None, minutes = None, seconds = None, tzid = None, packed = None ):
+    def __init__( self, year = None, month = None, day = None, hours = None, minutes = None, seconds = None, tzid = None, utcoffset = None ):
         
         self.mYear = 1970
         self.mMonth = 1
@@ -77,20 +77,6 @@ class PyCalendarDateTime(object):
             if tzid:
                 self.mTZUTC = tzid.getUTC()
                 self.mTZID = tzid.getTimezoneID()
-        elif (packed is not None):
-            # Unpack a packed date
-            self.mYear = utils.unpackDateYear( packed )
-            self.mMonth = utils.unpackDateMonth( packed )
-            self.mDay = utils.unpackDateDay( packed )
-            if self.mDay < 0:
-                self.mDay = -self.mDay
-            self.mDateOnly = True
-    
-            if tzid:
-                self.mTZUTC = tzid.getUTC()
-                self.mTZID = tzid.getTimezoneID()
-    
-            self.normalise()
     
     def duplicate(self):
         other = PyCalendarDateTime(self.mYear, self.mMonth, self.mDay, self.mHours, self.mMinutes, self.mSeconds)
@@ -806,64 +792,140 @@ class PyCalendarDateTime(object):
         else:
             if self.mTZUTC:
                 return "%4d%02d%02dT%02d%02d%02dZ" % ( self.mYear, self.mMonth, self.mDay, self.mHours, self.mMinutes, self.mSeconds )
+            elif isinstance(self.mTZID, int):
+                sign = "-" if self.mTZID < 0 else "+"
+                hours = abs(self.mTZID) / 3600
+                minutes = divmod(abs(self.mTZID) / 60, 60)[1]
+                return "%4d%02d%02dT%02d%02d%02d%s%02d%02d" % ( self.mYear, self.mMonth, self.mDay, self.mHours, self.mMinutes, self.mSeconds, sign, hours, minutes )
             else:
                 return "%4d%02d%02dT%02d%02d%02d" % ( self.mYear, self.mMonth, self.mDay, self.mHours, self.mMinutes, self.mSeconds )
 
     @classmethod
-    def parseText(cls, data):
+    def parseText(cls, data, fullISO=False):
         dt = cls()
-        dt.parse(data)
+        dt.parse(data, fullISO)
         return dt
 
-    def parse( self, data ):
 
-        # parse format YYYYMMDD[THHMMSS[Z]]
-
-        # Size must be at least 8
-        dlen = len(data)
-        if dlen not in (8, 15, 16):
-            raise ValueError
-
+    def parseDate(self, data, fullISO):
         # Get year
-        buf = data[0:4]
-        self.mYear = int(buf)
+        self.mYear = int(data[0:4])
+        index = 4
+        if fullISO and data[index] == "-":
+            index += 1
 
         # Get month
-        buf = data[4:6]
-        self.mMonth = int(buf)
+        self.mMonth = int(data[index:index + 2])
+        index += 2
+        if fullISO and data[index] == "-":
+            index += 1
 
         # Get day
-        buf = data[6:8]
-        self.mDay = int(buf)
+        self.mDay = int(data[index:index + 2])
+        index += 2
 
-        # Now look for more
-        if dlen >= 15:
-            
-            if data[8] != 'T':
+        return index
+
+
+    def parseTime(self, data, index, fullISO):
+        # Get hours
+        self.mHours = int(data[index:index + 2])
+        index += 2
+        if fullISO and data[index] == ":":
+            index += 1
+
+        # Get minutes
+        self.mMinutes = int(data[index:index + 2])
+        index += 2
+        if fullISO and data[index] == ":":
+            index += 1
+
+        # Get seconds
+        self.mSeconds = int(data[index:index + 2])
+        index += 2
+
+        return index
+
+
+    def parseFractionalAndUTCOffset(self, data, index, dlen):
+        # Optional fraction
+        if data[index] == ",":
+            index += 1
+            if not data[index].isdigit():
                 raise ValueError
-
-            # Get hours
-            buf = data[9:11]
-            self.mHours = int(buf)
-
-            # Get minutes
-            buf = data[11:13]
-            self.mMinutes = int(buf)
-
-            # Get seconds
-            buf = data[13:15]
-            self.mSeconds = int(buf)
-
-            self.mDateOnly = False
-
-            if dlen > 15:
-                if data[15] != 'Z':
-                    raise ValueError
+            while index < dlen and data[index].isdigit():
+                index += 1
+        
+        # Optional timezone descriptor
+        if index < dlen:
+            if data[index] == "Z":
+                index += 1
                 self.mTZUTC = True
             else:
-                self.mTZUTC = False
-        else:
-            self.mDateOnly = True
+                if data[index] == "+":
+                    sign = 1
+                elif data[index] == "-":
+                    sign = -1
+                else:
+                    raise ValueError
+                index += 1
+
+                # Get hours
+                hours_offset = int(data[index:index + 2])
+                index += 2
+                if data[index] == ":":
+                    index += 1
+
+                # Get minutes
+                minutes_offset = int(data[index:index + 2])
+                index += 2
+
+                self.mTZID = sign * (hours_offset * 60 + minutes_offset) * 60
+
+        if index < dlen:
+            raise ValueError
+        return index
+
+    def parse(self, data, fullISO=False):
+
+        # iCalendar:
+        #   parse format YYYYMMDD[THHMMSS[Z]]
+        # vCard (fullISO)
+        #   parse format YYYY[-]MM[-]DD[THH[:]MM[:]SS[(Z/(+/-)HHMM]]
+
+        try:
+            # Parse out the date
+            index = self.parseDate(data, fullISO)
+    
+            # Now look for more
+            dlen = len(data)
+            if index < dlen:
+                
+                if data[index] != 'T':
+                    raise ValueError
+                index += 1
+    
+                # Parse out the time
+                index = self.parseTime(data, index, fullISO)
+                self.mDateOnly = False
+    
+                if index < dlen:
+                    if fullISO:
+                        index = self.parseFractionalAndUTCOffset(data, index, dlen)
+                    else:
+                        if index < dlen:
+                            if data[index] != 'Z':
+                                raise ValueError
+                            index += 1
+                            self.mTZUTC = True
+                            if index < dlen:
+                                raise ValueError
+                else:
+                    self.mTZUTC = False
+            else:
+                self.mDateOnly = True
+        except IndexError:
+            raise ValueError
 
         # Always uncache posix time
         self.changed()

@@ -80,7 +80,12 @@ def find_first_of( text, tokens, offset ):
         if c in tokens:
             return offset + ctr
     return -1
-    
+
+def escapeTextValue(value):
+    os = StringIO.StringIO()
+    writeTextValue(os, value)
+    return os.getvalue()
+
 def writeTextValue( os, value ):
     try:
         start_pos = 0
@@ -172,6 +177,92 @@ def decodeTextValue(value):
 # Use these to control the parsing of illegal escape characters
 decodeTextValue.raiseOnInvalidEscape = True
 decodeTextValue.fixInvalidEscape = True
+
+# vCard text list parsing/generation
+def parseTextList(data, sep=';'):
+    """
+    Each element of the list has to be separately un-escaped
+    """
+    results = []
+    item = []
+    pre_s = ''
+    for s in data:
+        if s == sep and pre_s != '\\':
+            results.append(decodeTextValue("".join(item)))
+            item = []
+        else:
+            item.append(s)
+        pre_s = s
+    
+    results.append(decodeTextValue("".join(item)))
+
+    return tuple(results) if len(results) > 1 else (results[0] if len(results) else "")
+
+def generateTextList(os, data, sep=';'):
+    """
+    Each element of the list must be separately escaped
+    """
+    try:
+        if isinstance(data, basestring):
+            data = (data,)
+        results = [escapeTextValue(value) for value in data]
+        os.write(sep.join(results))
+    except:
+        pass
+
+# vCard double-nested list parsing/generation
+def parseDoubleNestedList(data, maxsize):
+    results = []
+    items = [""]
+    pre_s = ''
+    for s in data:
+        if s == ';' and pre_s != '\\':
+            
+            if len(items) > 1:
+                results.append(tuple([decodeTextValue(item) for item in items]))
+            elif len(items) == 1:
+                results.append(decodeTextValue(items[0]))
+            else:
+                results.append("")
+            
+            items = [""]
+        elif s == ',' and pre_s != '\\':
+            items.append("")
+        else:
+            items[-1] += s
+        pre_s = s
+    
+    if len(items) > 1:
+        results.append(tuple([decodeTextValue(item) for item in items]))
+    elif len(items) == 1:
+        results.append(decodeTextValue(items[0]))
+    else:
+        results.append("")
+
+    for _ignore in range(maxsize - len(results)):
+        results.append("")
+
+    return tuple(results)
+
+def generateDoubleNestedList(os, data):
+    try:
+        def _writeElement(item):
+            if isinstance(item, basestring):
+                writeTextValue(os, item)
+            else:
+                if item:
+                    writeTextValue(os, item[0])
+                    for bit in item[1:]:
+                        os.write(",")
+                        writeTextValue(os, bit)
+            
+        for item in data[:-1]:
+            _writeElement(item)
+            os.write(";")
+        _writeElement(data[-1])
+        
+    except:
+        pass
 
 # Date/time calcs
 days_in_month      = ( 0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 )

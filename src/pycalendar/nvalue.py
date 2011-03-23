@@ -14,18 +14,32 @@
 #    limitations under the License.
 ##
 
-from distutils.core import setup, Extension
+# vCard ADR value
 
-setup (
-    name = "pycalendar",
-    version = "2.0",
-    description = "iCalendar/vCard Library",
-    license = "Apache 2.0",
-    platforms = ["any"],
-    package_dir={'': 'src'},
-    packages = [
-        'pycalendar',
-        'pycalendar.icalendar',
-        'pycalendar.vcard',
-    ]
-)
+from value import PyCalendarValue
+from n import N
+
+class NValue( PyCalendarValue ):
+
+    def __init__(self, value = None):
+        self.mValue = value if value is not None else N()
+
+    def duplicate(self):
+        return NValue(self.mValue.duplicate())
+
+    def getType(self):
+        return PyCalendarValue.VALUETYPE_N
+
+    def parse(self, data):
+        self.mValue.parse(data)
+
+    def generate(self, os):
+        self.mValue.generate(os)
+
+    def getValue(self):
+        return self.mValue
+
+    def setValue(self, value):
+        self.mValue = value
+
+PyCalendarValue.registerType(PyCalendarValue.VALUETYPE_N, NValue)

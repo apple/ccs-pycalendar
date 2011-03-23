@@ -1,4 +1,4 @@
-##
+#
 #    Copyright (c) 2007-2011 Cyrus Daboo. All rights reserved.
 #    
 #    Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,18 +14,3 @@
 #    limitations under the License.
 ##
 
-from distutils.core import setup, Extension
-
-setup (
-    name = "pycalendar",
-    version = "2.0",
-    description = "iCalendar/vCard Library",
-    license = "Apache 2.0",
-    platforms = ["any"],
-    package_dir={'': 'src'},
-    packages = [
-        'pycalendar',
-        'pycalendar.icalendar',
-        'pycalendar.vcard',
-    ]
-)

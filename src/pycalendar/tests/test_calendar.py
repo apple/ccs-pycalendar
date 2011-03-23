@@ -16,7 +16,7 @@
 from pycalendar.calendar import PyCalendar
 from pycalendar.property import PyCalendarProperty
 
-import StringIO
+import cStringIO as StringIO
 import unittest
 import difflib
 

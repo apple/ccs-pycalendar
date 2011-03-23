@@ -241,7 +241,7 @@ class PyCalendar(PyCalendarComponentBase):
         PyCalendarTimezoneDatabase.mergeTimezones(self, self.getComponents(definitions.cICalComponent_VTIMEZONE))
     
         # Validate some things
-        if not self.hasProperty("VERSION"):
+        if result and not self.hasProperty("VERSION"):
             raise PyCalendarInvalidData("iCalendar missing VERSION", "")
 
         return result

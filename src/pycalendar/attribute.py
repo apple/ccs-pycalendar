@@ -22,9 +22,14 @@ The attribute can consist of one or more values, all string.
 
 class PyCalendarAttribute(object):
 
-    def __init__( self, name, value = None ):
+    def __init__(self, name, value = None):
         self.mName = name
-        self.mValues = [value] if value is not None else []
+        if value is None:
+            self.mValues = []
+        elif isinstance(value, basestring):
+            self.mValues = [value]
+        else:
+            self.mValues = value
 
     def duplicate(self):
         other = PyCalendarAttribute(self.mName, [i for i in self.mValues])
@@ -32,57 +37,60 @@ class PyCalendarAttribute(object):
         return other
 
     def __hash__(self):
-        return hash((self.mName, tuple(self.mValues)))
+        return hash((self.mName.upper(), tuple(self.mValues)))
 
     def __ne__(self, other): return not self.__eq__(other)
     def __eq__(self, other):
         if not isinstance(other, PyCalendarAttribute): return False
-        return self.mName == other.mName and self.mValues == other.mValues
+        return self.mName.upper() == other.mName.upper() and self.mValues == other.mValues
 
-    def getName( self ):
+    def getName(self):
         return self.mName
 
-    def setName( self, name ):
+    def setName(self, name):
         self.mName = name
 
-    def getFirstValue( self ):
+    def getFirstValue(self):
         return self.mValues[0]
 
-    def getValues( self ):
+    def getValues(self):
         return self.mValues
 
-    def setValues( self, values ):
+    def setValues(self, values):
         self.mValues = values
 
-    def addValue( self, value ):
-        self.mValues.append( value )
+    def addValue(self, value):
+        self.mValues.append(value)
 
-    def removeValue( self, value ):
-        self.mValues.remove( value )
+    def removeValue(self, value):
+        self.mValues.remove(value)
         return len(self.mValues)
 
-    def generate( self, os ):
+    def generate(self, os):
         try:
-            os.write( self.mName )
-            os.write( "=" )
-
-            first = True
-            for s in self.mValues:
-                if first:
-                    first = False
-                else:
-                    os.write( "," )
-
-                # Write with quotation if required
-                self.generateValue( os, s )
+            os.write(self.mName)
+            
+            # To support vCard 2.1 syntax we allow parameters without values
+            if self.mValues:
+                os.write("=")
+    
+                first = True
+                for s in self.mValues:
+                    if first:
+                        first = False
+                    else:
+                        os.write(",")
+    
+                    # Write with quotation if required
+                    self.generateValue(os, s)
 
         except:
             # We ignore errors
             pass
     
-    def generateValue( self, os, str ):
+    def generateValue(self, os, str):
         # Look for quoting
-        if str.find( ":" ) != -1 or str.find( ";" ) != -1 or str.find( "," ) != -1:
-            os.write( "\"%s\"" % (str,) )
+        if str.find(":") != -1 or str.find(";") != -1 or str.find(",") != -1:
+            os.write("\"%s\"" % (str,))
         else:
-            os.write( str )
+            os.write(str)

@@ -1,5 +1,5 @@
 ##
-#    Copyright (c) 2007 Cyrus Daboo. All rights reserved.
+#    Copyright (c) 2007-2011 Cyrus Daboo. All rights reserved.
 #    
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -14,22 +14,24 @@
 #    limitations under the License.
 ##
 
-from datetime import PyCalendarDateTime
+# vCard ADR value
+
+from adr import Adr
 from value import PyCalendarValue
 
-class PyCalendarDateTimeValue(PyCalendarValue):
+class AdrValue( PyCalendarValue ):
 
-    def __init__(self, value=None):
-        self.mValue = value if value is not None else PyCalendarDateTime()
+    def __init__(self, value = None):
+        self.mValue = value if value is not None else Adr()
 
     def duplicate(self):
-        return PyCalendarDateTimeValue(self.mValue.duplicate())
+        return AdrValue(self.mValue.duplicate())
 
     def getType(self):
-        return  (PyCalendarValue.VALUETYPE_DATETIME, PyCalendarValue.VALUETYPE_DATE)[self.mValue.isDateOnly()]
+        return PyCalendarValue.VALUETYPE_ADR
 
-    def parse(self, data, fullISO=False):
-        self.mValue.parse(data, fullISO)
+    def parse(self, data):
+        self.mValue.parse(data)
 
     def generate(self, os):
         self.mValue.generate(os)
@@ -40,5 +42,4 @@ class PyCalendarDateTimeValue(PyCalendarValue):
     def setValue(self, value):
         self.mValue = value
 
-PyCalendarValue.registerType(PyCalendarValue.VALUETYPE_DATE, PyCalendarDateTimeValue)
-PyCalendarValue.registerType(PyCalendarValue.VALUETYPE_DATETIME, PyCalendarDateTimeValue)
+PyCalendarValue.registerType(PyCalendarValue.VALUETYPE_ADR, AdrValue)

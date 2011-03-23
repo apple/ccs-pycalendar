@@ -1,5 +1,5 @@
 ##
-#    Copyright (c) 2007 Cyrus Daboo. All rights reserved.
+#    Copyright (c) 2007-2011 Cyrus Daboo. All rights reserved.
 #    
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -14,25 +14,30 @@
 #    limitations under the License.
 ##
 
-from datetime import PyCalendarDateTime
-from value import PyCalendarValue
+# vCard ORG value
 
-class PyCalendarDateTimeValue(PyCalendarValue):
+from value import PyCalendarValue
+from pycalendar import utils
+
+class OrgValue(PyCalendarValue):
+    """
+    mValue is a str or tuple of str
+    """
 
     def __init__(self, value=None):
-        self.mValue = value if value is not None else PyCalendarDateTime()
+        self.mValue = value
 
     def duplicate(self):
-        return PyCalendarDateTimeValue(self.mValue.duplicate())
+        return OrgValue(self.mValue)
 
     def getType(self):
-        return  (PyCalendarValue.VALUETYPE_DATETIME, PyCalendarValue.VALUETYPE_DATE)[self.mValue.isDateOnly()]
+        return PyCalendarValue.VALUETYPE_ORG
 
-    def parse(self, data, fullISO=False):
-        self.mValue.parse(data, fullISO)
-
+    def parse(self, data):
+        self.mValue = utils.parseTextList(data, ';')
+        
     def generate(self, os):
-        self.mValue.generate(os)
+        utils.generateTextList(os, self.mValue, ';')
 
     def getValue(self):
         return self.mValue
@@ -40,5 +45,4 @@ class PyCalendarDateTimeValue(PyCalendarValue):
     def setValue(self, value):
         self.mValue = value
 
-PyCalendarValue.registerType(PyCalendarValue.VALUETYPE_DATE, PyCalendarDateTimeValue)
-PyCalendarValue.registerType(PyCalendarValue.VALUETYPE_DATETIME, PyCalendarDateTimeValue)
+PyCalendarValue.registerType(PyCalendarValue.VALUETYPE_ORG, OrgValue)

@@ -233,23 +233,23 @@ class PyCalendarProperty(object):
         return self.mAttributes
 
     def setAttributes(self, attributes):
-        self.mAttributes = attributes
+        self.mAttributes = dict([(k.upper(), v) for k,v in attributes.iteritems()])
 
     def hasAttribute(self, attr):
-        return self.mAttributes.has_key(attr)
+        return self.mAttributes.has_key(attr.upper())
 
     def getAttributeValue(self, attr):
-        return self.mAttributes[attr][0].getFirstValue()
+        return self.mAttributes[attr.upper()][0].getFirstValue()
 
     def addAttribute(self, attr):
-        self.mAttributes.setdefault(attr.getName(), []).append(attr)
+        self.mAttributes.setdefault(attr.getName().upper(), []).append(attr)
 
     def replaceAttribute(self, attr):
-        self.mAttributes[attr.getName()] = [attr]
+        self.mAttributes[attr.getName().upper()] = [attr]
 
     def removeAttributes(self, attr):
-        if self.mAttributes.has_key(attr):
-            del self.mAttributes[attr]
+        if self.mAttributes.has_key(attr.upper()):
+            del self.mAttributes[attr.upper()]
 
     def getValue(self):
         return self.mValue
@@ -343,37 +343,41 @@ class PyCalendarProperty(object):
         # TODO: Try to use static string for the name
 
         # Now loop getting data
-        while txt:
-            if txt[0] == ';':
-                # Parse attribute
-
-                # Move past delimiter
-                txt = txt[1:]
-
-                # Get quoted string or token
-                attribute_name, txt = stringutils.strduptokenstr(txt, "=")
-                if attribute_name is None:
-                    raise PyCalendarInvalidProperty("Invalid property", data)
-                txt = txt[1:]
-                attribute_value, txt = stringutils.strduptokenstr(txt, ":;,")
-                if attribute_value is None:
-                    raise PyCalendarInvalidProperty("Invalid property", data)
-
-                # Now add attribute value
-                attrvalue = PyCalendarAttribute(name = attribute_name, value=attribute_value)
-                self.mAttributes.setdefault(attribute_name, []).append(attrvalue)
-
-                # Look for additional values
-                while txt[0] == ',':
+        try:
+            while txt:
+                if txt[0] == ';':
+                    # Parse attribute
+    
+                    # Move past delimiter
                     txt = txt[1:]
-                    attribute_value2, txt = stringutils.strduptokenstr(txt, ":;,")
-                    if attribute_value2 is None:
+    
+                    # Get quoted string or token
+                    attribute_name, txt = stringutils.strduptokenstr(txt, "=")
+                    if attribute_name is None:
                         raise PyCalendarInvalidProperty("Invalid property", data)
-                    attrvalue.addValue(attribute_value2)
-            elif txt[0] == ':':
-                txt = txt[1:]
-                self.createValue(txt)
-                txt = None
+                    txt = txt[1:]
+                    attribute_value, txt = stringutils.strduptokenstr(txt, ":;,")
+                    if attribute_value is None:
+                        raise PyCalendarInvalidProperty("Invalid property", data)
+    
+                    # Now add attribute value
+                    attrvalue = PyCalendarAttribute(name = attribute_name, value=attribute_value)
+                    self.mAttributes.setdefault(attribute_name.upper(), []).append(attrvalue)
+    
+                    # Look for additional values
+                    while txt[0] == ',':
+                        txt = txt[1:]
+                        attribute_value2, txt = stringutils.strduptokenstr(txt, ":;,")
+                        if attribute_value2 is None:
+                            raise PyCalendarInvalidProperty("Invalid property", data)
+                        attrvalue.addValue(attribute_value2)
+                elif txt[0] == ':':
+                    txt = txt[1:]
+                    self.createValue(txt)
+                    txt = None
+
+        except IndexError:
+            raise PyCalendarInvalidProperty("Invalid property", data)
 
         # We must have a value of some kind
         if self.mValue is None:

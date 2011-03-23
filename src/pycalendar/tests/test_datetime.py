@@ -53,3 +53,64 @@ class TestDateTime(unittest.TestCase):
         
         self.assertTrue(PyCalendarDateTime(2011, 1, 1, 0, 0, 0, tzid=PyCalendarTimezone(utc=True)) in s)
         self.assertFalse(PyCalendarDateTime(2011, 1, 3, 0, 0, 0, tzid=PyCalendarTimezone(utc=True)) in s)
+
+    def testRoundtrip(self):
+        
+        data1 = (
+            "20110102",
+            "20110103T121212",
+            "20110103T121212Z",
+        )
+        
+        data2 = (
+            ("20110102", "20110102"),
+            ("2011-01-02", "20110102"),
+            ("20110103T121212", "20110103T121212"),
+            ("2011-01-03T12:12:12", "20110103T121212"),
+            ("20110103T121212Z", "20110103T121212Z"),
+            ("2011-01-03T12:12:12Z", "20110103T121212Z"),
+            ("20110103T121212+0100", "20110103T121212+0100"),
+            ("2011-01-03T12:12:12-0500", "20110103T121212-0500"),
+            ("20110103T121212,123", "20110103T121212"),
+            ("2011-01-03T12:12:12,123", "20110103T121212"),
+            ("20110103T121212,123Z", "20110103T121212Z"),
+            ("2011-01-03T12:12:12,123Z", "20110103T121212Z"),
+            ("20110103T121212,123+0100", "20110103T121212+0100"),
+            ("2011-01-03T12:12:12,123-0500", "20110103T121212-0500"),
+        )
+
+        for item in data1:
+            dt = PyCalendarDateTime.parseText(item, False)
+            self.assertEqual(dt.getText(), item, "Failed on: %s" % (item,))
+        
+        for item, result in data2:
+            dt = PyCalendarDateTime.parseText(item, True)
+            self.assertEqual(dt.getText(), result, "Failed on: %s" % (item,))
+        
+    def testBadParse(self):
+        
+        data1 = (
+            "2011",
+            "201101023",
+            "20110103t121212",
+            "20110103T1212",
+            "20110103T1212123",
+            "20110103T121212A",
+            "2011-01-03T121212Z",
+            "20110103T12:12:12Z",
+            "20110103T121212+0500",
+        )
+        data2 = (
+            "2011-01+02",
+            "20110103T12-12-12",
+            "2011-01-03T12:12:12,",
+            "2011-01-03T12:12:12,ABC",
+            "20110103T12:12:12-1",
+        )
+
+        for item in data1:
+            self.assertRaises(ValueError, PyCalendarDateTime.parseText, item, False)
+        
+        for item in data2:
+            self.assertRaises(ValueError, PyCalendarDateTime.parseText, item, False)
+        
