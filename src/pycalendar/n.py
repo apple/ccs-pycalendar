@@ -38,7 +38,7 @@ class N(object):
         self.mValue = (first, last, middle, prefix, suffix)
 
     def duplicate(self):
-        return N(self.mValue)
+        return N(*self.mValue)
 
     def __hash__(self):
         return hash(self.mValue)

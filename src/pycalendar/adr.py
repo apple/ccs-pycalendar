@@ -40,7 +40,7 @@ class Adr(object):
         self.mValue = (pobox, extended, street, locality, region, postalcode, country)
 
     def duplicate(self):
-        return Adr(self.mValue)
+        return Adr(*self.mValue)
 
     def __hash__(self):
         return hash(self.mValue)

@@ -32,14 +32,19 @@ class TestAdrValue(unittest.TestCase):
         )
 
         for args, result in data:
-            n = Adr(*args)
+            a = Adr(*args)
     
             self.assertEqual(
-                n.getValue(),
+                a.getValue(),
                 args,
             )
     
             self.assertEqual(
-                n.getText(),
+                a.getText(),
+                result,
+            )
+    
+            self.assertEqual(
+                a.duplicate().getText(),
                 result,
             )

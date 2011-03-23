@@ -51,3 +51,8 @@ class TestAdrValue(unittest.TestCase):
                 n.getFullName(),
                 fullName,
             )
+
+            self.assertEqual(
+                n.duplicate().getText(),
+                result,
+            )
