@@ -305,4 +305,43 @@ END:VCARD
             self.assertEqual(len(cards), len(results))
             for card, result in zip(cards, results):
                 self.assertEqual(str(card), result, "\n".join(difflib.unified_diff(str(card).splitlines(), result.splitlines())))
-                
+    
+    def testABapp(self):
+        
+        data = """BEGIN:VCARD
+VERSION:3.0
+N:Card;Test;;;
+FN:Test Card
+EMAIL;type=INTERNET;type=WORK;type=pref:sagen@apple.com
+TEL;type=WORK;type=pref:555-1212
+TEL;type=HOME:532-1234
+PHOTO;BASE64:
+  TU0AKgAAMAj////////////////////////////////////////////////////////////+///+
+  SW1hZ2VNYWdpY2sgNS4zLjkgMTAvMDEvMDEgUToxNiBodHRwOi8vd3d3LmltYWdlbWFnaWNrLm9y
+  ZwA=
+CATEGORIES:My Contacts
+X-ABUID:5B77BC10-E9DB-48C4-8BE1-BAB5E38E1E43\:ABPerson
+UID:128ad7ee-a656-4773-95ce-f07f77e8cc23
+REV:2011-03-23T20:20:04Z
+END:VCARD
+""".replace("\n", "\r\n")
+        
+        result = """BEGIN:VCARD
+VERSION:3.0
+UID:128ad7ee-a656-4773-95ce-f07f77e8cc23
+CATEGORIES:My Contacts
+EMAIL;type=INTERNET;type=WORK;type=pref:sagen@apple.com
+FN:Test Card
+N:Card;Test;;;
+PHOTO;ENCODING=B:TU0AKgAAMAj//////////////////////////////////////////////
+ //////////////+///+SW1hZ2VNYWdpY2sgNS4zLjkgMTAvMDEvMDEgUToxNiBodHRwOi8vd3
+ d3LmltYWdlbWFnaWNrLm9yZwA=
+REV:20110323T202004Z
+TEL;type=WORK;type=pref:555-1212
+TEL;type=HOME:532-1234
+X-ABUID:5B77BC10-E9DB-48C4-8BE1-BAB5E38E1E43:ABPerson
+END:VCARD
+""".replace("\n", "\r\n")
+
+        card = Card.parseText(data)
+        self.assertEqual(str(card), result)

@@ -175,7 +175,7 @@ def decodeTextValue(value):
     return os.getvalue()
 
 # Use these to control the parsing of illegal escape characters
-decodeTextValue.raiseOnInvalidEscape = True
+decodeTextValue.raiseOnInvalidEscape = False
 decodeTextValue.fixInvalidEscape = True
 
 # vCard text list parsing/generation

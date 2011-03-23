@@ -255,6 +255,7 @@ class Property(object):
         
         # Now loop getting data
         try:
+            stripValueSpaces = False    # Fix for AB.app base PHOTO properties that use two spaces at start of line
             while txt:
                 if txt[0] == ';':
                     # Parse attribute
@@ -277,6 +278,7 @@ class Property(object):
                             if attribute_name.upper() == "BASE64":
                                 attribute_name = definitions.Parameter_ENCODING
                                 attribute_value = definitions.Parameter_Value_ENCODING_B
+                                stripValueSpaces = True
                             else:
                                 # Default to allow
                                 attribute_value = None
@@ -304,6 +306,8 @@ class Property(object):
                         attrvalue.addValue(attribute_value2)
                 elif txt[0] == ':':
                     txt = txt[1:]
+                    if stripValueSpaces:
+                        txt = txt.replace(" ", "")
                     self.createValue(txt)
                     txt = None
 
