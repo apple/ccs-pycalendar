@@ -36,6 +36,7 @@ from vunknown import PyCalendarUnknownComponent
 import definitions
 
 from cStringIO import StringIO
+from pycalendar.parser import ParserContext
 
 class PyCalendar(PyCalendarComponentBase):
 
@@ -171,7 +172,7 @@ class PyCalendar(PyCalendarComponentBase):
         state = LOOK_FOR_VCALENDAR
     
         # Get lines looking for start of calendar
-        lines = ["", ""]
+        lines = [None, None]
         comp = self
         compend = None
         componentstack = []
@@ -179,6 +180,7 @@ class PyCalendar(PyCalendarComponentBase):
         while readFoldedLine(ins, lines):
             
             line = lines[0]
+
             if state == LOOK_FOR_VCALENDAR:
 
                 # Look for start
@@ -188,6 +190,16 @@ class PyCalendar(PyCalendarComponentBase):
     
                     # Indicate success at this point
                     result = True
+
+                # Handle blank line
+                elif len(line) == 0:
+                    # Raise if requested, otherwise just ignore
+                    if ParserContext.BLANK_LINES_IN_DATA == ParserContext.PARSER_RAISE:
+                        raise PyCalendarInvalidData("iCalendar data has blank lines")
+                
+                # Unrecognized data
+                else:
+                    raise PyCalendarInvalidData("iCalendar data not recognized", line)
 
             elif state == GET_PROPERTY_OR_COMPONENT:
 
@@ -220,6 +232,12 @@ class PyCalendar(PyCalendarComponentBase):
                     componentstack[-1][0].addComponent(comp)
                     comp, compend = componentstack.pop()
                 
+                # Blank line
+                elif len(line) == 0:
+                    # Raise if requested, otherwise just ignore
+                    if ParserContext.BLANK_LINES_IN_DATA == ParserContext.PARSER_RAISE:
+                        raise PyCalendarInvalidData("iCalendar data has blank lines")
+
                 # Must be a property
                 else:
 
@@ -236,13 +254,17 @@ class PyCalendar(PyCalendarComponentBase):
                         else:
                             comp.addProperty(prop)
     
+        # Check for truncated data
+        if state != LOOK_FOR_VCALENDAR:
+            raise PyCalendarInvalidData("iCalendar data not complete")
+            
         # We need to store all timezones in the static object so they can be accessed by any date object
         from timezonedb import PyCalendarTimezoneDatabase
         PyCalendarTimezoneDatabase.mergeTimezones(self, self.getComponents(definitions.cICalComponent_VTIMEZONE))
     
         # Validate some things
         if result and not self.hasProperty("VERSION"):
-            raise PyCalendarInvalidData("iCalendar missing VERSION", "")
+            raise PyCalendarInvalidData("iCalendar missing VERSION")
 
         return result
     
@@ -257,7 +279,7 @@ class PyCalendar(PyCalendarComponentBase):
         state = LOOK_FOR_VCALENDAR
     
         # Get lines looking for start of calendar
-        lines = ["", ""]
+        lines = [None, None]
         comp = self
         compend = None
         componentstack = []
@@ -271,6 +293,16 @@ class PyCalendar(PyCalendarComponentBase):
                 if lines[0] == self.getBeginDelimiter():
                     # Next state
                     state = GET_PROPERTY_OR_COMPONENT
+
+                # Handle blank line
+                elif len(lines[0]) == 0:
+                    # Raise if requested, otherwise just ignore
+                    if ParserContext.BLANK_LINES_IN_DATA == ParserContext.PARSER_RAISE:
+                        raise PyCalendarInvalidData("iCalendar data has blank lines")
+                
+                # Unrecognized data
+                else:
+                    raise PyCalendarInvalidData("iCalendar data not recognized", lines[0])
 
             elif state == GET_PROPERTY_OR_COMPONENT:
 
@@ -307,6 +339,12 @@ class PyCalendar(PyCalendarComponentBase):
                     componentstack[-1][0].addComponent(comp)
                     comp, compend = componentstack.pop()
                 
+                # Blank line
+                elif len(lines[0]) == 0:
+                    # Raise if requested, otherwise just ignore
+                    if ParserContext.BLANK_LINES_IN_DATA == ParserContext.PARSER_RAISE:
+                        raise PyCalendarInvalidData("iCalendar data has blank lines")
+
                 # Ignore top-level items
                 elif comp is self:
                     pass

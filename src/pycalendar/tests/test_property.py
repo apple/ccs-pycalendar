@@ -18,6 +18,7 @@ import unittest
 
 from pycalendar.property import PyCalendarProperty
 from pycalendar.exceptions import PyCalendarInvalidProperty
+from pycalendar.parser import ParserContext
 
 class TestProperty(unittest.TestCase):
     
@@ -77,9 +78,12 @@ class TestProperty(unittest.TestCase):
             "REQUEST-STATUS:2.0,Success",
             "TZOFFSETFROM:-050",
         )
+        save = ParserContext.INVALID_ESCAPE_SEQUENCES
         for data in test_bad_data:
+            ParserContext.INVALID_ESCAPE_SEQUENCES = ParserContext.PARSER_RAISE
             prop = PyCalendarProperty()
             self.assertRaises(PyCalendarInvalidProperty, prop.parse, data)
+        ParserContext.INVALID_ESCAPE_SEQUENCES = save
     
     def testHash(self):
         

@@ -16,7 +16,7 @@
 
 class PyCalendarInvalidData(Exception):
 
-    def __init__(self, reason, data):
+    def __init__(self, reason, data=""):
         self.mReason = reason
         self.mData = data
 

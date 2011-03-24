@@ -34,6 +34,7 @@ from pycalendar.vcard.definitions import Property_ORG, Property_GEO
 import definitions
 from pycalendar.adrvalue import AdrValue
 from pycalendar.nvalue import NValue
+from pycalendar.parser import ParserContext
 
 handleOptions = ("allow", "ignore", "fix", "raise")
 missingParameterValues = "fix"
@@ -272,20 +273,17 @@ class Property(object):
                     
                     if txt[0] != "=":
                         # Deal with parameters without values
-                        if missingParameterValues == "raise":
+                        if ParserContext.VCARD_2_NO_PARAMETER_VALUES == ParserContext.PARSER_RAISE:
                             raise PyCalendarInvalidProperty("Invalid property parameter", data)
-                        elif missingParameterValues == "fix":
-                            if attribute_name.upper() == "BASE64":
-                                attribute_name = definitions.Parameter_ENCODING
-                                attribute_value = definitions.Parameter_Value_ENCODING_B
-                                stripValueSpaces = True
-                            else:
-                                # Default to allow
-                                attribute_value = None
-                        elif missingParameterValues == "ignore":
-                            attribute_name = None
-                        else:
+                        elif ParserContext.VCARD_2_NO_PARAMETER_VALUES == ParserContext.PARSER_ALLOW:
                             attribute_value = None
+                        else: # PARSER_IGNORE and PARSER_FIX
+                            attribute_name = None
+
+                        if attribute_name.upper() == "BASE64" and ParserContext.VCARD_2_BASE64 == ParserContext.PARSER_FIX:
+                            attribute_name = definitions.Parameter_ENCODING
+                            attribute_value = definitions.Parameter_Value_ENCODING_B
+                            stripValueSpaces = True
                     else:
                         txt = txt[1:]
                         attribute_value, txt = stringutils.strduptokenstr(txt, ":;,")

@@ -13,12 +13,14 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 ##
-from pycalendar.calendar import PyCalendar
-from pycalendar.property import PyCalendarProperty
 
+from pycalendar.calendar import PyCalendar
+from pycalendar.exceptions import PyCalendarInvalidData
+from pycalendar.property import PyCalendarProperty
 import cStringIO as StringIO
-import unittest
 import difflib
+import unittest
+from pycalendar.parser import ParserContext
 
 class TestCalendar(unittest.TestCase):
     
@@ -417,3 +419,197 @@ END:VCALENDAR
         cal.parse(StringIO.StringIO(data1))
         cal.parseComponent(StringIO.StringIO(data2))
         self.assertEqual(str(cal), result)
+
+    def testParseFail(self):
+        
+        data = (
+"""BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//mulberrymail.com//Mulberry v4.0//EN
+BEGIN:VEVENT
+UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
+DTSTART;VALUE=DATE:20020101
+DTEND;VALUE=DATE:20020102
+DTSTAMP:20020101T000000Z
+RRULE:FREQ=YEARLY;UNTIL=20031231;BYMONTH=1
+SUMMARY:New Year's Day
+END:VEVENT
+""".replace("\n", "\r\n"),
+
+"""BEGIN:VCARD
+PRODID:-//mulberrymail.com//Mulberry v4.0//EN
+VERSION:2.0
+END:VCARD
+""".replace("\n", "\r\n"),
+
+"""BOGUS
+BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//mulberrymail.com//Mulberry v4.0//EN
+BEGIN:VEVENT
+UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
+DTSTART;VALUE=DATE:20020101
+DTEND;VALUE=DATE:20020102
+DTSTAMP:20020101T000000Z
+RRULE:FREQ=YEARLY;UNTIL=20031231;BYMONTH=1
+SUMMARY:New Year's Day
+END:VEVENT
+END:VCALENDAR
+""".replace("\n", "\r\n"),
+
+"""BOGUS
+
+BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//mulberrymail.com//Mulberry v4.0//EN
+BEGIN:VEVENT
+UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
+DTSTART;VALUE=DATE:20020101
+DTEND;VALUE=DATE:20020102
+DTSTAMP:20020101T000000Z
+RRULE:FREQ=YEARLY;UNTIL=20031231;BYMONTH=1
+SUMMARY:New Year's Day
+END:VEVENT
+END:VCALENDAR
+""".replace("\n", "\r\n"),
+
+"""BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//mulberrymail.com//Mulberry v4.0//EN
+BEGIN:VEVENT
+UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
+DTSTART;VALUE=DATE:20020101
+DTEND;VALUE=DATE:20020102
+DTSTAMP:20020101T000000Z
+RRULE:FREQ=YEARLY;UNTIL=20031231;BYMONTH=1
+SUMMARY:New Year's Day
+END:VEVENT
+END:VCALENDAR
+BOGUS
+""".replace("\n", "\r\n"),
+
+"""BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//mulberrymail.com//Mulberry v4.0//EN
+BEGIN:VEVENT
+UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
+DTSTART;VALUE=DATE:20020101
+DTEND;VALUE=DATE:20020102
+DTSTAMP:20020101T000000Z
+RRULE:FREQ=YEARLY;UNTIL=20031231;BYMONTH=1
+SUMMARY:New Year's Day
+END:VEVENT
+END:VCALENDAR
+
+BOGUS
+""".replace("\n", "\r\n"),
+
+        )
+
+        for item in data:
+            print item
+            self.assertRaises(PyCalendarInvalidData, PyCalendar.parseText, item)
+
+    def testParseBlank(self):
+        
+        data = (
+"""
+BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//mulberrymail.com//Mulberry v4.0//EN
+BEGIN:VEVENT
+UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
+DTSTART;VALUE=DATE:20020101
+DTEND;VALUE=DATE:20020102
+DTSTAMP:20020101T000000Z
+RRULE:FREQ=YEARLY;UNTIL=20031231;BYMONTH=1
+SUMMARY:New Year's Day
+END:VEVENT
+END:VCALENDAR
+""".replace("\n", "\r\n"),
+
+"""
+
+BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//mulberrymail.com//Mulberry v4.0//EN
+BEGIN:VEVENT
+UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
+DTSTART;VALUE=DATE:20020101
+DTEND;VALUE=DATE:20020102
+DTSTAMP:20020101T000000Z
+RRULE:FREQ=YEARLY;UNTIL=20031231;BYMONTH=1
+SUMMARY:New Year's Day
+END:VEVENT
+END:VCALENDAR
+""".replace("\n", "\r\n"),
+
+"""BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//mulberrymail.com//Mulberry v4.0//EN
+BEGIN:VEVENT
+UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
+DTSTART;VALUE=DATE:20020101
+DTEND;VALUE=DATE:20020102
+DTSTAMP:20020101T000000Z
+RRULE:FREQ=YEARLY;UNTIL=20031231;BYMONTH=1
+SUMMARY:New Year's Day
+END:VEVENT
+END:VCALENDAR
+
+
+""".replace("\n", "\r\n"),
+
+"""BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//mulberrymail.com//Mulberry v4.0//EN
+BEGIN:VEVENT
+
+UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
+DTSTART;VALUE=DATE:20020101
+DTEND;VALUE=DATE:20020102
+DTSTAMP:20020101T000000Z
+RRULE:FREQ=YEARLY;UNTIL=20031231;BYMONTH=1
+SUMMARY:New Year's Day
+END:VEVENT
+END:VCALENDAR
+""".replace("\n", "\r\n"),
+
+"""BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//mulberrymail.com//Mulberry v4.0//EN
+BEGIN:VEVENT
+
+
+UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
+DTSTART;VALUE=DATE:20020101
+DTEND;VALUE=DATE:20020102
+DTSTAMP:20020101T000000Z
+RRULE:FREQ=YEARLY;UNTIL=20031231;BYMONTH=1
+SUMMARY:New Year's Day
+END:VEVENT
+END:VCALENDAR
+""".replace("\n", "\r\n"),
+        )
+
+        save = ParserContext.BLANK_LINES_IN_DATA
+        for item in data:
+            ParserContext.BLANK_LINES_IN_DATA = ParserContext.PARSER_RAISE
+            self.assertRaises(PyCalendarInvalidData, PyCalendar.parseText, item)
+
+            ParserContext.BLANK_LINES_IN_DATA = ParserContext.PARSER_IGNORE
+            lines = item.split("\r\n")
+            result = "\r\n".join([line for line in lines if line]) + "\r\n"
+            self.assertEqual(str(PyCalendar.parseText(item)), result)
+
+        ParserContext.BLANK_LINES_IN_DATA = save

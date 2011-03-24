@@ -19,6 +19,8 @@ from pycalendar.vcard.property import Property
 import cStringIO as StringIO
 import difflib
 import unittest
+from pycalendar.parser import ParserContext
+from pycalendar.exceptions import PyCalendarInvalidData
 
 class TestCard(unittest.TestCase):
     
@@ -345,3 +347,183 @@ END:VCARD
 
         card = Card.parseText(data)
         self.assertEqual(str(card), result)
+
+    def testParseFail(self):
+        
+        data = (
+"""BEGIN:VCARD
+VERSION:3.0
+N:Thompson;Default;;;
+FN:Default Thompson
+EMAIL;type=INTERNET;type=WORK;type=pref:lthompson@example.com
+TEL;type=WORK;type=pref:1-555-555-5555
+TEL;type=CELL:1-444-444-4444
+item1.ADR;type=WORK;type=pref:;;1245 Test;Sesame Street;California;11111;USA
+item1.X-ABADR:us
+UID:ED7A5AEC-AB19-4CE0-AD6A-2923A3E5C4E1:ABPerson
+""".replace("\n", "\r\n"),
+
+"""BEGIN:VCALENDAR
+PRODID:-//mulberrymail.com//Mulberry v4.0//EN
+VERSION:2.0
+END:VCALENDAR
+""".replace("\n", "\r\n"),
+
+"""BOGUS
+BEGIN:VCARD
+VERSION:3.0
+N:Thompson;Default;;;
+FN:Default Thompson
+EMAIL;type=INTERNET;type=WORK;type=pref:lthompson@example.com
+TEL;type=WORK;type=pref:1-555-555-5555
+TEL;type=CELL:1-444-444-4444
+item1.ADR;type=WORK;type=pref:;;1245 Test;Sesame Street;California;11111;USA
+item1.X-ABADR:us
+UID:ED7A5AEC-AB19-4CE0-AD6A-2923A3E5C4E1:ABPerson
+END:VCARD
+""".replace("\n", "\r\n"),
+
+"""BOGUS
+
+BEGIN:VCARD
+VERSION:3.0
+N:Thompson;Default;;;
+FN:Default Thompson
+EMAIL;type=INTERNET;type=WORK;type=pref:lthompson@example.com
+TEL;type=WORK;type=pref:1-555-555-5555
+TEL;type=CELL:1-444-444-4444
+item1.ADR;type=WORK;type=pref:;;1245 Test;Sesame Street;California;11111;USA
+item1.X-ABADR:us
+UID:ED7A5AEC-AB19-4CE0-AD6A-2923A3E5C4E1:ABPerson
+END:VCARD
+""".replace("\n", "\r\n"),
+
+"""BEGIN:VCARD
+VERSION:3.0
+N:Thompson;Default;;;
+FN:Default Thompson
+EMAIL;type=INTERNET;type=WORK;type=pref:lthompson@example.com
+TEL;type=WORK;type=pref:1-555-555-5555
+TEL;type=CELL:1-444-444-4444
+item1.ADR;type=WORK;type=pref:;;1245 Test;Sesame Street;California;11111;USA
+item1.X-ABADR:us
+UID:ED7A5AEC-AB19-4CE0-AD6A-2923A3E5C4E1:ABPerson
+END:VCARD
+BOGUS
+""".replace("\n", "\r\n"),
+
+"""BEGIN:VCARD
+VERSION:3.0
+N:Thompson;Default;;;
+FN:Default Thompson
+EMAIL;type=INTERNET;type=WORK;type=pref:lthompson@example.com
+TEL;type=WORK;type=pref:1-555-555-5555
+TEL;type=CELL:1-444-444-4444
+item1.ADR;type=WORK;type=pref:;;1245 Test;Sesame Street;California;11111;USA
+item1.X-ABADR:us
+UID:ED7A5AEC-AB19-4CE0-AD6A-2923A3E5C4E1:ABPerson
+END:VCARD
+
+BOGUS
+""".replace("\n", "\r\n"),
+
+        )
+
+        for item in data:
+            print item
+            self.assertRaises(PyCalendarInvalidData, Card.parseText, item)
+
+    def testParseBlank(self):
+        
+        data = (
+"""
+BEGIN:VCARD
+VERSION:3.0
+UID:ED7A5AEC-AB19-4CE0-AD6A-2923A3E5C4E1:ABPerson
+item1.ADR;type=WORK;type=pref:;;1245 Test;Sesame Street;California;11111;U
+ SA
+EMAIL;type=INTERNET;type=WORK;type=pref:lthompson@example.com
+FN:Default Thompson
+N:Thompson;Default;;;
+TEL;type=WORK;type=pref:1-555-555-5555
+TEL;type=CELL:1-444-444-4444
+item1.X-ABADR:us
+END:VCARD
+""".replace("\n", "\r\n"),
+
+"""
+
+BEGIN:VCARD
+VERSION:3.0
+UID:ED7A5AEC-AB19-4CE0-AD6A-2923A3E5C4E1:ABPerson
+item1.ADR;type=WORK;type=pref:;;1245 Test;Sesame Street;California;11111;U
+ SA
+EMAIL;type=INTERNET;type=WORK;type=pref:lthompson@example.com
+FN:Default Thompson
+N:Thompson;Default;;;
+TEL;type=WORK;type=pref:1-555-555-5555
+TEL;type=CELL:1-444-444-4444
+item1.X-ABADR:us
+END:VCARD
+""".replace("\n", "\r\n"),
+
+"""BEGIN:VCARD
+VERSION:3.0
+UID:ED7A5AEC-AB19-4CE0-AD6A-2923A3E5C4E1:ABPerson
+item1.ADR;type=WORK;type=pref:;;1245 Test;Sesame Street;California;11111;U
+ SA
+EMAIL;type=INTERNET;type=WORK;type=pref:lthompson@example.com
+FN:Default Thompson
+N:Thompson;Default;;;
+TEL;type=WORK;type=pref:1-555-555-5555
+TEL;type=CELL:1-444-444-4444
+item1.X-ABADR:us
+END:VCARD
+
+
+""".replace("\n", "\r\n"),
+
+"""BEGIN:VCARD
+VERSION:3.0
+UID:ED7A5AEC-AB19-4CE0-AD6A-2923A3E5C4E1:ABPerson
+item1.ADR;type=WORK;type=pref:;;1245 Test;Sesame Street;California;11111;U
+ SA
+EMAIL;type=INTERNET;type=WORK;type=pref:lthompson@example.com
+
+FN:Default Thompson
+N:Thompson;Default;;;
+TEL;type=WORK;type=pref:1-555-555-5555
+TEL;type=CELL:1-444-444-4444
+item1.X-ABADR:us
+END:VCARD
+""".replace("\n", "\r\n"),
+
+"""BEGIN:VCARD
+VERSION:3.0
+UID:ED7A5AEC-AB19-4CE0-AD6A-2923A3E5C4E1:ABPerson
+item1.ADR;type=WORK;type=pref:;;1245 Test;Sesame Street;California;11111;U
+ SA
+EMAIL;type=INTERNET;type=WORK;type=pref:lthompson@example.com
+
+
+FN:Default Thompson
+N:Thompson;Default;;;
+TEL;type=WORK;type=pref:1-555-555-5555
+TEL;type=CELL:1-444-444-4444
+item1.X-ABADR:us
+END:VCARD
+""".replace("\n", "\r\n"),
+        )
+
+        save = ParserContext.BLANK_LINES_IN_DATA
+        for item in data:
+            ParserContext.BLANK_LINES_IN_DATA = ParserContext.PARSER_RAISE
+            self.assertRaises(PyCalendarInvalidData, Card.parseText, item)
+
+            ParserContext.BLANK_LINES_IN_DATA = ParserContext.PARSER_IGNORE
+            lines = item.split("\r\n")
+            result = "\r\n".join([line for line in lines if line]) + "\r\n"
+            print result
+            self.assertEqual(str(Card.parseText(item)), result)
+
+        ParserContext.BLANK_LINES_IN_DATA = save

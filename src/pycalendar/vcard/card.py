@@ -22,6 +22,7 @@ from pycalendar.utils import readFoldedLine
 from pycalendar.vcard.property import Property
 from pycalendar.exceptions import PyCalendarInvalidData
 from pycalendar.vcard import definitions
+from pycalendar.parser import ParserContext
 
 class Card(PyCalendarComponentBase):
 
@@ -71,7 +72,7 @@ class Card(PyCalendarComponentBase):
         state = LOOK_FOR_VCARD
     
         # Get lines looking for start of calendar
-        lines = ["", ""]
+        lines = [None, None]
     
         while readFoldedLine(ins, lines):
             
@@ -82,6 +83,16 @@ class Card(PyCalendarComponentBase):
                 if line == card.getBeginDelimiter():
                     # Next state
                     state = GET_PROPERTY
+
+                # Handle blank line
+                elif len(line) == 0:
+                    # Raise if requested, otherwise just ignore
+                    if ParserContext.BLANK_LINES_IN_DATA == ParserContext.PARSER_RAISE:
+                        raise PyCalendarInvalidData("vCard data has blank lines")
+                
+                # Unrecognized data
+                else:
+                    raise PyCalendarInvalidData("vCard data not recognized", line)
 
             elif state == GET_PROPERTY:
 
@@ -101,6 +112,12 @@ class Card(PyCalendarComponentBase):
                     card = Card(add_defaults=False)
                     state = LOOK_FOR_VCARD
 
+                # Blank line
+                elif len(line) == 0:
+                    # Raise if requested, otherwise just ignore
+                    if ParserContext.BLANK_LINES_IN_DATA == ParserContext.PARSER_RAISE:
+                        raise PyCalendarInvalidData("vCard data has blank lines")
+
                 # Must be a property
                 else:
 
@@ -114,6 +131,9 @@ class Card(PyCalendarComponentBase):
                         else:
                             card.addProperty(prop)
     
+        # Check for truncated data
+        if state != LOOK_FOR_VCARD:
+            raise PyCalendarInvalidData("vCard data not complete")
 
         return results
     
@@ -138,7 +158,7 @@ class Card(PyCalendarComponentBase):
         state = LOOK_FOR_VCARD
     
         # Get lines looking for start of calendar
-        lines = ["", ""]
+        lines = [None, None]
     
         while readFoldedLine(ins, lines):
             
@@ -153,6 +173,16 @@ class Card(PyCalendarComponentBase):
                     # Indicate success at this point
                     result = True
 
+                # Handle blank line
+                elif len(line) == 0:
+                    # Raise if requested, otherwise just ignore
+                    if ParserContext.BLANK_LINES_IN_DATA == ParserContext.PARSER_RAISE:
+                        raise PyCalendarInvalidData("vCard data has blank lines")
+                
+                # Unrecognized data
+                else:
+                    raise PyCalendarInvalidData("vCard data not recognized", line)
+
             elif state == GET_PROPERTY:
 
                 # Look for end of object
@@ -163,6 +193,12 @@ class Card(PyCalendarComponentBase):
     
                     # Change state
                     state = LOOK_FOR_VCARD
+
+                # Blank line
+                elif len(line) == 0:
+                    # Raise if requested, otherwise just ignore
+                    if ParserContext.BLANK_LINES_IN_DATA == ParserContext.PARSER_RAISE:
+                        raise PyCalendarInvalidData("vCard data has blank lines")
 
                 # Must be a property
                 else:
@@ -180,6 +216,10 @@ class Card(PyCalendarComponentBase):
                     except IndexError:
                         print line
     
+        # Check for truncated data
+        if state != LOOK_FOR_VCARD:
+            raise PyCalendarInvalidData("vCard data not complete", "")
+            
         # Validate some things
         if result and not self.hasProperty("VERSION"):
             raise PyCalendarInvalidData("vCard missing VERSION", "")

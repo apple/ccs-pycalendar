@@ -15,18 +15,19 @@
 ##
 
 import cStringIO as StringIO
-
-#from PyCalendarDateTime import PyCalendarDateTime
+from pycalendar.parser import ParserContext
 
 def readFoldedLine( ins, lines ):
 
     # If line2 already has data, transfer that into line1
-    if lines[1]:
+    if lines[1] is not None:
         lines[0] = lines[1]
     else:
         # Fill first line
         try:
             myline = ins.readline()
+            if len(myline) == 0:
+                raise ValueError
             if myline[-1] == "\n":
                 if myline[-2] == "\r":
                     lines[0] = myline[:-2]
@@ -36,11 +37,10 @@ def readFoldedLine( ins, lines ):
                 lines[0] = myline[:-1]
             else:
                 lines[0] = myline
-        except:
+        except IndexError:
             lines[0] = ""
-            return False
-
-        if not lines[0]:
+        except:
+            lines[0] = None
             return False
  
     # Now loop looking ahead at the next line to see if it is folded
@@ -48,6 +48,8 @@ def readFoldedLine( ins, lines ):
         # Get next line
         try:
             myline = ins.readline()
+            if len(myline) == 0:
+                raise ValueError
             if myline[-1] == "\n":
                 if myline[-2] == "\r":
                     lines[1] = myline[:-2]
@@ -57,8 +59,10 @@ def readFoldedLine( ins, lines ):
                 lines[1] = myline[:-1]
             else:
                 lines[1] = myline
-        except:
+        except IndexError:
             lines[1] = ""
+        except:
+            lines[1] = None
             return True
 
         if not lines[1]:
@@ -154,9 +158,9 @@ def decodeTextValue(value):
                 os.write(',')
             elif c == ';':
                 os.write(';')
-            elif decodeTextValue.raiseOnInvalidEscape:
+            elif ParserContext.INVALID_ESCAPE_SEQUENCES == ParserContext.PARSER_RAISE:
                 raise ValueError
-            elif decodeTextValue.fixInvalidEscape:
+            elif ParserContext.INVALID_ESCAPE_SEQUENCES == ParserContext.PARSER_FIX:
                 os.write(c)
 
             # Bump past escapee and look for next segment (not past the end)
@@ -173,10 +177,6 @@ def decodeTextValue(value):
         os.write(value)
 
     return os.getvalue()
-
-# Use these to control the parsing of illegal escape characters
-decodeTextValue.raiseOnInvalidEscape = False
-decodeTextValue.fixInvalidEscape = True
 
 # vCard text list parsing/generation
 def parseTextList(data, sep=';'):
