@@ -158,6 +158,14 @@ def decodeTextValue(value):
                 os.write(',')
             elif c == ';':
                 os.write(';')
+            elif c == ':':
+                # ":" escape normally invalid
+                if ParserContext.INVALID_COLON_ESCAPE_SEQUENCE == ParserContext.PARSER_RAISE:
+                    raise ValueError
+                elif ParserContext.INVALID_COLON_ESCAPE_SEQUENCE == ParserContext.PARSER_FIX:
+                    os.write(':')
+                    
+            # Other escaped chars normally not allowed
             elif ParserContext.INVALID_ESCAPE_SEQUENCES == ParserContext.PARSER_RAISE:
                 raise ValueError
             elif ParserContext.INVALID_ESCAPE_SEQUENCES == ParserContext.PARSER_FIX:

@@ -28,8 +28,11 @@ class ParserContext(object):
         PARSER_RAISE,       # Raise an exception
     ) = range(4)
     
-    # Some clients escape ":" - ignore 
-    INVALID_ESCAPE_SEQUENCES = PARSER_FIX
+    # Some clients escape ":" - fix 
+    INVALID_COLON_ESCAPE_SEQUENCE = PARSER_FIX
+    
+    # Other escape sequences - raise 
+    INVALID_ESCAPE_SEQUENCES = PARSER_RAISE
     
     # Some client generate empty lines in the body of the data
     BLANK_LINES_IN_DATA = PARSER_FIX
