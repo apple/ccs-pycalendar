@@ -22,7 +22,7 @@ from value import PyCalendarValue
 class PyCalendarBinaryValue( PyCalendarPlainTextValue ):
 
     def getType(self):
-        return PyCalendarBinaryValue.VALUETYPE_BINARY
+        return PyCalendarValue.VALUETYPE_BINARY
 
 PyCalendarValue.registerType(PyCalendarValue.VALUETYPE_BINARY, PyCalendarBinaryValue)
 

@@ -16,7 +16,7 @@
 
 import unittest
 
-from pycalendar.property import PyCalendarProperty
+from pycalendar.vcard.property import Property
 from pycalendar.exceptions import PyCalendarInvalidProperty
 from pycalendar.parser import ParserContext
 
@@ -24,33 +24,20 @@ class TestProperty(unittest.TestCase):
     
     test_data = (
         # Different value types
-        "ATTACH;VALUE=BINARY:VGVzdA==",
-        "attach;VALUE=BINARY:VGVzdA==",
-        "ORGANIZER:mailto:jdoe@example.com",
-        "DTSTART;TZID=US/Eastern:20060226T120000",
-        "DTSTART;VALUE=DATE:20060226",
-        "DTSTART:20060226T130000Z",
+        "PHOTO;VALUE=URI:http://example.com/photo.jpg",
+        "photo;VALUE=URI:http://example.com/photo.jpg",
+        "TEL;type=WORK;type=pref:1-555-555-5555",
+        "REV:20060226T120000Z",
         "X-FOO:BAR",
-        "DURATION:PT10M",
-        "duraTION:PT10M",
-        "SEQUENCE:1",
-        "RDATE:20060226T120000Z,20060227T120000Z",
-        "FREEBUSY:20060226T120000Z/20060227T120000Z",
-        "SUMMARY:Some \\ntext",
-        "RRULE:FREQ=MONTHLY;COUNT=3;BYDAY=TU,WE,TH;BYSETPOS=-1",
-        "REQUEST-STATUS:2.0;Success",
-        "URI:http://www.example.com",
-        "TZOFFSETFROM:-0500",
-        
-        # Various parameters
-        "DTSTART;TZID=\"Somewhere, else\":20060226T120000",
-        "ATTENDEE;PARTSTAT=ACCEPTED;ROLE=CHAIR:mailto:jdoe@example.com",
+        "NOTE:Some \\ntext",
+        "note:Some \\ntext",
+        "item1.ADR;type=WORK;type=pref:;;1245 Test;Sesame Street;CA;11111;USA",
     )
     
     def testParseGenerate(self):
         
         for data in TestProperty.test_data:
-            prop = PyCalendarProperty()
+            prop = Property()
             prop.parse(data)
             propstr = str(prop)
             self.assertEqual(propstr[:-2], data, "Failed parse/generate: %s to %s" % (data, propstr,))
@@ -58,32 +45,22 @@ class TestProperty(unittest.TestCase):
     def testEquality(self):
         
         for data in TestProperty.test_data:
-            prop1 = PyCalendarProperty()
+            prop1 = Property()
             prop1.parse(data)
-            prop2 = PyCalendarProperty()
+            prop2 = Property()
             prop2.parse(data)
             self.assertEqual(prop1, prop2, "Failed equality: %s" % (data,))
     
     def testParseBad(self):
         
         test_bad_data = (
-            "DTSTART;TZID=US/Eastern:abc",
-            "DTSTART;VALUE=DATE:20060226T",
-            "DTSTART:20060226T120000A",
-            "X-FOO;:BAR",
-            "DURATION:A",
-            "SEQUENCE:b",
-            "RDATE:20060226T120000Z;20060227T120000Z",
-            "FREEBUSY:20060226T120000Z/ABC",
-            "SUMMARY:Some \\qtext",
-            "RRULE:FREQ=MONTHLY;COUNT=3;BYDAY=TU,WE,VE;BYSETPOS=-1",
-            "REQUEST-STATUS:2.0,Success",
-            "TZOFFSETFROM:-050",
+            "REV:20060226T120",
+            "NOTE:Some \\atext",
         )
         save = ParserContext.INVALID_ESCAPE_SEQUENCES
         for data in test_bad_data:
             ParserContext.INVALID_ESCAPE_SEQUENCES = ParserContext.PARSER_RAISE
-            prop = PyCalendarProperty()
+            prop = Property()
             self.assertRaises(PyCalendarInvalidProperty, prop.parse, data)
         ParserContext.INVALID_ESCAPE_SEQUENCES = save
     
@@ -91,7 +68,7 @@ class TestProperty(unittest.TestCase):
         
         hashes = []
         for item in TestProperty.test_data:
-            prop = PyCalendarProperty()
+            prop = Property()
             prop.parse(item)
             hashes.append(hash(prop))
         hashes.sort()
@@ -101,13 +78,13 @@ class TestProperty(unittest.TestCase):
     def testDefaultValueCreate(self):
         
         test_data = (
-            ("ATTENDEE", "mailto:attendee@example.com", "ATTENDEE:mailto:attendee@example.com\r\n"),
-            ("attendee", "mailto:attendee@example.com", "attendee:mailto:attendee@example.com\r\n"),
-            ("ORGANIZER", "mailto:organizer@example.com", "ORGANIZER:mailto:organizer@example.com\r\n"),
-            ("ORGANizer", "mailto:organizer@example.com", "ORGANizer:mailto:organizer@example.com\r\n"),
+            ("SOURCE", "http://example.com/source", "SOURCE:http://example.com/source\r\n"),
+            ("souRCE", "http://example.com/source", "souRCE:http://example.com/source\r\n"),
+            ("PHOTO",  "YWJj", "PHOTO:\r\n YWJj\r\n"),
+            ("photo",  "YWJj", "photo:\r\n YWJj\r\n"),
             ("URL", "http://example.com/tz1", "URL:http://example.com/tz1\r\n"),
-            ("TZURL", "http://example.com/tz2", "TZURL:http://example.com/tz2\r\n"),
         )
         for propname, propvalue, result in test_data:
-            prop = PyCalendarProperty(name=propname, value=propvalue)
+            prop = Property(name=propname, value=propvalue)
             self.assertEqual(str(prop), result)
+    

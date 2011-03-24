@@ -168,7 +168,7 @@ class PyCalendarProperty(object):
             self._init_attr_value_int(value)
 
         elif isinstance(value, str):
-            self._init_attr_value_text(value, valuetype if valuetype else PyCalendarValue.VALUETYPE_TEXT)
+            self._init_attr_value_text(value, valuetype if valuetype else PyCalendarProperty.sDefaultValueTypeMap.get(self.mName.upper(), PyCalendarValue.VALUETYPE_TEXT))
 
         elif isinstance(value, PyCalendarDateTime):
             self._init_attr_value_datetime(value)
@@ -400,7 +400,7 @@ class PyCalendarProperty(object):
     def generateFiltered(self, os, filter):
         
         # Check for property in filter and whether value is written out
-        test, novalue = filter.testPropertyValue(self.mName)
+        test, novalue = filter.testPropertyValue(self.mName.upper())
         if test:
             self.generateValue(os, novalue)
 
@@ -466,14 +466,14 @@ class PyCalendarProperty(object):
         self.mValue = None
 
         # Get value type from property name
-        type = PyCalendarProperty.sDefaultValueTypeMap.get(self.mName, PyCalendarValue.VALUETYPE_TEXT)
+        type = PyCalendarProperty.sDefaultValueTypeMap.get(self.mName.upper(), PyCalendarValue.VALUETYPE_TEXT)
 
         # Check whether custom value is set
         if self.mAttributes.has_key(definitions.cICalAttribute_VALUE):
             type = PyCalendarProperty.sValueTypeMap.get(self.getAttributeValue(definitions.cICalAttribute_VALUE), type)
 
         # Check for multivalued
-        if self.mName in PyCalendarProperty.sMultiValues:
+        if self.mName.upper() in PyCalendarProperty.sMultiValues:
             self.mValue = PyCalendarMultiValue(type)
         else:
             # Create the type
@@ -504,14 +504,14 @@ class PyCalendarProperty(object):
         self.mValue = None
 
         # Get value type from property name
-        type = PyCalendarProperty.sDefaultValueTypeMap.get(self.mName, PyCalendarValue.VALUETYPE_TEXT)
+        type = PyCalendarProperty.sDefaultValueTypeMap.get(self.mName.upper(), PyCalendarValue.VALUETYPE_TEXT)
 
         # Check whether custom value is set
         if self.mAttributes.has_key(definitions.cICalAttribute_VALUE):
             type = PyCalendarProperty.sValueTypeMap.get(self.getAttributeValue(definitions.cICalAttribute_VALUE), type)
 
         # Check for multivalued
-        if self.mName in PyCalendarProperty.sMultiValues:
+        if self.mName.upper() in PyCalendarProperty.sMultiValues:
             self.mValue = PyCalendarMultiValue(type)
         else:
             # Create the type
@@ -542,7 +542,7 @@ class PyCalendarProperty(object):
             return
 
         # See if current type is default for this property
-        default_type = self.sDefaultValueTypeMap.get(self.mName)
+        default_type = self.sDefaultValueTypeMap.get(self.mName.upper())
         if default_type is not None:
             actual_type = self.mValue.getType()
             if default_type != actual_type:

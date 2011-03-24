@@ -147,7 +147,7 @@ class Property(object):
             self._init_attr_value_int(value)
 
         elif isinstance(value, str):
-            self._init_attr_value_text(value, valuetype if valuetype else PyCalendarValue.VALUETYPE_TEXT)
+            self._init_attr_value_text(value, valuetype if valuetype else Property.sDefaultValueTypeMap.get(self.mName.upper(), PyCalendarValue.VALUETYPE_TEXT))
 
         elif isinstance(value, PyCalendarDateTime):
             self._init_attr_value_datetime(value)
@@ -333,7 +333,7 @@ class Property(object):
     def generateFiltered(self, os, filter):
         
         # Check for property in filter and whether value is written out
-        test, novalue = filter.testPropertyValue(self.mName)
+        test, novalue = filter.testPropertyValue(self.mName.upper())
         if test:
             self.generateValue(os, novalue)
 
@@ -356,40 +356,57 @@ class Property(object):
 
         # Write value
         sout.write(":")
-        if self.mValue and not novalue:
-            self.mValue.generate(sout)
-
-        # Get string text
-        temp = sout.getvalue()
-        sout.close()
-
-        # Look for line length exceed
-        if len(temp) < 75:
-            os.write(temp)
+        if self.mName.upper() == "PHOTO" and self.mValue.getType() == PyCalendarValue.VALUETYPE_BINARY:
+            # Handle AB.app PHOTO values
+            sout.write("\r\n")
+            
+            value = self.mValue.getText()
+            value_len = len(value)
+            offset = 0
+            while(value_len > 72):
+                sout.write(" ")
+                sout.write(value[offset:offset+72])
+                sout.write("\r\n")
+                value_len -= 72
+                offset += 72
+            sout.write(" ")
+            sout.write(value[offset:])
+            os.write(sout.getvalue())
         else:
-            # Look for valid utf8 range and write that out
-            start = 0
-            written = 0
-            lineWrap = 74
-            while written < len(temp):
-                # Start 74 chars on from where we are
-                offset = start + lineWrap
-                if offset >= len(temp):
-                    line = temp[start:]
-                    os.write(line)
-                    written = len(temp)
-                else:
-                    # Check whether next char is valid utf8 lead byte
-                    while (temp[offset] > 0x7F) and ((ord(temp[offset]) & 0xC0) == 0x80):
-                        # Step back until we have a valid char
-                        offset -= 1
-                    
-                    line = temp[start:offset]
-                    os.write(line)
-                    os.write("\r\n ")
-                    lineWrap = 73   # We are now adding a space at the start
-                    written += offset - start
-                    start = offset
+            if self.mValue and not novalue:
+                self.mValue.generate(sout)
+    
+            # Get string text
+            temp = sout.getvalue()
+            sout.close()
+    
+            # Look for line length exceed
+            if len(temp) < 75:
+                os.write(temp)
+            else:
+                # Look for valid utf8 range and write that out
+                start = 0
+                written = 0
+                lineWrap = 74
+                while written < len(temp):
+                    # Start 74 chars on from where we are
+                    offset = start + lineWrap
+                    if offset >= len(temp):
+                        line = temp[start:]
+                        os.write(line)
+                        written = len(temp)
+                    else:
+                        # Check whether next char is valid utf8 lead byte
+                        while (temp[offset] > 0x7F) and ((ord(temp[offset]) & 0xC0) == 0x80):
+                            # Step back until we have a valid char
+                            offset -= 1
+                        
+                        line = temp[start:offset]
+                        os.write(line)
+                        os.write("\r\n ")
+                        lineWrap = 73   # We are now adding a space at the start
+                        written += offset - start
+                        start = offset
     
         os.write("\r\n")
     
@@ -404,16 +421,16 @@ class Property(object):
         self.mValue = None
 
         # Get value type from property name
-        valueType = Property.sDefaultValueTypeMap.get(self.mName, PyCalendarValue.VALUETYPE_TEXT)
+        valueType = Property.sDefaultValueTypeMap.get(self.mName.upper(), PyCalendarValue.VALUETYPE_TEXT)
 
         # Check whether custom value is set
         if self.mAttributes.has_key(definitions.Parameter_VALUE):
             attr = self.getAttributeValue(definitions.Parameter_VALUE)
-            if attr != definitions.Value_TEXT or self.mName not in Property.sTextVariants:
+            if attr != definitions.Value_TEXT or self.mName.upper() not in Property.sTextVariants:
                 valueType = Property.sValueTypeMap.get(attr, valueType)
 
         # Check for multivalued
-        if self.mName in Property.sMultiValues:
+        if self.mName.upper() in Property.sMultiValues:
             self.mValue = PyCalendarMultiValue(valueType)
         else:
             # Create the type
@@ -434,16 +451,16 @@ class Property(object):
         self.mValue = None
 
         # Get value type from property name
-        valueType = Property.sDefaultValueTypeMap.get(self.mName, PyCalendarDummyValue)
+        valueType = Property.sDefaultValueTypeMap.get(self.mName.upper(), PyCalendarDummyValue)
 
         # Check whether custom value is set
         if self.mAttributes.has_key(definitions.Parameter_VALUE):
             attr = self.getAttributeValue(definitions.Parameter_VALUE)
-            if attr != definitions.Value_TEXT or self.mName not in Property.sTextVariants:
+            if attr != definitions.Value_TEXT or self.mName.upper() not in Property.sTextVariants:
                 valueType = Property.sValueTypeMap.get(attr, valueType)
 
         # Check for multivalued
-        if self.mName in Property.sMultiValues:
+        if self.mName.upper() in Property.sMultiValues:
             self.mValue = PyCalendarMultiValue(valueType)
         else:
             # Create the type
@@ -460,7 +477,7 @@ class Property(object):
             return
 
         # See if current type is default for this property
-        default_type = Property.sDefaultValueTypeMap.get(self.mName)
+        default_type = Property.sDefaultValueTypeMap.get(self.mName.upper())
         if default_type is not None:
             actual_type = self.mValue.getType()
             if default_type != actual_type:
