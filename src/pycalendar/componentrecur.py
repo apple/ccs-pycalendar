@@ -110,8 +110,7 @@ class PyCalendarComponentRecur(PyCalendarComponent):
         if self.mRecurrenceID is not None:
             other.mRecurrenceID = self.mRecurrenceID.duplicate()
 
-        if self.mRecurrences is not None:
-            other.mRecurrences = self.mRecurrences.duplicate()
+        other._resetRecurrenceSet()
         
         return other
 
@@ -276,12 +275,16 @@ class PyCalendarComponentRecur(PyCalendarComponent):
         else:
             self.mMapKey = self.mapKey(self.mUID)
 
+        self._resetRecurrenceSet()
+
+    def _resetRecurrenceSet(self):
         # May need to create items
         self.mRecurrences = None
-        if ((self.countProperty(definitions.cICalProperty_RRULE) != 0)
-                or (self.countProperty(definitions.cICalProperty_RDATE) != 0)
-                or (self.countProperty(definitions.cICalProperty_EXRULE) != 0)
-                or (self.countProperty(definitions.cICalProperty_EXDATE) != 0)):
+        if ((self.countProperty(definitions.cICalProperty_RRULE) != 0) or
+            (self.countProperty(definitions.cICalProperty_RDATE) != 0) or 
+            (self.countProperty(definitions.cICalProperty_EXRULE) != 0) or 
+            (self.countProperty(definitions.cICalProperty_EXDATE) != 0)):
+
             self.mRecurrences = PyCalendarRecurrenceSet()
 
             # Get RRULEs
