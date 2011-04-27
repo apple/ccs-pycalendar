@@ -14,14 +14,13 @@
 #    limitations under the License.
 ##
 
-from component import PyCalendarComponent
-from componentexpanded import PyCalendarComponentExpanded
-from datetime import PyCalendarDateTime
-from property import PyCalendarProperty
-from recurrenceset import PyCalendarRecurrenceSet
-from utils import set_difference
-import definitions
-
+from pycalendar import definitions
+from pycalendar.component import PyCalendarComponent
+from pycalendar.componentexpanded import PyCalendarComponentExpanded
+from pycalendar.datetime import PyCalendarDateTime
+from pycalendar.property import PyCalendarProperty
+from pycalendar.recurrenceset import PyCalendarRecurrenceSet
+from pycalendar.utils import set_difference
 import uuid
 
 class PyCalendarComponentRecur(PyCalendarComponent):

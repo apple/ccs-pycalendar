@@ -14,13 +14,13 @@
 #    limitations under the License.
 ##
 
+from pycalendar.exceptions import PyCalendarInvalidData
+from pycalendar.parser import ParserContext
 from pycalendar.vcard.card import Card
 from pycalendar.vcard.property import Property
 import cStringIO as StringIO
 import difflib
 import unittest
-from pycalendar.parser import ParserContext
-from pycalendar.exceptions import PyCalendarInvalidData
 
 class TestCard(unittest.TestCase):
     

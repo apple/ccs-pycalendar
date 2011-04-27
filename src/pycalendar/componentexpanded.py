@@ -14,7 +14,7 @@
 #    limitations under the License.
 ##
 
-from datetime import PyCalendarDateTime
+from pycalendar.datetime import PyCalendarDateTime
 
 class PyCalendarComponentExpanded(object):
 

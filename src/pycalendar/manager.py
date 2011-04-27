@@ -14,7 +14,7 @@
 #    limitations under the License.
 ##
 
-from timezone import PyCalendarTimezone
+from pycalendar.timezone import PyCalendarTimezone
 
 class PyCalendarManager(object):
 

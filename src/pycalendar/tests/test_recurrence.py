@@ -14,9 +14,8 @@
 #    limitations under the License.
 ##
 
-import unittest
-
 from pycalendar.recurrence import PyCalendarRecurrence
+import unittest
 
 class TestRecurrence(unittest.TestCase):
     

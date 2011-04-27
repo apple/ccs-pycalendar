@@ -14,9 +14,9 @@
 #    limitations under the License.
 ##
 
-from component import PyCalendarComponent
-from datetime import PyCalendarDateTime
-import definitions
+from pycalendar import definitions
+from pycalendar.component import PyCalendarComponent
+from pycalendar.datetime import PyCalendarDateTime
 
 class PyCalendarVTimezone(PyCalendarComponent):
 

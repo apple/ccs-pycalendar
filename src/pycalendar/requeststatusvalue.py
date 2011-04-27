@@ -16,8 +16,8 @@
 
 # iCalendar REQUEST-STATUS value
 
-from value import PyCalendarValue
-import utils
+from pycalendar import utils
+from pycalendar.value import PyCalendarValue
 
 class PyCalendarRequestStatusValue( PyCalendarValue ):
     """

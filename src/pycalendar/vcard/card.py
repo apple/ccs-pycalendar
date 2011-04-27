@@ -16,13 +16,13 @@
 
 from cStringIO import StringIO
 from pycalendar.componentbase import PyCalendarComponentBase
+from pycalendar.exceptions import PyCalendarInvalidData
+from pycalendar.parser import ParserContext
+from pycalendar.utils import readFoldedLine
+from pycalendar.vcard import definitions
 from pycalendar.vcard.definitions import VCARD, Property_VERSION,\
     Property_PRODID, Property_UID
-from pycalendar.utils import readFoldedLine
 from pycalendar.vcard.property import Property
-from pycalendar.exceptions import PyCalendarInvalidData
-from pycalendar.vcard import definitions
-from pycalendar.parser import ParserContext
 
 class Card(PyCalendarComponentBase):
 

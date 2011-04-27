@@ -14,30 +14,29 @@
 #    limitations under the License.
 ##
 
+from pycalendar import definitions
+from pycalendar import stringutils
+from pycalendar.attribute import PyCalendarAttribute
+from pycalendar.binaryvalue import PyCalendarBinaryValue
+from pycalendar.caladdressvalue import PyCalendarCalAddressValue
+from pycalendar.datetime import PyCalendarDateTime
+from pycalendar.datetimevalue import PyCalendarDateTimeValue
+from pycalendar.dummyvalue import PyCalendarDummyValue
+from pycalendar.duration import PyCalendarDuration
+from pycalendar.durationvalue import PyCalendarDurationValue
+from pycalendar.exceptions import PyCalendarInvalidProperty
+from pycalendar.integervalue import PyCalendarIntegerValue
+from pycalendar.multivalue import PyCalendarMultiValue
+from pycalendar.period import PyCalendarPeriod
+from pycalendar.periodvalue import PyCalendarPeriodValue
+from pycalendar.plaintextvalue import PyCalendarPlainTextValue
+from pycalendar.recurrence import PyCalendarRecurrence
+from pycalendar.recurrencevalue import PyCalendarRecurrenceValue
+from pycalendar.requeststatusvalue import PyCalendarRequestStatusValue
+from pycalendar.urivalue import PyCalendarURIValue
+from pycalendar.utcoffsetvalue import PyCalendarUTCOffsetValue
+from pycalendar.value import PyCalendarValue
 import cStringIO as StringIO
-
-from attribute import PyCalendarAttribute
-from binaryvalue import PyCalendarBinaryValue
-from caladdressvalue import PyCalendarCalAddressValue
-from datetime import PyCalendarDateTime
-from datetimevalue import PyCalendarDateTimeValue
-from dummyvalue import PyCalendarDummyValue
-from duration import PyCalendarDuration
-from durationvalue import PyCalendarDurationValue
-from exceptions import PyCalendarInvalidProperty
-from integervalue import PyCalendarIntegerValue
-from multivalue import PyCalendarMultiValue
-from period import PyCalendarPeriod
-from periodvalue import PyCalendarPeriodValue
-from plaintextvalue import PyCalendarPlainTextValue
-from recurrence import PyCalendarRecurrence
-from recurrencevalue import PyCalendarRecurrenceValue
-from requeststatusvalue import PyCalendarRequestStatusValue
-from urivalue import PyCalendarURIValue
-from utcoffsetvalue import PyCalendarUTCOffsetValue
-from value import PyCalendarValue
-import definitions
-import stringutils
 
 class PyCalendarProperty(object):
 

@@ -16,8 +16,8 @@
 
 # vCard ORG value
 
-from value import PyCalendarValue
 from pycalendar import utils
+from pycalendar.value import PyCalendarValue
 
 class OrgValue(PyCalendarValue):
     """

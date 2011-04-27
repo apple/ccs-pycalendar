@@ -16,8 +16,8 @@
 
 # iCalendar Binary value
 
-from plaintextvalue import PyCalendarPlainTextValue
-from value import PyCalendarValue
+from pycalendar.plaintextvalue import PyCalendarPlainTextValue
+from pycalendar.value import PyCalendarValue
 
 class PyCalendarBinaryValue( PyCalendarPlainTextValue ):
 

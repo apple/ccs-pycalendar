@@ -16,8 +16,8 @@
 
 # vCard ADR value
 
-from value import PyCalendarValue
-from n import N
+from pycalendar.n import N
+from pycalendar.value import PyCalendarValue
 
 class NValue( PyCalendarValue ):
 

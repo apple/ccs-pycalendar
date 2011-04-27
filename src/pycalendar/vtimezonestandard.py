@@ -14,8 +14,8 @@
 #    limitations under the License.
 ##
 
-from vtimezoneelement import PyCalendarVTimezoneElement
-import definitions
+from pycalendar import definitions
+from pycalendar.vtimezoneelement import PyCalendarVTimezoneElement
 
 class PyCalendarVTimezoneStandard(PyCalendarVTimezoneElement):
 

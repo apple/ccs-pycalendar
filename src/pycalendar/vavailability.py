@@ -14,9 +14,9 @@
 #    limitations under the License.
 ##
 
-from component import PyCalendarComponent
-import definitions
-import itipdefinitions
+from pycalendar import definitions
+from pycalendar import itipdefinitions
+from pycalendar.component import PyCalendarComponent
 
 class PyCalendarVAvailability(PyCalendarComponent):
 

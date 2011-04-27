@@ -16,11 +16,10 @@
 
 # vCard ADR value
 
-import cStringIO as StringIO
-
 from pycalendar import utils
+from pycalendar.valueutils import ValueMixin
 
-class N(object):
+class N(ValueMixin):
     """
     mValue is a tuple of seven str or tuples of str
     """
@@ -45,9 +44,6 @@ class N(object):
 
     def __repr__(self):
         return "N %s" % (self.getText(),)
-
-    def __str__(self):
-        return self.getText()
 
     def __eq__( self, comp ):
         return self.mValue == comp.mValue
@@ -97,11 +93,6 @@ class N(object):
 
     def parse(self, data):
         self.mValue = utils.parseDoubleNestedList(data, N.MAXITEMS)
-
-    def getText(self):
-        os = StringIO.StringIO()
-        self.generate(os)
-        return os.getvalue()
 
     def generate(self, os):
         utils.generateDoubleNestedList(os, self.mValue)

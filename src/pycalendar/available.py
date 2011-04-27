@@ -14,8 +14,8 @@
 #    limitations under the License.
 ##
 
-from componentrecur import PyCalendarComponentRecur
-import definitions
+from pycalendar import definitions
+from pycalendar.componentrecur import PyCalendarComponentRecur
 
 class PyCalendarAvailable(PyCalendarComponentRecur):
 

@@ -42,3 +42,6 @@ class ParserContext(object):
     
     # Use this to fix v2 BASE64 to v3 ENCODING=b - only PARSER_FIX or PARSER_ALLOW
     VCARD_2_BASE64 = PARSER_FIX
+
+    # Allow slightly invalid DURATION values
+    INVALID_DURATION_VALUE = PARSER_FIX

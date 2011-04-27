@@ -14,16 +14,28 @@
 #    limitations under the License.
 ##
 
-# iCalendar URI value
+# Helpers for value classes
 
-from pycalendar.plaintextvalue import PyCalendarPlainTextValue
-from pycalendar.value import PyCalendarValue
+from cStringIO import StringIO
 
-class PyCalendarURIValue( PyCalendarPlainTextValue ):
+class ValueMixin(object):
 
-    def getType(self):
-        return PyCalendarURIValue.VALUETYPE_URI
+    def __str__(self):
+        return self.getText()
 
-PyCalendarValue.registerType(PyCalendarValue.VALUETYPE_URI, PyCalendarURIValue)
+    @classmethod
+    def parseText(cls, data):
+        value = cls()
+        value.parse(data)
+        return value
 
-        
+    def parse(self, data):
+        raise NotImplementedError
+    
+    def generate(self, os):
+        raise NotImplementedError
+    
+    def getText(self):
+        os = StringIO()
+        self.generate(os)
+        return os.getvalue()

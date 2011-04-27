@@ -14,15 +14,15 @@
 #    limitations under the License.
 ##
 
-from component import PyCalendarComponent
-from datetime import PyCalendarDateTime
-from freebusy import PyCalendarFreeBusy
-from period import PyCalendarPeriod
-from periodvalue import PyCalendarPeriodValue
-from property import PyCalendarProperty
-from value import PyCalendarValue
-import definitions
-import itipdefinitions
+from pycalendar import definitions
+from pycalendar import itipdefinitions
+from pycalendar.component import PyCalendarComponent
+from pycalendar.datetime import PyCalendarDateTime
+from pycalendar.freebusy import PyCalendarFreeBusy
+from pycalendar.period import PyCalendarPeriod
+from pycalendar.periodvalue import PyCalendarPeriodValue
+from pycalendar.property import PyCalendarProperty
+from pycalendar.value import PyCalendarValue
 
 class PyCalendarVFreeBusy(PyCalendarComponent):
 

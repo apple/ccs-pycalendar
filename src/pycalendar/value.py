@@ -16,9 +16,9 @@
 
 # ICalendar Value class
 
-from cStringIO import StringIO
+from pycalendar.valueutils import ValueMixin
 
-class PyCalendarValue(object):
+class PyCalendarValue(ValueMixin):
 
     (
         VALUETYPE_ADR,
@@ -47,9 +47,6 @@ class PyCalendarValue(object):
     
     _typeMap = {}
     
-    def __str__(self):
-        return self.getText()
-
     def __hash__(self):
         return hash((self.getType(), self.getValue()))
 
@@ -76,17 +73,6 @@ class PyCalendarValue(object):
 
     def getRealType(self):
         return self.getType()
-
-    def parse(self, data):
-        raise NotImplementedError
-    
-    def generate(self, os):
-        raise NotImplementedError
-    
-    def getText(self):
-        os = StringIO()
-        self.generate(os)
-        return os.getvalue()
 
     def getValue( self ):
         raise NotImplementedError

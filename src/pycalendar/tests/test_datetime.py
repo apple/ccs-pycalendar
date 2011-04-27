@@ -14,10 +14,9 @@
 #    limitations under the License.
 ##
 
-import unittest
-
 from pycalendar.datetime import PyCalendarDateTime
 from pycalendar.timezone import PyCalendarTimezone
+import unittest
 
 class TestDateTime(unittest.TestCase):
     

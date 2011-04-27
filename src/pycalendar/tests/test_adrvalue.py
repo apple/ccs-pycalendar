@@ -14,9 +14,9 @@
 #    limitations under the License.
 ##
 
-import unittest
 from pycalendar.adrvalue import AdrValue
 from pycalendar.vcard.property import Property
+import unittest
 
 class TestAdrValue(unittest.TestCase):
     

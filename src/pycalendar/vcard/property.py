@@ -14,10 +14,9 @@
 #    limitations under the License.
 ##
 
-import cStringIO as StringIO
-
 from pycalendar import stringutils
 from pycalendar.adr import Adr
+from pycalendar.adrvalue import AdrValue
 from pycalendar.attribute import PyCalendarAttribute
 from pycalendar.datetime import PyCalendarDateTime
 from pycalendar.datetimevalue import PyCalendarDateTimeValue
@@ -26,15 +25,14 @@ from pycalendar.exceptions import PyCalendarInvalidProperty
 from pycalendar.integervalue import PyCalendarIntegerValue
 from pycalendar.multivalue import PyCalendarMultiValue
 from pycalendar.n import N
+from pycalendar.nvalue import NValue
 from pycalendar.orgvalue import OrgValue
+from pycalendar.parser import ParserContext
 from pycalendar.plaintextvalue import PyCalendarPlainTextValue
 from pycalendar.utcoffsetvalue import PyCalendarUTCOffsetValue
 from pycalendar.value import PyCalendarValue
-from pycalendar.vcard.definitions import Property_ORG, Property_GEO
-import definitions
-from pycalendar.adrvalue import AdrValue
-from pycalendar.nvalue import NValue
-from pycalendar.parser import ParserContext
+from pycalendar.vcard import definitions
+import cStringIO as StringIO
 
 handleOptions = ("allow", "ignore", "fix", "raise")
 missingParameterValues = "fix"
@@ -159,9 +157,9 @@ class Property(object):
             self._init_attr_value_n(value)
 
         elif isinstance(value, list) or isinstance(value, tuple):
-            if name.upper() == Property_ORG:
+            if name.upper() == definitions.Property_ORG:
                 self._init_attr_value_org(value)
-            elif name.upper() == Property_GEO:
+            elif name.upper() == definitions.Property_GEO:
                 self._init_attr_value_geo(value)
             else:
                 # Assume everything else is a text list

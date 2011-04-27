@@ -14,7 +14,7 @@
 #    limitations under the License.
 ##
 
-from value import PyCalendarValue
+from pycalendar.value import PyCalendarValue
 
 class PyCalendarMultiValue( PyCalendarValue ):
 

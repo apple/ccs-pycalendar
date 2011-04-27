@@ -14,12 +14,11 @@
 #    limitations under the License.
 ##
 
-import cStringIO as StringIO
+from pycalendar.datetime import PyCalendarDateTime
+from pycalendar.duration import PyCalendarDuration
+from pycalendar.valueutils import ValueMixin
 
-from datetime import PyCalendarDateTime
-from duration import PyCalendarDuration
-
-class PyCalendarPeriod(object):
+class PyCalendarPeriod(ValueMixin):
 
     def __init__( self, start = None, end = None, duration = None ):
         
@@ -79,11 +78,6 @@ class PyCalendarPeriod(object):
                 self.mDuration = self.mEnd - self.mStart
         else:
             raise ValueError
-
-    def getText(self):
-        os = StringIO.StringIO()
-        self.generate(os)
-        return os.getvalue()
 
     def generate( self, os ):
         try:

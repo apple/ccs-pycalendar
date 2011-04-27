@@ -14,17 +14,16 @@
 #    limitations under the License.
 ##
 
-
-from duration import PyCalendarDuration
-from timezone import PyCalendarTimezone
-import definitions
-import locale
-import utils
-
+from pycalendar import definitions
+from pycalendar import locale
+from pycalendar import utils
+from pycalendar.duration import PyCalendarDuration
+from pycalendar.timezone import PyCalendarTimezone
+from pycalendar.valueutils import ValueMixin
 import cStringIO as StringIO
 import time
 
-class PyCalendarDateTime(object):
+class PyCalendarDateTime(ValueMixin):
 
     SUNDAY = 0
     MONDAY = 1
@@ -98,9 +97,6 @@ class PyCalendarDateTime(object):
 
     def __repr__(self):
         return "PyCalendarDateTime: %s" % (self.getText(),)
-
-    def __str__(self):
-        return self.getText()
 
     def __hash__(self):
         return hash(self.getPosixTime())

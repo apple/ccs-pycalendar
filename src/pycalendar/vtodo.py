@@ -14,13 +14,12 @@
 #    limitations under the License.
 ##
 
+from pycalendar import definitions
+from pycalendar import itipdefinitions
+from pycalendar.componentrecur import PyCalendarComponentRecur
+from pycalendar.datetime import PyCalendarDateTime
+from pycalendar.property import PyCalendarProperty
 import cStringIO as StringIO
-
-from componentrecur import PyCalendarComponentRecur
-from datetime import PyCalendarDateTime
-from property import PyCalendarProperty
-import definitions
-import itipdefinitions
 
 class PyCalendarVToDo(PyCalendarComponentRecur):
 

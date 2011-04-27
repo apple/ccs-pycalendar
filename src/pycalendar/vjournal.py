@@ -14,9 +14,9 @@
 #    limitations under the License.
 ##
 
-from componentrecur import PyCalendarComponentRecur
-import definitions
-import itipdefinitions
+from pycalendar import definitions
+from pycalendar import itipdefinitions
+from pycalendar.componentrecur import PyCalendarComponentRecur
 
 class PyCalendarVJournal(PyCalendarComponentRecur):
 

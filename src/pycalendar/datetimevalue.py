@@ -14,8 +14,8 @@
 #    limitations under the License.
 ##
 
-from datetime import PyCalendarDateTime
-from value import PyCalendarValue
+from pycalendar.datetime import PyCalendarDateTime
+from pycalendar.value import PyCalendarValue
 
 class PyCalendarDateTimeValue(PyCalendarValue):
 

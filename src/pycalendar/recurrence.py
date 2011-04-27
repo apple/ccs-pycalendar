@@ -14,11 +14,11 @@
 #    limitations under the License.
 ##
 
+from pycalendar import definitions
+from pycalendar.datetime import PyCalendarDateTime
+from pycalendar.period import PyCalendarPeriod
+from pycalendar.valueutils import ValueMixin
 import cStringIO as StringIO
-
-from datetime import PyCalendarDateTime
-from period import PyCalendarPeriod
-import definitions
 
 def WeekDayNumCompare_compare(w1, w2):
 
@@ -37,7 +37,7 @@ def WeekDayNumSort_less_than(w1, w2):
 
     return (w1[0] < w2[0]) or (w1[0] == w2[0]) and (w1[1] < w2[1])
 
-class PyCalendarRecurrence(object):
+class PyCalendarRecurrence(ValueMixin):
 
     cFreqMap = {
         definitions.cICalValue_RECUR_SECONDLY : definitions.eRecurrence_SECONDLY,
@@ -478,11 +478,6 @@ class PyCalendarRecurrence(object):
 
             list.append((num, wday))
     
-    def getText(self):
-        os = StringIO.StringIO()
-        self.generate(os)
-        return os.getvalue()
-
     def generate(self, os):
         try:
             os.write(definitions.cICalValue_RECUR_FREQ)

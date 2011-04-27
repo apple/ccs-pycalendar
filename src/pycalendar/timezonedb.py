@@ -14,8 +14,8 @@
 #    limitations under the License.
 ##
 
-from calendar import PyCalendar
-from exceptions import PyCalendarNoTimezoneInDatabase,\
+from pycalendar.calendar import PyCalendar
+from pycalendar.exceptions import PyCalendarNoTimezoneInDatabase,\
     PyCalendarInvalidData
 import os
 

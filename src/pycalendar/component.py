@@ -14,12 +14,11 @@
 #    limitations under the License.
 ##
 
-from componentbase import PyCalendarComponentBase
-from datetime import PyCalendarDateTime
-from property import PyCalendarProperty
-import definitions
-import stringutils
-
+from pycalendar import definitions
+from pycalendar import stringutils
+from pycalendar.componentbase import PyCalendarComponentBase
+from pycalendar.datetime import PyCalendarDateTime
+from pycalendar.property import PyCalendarProperty
 import os
 import time
 import uuid

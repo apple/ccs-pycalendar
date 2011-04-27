@@ -14,8 +14,8 @@
 #    limitations under the License.
 ##
 
-from duration import PyCalendarDuration
-from value import PyCalendarValue
+from pycalendar.duration import PyCalendarDuration
+from pycalendar.value import PyCalendarValue
 
 class PyCalendarDurationValue(PyCalendarValue):
 

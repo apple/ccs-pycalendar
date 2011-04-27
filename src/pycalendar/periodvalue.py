@@ -14,8 +14,8 @@
 #    limitations under the License.
 ##
 
-from period import PyCalendarPeriod
-from value import PyCalendarValue
+from pycalendar.period import PyCalendarPeriod
+from pycalendar.value import PyCalendarValue
 
 class PyCalendarPeriodValue( PyCalendarValue ):
 

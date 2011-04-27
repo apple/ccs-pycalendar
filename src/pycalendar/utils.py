@@ -14,8 +14,8 @@
 #    limitations under the License.
 ##
 
-import cStringIO as StringIO
 from pycalendar.parser import ParserContext
+import cStringIO as StringIO
 
 def readFoldedLine( ins, lines ):
 

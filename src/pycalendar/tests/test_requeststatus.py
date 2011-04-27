@@ -14,9 +14,9 @@
 #    limitations under the License.
 ##
 
-import unittest
-from pycalendar.requeststatusvalue import PyCalendarRequestStatusValue
 from pycalendar.property import PyCalendarProperty
+from pycalendar.requeststatusvalue import PyCalendarRequestStatusValue
+import unittest
 
 class TestRequestStatus(unittest.TestCase):
     

@@ -14,8 +14,8 @@
 #    limitations under the License.
 ##
 
+from pycalendar import definitions
 from vtimezoneelement import PyCalendarVTimezoneElement
-import definitions
 
 class PyCalendarVTimezoneDaylight(PyCalendarVTimezoneElement):
 

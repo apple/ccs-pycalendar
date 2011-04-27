@@ -14,10 +14,10 @@
 #    limitations under the License.
 ##
 
-from componentrecur import PyCalendarComponentRecur
-from property import PyCalendarProperty
-import definitions
-import itipdefinitions
+from pycalendar import definitions
+from pycalendar import itipdefinitions
+from pycalendar.componentrecur import PyCalendarComponentRecur
+from pycalendar.property import PyCalendarProperty
 
 class PyCalendarVEvent(PyCalendarComponentRecur):
 

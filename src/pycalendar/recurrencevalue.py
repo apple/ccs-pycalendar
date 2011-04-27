@@ -14,8 +14,8 @@
 #    limitations under the License.
 ##
 
-from recurrence import PyCalendarRecurrence
-from value import PyCalendarValue
+from pycalendar.recurrence import PyCalendarRecurrence
+from pycalendar.value import PyCalendarValue
 
 class PyCalendarRecurrenceValue( PyCalendarValue ):
 

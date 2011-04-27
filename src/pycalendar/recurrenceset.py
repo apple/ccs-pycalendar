@@ -14,7 +14,7 @@
 #    limitations under the License.
 ##
 
-from utils import set_difference
+from pycalendar.utils import set_difference
 
 class PyCalendarRecurrenceSet(object):
 

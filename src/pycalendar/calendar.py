@@ -14,29 +14,28 @@
 #    limitations under the License.
 ##
 
-from available import PyCalendarAvailable
-from componentbase import PyCalendarComponentBase
-from componentexpanded import PyCalendarComponentExpanded
-from datetime import PyCalendarDateTime
-from exceptions import PyCalendarInvalidData
-from freebusy import PyCalendarFreeBusy
-from period import PyCalendarPeriod
-from property import PyCalendarProperty
-from utils import readFoldedLine
-from valarm import PyCalendarVAlarm
-from vavailability import PyCalendarVAvailability
-from vevent import PyCalendarVEvent
-from vfreebusy import PyCalendarVFreeBusy
-from vjournal import PyCalendarVJournal
-from vtimezone import PyCalendarVTimezone
-from vtimezonedaylight import PyCalendarVTimezoneDaylight
-from vtimezonestandard import PyCalendarVTimezoneStandard
-from vtodo import PyCalendarVToDo
-from vunknown import PyCalendarUnknownComponent
-import definitions
-
 from cStringIO import StringIO
+from pycalendar import definitions
+from pycalendar.available import PyCalendarAvailable
+from pycalendar.componentbase import PyCalendarComponentBase
+from pycalendar.componentexpanded import PyCalendarComponentExpanded
+from pycalendar.datetime import PyCalendarDateTime
+from pycalendar.exceptions import PyCalendarInvalidData
+from pycalendar.freebusy import PyCalendarFreeBusy
 from pycalendar.parser import ParserContext
+from pycalendar.period import PyCalendarPeriod
+from pycalendar.property import PyCalendarProperty
+from pycalendar.utils import readFoldedLine
+from pycalendar.valarm import PyCalendarVAlarm
+from pycalendar.vavailability import PyCalendarVAvailability
+from pycalendar.vevent import PyCalendarVEvent
+from pycalendar.vfreebusy import PyCalendarVFreeBusy
+from pycalendar.vjournal import PyCalendarVJournal
+from pycalendar.vtimezone import PyCalendarVTimezone
+from pycalendar.vtimezonedaylight import PyCalendarVTimezoneDaylight
+from pycalendar.vtimezonestandard import PyCalendarVTimezoneStandard
+from pycalendar.vtodo import PyCalendarVToDo
+from pycalendar.vunknown import PyCalendarUnknownComponent
 
 class PyCalendar(PyCalendarComponentBase):
 

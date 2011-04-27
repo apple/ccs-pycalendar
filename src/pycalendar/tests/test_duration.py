@@ -13,11 +13,11 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 ##
+
 from cStringIO import StringIO
-
-import unittest
-
 from pycalendar.duration import PyCalendarDuration
+from pycalendar.parser import ParserContext
+import unittest
 
 class TestDuration(unittest.TestCase):
     
@@ -61,8 +61,7 @@ class TestDuration(unittest.TestCase):
     def testParse(self):
         
         for seconds, result in TestDuration.test_data:
-            duration = PyCalendarDuration()
-            duration.parse(result)
+            duration = PyCalendarDuration().parseText(result)
             self.assertEqual(duration.getTotalSeconds(), seconds)
     
     def testParseBad(self):
@@ -81,5 +80,19 @@ class TestDuration(unittest.TestCase):
             "P12DT1SA",
         )
         for data in test_bad_data:
-            duration = PyCalendarDuration()
-            self.assertRaises(ValueError, duration.parse, data)
+            self.assertRaises(ValueError, PyCalendarDuration.parseText, data)
+    
+    def testRelaxedBad(self):
+        
+        test_relaxed_data = (
+            ("P12DT", 12 * 24 * 60 * 60, "P12D"),
+            ("-P1WT", -7 * 24 * 60 * 60, "-P1W"),
+        )
+        for text, seconds, result in test_relaxed_data:
+            
+            ParserContext.INVALID_DURATION_VALUE = ParserContext.PARSER_FIX
+            self.assertEqual(PyCalendarDuration.parseText(text).getTotalSeconds(), seconds)
+            self.assertEqual(PyCalendarDuration.parseText(text).getText(), result)
+            
+            ParserContext.INVALID_DURATION_VALUE = ParserContext.PARSER_RAISE
+            self.assertRaises(ValueError, PyCalendarDuration.parseText, text)

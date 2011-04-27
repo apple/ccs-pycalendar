@@ -16,11 +16,11 @@
 
 from pycalendar.calendar import PyCalendar
 from pycalendar.exceptions import PyCalendarInvalidData
+from pycalendar.parser import ParserContext
 from pycalendar.property import PyCalendarProperty
 import cStringIO as StringIO
 import difflib
 import unittest
-from pycalendar.parser import ParserContext
 
 class TestCalendar(unittest.TestCase):
     

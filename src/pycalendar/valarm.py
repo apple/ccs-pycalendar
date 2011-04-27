@@ -14,13 +14,13 @@
 #    limitations under the License.
 ##
 
-from attribute import PyCalendarAttribute
-from component import PyCalendarComponent
-from datetime import PyCalendarDateTime
-from duration import PyCalendarDuration
-from property import PyCalendarProperty
-from value import PyCalendarValue
-import definitions
+from pycalendar import definitions
+from pycalendar.attribute import PyCalendarAttribute
+from pycalendar.component import PyCalendarComponent
+from pycalendar.datetime import PyCalendarDateTime
+from pycalendar.duration import PyCalendarDuration
+from pycalendar.property import PyCalendarProperty
+from pycalendar.value import PyCalendarValue
 
 class PyCalendarVAlarm(PyCalendarComponent):
 

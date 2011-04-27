@@ -14,13 +14,13 @@
 #    limitations under the License.
 ##
 
-from datetime import PyCalendarDateTime
-from period import PyCalendarPeriod
-from recurrenceset import PyCalendarRecurrenceSet
-from value import PyCalendarValue
-from vtimezone import PyCalendarVTimezone
-import definitions
 from bisect import bisect_right
+from pycalendar import definitions
+from pycalendar.datetime import PyCalendarDateTime
+from pycalendar.period import PyCalendarPeriod
+from pycalendar.recurrenceset import PyCalendarRecurrenceSet
+from pycalendar.value import PyCalendarValue
+from pycalendar.vtimezone import PyCalendarVTimezone
 
 class PyCalendarVTimezoneElement(PyCalendarVTimezone):
 

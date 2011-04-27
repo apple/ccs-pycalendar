@@ -14,9 +14,11 @@
 #    limitations under the License.
 ##
 
-from stringutils import strtoul
+from pycalendar.parser import ParserContext
+from pycalendar.stringutils import strtoul
+from pycalendar.valueutils import ValueMixin
 
-class PyCalendarDuration(object):
+class PyCalendarDuration(ValueMixin):
 
     def __init__(self, duration = None, weeks=0, days=0, hours=0, minutes=0, seconds=0):
         self.mForward = True
@@ -148,6 +150,8 @@ class PyCalendarDuration(object):
     
                     # There cannot be anything else after this so just exit
                     if offset != maxoffset:
+                        if data[offset] == "T" and ParserContext.INVALID_DURATION_VALUE != ParserContext.PARSER_RAISE:
+                            return
                         raise ValueError
                     return
                 elif data[offset] == "D":
@@ -168,6 +172,14 @@ class PyCalendarDuration(object):
     
             # Have time
             offset += 1
+
+            # Strictly speaking T must always be followed by time values, but some clients
+            # send T with no additional text
+            if offset == maxoffset:
+                if ParserContext.INVALID_DURATION_VALUE == ParserContext.PARSER_RAISE:
+                    raise ValueError
+                else:
+                    return
             num, offset = strtoul(data, offset)
     
             # Look for hour

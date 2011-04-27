@@ -16,7 +16,7 @@
 
 # iCalendar UTC Offset value
 
-from value import PyCalendarValue
+from pycalendar.value import PyCalendarValue
 
 class PyCalendarIntegerValue( PyCalendarValue ):
 

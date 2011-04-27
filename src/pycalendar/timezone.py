@@ -14,7 +14,7 @@
 #    limitations under the License.
 ##
 
-import stringutils
+from pycalendar import stringutils
 
 class PyCalendarTimezone(object):
     """

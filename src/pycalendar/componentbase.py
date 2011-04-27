@@ -14,12 +14,11 @@
 #    limitations under the License.
 ##
 
-from datetimevalue import PyCalendarDateTimeValue
-from periodvalue import PyCalendarPeriodValue
-from property import PyCalendarProperty
-from value import PyCalendarValue
-
 from cStringIO import StringIO
+from pycalendar.datetimevalue import PyCalendarDateTimeValue
+from pycalendar.periodvalue import PyCalendarPeriodValue
+from pycalendar.property import PyCalendarProperty
+from pycalendar.value import PyCalendarValue
 
 class PyCalendarComponentBase(object):
 

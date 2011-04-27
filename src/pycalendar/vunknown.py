@@ -14,7 +14,7 @@
 #    limitations under the License.
 ##
 
-from component import PyCalendarComponent
+from pycalendar.component import PyCalendarComponent
 import uuid
 
 class PyCalendarUnknownComponent(PyCalendarComponent):
