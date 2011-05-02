@@ -565,7 +565,7 @@ class PyCalendarDateTime(ValueMixin):
         return self.mTZUTC
 
     def setTimezoneUTC( self, utc ):
-        if self.mTZID != utc:
+        if self.mTZUTC != utc:
             self.mTZUTC = utc
             self.changed()
 
