@@ -432,7 +432,6 @@ BOGUS
         )
 
         for item in data:
-            print item
             self.assertRaises(PyCalendarInvalidData, Card.parseText, item)
 
     def testParseBlank(self):
@@ -525,7 +524,6 @@ END:VCARD
             ParserContext.BLANK_LINES_IN_DATA = ParserContext.PARSER_IGNORE
             lines = item.split("\r\n")
             result = "\r\n".join([line for line in lines if line]) + "\r\n"
-            print result
             self.assertEqual(str(Card.parseText(item)), result)
 
         ParserContext.BLANK_LINES_IN_DATA = save

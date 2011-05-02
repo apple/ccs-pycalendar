@@ -512,7 +512,6 @@ BOGUS
         )
 
         for item in data:
-            print item
             self.assertRaises(PyCalendarInvalidData, PyCalendar.parseText, item)
 
     def testParseBlank(self):
