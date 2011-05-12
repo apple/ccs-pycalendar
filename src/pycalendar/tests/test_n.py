@@ -23,13 +23,13 @@ class TestAdrValue(unittest.TestCase):
         
         data = (
             (
-                ("first", "last", "middle", "prefix", "suffix"),
-                "first;last;middle;prefix;suffix",
+                ("last", "first", "middle", "prefix", "suffix"),
+                "last;first;middle;prefix;suffix",
                 "prefix first middle last suffix",
             ),
             (
-                (("first",), "last", ("middle1", "middle2",), (), ("suffix",)),
-                "first;last;middle1,middle2;;suffix",
+                ("last", ("first",), ("middle1", "middle2",), (), ("suffix",)),
+                "last;first;middle1,middle2;;suffix",
                 "first middle1 middle2 last suffix",
             ),
         )

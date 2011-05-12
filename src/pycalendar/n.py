@@ -24,17 +24,18 @@ class N(ValueMixin):
     mValue is a tuple of seven str or tuples of str
     """
 
+    # This is the order of fields in the vCard property value
     (
-        FIRST,
         LAST,
+        FIRST,
         MIDDLE,
         PREFIX,
         SUFFIX,
         MAXITEMS
     ) = range(6)
 
-    def __init__(self, first="", last="", middle="", prefix="", suffix=""):
-        self.mValue = (first, last, middle, prefix, suffix)
+    def __init__(self, last="", first="", middle="", prefix="", suffix=""):
+        self.mValue = (last, first, middle, prefix, suffix)
 
     def duplicate(self):
         return N(*self.mValue)
