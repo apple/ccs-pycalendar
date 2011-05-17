@@ -190,10 +190,10 @@ class PyCalendarVTimezone(PyCalendarComponent):
 
         return found
 
-    def expandAll(self, start, end):
+    def expandAll(self, start, end, with_name=False):
         results = []
         for item in self.mComponents:
-            results.extend(item.expandAll(start, end))
+            results.extend(item.expandAll(start, end, with_name))
         results = [x for x in set(results)]
         results.sort(key=lambda x:x[0].getPosixTime())
         return results

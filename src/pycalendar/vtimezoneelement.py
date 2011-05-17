@@ -135,7 +135,7 @@ class PyCalendarVTimezoneElement(PyCalendarVTimezone):
 
             return self.mStart
 
-    def expandAll(self, start, end):
+    def expandAll(self, start, end, with_name):
 
         if start is None:
             start = self.mStart
@@ -153,7 +153,10 @@ class PyCalendarVTimezoneElement(PyCalendarVTimezone):
         elif not self.mRecurrences.hasRecurrence():
             # Return DTSTART even if it is newer
             if self.mStart >= start:
-                return ((self.mStart, offsetfrom, offsetto),)
+                result = (self.mStart, offsetfrom, offsetto,)
+                if with_name:
+                    result += (self.getTZName(),)
+                return (result,)
             else:
                 return ()
         else:
@@ -182,6 +185,13 @@ class PyCalendarVTimezoneElement(PyCalendarVTimezone):
             
             if len(self.mCachedExpandBelowItems) != 0:
                 # Return them all within the range
-                return [(dt, offsetfrom, offsetto,) for dt in self.mCachedExpandBelowItems if dt >= start and dt < end]
+                results = []
+                for dt in self.mCachedExpandBelowItems:
+                    if dt >= start and dt < end:
+                        result = (dt, offsetfrom, offsetto,)
+                        if with_name:
+                            result += (self.getTZName(),)
+                        results.append(result)
+                return results
 
             return ()
