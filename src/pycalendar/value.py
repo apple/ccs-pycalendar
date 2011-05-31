@@ -17,6 +17,8 @@
 # ICalendar Value class
 
 from pycalendar.valueutils import ValueMixin
+from pycalendar import xmldefs
+import xml.etree.cElementTree as XML
 
 class PyCalendarValue(ValueMixin):
 
@@ -46,6 +48,7 @@ class PyCalendarValue(ValueMixin):
     ) = range(22)
     
     _typeMap = {}
+    _xmlMap = {}
     
     def __hash__(self):
         return hash((self.getType(), self.getValue()))
@@ -56,8 +59,9 @@ class PyCalendarValue(ValueMixin):
         return self.getType() == other.getType() and self.getValue() == other.getValue()
 
     @classmethod
-    def registerType(clz, type, cls):
+    def registerType(clz, type, cls, xmlNode):
         clz._typeMap[type] = cls
+        clz._xmlMap[type] = xmlNode
     
     @classmethod
     def createFromType(clz, type):
@@ -79,3 +83,10 @@ class PyCalendarValue(ValueMixin):
 
     def setValue( self, value ):
         raise NotImplementedError
+
+    def writeXML(self, node, namespace):
+        raise NotImplementedError
+
+    def getXMLNode(self, node, namespace):
+        return XML.SubElement(node, xmldefs.makeTag(namespace, self._xmlMap[self.getType()]))
+

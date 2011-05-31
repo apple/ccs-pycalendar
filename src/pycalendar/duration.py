@@ -250,3 +250,6 @@ class PyCalendarDuration(ValueMixin):
                     os.write("T0S")
         except:
             pass
+
+    def writeXML(self, node, namespace):
+        node.text = self.getText()

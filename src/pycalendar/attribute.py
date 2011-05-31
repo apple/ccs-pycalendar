@@ -19,6 +19,8 @@ ICalendar attribute.
 
 The attribute can consist of one or more values, all string.
 """
+import xml.etree.cElementTree as XML
+from pycalendar import xmldefs
 
 class PyCalendarAttribute(object):
 
@@ -94,3 +96,10 @@ class PyCalendarAttribute(object):
             os.write("\"%s\"" % (str,))
         else:
             os.write(str)
+
+    def writeXML(self, node, namespace):
+        param = XML.SubElement(node, xmldefs.makeTag(namespace, self.getName()))
+        for value in self.getValues():
+            # TODO: need to figure out proper value types
+            text = XML.SubElement(param, xmldefs.makeTag(namespace, xmldefs.value_text))
+            text.text = value

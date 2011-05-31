@@ -14,9 +14,11 @@
 #    limitations under the License.
 ##
 
+from pycalendar import xmldefs
 from pycalendar.datetime import PyCalendarDateTime
 from pycalendar.duration import PyCalendarDuration
 from pycalendar.valueutils import ValueMixin
+import xml.etree.cElementTree as XML
 
 class PyCalendarPeriod(ValueMixin):
 
@@ -89,6 +91,17 @@ class PyCalendarPeriod(ValueMixin):
                 self.mEnd.generate( os )
         except:
             pass
+
+    def writeXML(self, node, namespace):
+        start = XML.SubElement(node, xmldefs.makeTag(namespace, xmldefs.period_start))
+        start.text = self.mStart.getXMLText()
+
+        if self.mUseDuration:
+            duration = XML.SubElement(node, xmldefs.makeTag(namespace, xmldefs.period_duration))
+            duration.text = self.mDuration.getText()
+        else:
+            end = XML.SubElement(node, xmldefs.makeTag(namespace, xmldefs.period_end))
+            end.text = self.mEnd.getXMLText()
 
     def getStart( self ):
         return self.mStart

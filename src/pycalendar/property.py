@@ -14,7 +14,7 @@
 #    limitations under the License.
 ##
 
-from pycalendar import definitions
+from pycalendar import definitions, xmldefs
 from pycalendar import stringutils
 from pycalendar.attribute import PyCalendarAttribute
 from pycalendar.binaryvalue import PyCalendarBinaryValue
@@ -37,6 +37,7 @@ from pycalendar.urivalue import PyCalendarURIValue
 from pycalendar.utcoffsetvalue import PyCalendarUTCOffsetValue
 from pycalendar.value import PyCalendarValue
 import cStringIO as StringIO
+import xml.etree.cElementTree as XML
 
 class PyCalendarProperty(object):
 
@@ -454,6 +455,36 @@ class PyCalendarProperty(object):
                     start = offset
     
         os.write("\r\n")
+    
+    def writeXML(self, node, namespace):
+
+        # Write it out always with value
+        self.generateValueXML(node, namespace, False)
+
+
+    def generateFilteredXML(self, node, namespace, filter):
+        
+        # Check for property in filter and whether value is written out
+        test, novalue = filter.testPropertyValue(self.mName.upper())
+        if test:
+            self.generateValueXML(node, namespace, novalue)
+
+    # Write out the actual property, possibly skipping the value
+    def generateValueXML(self, node, namespace, novalue):
+
+        prop = XML.SubElement(node, xmldefs.makeTag(namespace, self.getName()))
+        
+        # Write all attributes
+        if len(self.mAttributes):
+            params = XML.SubElement(prop, xmldefs.makeTag(namespace, xmldefs.parameters))
+            for key in sorted(self.mAttributes.keys()):
+                for attr in self.mAttributes[key]:
+                    if attr.getName() != "VALUE":
+                        attr.writeXML(params, namespace)
+
+        # Write value
+        if self.mValue and not novalue:
+            self.mValue.writeXML(prop, namespace)
     
     def _init_PyCalendarProperty(self):
         self.mName = ""

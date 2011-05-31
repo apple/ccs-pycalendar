@@ -16,6 +16,7 @@
 
 # iCalendar UTC Offset value
 
+from pycalendar import xmldefs
 from pycalendar.plaintextvalue import PyCalendarPlainTextValue
 from pycalendar.value import PyCalendarValue
 
@@ -24,4 +25,4 @@ class PyCalendarCalAddressValue( PyCalendarPlainTextValue ):
     def getType( self ):
         return PyCalendarValue.VALUETYPE_CALADDRESS
 
-PyCalendarValue.registerType(PyCalendarValue.VALUETYPE_CALADDRESS, PyCalendarCalAddressValue)
+PyCalendarValue.registerType(PyCalendarValue.VALUETYPE_CALADDRESS, PyCalendarCalAddressValue, xmldefs.value_cal_address)

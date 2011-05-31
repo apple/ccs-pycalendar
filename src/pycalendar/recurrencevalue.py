@@ -14,6 +14,7 @@
 #    limitations under the License.
 ##
 
+from pycalendar import xmldefs
 from pycalendar.recurrence import PyCalendarRecurrence
 from pycalendar.value import PyCalendarValue
 
@@ -34,10 +35,13 @@ class PyCalendarRecurrenceValue( PyCalendarValue ):
     def generate( self, os ):
         self.mValue.generate( os )
 
+    def writeXML(self, node, namespace):
+        self.mValue.writeXML(node, namespace)
+
     def getValue( self ):
         return self.mValue
 
     def setValue( self, value ):
         self.mValue = value
 
-PyCalendarValue.registerType(PyCalendarValue.VALUETYPE_RECUR, PyCalendarRecurrenceValue)
+PyCalendarValue.registerType(PyCalendarValue.VALUETYPE_RECUR, PyCalendarRecurrenceValue, xmldefs.value_recur)

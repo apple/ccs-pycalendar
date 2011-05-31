@@ -15,7 +15,7 @@
 ##
 
 from cStringIO import StringIO
-from pycalendar import definitions
+from pycalendar import definitions, xmldefs
 from pycalendar.available import PyCalendarAvailable
 from pycalendar.componentbase import PyCalendarComponentBase
 from pycalendar.componentexpanded import PyCalendarComponentExpanded
@@ -36,6 +36,8 @@ from pycalendar.vtimezonedaylight import PyCalendarVTimezoneDaylight
 from pycalendar.vtimezonestandard import PyCalendarVTimezoneStandard
 from pycalendar.vtodo import PyCalendarVToDo
 from pycalendar.vunknown import PyCalendarUnknownComponent
+
+import xml.etree.cElementTree as XML
 
 class PyCalendar(PyCalendarComponentBase):
 
@@ -371,10 +373,30 @@ class PyCalendar(PyCalendarComponentBase):
     
         return result
         
-    def generate(self, os):
+    def getText(self, includeTimezones=False):
+        s = StringIO()
+        self.generate(s, includeTimezones=includeTimezones)
+        return s.getvalue()
+
+    def generate(self, os, includeTimezones=False):
         # Make sure all required timezones are in this object
-        self.includeTimezones()
+        if includeTimezones:
+            self.includeTimezones()
         super(PyCalendar, self).generate(os)
+        
+    def getTextXML(self, includeTimezones=False):
+        node = self.writeXML(includeTimezones)
+        return xmldefs.toString(node)
+
+    def writeXML(self, includeTimezones=False):
+        # Make sure all required timezones are in this object
+        if includeTimezones:
+            self.includeTimezones()
+            
+        # Root node structure
+        root = XML.Element(xmldefs.makeTag(xmldefs.iCalendar20_namespace, xmldefs.icalendar))
+        super(PyCalendar, self).writeXML(root, xmldefs.iCalendar20_namespace)
+        return root
         
     # Get expanded components
     def getVEvents(self, period, list, all_day_at_top = True):

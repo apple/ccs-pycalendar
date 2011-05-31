@@ -17,11 +17,13 @@
 from pycalendar import definitions
 from pycalendar import locale
 from pycalendar import utils
+from pycalendar import xmldefs
 from pycalendar.duration import PyCalendarDuration
 from pycalendar.timezone import PyCalendarTimezone
 from pycalendar.valueutils import ValueMixin
 import cStringIO as StringIO
 import time
+import xml.etree.cElementTree as XML
 
 class PyCalendarDateTime(ValueMixin):
 
@@ -796,6 +798,21 @@ class PyCalendarDateTime(ValueMixin):
             else:
                 return "%4d%02d%02dT%02d%02d%02d" % ( self.mYear, self.mMonth, self.mDay, self.mHours, self.mMinutes, self.mSeconds )
 
+    def getXMLText( self ):
+    
+        if self.mDateOnly:
+            return "%4d-%02d-%02d" % ( self.mYear, self.mMonth, self.mDay )
+        else:
+            if self.mTZUTC:
+                return "%4d-%02d-%02dT%02d:%02d:%02dZ" % ( self.mYear, self.mMonth, self.mDay, self.mHours, self.mMinutes, self.mSeconds )
+            elif isinstance(self.mTZID, int):
+                sign = "-" if self.mTZID < 0 else "+"
+                hours = abs(self.mTZID) / 3600
+                minutes = divmod(abs(self.mTZID) / 60, 60)[1]
+                return "%4d-%02d-%02dT%02d:%02d:%02d%s%02d:%02d" % ( self.mYear, self.mMonth, self.mDay, self.mHours, self.mMinutes, self.mSeconds, sign, hours, minutes )
+            else:
+                return "%4d-%02d-%02dT%02d:%02d:%02d" % ( self.mYear, self.mMonth, self.mDay, self.mHours, self.mMinutes, self.mSeconds )
+
     @classmethod
     def parseText(cls, data, fullISO=False):
         dt = cls()
@@ -934,6 +951,15 @@ class PyCalendarDateTime(ValueMixin):
 
     def generateRFC2822( self, os ):
         pass
+
+    def writeXML(self, node, namespace):
+        value = XML.SubElement(
+            node,
+            xmldefs.makeTag(
+                namespace,
+                xmldefs.value_date if self.isDateOnly() else xmldefs.value_date_time
+        ))
+        value.text = self.getXMLText()
 
     def normalise( self ):
         # Normalise seconds

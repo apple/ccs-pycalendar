@@ -42,10 +42,14 @@ class PyCalendarDummyValue( PyCalendarValue ):
         except:
             pass
 
+    def writeXML(self, node, namespace):
+        value = self.getXMLNode(node, namespace)
+        value.text = self.mValue
+
     def getValue( self ):
         return self.mValue
 
     def setValue( self, value ):
         self.mValue = value
 
-PyCalendarValue.registerType("DUMMY", PyCalendarDummyValue)
+PyCalendarValue.registerType("DUMMY", PyCalendarDummyValue, None)

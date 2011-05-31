@@ -38,6 +38,10 @@ class PyCalendarPlainTextValue( PyCalendarValue ):
         except:
             pass
 
+    def writeXML(self, node, namespace):
+        value = self.getXMLNode(node, namespace)
+        value.text = self.mValue
+
     def getValue(self):
         return self.mValue
 

@@ -14,6 +14,7 @@
 #    limitations under the License.
 ##
 
+from pycalendar import xmldefs
 from pycalendar.duration import PyCalendarDuration
 from pycalendar.value import PyCalendarValue
 
@@ -34,10 +35,14 @@ class PyCalendarDurationValue(PyCalendarValue):
     def generate(self, os):
         self.mValue.generate(os)
 
+    def writeXML(self, node, namespace):
+        value = self.getXMLNode(node, namespace)
+        value.text = self.mValue.writeXML()
+
     def getValue(self):
         return self.mValue
 
     def setValue(self,  value):
         self.mValue = value
 
-PyCalendarValue.registerType(PyCalendarValue.VALUETYPE_DURATION, PyCalendarDurationValue)
+PyCalendarValue.registerType(PyCalendarValue.VALUETYPE_DURATION, PyCalendarDurationValue, xmldefs.value_duration)

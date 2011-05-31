@@ -39,3 +39,6 @@ class ValueMixin(object):
         os = StringIO()
         self.generate(os)
         return os.getvalue()
+
+    def writeXML(self, node, namespace):
+        raise NotImplementedError

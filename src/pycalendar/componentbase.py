@@ -15,10 +15,12 @@
 ##
 
 from cStringIO import StringIO
+from pycalendar import xmldefs
 from pycalendar.datetimevalue import PyCalendarDateTimeValue
 from pycalendar.periodvalue import PyCalendarPeriodValue
 from pycalendar.property import PyCalendarProperty
 from pycalendar.value import PyCalendarValue
+import xml.etree.cElementTree as XML
 
 class PyCalendarComponentBase(object):
 
@@ -195,12 +197,33 @@ class PyCalendarComponentBase(object):
         # Write each property
         self.writePropertiesFiltered(os, filter)
 
-        # Write each property
+        # Write each embedded component based on specific order
         self.writeComponentsFiltered(os, filter)
 
         # Footer
         os.write(self.getEndDelimiter())
         os.write("\r\n")
+
+    def writeXML(self, node, namespace):
+        
+        # Component element
+        comp = XML.SubElement(node, xmldefs.makeTag(namespace, self.getType()))
+        
+        # Each property
+        self.writePropertiesXML(comp, namespace)
+    
+        # Each component
+        self.writeComponentsXML(comp, namespace)
+    
+    def writeXMLFiltered(self, node, namespace, filter):
+        # Component element
+        comp = XML.SubElement(node, xmldefs.makeTag(namespace, self.getType()))
+        
+        # Each property
+        self.writePropertiesFilteredXML(comp, namespace, filter)
+    
+        # Each component
+        self.writeComponentsFilteredXML(comp, namespace, filter)
 
     def sortedComponents(self):
         
@@ -241,6 +264,29 @@ class PyCalendarComponentBase(object):
                 subfilter = filter.getSubComponentFilter(subcomp.getType())
                 if subfilter is not None:
                     subcomp.generateFiltered(os, subfilter)
+        
+    def writeComponentsXML(self, node, namespace):
+        
+        if self.mComponents:
+            comps = XML.SubElement(node, xmldefs.makeTag(namespace, xmldefs.components))
+            
+            # Write out the remainder 
+            for component in self.sortedComponents():
+                component.writeXML(comps, namespace)
+        
+    def writeComponentsFilteredXML(self, node, namespace, filter):
+
+        if self.mComponents:
+            comps = XML.SubElement(node, xmldefs.makeTag(namespace, xmldefs.components))
+            
+            # Shortcut for all sub-components
+            if filter.isAllSubComponents():
+                self.writeXML(comps, namespace)
+            elif filter.hasSubComponentFilters():
+                for subcomp in self.sortedcomponents():
+                    subfilter = filter.getSubComponentFilter(subcomp.getType())
+                    if subfilter is not None:
+                        subcomp.writeFilteredXML(comps, namespace, subfilter)
         
     def loadValue(self, value_name):
         if self.hasProperty(value_name):
@@ -371,6 +417,34 @@ class PyCalendarComponentBase(object):
             for key in keys:
                 for prop in self.getProperties(key):
                     prop.generateFiltered(os, filter)
+
+    def writePropertiesXML(self, node, namespace):
+
+        properties = XML.SubElement(node, xmldefs.makeTag(namespace, xmldefs.properties))
+        
+        # Sort properties by name
+        keys = self.sortedPropertyKeys()
+        for key in keys:
+            props = self.mProperties[key]
+            for prop in props:
+                prop.writeXML(properties, namespace)
+
+    def writePropertiesFilteredXML(self, node, namespace, filter):
+
+        props = XML.SubElement(node, xmldefs.makeTag(namespace, xmldefs.properties))
+        
+        # Sort properties by name
+        keys = self.sortedPropertyKeys()
+
+        # Shortcut for all properties
+        if filter.isAllProperties():
+            for key in keys:
+                for prop in self.getProperties(key):
+                    prop.writeXML(props, namespace)
+        elif filter.hasPropertyFilters():
+            for key in keys:
+                for prop in self.getProperties(key):
+                    prop.writeFilteredXML(props, namespace, filter)
 
     def loadPrivateValue(self, value_name):
         # Read it in from properties list and then delete the property from the

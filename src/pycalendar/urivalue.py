@@ -16,6 +16,7 @@
 
 # iCalendar URI value
 
+from pycalendar import xmldefs
 from pycalendar.plaintextvalue import PyCalendarPlainTextValue
 from pycalendar.value import PyCalendarValue
 
@@ -24,6 +25,6 @@ class PyCalendarURIValue( PyCalendarPlainTextValue ):
     def getType(self):
         return PyCalendarURIValue.VALUETYPE_URI
 
-PyCalendarValue.registerType(PyCalendarValue.VALUETYPE_URI, PyCalendarURIValue)
+PyCalendarValue.registerType(PyCalendarValue.VALUETYPE_URI, PyCalendarURIValue, xmldefs.value_uri)
 
         

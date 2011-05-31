@@ -16,8 +16,9 @@
 
 # iCalendar REQUEST-STATUS value
 
-from pycalendar import utils
+from pycalendar import utils, xmldefs
 from pycalendar.value import PyCalendarValue
+import xml.etree.cElementTree as XML
 
 class PyCalendarRequestStatusValue( PyCalendarValue ):
     """
@@ -74,11 +75,22 @@ class PyCalendarRequestStatusValue( PyCalendarValue ):
         except:
             pass
 
+    def writeXML(self, node, namespace):
+        code = XML.SubElement(node, xmldefs.makeTag(namespace, xmldefs.req_status_code))
+        code.text = self.mValue[0]
+
+        description = XML.SubElement(node, xmldefs.makeTag(namespace, xmldefs.req_status_description))
+        description.text = self.mValue[1]
+
+        if len(self.mValue) == 3 and self.mValue[2]:
+            data = XML.SubElement(node, xmldefs.makeTag(namespace, xmldefs.req_status_data))
+            data.text = self.mValue[1]
+
     def getValue(self):
         return self.mValue
 
     def setValue( self, value ):
         self.mValue = value
 
-PyCalendarValue.registerType(PyCalendarValue.VALUETYPE_REQUEST_STATUS, PyCalendarRequestStatusValue)
+PyCalendarValue.registerType(PyCalendarValue.VALUETYPE_REQUEST_STATUS, PyCalendarRequestStatusValue, None)
     

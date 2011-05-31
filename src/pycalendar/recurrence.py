@@ -15,10 +15,12 @@
 ##
 
 from pycalendar import definitions
+from pycalendar import xmldefs
 from pycalendar.datetime import PyCalendarDateTime
 from pycalendar.period import PyCalendarPeriod
 from pycalendar.valueutils import ValueMixin
 import cStringIO as StringIO
+import xml.etree.cElementTree as XML
 
 def WeekDayNumCompare_compare(w1, w2):
 
@@ -48,6 +50,16 @@ class PyCalendarRecurrence(ValueMixin):
         definitions.cICalValue_RECUR_MONTHLY  : definitions.eRecurrence_MONTHLY,
         definitions.cICalValue_RECUR_YEARLY   : definitions.eRecurrence_YEARLY,
     }
+
+    cFreqToXMLMap = {
+        definitions.eRecurrence_SECONDLY: xmldefs.recur_freq_secondly,
+        definitions.eRecurrence_MINUTELY: xmldefs.recur_freq_minutely,
+        definitions.eRecurrence_HOURLY: xmldefs.recur_freq_hourly,
+        definitions.eRecurrence_DAILY: xmldefs.recur_freq_daily,
+        definitions.eRecurrence_WEEKLY: xmldefs.recur_freq_weekly,
+        definitions.eRecurrence_MONTHLY: xmldefs.recur_freq_monthly,
+        definitions.eRecurrence_YEARLY: xmldefs.recur_freq_yearly,
+    }
     
     cRecurMap = {
         definitions.cICalValue_RECUR_FREQ       : definitions.eRecurrence_FREQ,
@@ -75,7 +87,9 @@ class PyCalendarRecurrence(ValueMixin):
         definitions.cICalValue_RECUR_WEEKDAY_FR : definitions.eRecurrence_WEEKDAY_FR,
         definitions.cICalValue_RECUR_WEEKDAY_SA : definitions.eRecurrence_WEEKDAY_SA,
     }
-                
+    
+    cWeekdayRecurMap = dict([(v, k) for k, v in cWeekdayMap.items()])
+         
     cUnknownIndex = -1
 
     def __init__(self):
@@ -509,7 +523,7 @@ class PyCalendarRecurrence(ValueMixin):
                 os.write(definitions.cICalValue_RECUR_COUNT)
                 os.write("=")
                 os.write(str(self.mCount))
-            elif (self.mUseUntil):
+            elif self.mUseUntil:
                 os.write(";")
                 os.write(definitions.cICalValue_RECUR_UNTIL)
                 os.write("=")
@@ -597,19 +611,68 @@ class PyCalendarRecurrence(ValueMixin):
         except:
             pass
 
-    def generateList(self, os, title, list):
+    def generateList(self, os, title, items):
 
-        if (list is not None) and (len(list) != 0):
+        if (items is not None) and (len(items) != 0):
             os.write(";")
             os.write(title)
             os.write("=")
             comma = False
-            for e in list:
+            for e in items:
                 if comma:
                     os.write(",")
                 comma = True
                 os.write(str(e))
 
+    def writeXML(self, node, namespace):
+
+        recur = XML.SubElement(node, xmldefs.makeTag(namespace, xmldefs.value_recur))
+
+        freq = XML.SubElement(recur, xmldefs.makeTag(namespace, xmldefs.recur_freq))
+        freq.text = self.cFreqToXMLMap[self.mFreq]
+
+        if self.mUseCount:
+            count = XML.SubElement(recur, xmldefs.makeTag(namespace, xmldefs.recur_count))
+            count.text = str(self.mCount)
+        elif self.mUseUntil:
+            until = XML.SubElement(recur, xmldefs.makeTag(namespace, xmldefs.recur_until))
+            self.mUntil.writeXML(until, namespace)
+
+        if self.mInterval > 1:
+            interval = XML.SubElement(recur, xmldefs.makeTag(namespace, xmldefs.recur_interval))
+            interval.text = str(self.mInterval)
+
+        self.writeXMLList(recur, namespace, xmldefs.recur_bysecond, self.mBySeconds)
+        self.writeXMLList(recur, namespace, xmldefs.recur_byminute, self.mByMinutes)
+        self.writeXMLList(recur, namespace, xmldefs.recur_byhour, self.mByHours)
+            
+        if self.mByDay is not None and len(self.mByDay) != 0:
+            for iter in self.mByDay:
+                byday = XML.SubElement(recur, xmldefs.makeTag(namespace, xmldefs.recur_byday))
+                data = ""
+                if iter[0] != 0:
+                    data = str(iter[0])
+                data += self.cWeekdayRecurMap.get(iter[1], "")
+                byday.text = data
+
+        self.writeXMLList(recur, namespace, xmldefs.recur_bymonthday, self.mByMonthDay)
+        self.writeXMLList(recur, namespace, xmldefs.recur_byyearday, self.mByYearDay)
+        self.writeXMLList(recur, namespace, xmldefs.recur_byweekno, self.mByWeekNo)
+        self.writeXMLList(recur, namespace, xmldefs.recur_bymonth, self.mByMonth)
+        self.writeXMLList(recur, namespace, xmldefs.recur_bysetpos, self.mBySetPos)
+
+        # MO is the default so we do not need it
+        if self.mWeekstart != definitions.eRecurrence_WEEKDAY_MO:
+            wkst = XML.SubElement(recur, xmldefs.makeTag(namespace, xmldefs.recur_wkst))
+            wkst.text = self.cWeekdayRecurMap.get(self.mWeekstart, definitions.cICalValue_RECUR_WEEKDAY_MO)
+
+    def writeXMLList(self, node, namespace, name, items):
+        if items is not None and len(items) != 0:
+            for item in items:
+                child = XML.SubElement(node, xmldefs.makeTag(namespace, name))
+                child.text = str(item)
+                
+    
     def hasBy(self):
         return (self.mBySeconds is not None) and (len(self.mBySeconds) != 0) \
                 or (self.mByMinutes is not None) and (len(self.mByMinutes) != 0) \

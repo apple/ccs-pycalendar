@@ -73,5 +73,8 @@ class PyCalendarMultiValue( PyCalendarValue ):
         except:
             pass
 
-PyCalendarValue.registerType(PyCalendarValue.VALUETYPE_MULTIVALUE, PyCalendarMultiValue)
-            
+    def writeXML(self, node, namespace):
+        for iter in self.mValues:
+            iter.writeXML(node, namespace)
+
+PyCalendarValue.registerType(PyCalendarValue.VALUETYPE_MULTIVALUE, PyCalendarMultiValue, None)

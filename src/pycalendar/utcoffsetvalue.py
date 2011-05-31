@@ -16,6 +16,8 @@
 
 # iCalendar UTC Offset value
 
+from cStringIO import StringIO
+from pycalendar import xmldefs
 from pycalendar.value import PyCalendarValue
 
 class PyCalendarUTCOffsetValue( PyCalendarValue ):
@@ -84,11 +86,21 @@ class PyCalendarUTCOffsetValue( PyCalendarValue ):
         except:
             pass
 
+    def writeXML(self, node, namespace):
+        
+        os = StringIO.StringIO()
+        self.generate(os)
+        text = os.getvalue()
+        text = text[:-2] + ":" + text[-2:]
+
+        value = self.getXMLNode(node, namespace)
+        value.text = text
+
     def getValue( self ):
         return self.mValue
 
     def setValue( self, value ):
         self.mValue = value
 
-PyCalendarValue.registerType(PyCalendarValue.VALUETYPE_UTC_OFFSET, PyCalendarUTCOffsetValue)
+PyCalendarValue.registerType(PyCalendarValue.VALUETYPE_UTC_OFFSET, PyCalendarUTCOffsetValue, xmldefs.value_utc_offset)
 
