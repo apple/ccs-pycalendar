@@ -42,4 +42,4 @@ class NValue( PyCalendarValue ):
     def setValue(self, value):
         self.mValue = value
 
-PyCalendarValue.registerType(PyCalendarValue.VALUETYPE_N, NValue)
+PyCalendarValue.registerType(PyCalendarValue.VALUETYPE_N, NValue, None)

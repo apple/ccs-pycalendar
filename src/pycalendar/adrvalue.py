@@ -42,4 +42,4 @@ class AdrValue( PyCalendarValue ):
     def setValue(self, value):
         self.mValue = value
 
-PyCalendarValue.registerType(PyCalendarValue.VALUETYPE_ADR, AdrValue)
+PyCalendarValue.registerType(PyCalendarValue.VALUETYPE_ADR, AdrValue, None)

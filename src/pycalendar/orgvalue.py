@@ -45,4 +45,4 @@ class OrgValue(PyCalendarValue):
     def setValue(self, value):
         self.mValue = value
 
-PyCalendarValue.registerType(PyCalendarValue.VALUETYPE_ORG, OrgValue)
+PyCalendarValue.registerType(PyCalendarValue.VALUETYPE_ORG, OrgValue, None)
