@@ -155,6 +155,7 @@ class tzconvert(object):
             print "Write path: %s" % (fpath,)
         
         if links:
+            link_list = []
             for linkTo, linkFrom in self.links.iteritems():
                 
                 # Check for existing output file
@@ -173,6 +174,12 @@ class tzconvert(object):
                 with open(toPath, "w") as f:
                     f.write(icsdata)
                 print "Write link: %s" % (linkTo,)
+                
+                link_list.append("%s\t%s" % (linkTo, linkFrom,))
+            
+            # Generate link mapping file
+            linkPath = os.path.join(outputdir, "links.txt")
+            open(linkPath, "w").write("\n".join(link_list))
             
 def usage(error_msg=None):
     if error_msg:
