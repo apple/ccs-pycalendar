@@ -15,8 +15,10 @@
 ##
 
 from pycalendar.calendar import PyCalendar
+from pycalendar.datetime import PyCalendarDateTime
 from pycalendar.exceptions import PyCalendarInvalidData
 from pycalendar.parser import ParserContext
+from pycalendar.period import PyCalendarPeriod
 from pycalendar.property import PyCalendarProperty
 import cStringIO as StringIO
 import difflib
@@ -612,3 +614,197 @@ END:VCALENDAR
             self.assertEqual(str(PyCalendar.parseText(item)), result)
 
         ParserContext.BLANK_LINES_IN_DATA = save
+
+    def testGetVEvents(self):
+
+        data = (
+            (
+                "Non-recurring match",
+                """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//mulberrymail.com//Mulberry v4.0//EN
+BEGIN:VEVENT
+UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
+DTSTART;VALUE=DATE:20110601
+DURATION:P1D
+DTSTAMP:20020101T000000Z
+SUMMARY:New Year's Day
+END:VEVENT
+END:VCALENDAR
+""".replace("\n", "\r\n"),
+                (PyCalendarDateTime(2011, 6, 1),),
+            ),
+            (
+                "Non-recurring no-match",
+                """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//mulberrymail.com//Mulberry v4.0//EN
+BEGIN:VEVENT
+UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
+DTSTART;VALUE=DATE:20110501
+DURATION:P1D
+DTSTAMP:20020101T000000Z
+SUMMARY:New Year's Day
+END:VEVENT
+END:VCALENDAR
+""".replace("\n", "\r\n"),
+                (),
+            ),
+            (
+                "Recurring match",
+                """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//mulberrymail.com//Mulberry v4.0//EN
+BEGIN:VEVENT
+UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
+DTSTART;VALUE=DATE:20110601
+DURATION:P1D
+DTSTAMP:20020101T000000Z
+RRULE:FREQ=DAILY;COUNT=2
+SUMMARY:New Year's Day
+END:VEVENT
+END:VCALENDAR
+""".replace("\n", "\r\n"),
+                (
+                    PyCalendarDateTime(2011, 6, 1),
+                    PyCalendarDateTime(2011, 6, 2),
+                ),
+            ),
+            (
+                "Recurring no match",
+                """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//mulberrymail.com//Mulberry v4.0//EN
+BEGIN:VEVENT
+UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
+DTSTART;VALUE=DATE:20110501
+DURATION:P1D
+DTSTAMP:20020101T000000Z
+RRULE:FREQ=DAILY;COUNT=2
+SUMMARY:New Year's Day
+END:VEVENT
+END:VCALENDAR
+""".replace("\n", "\r\n"),
+                (),
+            ),
+            (
+                "Recurring with override match",
+                """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//mulberrymail.com//Mulberry v4.0//EN
+BEGIN:VEVENT
+UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
+DTSTART:20110601T120000
+DURATION:P1D
+DTSTAMP:20020101T000000Z
+RRULE:FREQ=DAILY;COUNT=2
+SUMMARY:New Year's Day
+END:VEVENT
+BEGIN:VEVENT
+UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
+RECURRENCE-ID;VALUE=DATE:20110602T120000
+DTSTART;VALUE=DATE:20110602T130000
+DURATION:P1D
+DTSTAMP:20020101T000000Z
+SUMMARY:New Year's Day
+END:VEVENT
+END:VCALENDAR
+""".replace("\n", "\r\n"),
+                (
+                    PyCalendarDateTime(2011, 6, 1, 12, 0, 0),
+                    PyCalendarDateTime(2011, 6, 2, 13, 0, 0),
+                ),
+            ),
+            (
+                "Recurring with override no match",
+                """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//mulberrymail.com//Mulberry v4.0//EN
+BEGIN:VEVENT
+UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
+DTSTART:20110501T120000
+DURATION:P1D
+DTSTAMP:20020101T000000Z
+RRULE:FREQ=DAILY;COUNT=2
+SUMMARY:New Year's Day
+END:VEVENT
+BEGIN:VEVENT
+UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
+RECURRENCE-ID;VALUE=DATE:20110502T120000
+DTSTART;VALUE=DATE:20110502T130000
+DURATION:P1D
+DTSTAMP:20020101T000000Z
+SUMMARY:New Year's Day
+END:VEVENT
+END:VCALENDAR
+""".replace("\n", "\r\n"),
+                (),
+            ),
+            (
+                "Recurring partial match",
+                """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//mulberrymail.com//Mulberry v4.0//EN
+BEGIN:VEVENT
+UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
+DTSTART;VALUE=DATE:20110531
+DURATION:P1D
+DTSTAMP:20020101T000000Z
+RRULE:FREQ=DAILY;COUNT=2
+SUMMARY:New Year's Day
+END:VEVENT
+END:VCALENDAR
+""".replace("\n", "\r\n"),
+                (
+                    PyCalendarDateTime(2011, 6, 1),
+                ),
+            ),
+            (
+                "Recurring with override partial match",
+                """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//mulberrymail.com//Mulberry v4.0//EN
+BEGIN:VEVENT
+UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
+DTSTART:20110531T120000
+DURATION:P1D
+DTSTAMP:20020101T000000Z
+RRULE:FREQ=DAILY;COUNT=2
+SUMMARY:New Year's Day
+END:VEVENT
+BEGIN:VEVENT
+UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
+RECURRENCE-ID;VALUE=DATE:20110601T120000
+DTSTART;VALUE=DATE:20110601T130000
+DURATION:P1D
+DTSTAMP:20020101T000000Z
+SUMMARY:New Year's Day
+END:VEVENT
+END:VCALENDAR
+""".replace("\n", "\r\n"),
+                (
+                    PyCalendarDateTime(2011, 6, 1, 13, 0, 0),
+                ),
+            ),
+        )
+
+        for title, caldata, result in data: 
+            calendar = PyCalendar.parseText(caldata)
+            instances = []
+            calendar.getVEvents(
+                PyCalendarPeriod(
+                    start=PyCalendarDateTime(2011, 6, 1),
+                    end=PyCalendarDateTime(2011, 7, 1),
+                ),
+                instances
+            )
+            instances = tuple([instance.getInstanceStart() for instance in instances])
+            self.assertEqual(instances, result, "Failed in %s: got %s, expected %s" % (title, instances, result))

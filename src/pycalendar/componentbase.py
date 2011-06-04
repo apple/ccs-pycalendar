@@ -93,7 +93,7 @@ class PyCalendarComponentBase(object):
 
         for component in self.mComponents:
             if component.getMapKey() == key:
-                self.mComponents.remove(component)
+                self.removeComponent(component)
                 return
 
     def addComponent(self, component):
@@ -113,7 +113,7 @@ class PyCalendarComponentBase(object):
             compname = compname.upper()
             for component in tuple(self.mComponents):
                 if component.getType().upper() == compname:
-                    self.mComponents.remove(component)
+                    self.removeComponent(component)
         else:
             self.mComponents = []
 

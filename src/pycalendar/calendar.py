@@ -19,6 +19,7 @@ from pycalendar import definitions, xmldefs
 from pycalendar.available import PyCalendarAvailable
 from pycalendar.componentbase import PyCalendarComponentBase
 from pycalendar.componentexpanded import PyCalendarComponentExpanded
+from pycalendar.componentrecur import PyCalendarComponentRecur
 from pycalendar.datetime import PyCalendarDateTime
 from pycalendar.exceptions import PyCalendarInvalidData
 from pycalendar.freebusy import PyCalendarFreeBusy
@@ -36,7 +37,7 @@ from pycalendar.vtimezonedaylight import PyCalendarVTimezoneDaylight
 from pycalendar.vtimezonestandard import PyCalendarVTimezoneStandard
 from pycalendar.vtodo import PyCalendarVToDo
 from pycalendar.vunknown import PyCalendarUnknownComponent
-
+import collections
 import xml.etree.cElementTree as XML
 
 class PyCalendar(PyCalendarComponentBase):
@@ -64,6 +65,8 @@ class PyCalendar(PyCalendarComponentBase):
 
         self.mName = ""
         self.mDescription = ""
+        self.mMasterComponentsByTypeAndUID = collections.defaultdict(lambda:collections.defaultdict(list))
+        self.mOverriddenComponentsByUID = collections.defaultdict(list)
     
         if add_defaults:
             self.addDefaultProperties()
@@ -373,6 +376,32 @@ class PyCalendar(PyCalendarComponentBase):
     
         return result
         
+    def addComponent(self, component):
+        """
+        Override to track components by UID.
+        """
+        super(PyCalendar, self).addComponent(component)
+        
+        uid = component.getUID()
+        rid = component.getRecurrenceID() if isinstance(component, PyCalendarComponentRecur) else None
+        if rid:
+            self.mOverriddenComponentsByUID[uid].append(component)
+        else:
+            self.mMasterComponentsByTypeAndUID[component.getType()][uid] = component
+
+    def removeComponent(self, component):
+        """
+        Override to track components by UID.
+        """
+        super(PyCalendar, self).removeComponent(component)
+
+        uid = component.getUID()
+        rid = component.getRecurrenceID() if isinstance(component, PyCalendarComponentRecur) else None
+        if rid:
+            self.mOverriddenComponentsByUID[uid].remove(component)
+        else:
+            del self.mMasterComponentsByTypeAndUID[component.getType()][uid]
+
     def getText(self, includeTimezones=False):
         s = StringIO()
         self.generate(s, includeTimezones=includeTimezones)
@@ -441,11 +470,11 @@ class PyCalendar(PyCalendarComponentBase):
         
     def getRecurrenceInstancesItems(self, type, uid, items):
         # Get instances from list
-        self.getComponents(type).getRecurrenceInstancesItems(uid, items)
+        items.extend(self.mOverriddenComponentsByUID.get(uid, ()))
 
     def getRecurrenceInstancesIds(self, type, uid, ids):
         # Get instances from list
-        self.getComponents(type).getRecurrenceInstancesIds(uid, ids)
+        ids.extend([comp.getRecurrenceID() for comp in self.mOverriddenComponentsByUID.get(uid, ())])
 
     # Freebusy generation
     def getVFreeBusyList(self, period, list):
