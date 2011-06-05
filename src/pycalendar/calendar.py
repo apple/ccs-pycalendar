@@ -382,12 +382,13 @@ class PyCalendar(PyCalendarComponentBase):
         """
         super(PyCalendar, self).addComponent(component)
         
-        uid = component.getUID()
-        rid = component.getRecurrenceID() if isinstance(component, PyCalendarComponentRecur) else None
-        if rid:
-            self.mOverriddenComponentsByUID[uid].append(component)
-        else:
-            self.mMasterComponentsByTypeAndUID[component.getType()][uid] = component
+        if isinstance(component, PyCalendarComponentRecur):
+            uid = component.getUID()
+            rid = component.getRecurrenceID()
+            if rid:
+                self.mOverriddenComponentsByUID[uid].append(component)
+            else:
+                self.mMasterComponentsByTypeAndUID[component.getType()][uid] = component
 
     def removeComponent(self, component):
         """
@@ -395,12 +396,13 @@ class PyCalendar(PyCalendarComponentBase):
         """
         super(PyCalendar, self).removeComponent(component)
 
-        uid = component.getUID()
-        rid = component.getRecurrenceID() if isinstance(component, PyCalendarComponentRecur) else None
-        if rid:
-            self.mOverriddenComponentsByUID[uid].remove(component)
-        else:
-            del self.mMasterComponentsByTypeAndUID[component.getType()][uid]
+        if isinstance(component, PyCalendarComponentRecur):
+            uid = component.getUID()
+            rid = component.getRecurrenceID()
+            if rid:
+                self.mOverriddenComponentsByUID[uid].remove(component)
+            else:
+                del self.mMasterComponentsByTypeAndUID[component.getType()][uid]
 
     def getText(self, includeTimezones=False):
         s = StringIO()

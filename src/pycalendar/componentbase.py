@@ -32,7 +32,8 @@ class PyCalendarComponentBase(object):
     def duplicate(self, **args):
         other = self.__class__(**args)
         
-        other.mComponents = [component.duplicate(parent=other) for component in self.mComponents]
+        for component in self.mComponents:
+            other.addComponent(component.duplicate(parent=other))
 
         other.mProperties = {}
         for propname, props in self.mProperties.iteritems():
