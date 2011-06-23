@@ -375,6 +375,9 @@ class PyCalendarProperty(object):
                     txt = txt[1:]
                     self.createValue(txt)
                     txt = None
+                else:
+                    # We should never get here but if we do we need to terminate the loop
+                    raise PyCalendarInvalidProperty("Invalid property", data)
 
         except IndexError:
             raise PyCalendarInvalidProperty("Invalid property", data)

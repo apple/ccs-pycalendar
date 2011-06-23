@@ -78,6 +78,8 @@ class TestProperty(unittest.TestCase):
             "RRULE:FREQ=MONTHLY;COUNT=3;BYDAY=TU,WE,VE;BYSETPOS=-1",
             "REQUEST-STATUS:2.0,Success",
             "TZOFFSETFROM:-050",
+            """ATTENDEE;CN="\\";CUTYPE=INDIVIDUAL;PARTSTAT=X-UNDELIVERABLE:invalid:nomai
+ l""",
         )
         save = ParserContext.INVALID_ESCAPE_SEQUENCES
         for data in test_bad_data:
