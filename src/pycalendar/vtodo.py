@@ -18,6 +18,7 @@ from pycalendar import definitions
 from pycalendar import itipdefinitions
 from pycalendar.componentrecur import PyCalendarComponentRecur
 from pycalendar.datetime import PyCalendarDateTime
+from pycalendar.icalendar.validation import ICALENDAR_VALUE_CHECKS
 from pycalendar.property import PyCalendarProperty
 import cStringIO as StringIO
 
@@ -81,6 +82,35 @@ class PyCalendarVToDo(PyCalendarComponentRecur):
 
         # Just use start time - older ones at the top
         return s1.mStart < s2.mStart
+
+    propertyCardinality_1 = (
+        definitions.cICalProperty_DTSTAMP,
+        definitions.cICalProperty_UID,
+    )
+
+    propertyCardinality_0_1 = (
+        definitions.cICalProperty_CLASS,
+        definitions.cICalProperty_COMPLETED,
+        definitions.cICalProperty_CREATED,
+        definitions.cICalProperty_DESCRIPTION,
+        definitions.cICalProperty_DTSTART,
+        definitions.cICalProperty_GEO,
+        definitions.cICalProperty_LAST_MODIFIED,
+        definitions.cICalProperty_LOCATION,
+        definitions.cICalProperty_ORGANIZER,
+        definitions.cICalProperty_PERCENT_COMPLETE,
+        definitions.cICalProperty_PRIORITY,
+        definitions.cICalProperty_RECURRENCE_ID,
+        definitions.cICalProperty_SEQUENCE,
+        definitions.cICalProperty_STATUS,
+        definitions.cICalProperty_SUMMARY,
+        definitions.cICalProperty_URL,
+        definitions.cICalProperty_RRULE,
+        definitions.cICalProperty_DUE,
+        definitions.cICalProperty_DURATION,
+    )
+
+    propertyValueChecks = ICALENDAR_VALUE_CHECKS
 
     def __init__(self, parent=None):
         super(PyCalendarVToDo, self).__init__(parent=parent)
@@ -231,6 +261,41 @@ class PyCalendarVToDo(PyCalendarComponentRecur):
         if self.mHasCompleted:
             self.mCompleted = temp
 
+    def validate(self, doFix=False):
+        """
+        Validate the data in this component and optionally fix any problems, else raise. If
+        loggedProblems is not None it must be a C{list} and problem descriptions are appended
+        to that. 
+        """
+        
+        fixed, unfixed = super(PyCalendarVToDo, self).validate(doFix)
+
+        # Extra constraint: only one of DUE or DURATION
+        if self.hasProperty(definitions.cICalProperty_DUE) and self.hasProperty(definitions.cICalProperty_DURATION):
+            # Fix by removing the DURATION
+            logProblem = "[%s] Properties must not both be present: %s, %s" % (
+                self.getType(),
+                definitions.cICalProperty_DUE,
+                definitions.cICalProperty_DURATION,
+            )
+            if doFix:
+                self.removeProperties(definitions.cICalProperty_DURATION)
+                fixed.append(logProblem)
+            else:
+                unfixed.append(logProblem)
+                
+        # Extra constraint: DTSTART must be present if DURATION is present
+        if self.hasProperty(definitions.cICalProperty_DURATION) and not self.hasProperty(definitions.cICalProperty_DTSTART):
+            # Cannot fix this one
+            logProblem = "[%s] Property must be present: %s with %s" % (
+                self.getType(),
+                definitions.cICalProperty_DTSTART,
+                definitions.cICalProperty_DURATION,
+            )
+            unfixed.append(logProblem)
+        
+        return fixed, unfixed
+                
     # Editing
     def editStatus(self, status):
         # Only if it is different

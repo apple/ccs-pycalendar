@@ -24,6 +24,14 @@ import xml.etree.cElementTree as XML
 
 class PyCalendarComponentBase(object):
 
+    # These are class attributes for sets of properties for testing cardinality constraints. The sets
+    # must contain property names.
+    propertyCardinality_1 = ()      # Must be present
+    propertyCardinality_0_1 = ()    # 0 or 1 only
+    propertyCardinality_1_More = () # 1 or more
+    
+    propertyValueChecks = None  # Either iCalendar or vCard validation
+
     def __init__(self, parent=None):
         self.mParentComponent = parent
         self.mComponents = []
@@ -169,6 +177,55 @@ class PyCalendarComponentBase(object):
 
     def finalise(self):
         raise NotImplemented
+
+    def validate(self, doFix=False):
+        """
+        Validate the data in this component and optionally fix any problems. Return
+        a tuple containing two lists: the first describes problems that were fixed, the
+        second problems that were not fixed. Caller can then decide what to do with unfixed
+        issues.
+        """
+        
+        fixed = []
+        unfixed = []
+
+        # Cardinality tests
+        for propname in self.propertyCardinality_1:
+            if self.countProperty(propname) != 1:
+                # Cannot fix a missing required property
+                logProblem = "[%s] Missing or too many required property: %s" % (self.getType(), propname,)
+                unfixed.append(logProblem)
+        
+        for propname in self.propertyCardinality_0_1:
+            if self.countProperty(propname) > 1:
+                # Cannot be fixed - no idea which one to delete
+                logProblem = "[%s] Too many properties present: %s" % (self.getType(), propname,)
+                unfixed.append(logProblem)
+        
+        for propname in self.propertyCardinality_1_More:
+            if not self.countProperty(propname) > 0:
+                # Cannot fix a missing required property
+                logProblem = "[%s] Missing required property: %s" % (self.getType(), propname,)
+                unfixed.append(logProblem)
+        
+        # Value constraints - these tests come from class specific attributes
+        if self.propertyValueChecks is not None:
+            for properties in self.mProperties.values():
+                for property in properties:
+                    propname = property.getName().upper()
+                    if propname in self.propertyValueChecks:
+                        if not self.propertyValueChecks[propname](property):
+                            # Cannot fix a bad property value
+                            logProblem = "[%s] Property value incorrect: %s" % (self.getType(), propname,)
+                            unfixed.append(logProblem)
+
+        # Validate all subcomponents
+        for component in self.mComponents:
+            morefixed, moreunfixed = component.validate(doFix)
+            fixed.extend(morefixed)
+            unfixed.extend(moreunfixed)
+
+        return fixed, unfixed
 
     def getText(self):
         s = StringIO()

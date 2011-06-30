@@ -17,8 +17,20 @@
 from pycalendar import definitions
 from pycalendar.component import PyCalendarComponent
 from pycalendar.datetime import PyCalendarDateTime
+from pycalendar.icalendar.validation import ICALENDAR_VALUE_CHECKS
 
 class PyCalendarVTimezone(PyCalendarComponent):
+
+    propertyCardinality_1 = (
+        definitions.cICalProperty_TZID,
+    )
+
+    propertyCardinality_0_1 = (
+        definitions.cICalProperty_LAST_MODIFIED,
+        definitions.cICalProperty_TZURL,
+    )
+
+    propertyValueChecks = ICALENDAR_VALUE_CHECKS
 
     def __init__(self, parent=None):
         super(PyCalendarVTimezone, self).__init__(parent=parent)
@@ -62,6 +74,30 @@ class PyCalendarVTimezone(PyCalendarComponent):
         # Do inherited
         super(PyCalendarVTimezone, self).finalise()
 
+    def validate(self, doFix=False):
+        """
+        Validate the data in this component and optionally fix any problems, else raise. If
+        loggedProblems is not None it must be a C{list} and problem descriptions are appended
+        to that. 
+        """
+        
+        fixed, unfixed = super(PyCalendarVTimezone, self).validate(doFix)
+
+        # Must have at least one STANDARD or DAYLIGHT sub-component
+        for component in self.mComponents:
+            if component.getType() in (definitions.cICalComponent_STANDARD, definitions.cICalComponent_DAYLIGHT):
+                break
+        else:
+            # Cannot fix a missing required component
+            logProblem = "[%s] At least one component must be present: %s or %s" % (
+                self.getType(),
+                definitions.cICalComponent_STANDARD,
+                definitions.cICalComponent_DAYLIGHT,
+            )
+            unfixed.append(logProblem)
+        
+        return fixed, unfixed
+                
     def getID(self):
         return self.mID
 

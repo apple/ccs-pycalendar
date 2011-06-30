@@ -20,6 +20,7 @@ from pycalendar.componentexpanded import PyCalendarComponentExpanded
 from pycalendar.datetime import PyCalendarDateTime
 from pycalendar.property import PyCalendarProperty
 from pycalendar.recurrenceset import PyCalendarRecurrenceSet
+from pycalendar.timezone import PyCalendarTimezone
 from pycalendar.utils import set_difference
 import uuid
 
@@ -275,6 +276,40 @@ class PyCalendarComponentRecur(PyCalendarComponent):
             self.mMapKey = self.mapKey(self.mUID)
 
         self._resetRecurrenceSet()
+
+    def validate(self, doFix=False):
+        """
+        Validate the data in this component and optionally fix any problems. Return
+        a tuple containing two lists: the first describes problems that were fixed, the
+        second problems that were not fixed. Caller can then decide what to do with unfixed
+        issues.
+        """
+        
+        # Do normal checks
+        fixed, unfixed = super(PyCalendarComponentRecur, self).validate(doFix)
+
+        # Check that any UNTIL value matches that for DTSTART
+        if self.mHasStart and self.mRecurrences:
+            dtutc = self.mStart.duplicateAsUTC()
+            for rrule in self.mRecurrences.getRules():
+                if rrule.getUseUntil():
+                    if rrule.getUntil().isDateOnly() ^ self.mStart.isDateOnly():
+                        logProblem = "[%s] Value types must match: %s, %s" % (
+                            self.getType(),
+                            definitions.cICalProperty_DTSTART,
+                            definitions.cICalValue_RECUR_UNTIL,
+                        )
+                        if doFix:
+                            rrule.getUntil().setDateOnly(self.mStart.isDateOnly())
+                            if not self.mStart.isDateOnly():
+                                rrule.getUntil().setHHMMSS(dtutc.getHours(), dtutc.getMinutes(), dtutc.getSeconds())
+                                rrule.getUntil().setTimezone(PyCalendarTimezone(utc=True))
+                            self.mRecurrences.changed()
+                            fixed.append(logProblem)
+                        else:
+                            unfixed.append(logProblem)
+
+        return fixed, unfixed
 
     def _resetRecurrenceSet(self):
         # May need to create items

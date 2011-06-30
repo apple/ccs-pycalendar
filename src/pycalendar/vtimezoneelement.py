@@ -16,13 +16,26 @@
 
 from bisect import bisect_right
 from pycalendar import definitions
+from pycalendar.component import PyCalendarComponent
 from pycalendar.datetime import PyCalendarDateTime
+from pycalendar.icalendar.validation import ICALENDAR_VALUE_CHECKS
 from pycalendar.period import PyCalendarPeriod
 from pycalendar.recurrenceset import PyCalendarRecurrenceSet
 from pycalendar.value import PyCalendarValue
-from pycalendar.vtimezone import PyCalendarVTimezone
 
-class PyCalendarVTimezoneElement(PyCalendarVTimezone):
+class PyCalendarVTimezoneElement(PyCalendarComponent):
+
+    propertyCardinality_1 = (
+        definitions.cICalProperty_DTSTART,
+        definitions.cICalProperty_TZOFFSETTO,
+        definitions.cICalProperty_TZOFFSETFROM,
+    )
+
+    propertyCardinality_0_1 = (
+        definitions.cICalProperty_RRULE,
+    )
+
+    propertyValueChecks = ICALENDAR_VALUE_CHECKS
 
     def __init__(self, parent=None, dt=None, offset=None):
         super(PyCalendarVTimezoneElement, self).__init__(parent=parent)

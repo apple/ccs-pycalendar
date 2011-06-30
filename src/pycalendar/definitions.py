@@ -14,7 +14,7 @@
 #    limitations under the License.
 ##
 
-#     2445 (and extension) Components
+#     2445 Components
 
 cICalComponent_VCALENDAR = "VCALENDAR"
 cICalComponent_VEVENT = "VEVENT"
@@ -22,9 +22,7 @@ cICalComponent_VTODO = "VTODO"
 cICalComponent_VJOURNAL = "VJOURNAL"
 cICalComponent_VFREEBUSY = "VFREEBUSY"
 cICalComponent_VTIMEZONE = "VTIMEZONE"
-cICalComponent_VAVAILABILITY = "VAVAILABILITY"
 cICalComponent_VALARM = "VALARM"
-cICalComponent_AVAILABLE = "AVAILABLE"
 cICalComponent_STANDARD = "STANDARD"
 cICalComponent_DAYLIGHT = "DAYLIGHT"
 
@@ -311,6 +309,14 @@ cICalProperty_ACTION_DISPLAY = "DISPLAY"
 cICalProperty_ACTION_EMAIL = "EMAIL"
 cICalProperty_ACTION_PROCEDURE = "PROCEDURE"
 
+#     Extensions: draft-daboo-calendar-availability-02
+
+#     Section 3.1
+cICalComponent_VAVAILABILITY = "VAVAILABILITY"
+cICalComponent_AVAILABLE = "AVAILABLE"
+
+#     Section 3.2
+cICalProperty_BUSYTYPE = "BUSYTYPE"
 
 #     Mulberry extensions
 cICalProperty_ACTION_X_SPEAKTEXT = "X-MULBERRY-SPEAK-TEXT"

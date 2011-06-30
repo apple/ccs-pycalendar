@@ -17,8 +17,30 @@
 from pycalendar import definitions
 from pycalendar import itipdefinitions
 from pycalendar.componentrecur import PyCalendarComponentRecur
+from pycalendar.icalendar.validation import ICALENDAR_VALUE_CHECKS
 
 class PyCalendarVJournal(PyCalendarComponentRecur):
+
+    propertyCardinality_1 = (
+        definitions.cICalProperty_DTSTAMP,
+        definitions.cICalProperty_UID,
+    )
+
+    propertyCardinality_0_1 = (
+        definitions.cICalProperty_CLASS,
+        definitions.cICalProperty_CREATED,
+        definitions.cICalProperty_DTSTART,
+        definitions.cICalProperty_LAST_MODIFIED,
+        definitions.cICalProperty_ORGANIZER,
+        definitions.cICalProperty_RECURRENCE_ID,
+        definitions.cICalProperty_SEQUENCE,
+        definitions.cICalProperty_STATUS,
+        definitions.cICalProperty_SUMMARY,
+        definitions.cICalProperty_URL,
+        definitions.cICalProperty_RRULE,
+    )
+
+    propertyValueChecks = ICALENDAR_VALUE_CHECKS
 
     def __init__(self, parent=None):
         super(PyCalendarVJournal, self).__init__(parent=parent)
@@ -34,3 +56,10 @@ class PyCalendarVJournal(PyCalendarComponentRecur):
 
     def finalise(self):
         super(PyCalendarVJournal, self).finalise()
+
+    def sortedPropertyKeyOrder(self):
+        return (
+            definitions.cICalProperty_UID,
+            definitions.cICalProperty_RECURRENCE_ID,
+            definitions.cICalProperty_DTSTART,
+        )

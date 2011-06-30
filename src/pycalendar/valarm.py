@@ -19,6 +19,7 @@ from pycalendar.attribute import PyCalendarAttribute
 from pycalendar.component import PyCalendarComponent
 from pycalendar.datetime import PyCalendarDateTime
 from pycalendar.duration import PyCalendarDuration
+from pycalendar.icalendar.validation import ICALENDAR_VALUE_CHECKS
 from pycalendar.property import PyCalendarProperty
 from pycalendar.value import PyCalendarValue
 
@@ -26,6 +27,12 @@ class PyCalendarVAlarm(PyCalendarComponent):
 
     # Classes for each action encapsulating action-specific data
     class PyCalendarVAlarmAction(object):
+
+        propertyCardinality_1 = ()
+    
+        propertyCardinality_0_1 = ()
+        
+        propertyCardinality_1_More = ()
 
         def __init__(self, type):
             self.mType = type
@@ -47,6 +54,17 @@ class PyCalendarVAlarm(PyCalendarComponent):
 
     class PyCalendarVAlarmAudio(PyCalendarVAlarmAction):
 
+        propertyCardinality_1 = (
+            definitions.cICalProperty_ACTION,
+            definitions.cICalProperty_TRIGGER,
+        )
+    
+        propertyCardinality_0_1 = (
+            definitions.cICalProperty_DURATION,
+            definitions.cICalProperty_REPEAT,
+            definitions.cICalProperty_ATTACH,
+        )
+        
         def __init__(self, speak=None):
             super(PyCalendarVAlarm.PyCalendarVAlarmAudio, self).__init__(type=definitions.eAction_VAlarm_Audio)
             self.mSpeakText = speak
@@ -76,6 +94,17 @@ class PyCalendarVAlarm(PyCalendarComponent):
 
     class PyCalendarVAlarmDisplay(PyCalendarVAlarmAction):
 
+        propertyCardinality_1 = (
+            definitions.cICalProperty_ACTION,
+            definitions.cICalProperty_DESCRIPTION,
+            definitions.cICalProperty_TRIGGER,
+        )
+    
+        propertyCardinality_0_1 = (
+            definitions.cICalProperty_DURATION,
+            definitions.cICalProperty_REPEAT,
+        )
+        
         def __init__(self, description=None):
             super(PyCalendarVAlarm.PyCalendarVAlarmDisplay, self).__init__(type=definitions.eAction_VAlarm_Display)
             self.mDescription = description
@@ -101,6 +130,22 @@ class PyCalendarVAlarm(PyCalendarComponent):
             return self.mDescription
 
     class PyCalendarVAlarmEmail(PyCalendarVAlarmAction):
+
+        propertyCardinality_1 = (
+            definitions.cICalProperty_ACTION,
+            definitions.cICalProperty_DESCRIPTION,
+            definitions.cICalProperty_TRIGGER,
+            definitions.cICalProperty_SUMMARY,
+        )
+    
+        propertyCardinality_0_1 = (
+            definitions.cICalProperty_DURATION,
+            definitions.cICalProperty_REPEAT,
+        )
+
+        propertyCardinality_1_More = (
+            definitions.cICalProperty_ATTENDEE,
+        )
 
         def __init__(self, description=None, summary=None, attendees=None):
             super(PyCalendarVAlarm.PyCalendarVAlarmEmail, self).__init__(type=definitions.eAction_VAlarm_Display)
@@ -156,6 +201,16 @@ class PyCalendarVAlarm(PyCalendarComponent):
 
     class PyCalendarVAlarmUnknown(PyCalendarVAlarmAction):
 
+        propertyCardinality_1 = (
+            definitions.cICalProperty_ACTION,
+            definitions.cICalProperty_TRIGGER,
+        )
+    
+        propertyCardinality_0_1 = (
+            definitions.cICalProperty_DURATION,
+            definitions.cICalProperty_REPEAT,
+        )
+        
         def __init__(self):
             super(PyCalendarVAlarm.PyCalendarVAlarmUnknown, self).__init__(type=definitions.eAction_VAlarm_Unknown)
 
@@ -174,6 +229,8 @@ class PyCalendarVAlarm(PyCalendarComponent):
     def getMimeComponentName(self):
         # Cannot be sent as a separate MIME object
         return None
+
+    propertyValueChecks = ICALENDAR_VALUE_CHECKS
 
     def __init__(self, parent=None):
         
@@ -345,6 +402,32 @@ class PyCalendarVAlarm(PyCalendarComponent):
         temp = self.loadValueDateTime(definitions.cICalProperty_ALARM_X_LASTTRIGGER)
         if temp is not None:
             self.mLastTrigger = temp
+
+    def validate(self, doFix=False):
+        """
+        Validate the data in this component and optionally fix any problems, else raise. If
+        loggedProblems is not None it must be a C{list} and problem descriptions are appended
+        to that. 
+        """
+        
+        # Validate using action specific constraints
+        self.propertyCardinality_1 = self.mActionData.propertyCardinality_1
+        self.propertyCardinality_0_1 = self.mActionData.propertyCardinality_0_1
+        self.propertyCardinality_1_More = self.mActionData.propertyCardinality_1_More
+
+        fixed, unfixed = super(PyCalendarVAlarm, self).validate(doFix)
+
+        # Extra constraint: both DURATION and REPEAT must be present togethe
+        if self.hasProperty(definitions.cICalProperty_DURATION) ^ self.hasProperty(definitions.cICalProperty_REPEAT):
+            # Cannot fix this
+            logProblem = "[%s] Properties must be present together: %s, %s" % (
+                self.getType(),
+                definitions.cICalProperty_DURATION,
+                definitions.cICalProperty_REPEAT,
+            )
+            unfixed.append(logProblem)
+        
+        return fixed, unfixed
 
     def editStatus(self, status):
         # Remove existing

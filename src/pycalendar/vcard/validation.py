@@ -14,23 +14,10 @@
 #    limitations under the License.
 ##
 
-class PyCalendarError(Exception):
+from pycalendar.validation import partial, PropertyValueChecks
+from pycalendar.vcard import definitions
 
-    def __init__(self, reason, data=""):
-        self.mReason = reason
-        self.mData = data
-
-class PyCalendarInvalidData(PyCalendarError):
-    pass
-
-class PyCalendarInvalidProperty(PyCalendarError):
-    pass
-
-class PyCalendarValidationError(PyCalendarError):
-    pass
-
-class PyCalendarNoTimezoneInDatabase(Exception):
-
-    def __init__(self, dbpath, tzid):
-        self.mTZDBpath = dbpath
-        self.mTZID = tzid
+VCARD_VALUE_CHECKS = {
+    definitions.Property_VERSION: partial(PropertyValueChecks.stringValue, "3.0"),
+    definitions.Property_PROFILE: partial(PropertyValueChecks.stringValue, "VCARD"),
+}

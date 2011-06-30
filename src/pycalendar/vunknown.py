@@ -14,10 +14,14 @@
 #    limitations under the License.
 ##
 
+from pycalendar import definitions
 from pycalendar.component import PyCalendarComponent
+from pycalendar.icalendar.validation import ICALENDAR_VALUE_CHECKS
 import uuid
 
 class PyCalendarUnknownComponent(PyCalendarComponent):
+
+    propertyValueChecks = ICALENDAR_VALUE_CHECKS
 
     def __init__(self, parent=None, comptype=""):
         super(PyCalendarUnknownComponent, self).__init__(parent=parent)
@@ -48,3 +52,7 @@ class PyCalendarUnknownComponent(PyCalendarComponent):
         """
         return ""
 
+    def sortedPropertyKeyOrder(self):
+        return (
+            definitions.cICalProperty_UID,
+        )

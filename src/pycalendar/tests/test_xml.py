@@ -93,7 +93,6 @@ END:VCALENDAR
             cal.parse(StringIO.StringIO(caldata))
             
             test2 = cal.getTextXML()
-            print test2
 
             self.assertEqual(
                 test1,

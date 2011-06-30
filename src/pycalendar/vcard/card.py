@@ -16,13 +16,15 @@
 
 from cStringIO import StringIO
 from pycalendar.componentbase import PyCalendarComponentBase
-from pycalendar.exceptions import PyCalendarInvalidData
+from pycalendar.exceptions import PyCalendarInvalidData,\
+    PyCalendarValidationError
 from pycalendar.parser import ParserContext
 from pycalendar.utils import readFoldedLine
 from pycalendar.vcard import definitions
 from pycalendar.vcard.definitions import VCARD, Property_VERSION,\
     Property_PRODID, Property_UID
 from pycalendar.vcard.property import Property
+from pycalendar.vcard.validation import VCARD_VALUE_CHECKS
 
 class Card(PyCalendarComponentBase):
 
@@ -36,6 +38,24 @@ class Card(PyCalendarComponentBase):
     @staticmethod
     def setDomain(domain):
         Card.sDomain = domain
+
+    propertyCardinality_1 = (
+        definitions.Property_VERSION,
+        definitions.Property_N,
+    )
+
+    propertyCardinality_0_1 = (
+        definitions.Property_BDAY,
+        definitions.Property_PRODID,
+        definitions.Property_REV,
+        definitions.Property_UID,
+    )
+
+    propertyCardinality_1_More = (
+        definitions.Property_FN,
+    )
+
+    propertyValueChecks = VCARD_VALUE_CHECKS
 
     def __init__(self, add_defaults=True):
         super(Card, self).__init__()
@@ -51,6 +71,20 @@ class Card(PyCalendarComponentBase):
 
     def finalise(self):
         pass
+
+    def validate(self, doFix=False, doRaise=False):
+        """
+        Validate the data in this component and optionally fix any problems. Return
+        a tuple containing two lists: the first describes problems that were fixed, the
+        second problems that were not fixed. Caller can then decide what to do with unfixed
+        issues.
+        """
+        
+        # Optional raise behavior
+        fixed, unfixed = super(Card, self).validate(doFix)
+        if doRaise and unfixed:
+            raise PyCalendarValidationError(";".join(unfixed))
+        return fixed, unfixed
 
     def sortedPropertyKeyOrder(self):
         return (

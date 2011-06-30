@@ -19,12 +19,28 @@ from pycalendar import itipdefinitions
 from pycalendar.component import PyCalendarComponent
 from pycalendar.datetime import PyCalendarDateTime
 from pycalendar.freebusy import PyCalendarFreeBusy
+from pycalendar.icalendar.validation import ICALENDAR_VALUE_CHECKS
 from pycalendar.period import PyCalendarPeriod
 from pycalendar.periodvalue import PyCalendarPeriodValue
 from pycalendar.property import PyCalendarProperty
 from pycalendar.value import PyCalendarValue
 
 class PyCalendarVFreeBusy(PyCalendarComponent):
+
+    propertyCardinality_1 = (
+        definitions.cICalProperty_DTSTAMP,
+        definitions.cICalProperty_UID,
+    )
+
+    propertyCardinality_0_1 = (
+        definitions.cICalProperty_CONTACT,
+        definitions.cICalProperty_DTSTART,
+        definitions.cICalProperty_DTEND,
+        definitions.cICalProperty_ORGANIZER,
+        definitions.cICalProperty_URL,
+    )
+
+    propertyValueChecks = ICALENDAR_VALUE_CHECKS
 
     def __init__(self, parent=None):
         super(PyCalendarVFreeBusy, self).__init__(parent=parent)

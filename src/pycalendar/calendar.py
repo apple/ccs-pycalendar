@@ -21,8 +21,10 @@ from pycalendar.componentbase import PyCalendarComponentBase
 from pycalendar.componentexpanded import PyCalendarComponentExpanded
 from pycalendar.componentrecur import PyCalendarComponentRecur
 from pycalendar.datetime import PyCalendarDateTime
-from pycalendar.exceptions import PyCalendarInvalidData
+from pycalendar.exceptions import PyCalendarInvalidData,\
+    PyCalendarValidationError
 from pycalendar.freebusy import PyCalendarFreeBusy
+from pycalendar.icalendar.validation import ICALENDAR_VALUE_CHECKS
 from pycalendar.parser import ParserContext
 from pycalendar.period import PyCalendarPeriod
 from pycalendar.property import PyCalendarProperty
@@ -59,6 +61,18 @@ class PyCalendar(PyCalendarComponentBase):
     @staticmethod
     def setDomain(domain):
         PyCalendar.sDomain = domain
+
+    propertyCardinality_1 = (
+        definitions.cICalProperty_PRODID,
+        definitions.cICalProperty_VERSION,
+    )
+
+    propertyCardinality_0_1 = (
+        definitions.cICalProperty_CALSCALE,
+        definitions.cICalProperty_METHOD,
+    )
+
+    propertyValueChecks = ICALENDAR_VALUE_CHECKS
 
     def __init__(self, parent=None, add_defaults=True):
         super(PyCalendar, self).__init__(None)
@@ -136,6 +150,20 @@ class PyCalendar(PyCalendarComponentBase):
         temps = self.loadValueString(definitions.cICalProperty_XWRCALDESC)
         if temps is not None:
             self.mDescription = temps
+
+    def validate(self, doFix=False, doRaise=False):
+        """
+        Validate the data in this component and optionally fix any problems. Return
+        a tuple containing two lists: the first describes problems that were fixed, the
+        second problems that were not fixed. Caller can then decide what to do with unfixed
+        issues.
+        """
+        
+        # Optional raise behavior
+        fixed, unfixed = super(PyCalendar, self).validate(doFix)
+        if doRaise and unfixed:
+            raise PyCalendarValidationError(";".join(unfixed))
+        return fixed, unfixed
 
     def sortedComponentNames(self):
         return (

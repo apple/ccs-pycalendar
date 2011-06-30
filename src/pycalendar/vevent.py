@@ -17,9 +17,37 @@
 from pycalendar import definitions
 from pycalendar import itipdefinitions
 from pycalendar.componentrecur import PyCalendarComponentRecur
+from pycalendar.icalendar.validation import ICALENDAR_VALUE_CHECKS
 from pycalendar.property import PyCalendarProperty
 
 class PyCalendarVEvent(PyCalendarComponentRecur):
+
+    propertyCardinality_1 = (
+        definitions.cICalProperty_DTSTAMP,
+        definitions.cICalProperty_UID,
+    )
+
+    propertyCardinality_0_1 = (
+        definitions.cICalProperty_CLASS,
+        definitions.cICalProperty_CREATED,
+        definitions.cICalProperty_DESCRIPTION,
+        definitions.cICalProperty_GEO,
+        definitions.cICalProperty_LAST_MODIFIED,
+        definitions.cICalProperty_LOCATION,
+        definitions.cICalProperty_ORGANIZER,
+        definitions.cICalProperty_PRIORITY,
+        definitions.cICalProperty_SEQUENCE,
+        definitions.cICalProperty_STATUS,
+        definitions.cICalProperty_SUMMARY,
+        definitions.cICalProperty_TRANSP,
+        definitions.cICalProperty_URL,
+        definitions.cICalProperty_RECURRENCE_ID,
+        definitions.cICalProperty_RRULE,
+        definitions.cICalProperty_DTEND,
+        definitions.cICalProperty_DURATION,
+    )
+
+    propertyValueChecks = ICALENDAR_VALUE_CHECKS
 
     def __init__(self, parent=None):
         super(PyCalendarVEvent, self).__init__(parent=parent)
@@ -62,6 +90,38 @@ class PyCalendarVEvent(PyCalendarComponentRecur):
             elif temp == definitions.cICalProperty_STATUS_CANCELLED:
                 self.mStatus = definitions.eStatus_VEvent_Cancelled
 
+    def validate(self, doFix=False):
+        """
+        Validate the data in this component and optionally fix any problems, else raise. If
+        loggedProblems is not None it must be a C{list} and problem descriptions are appended
+        to that. 
+        """
+        
+        fixed, unfixed = super(PyCalendarVEvent, self).validate(doFix)
+
+        # Extra constraint: if METHOD not present, DTSTART must be
+        if self.mParentComponent and not self.mParentComponent.hasProperty(definitions.cICalProperty_METHOD):
+            if not self.hasProperty(definitions.cICalProperty_DTSTART):
+                # Cannot fix a missing required property
+                logProblem = "[%s] Missing required property: %s" % (self.getType(), definitions.cICalProperty_DTSTART,)
+                unfixed.append(logProblem)
+        
+        # Extra constraint: only one of DTEND or DURATION
+        if self.hasProperty(definitions.cICalProperty_DTEND) and self.hasProperty(definitions.cICalProperty_DURATION):
+            # Fix by removing the DTEND
+            logProblem = "[%s] Properties must not both be present: %s, %s" % (
+                self.getType(),
+                definitions.cICalProperty_DTEND,
+                definitions.cICalProperty_DURATION,
+            )
+            if doFix:
+                self.removeProperties(definitions.cICalProperty_DTEND)
+                fixed.append(logProblem)
+            else:
+                unfixed.append(logProblem)
+        
+        return fixed, unfixed
+                
     # Editing
     def editStatus(self, status):
         # Only if it is different
