@@ -643,7 +643,7 @@ class PyCalendarDateTime(ValueMixin):
     @staticmethod
     def getNow( tzid ):
         utc = PyCalendarDateTime.getNowUTC()
-        utc.adjustTimezone( [tzid, PyCalendarTimezone()][tzid == 0] )
+        utc.adjustTimezone( tzid if tzid is not None else PyCalendarTimezone() )
         return utc
     
     def setNowUTC( self ):

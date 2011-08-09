@@ -31,8 +31,8 @@ class PyCalendarTimezone(object):
             self.mUTC = utc
             self.mTimezone = tzid
         elif tzid is not None:
-            self.mUTC = False
-            self.mTimezone = tzid
+            self.mUTC = tzid.lower() == 'utc'
+            self.mTimezone = None if tzid.lower() == 'utc' else tzid
         else:
             self.mUTC = True
             self.mTimezone = None
