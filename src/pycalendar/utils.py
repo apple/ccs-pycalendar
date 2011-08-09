@@ -250,6 +250,12 @@ def parseDoubleNestedList(data, maxsize):
     for _ignore in range(maxsize - len(results)):
         results.append("")
 
+    if len(results) > maxsize:
+        if ParserContext.INVALID_ADR_N_VALUES == ParserContext.PARSER_FIX:
+            results = results[:maxsize]
+        elif ParserContext.INVALID_ADR_N_VALUES == ParserContext.PARSER_RAISE:
+            raise ValueError
+
     return tuple(results)
 
 def generateDoubleNestedList(os, data):

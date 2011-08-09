@@ -45,3 +45,6 @@ class ParserContext(object):
 
     # Allow slightly invalid DURATION values
     INVALID_DURATION_VALUE = PARSER_FIX
+
+    # Truncate over long ADR and N values
+    INVALID_ADR_N_VALUES = PARSER_FIX
