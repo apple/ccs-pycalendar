@@ -48,3 +48,6 @@ class ParserContext(object):
 
     # Truncate over long ADR and N values
     INVALID_ADR_N_VALUES = PARSER_FIX
+
+    # REQUEST-STATUS values with \; as the first separator
+    INVALID_REQUEST_STATUS_VALUE = PARSER_FIX

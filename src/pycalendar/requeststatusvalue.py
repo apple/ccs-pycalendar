@@ -17,6 +17,7 @@
 # iCalendar REQUEST-STATUS value
 
 from pycalendar import utils, xmldefs
+from pycalendar.parser import ParserContext
 from pycalendar.value import PyCalendarValue
 import xml.etree.cElementTree as XML
 
@@ -41,6 +42,11 @@ class PyCalendarRequestStatusValue( PyCalendarValue ):
         
         # Split fields based on ;
         code, rest = data.split(";", 1)
+
+        if "\\" in code and ParserContext.INVALID_REQUEST_STATUS_VALUE in (ParserContext.PARSER_IGNORE, ParserContext.PARSER_FIX):
+            code = code.replace("\\", "")
+        elif ParserContext.INVALID_REQUEST_STATUS_VALUE == ParserContext.PARSER_RAISE:
+            raise ValueError
         
         # The next two items are text with possible \; sequences so we have to punt on those
         desc = ""

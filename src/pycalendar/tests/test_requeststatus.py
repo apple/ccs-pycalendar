@@ -14,6 +14,7 @@
 #    limitations under the License.
 ##
 
+from pycalendar.parser import ParserContext
 from pycalendar.property import PyCalendarProperty
 from pycalendar.requeststatusvalue import PyCalendarRequestStatusValue
 import unittest
@@ -35,6 +36,25 @@ class TestRequestStatus(unittest.TestCase):
             req = PyCalendarRequestStatusValue()
             req.parse(item)
             self.assertEqual(req.getText(), item, "Failed to parse and re-generate '%s'" % (item,))
+
+    def testBadValue(self):
+        
+        bad_value = "2.0\;Success"
+        ok_value = "2.0;Success"
+
+        # Fix the value
+        oldContext = ParserContext.INVALID_REQUEST_STATUS_VALUE
+        ParserContext.INVALID_REQUEST_STATUS_VALUE = ParserContext.PARSER_FIX
+        req = PyCalendarRequestStatusValue()
+        req.parse(bad_value)
+        self.assertEqual(req.getText(), ok_value, "Failed to parse and re-generate '%s'" % (bad_value,))
+
+        # Raise the value
+        ParserContext.INVALID_REQUEST_STATUS_VALUE = ParserContext.PARSER_RAISE
+        req = PyCalendarRequestStatusValue()
+        self.assertRaises(ValueError, req.parse, bad_value)
+
+        ParserContext.INVALID_REQUEST_STATUS_VALUE = oldContext
 
     def testParseProperty(self):
         
