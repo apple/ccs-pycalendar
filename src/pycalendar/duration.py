@@ -150,7 +150,7 @@ class PyCalendarDuration(ValueMixin):
     
                     # There cannot be anything else after this so just exit
                     if offset != maxoffset:
-                        if data[offset] == "T" and ParserContext.INVALID_DURATION_VALUE != ParserContext.PARSER_RAISE:
+                        if ParserContext.INVALID_DURATION_VALUE != ParserContext.PARSER_RAISE:
                             return
                         raise ValueError
                     return

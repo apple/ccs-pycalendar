@@ -72,7 +72,6 @@ class TestDuration(unittest.TestCase):
             "P",
             "PABC",
             "P12",
-            "P12W1",
             "P12D1",
             "P12DTAB",
             "P12DT1HA",
@@ -87,6 +86,7 @@ class TestDuration(unittest.TestCase):
         test_relaxed_data = (
             ("P12DT", 12 * 24 * 60 * 60, "P12D"),
             ("-P1WT", -7 * 24 * 60 * 60, "-P1W"),
+            ("-P1W1D", -7 * 24 * 60 * 60, "-P1W"),
         )
         for text, seconds, result in test_relaxed_data:
             
