@@ -29,9 +29,8 @@ class PyCalendarVAlarm(PyCalendarComponent):
     class PyCalendarVAlarmAction(object):
 
         propertyCardinality_1 = ()
-    
+        propertyCardinality_1_Fix_Empty = ()
         propertyCardinality_0_1 = ()
-        
         propertyCardinality_1_More = ()
 
         def __init__(self, type):
@@ -96,10 +95,13 @@ class PyCalendarVAlarm(PyCalendarComponent):
 
         propertyCardinality_1 = (
             definitions.cICalProperty_ACTION,
-            definitions.cICalProperty_DESCRIPTION,
             definitions.cICalProperty_TRIGGER,
         )
     
+        propertyCardinality_1_Fix_Empty = (
+            definitions.cICalProperty_DESCRIPTION,
+        )
+
         propertyCardinality_0_1 = (
             definitions.cICalProperty_DURATION,
             definitions.cICalProperty_REPEAT,
@@ -133,11 +135,14 @@ class PyCalendarVAlarm(PyCalendarComponent):
 
         propertyCardinality_1 = (
             definitions.cICalProperty_ACTION,
-            definitions.cICalProperty_DESCRIPTION,
             definitions.cICalProperty_TRIGGER,
-            definitions.cICalProperty_SUMMARY,
         )
     
+        propertyCardinality_1_Fix_Empty = (
+            definitions.cICalProperty_DESCRIPTION,
+            definitions.cICalProperty_SUMMARY,
+        )
+
         propertyCardinality_0_1 = (
             definitions.cICalProperty_DURATION,
             definitions.cICalProperty_REPEAT,
@@ -412,6 +417,7 @@ class PyCalendarVAlarm(PyCalendarComponent):
         
         # Validate using action specific constraints
         self.propertyCardinality_1 = self.mActionData.propertyCardinality_1
+        self.propertyCardinality_1_Fix_Empty = self.mActionData.propertyCardinality_1_Fix_Empty
         self.propertyCardinality_0_1 = self.mActionData.propertyCardinality_0_1
         self.propertyCardinality_1_More = self.mActionData.propertyCardinality_1_More
 

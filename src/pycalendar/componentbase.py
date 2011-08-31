@@ -26,9 +26,10 @@ class PyCalendarComponentBase(object):
 
     # These are class attributes for sets of properties for testing cardinality constraints. The sets
     # must contain property names.
-    propertyCardinality_1 = ()      # Must be present
-    propertyCardinality_0_1 = ()    # 0 or 1 only
-    propertyCardinality_1_More = () # 1 or more
+    propertyCardinality_1 = ()           # Must be present
+    propertyCardinality_1_Fix_Empty = () # Must be present but can be fixed by adding an empty value
+    propertyCardinality_0_1 = ()         # 0 or 1 only
+    propertyCardinality_1_More = ()      # 1 or more
     
     propertyValueChecks = None  # Either iCalendar or vCard validation
 
@@ -195,6 +196,20 @@ class PyCalendarComponentBase(object):
                 # Cannot fix a missing required property
                 logProblem = "[%s] Missing or too many required property: %s" % (self.getType(), propname,)
                 unfixed.append(logProblem)
+        
+        for propname in self.propertyCardinality_1_Fix_Empty:
+            if self.countProperty(propname) > 1:
+                # Cannot fix too many required property
+                logProblem = "[%s] Too many required property: %s" % (self.getType(), propname,)
+                unfixed.append(logProblem)
+            elif self.countProperty(propname) == 0:
+                # Possibly fix by adding empty property
+                logProblem = "[%s] Missing required property: %s" % (self.getType(), propname,)
+                if doFix:
+                    self.addProperty(PyCalendarProperty(propname, ""))
+                    fixed.append(logProblem)
+                else:
+                    unfixed.append(logProblem)
         
         for propname in self.propertyCardinality_0_1:
             if self.countProperty(propname) > 1:

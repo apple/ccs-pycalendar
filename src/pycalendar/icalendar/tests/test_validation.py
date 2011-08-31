@@ -1958,6 +1958,50 @@ END:VCALENDAR
                 )),
             ),
             (
+                "Missing required with fix",
+                """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//mulberrymail.com//Mulberry v4.0//EN
+BEGIN:VEVENT
+UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
+DTSTART;VALUE=DATE:20020101
+DTEND;VALUE=DATE:20020102
+DTSTAMP:20020101T000000Z
+RRULE:FREQ=YEARLY;UNTIL=20031231;BYMONTH=1
+SUMMARY:New Year's Day
+BEGIN:VALARM
+ACTION:DISPLAY
+END:VALARM
+END:VEVENT
+END:VCALENDAR
+""".replace("\n", "\r\n"),
+                """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//mulberrymail.com//Mulberry v4.0//EN
+BEGIN:VEVENT
+UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
+DTSTART;VALUE=DATE:20020101
+DTEND;VALUE=DATE:20020102
+DTSTAMP:20020101T000000Z
+RRULE:FREQ=YEARLY;UNTIL=20031231;BYMONTH=1
+SUMMARY:New Year's Day
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:
+END:VALARM
+END:VEVENT
+END:VCALENDAR
+""".replace("\n", "\r\n"),
+                set((
+                    "[VALARM] Missing required property: DESCRIPTION",
+                )),
+                set((
+                    "[VALARM] Missing or too many required property: TRIGGER",
+                )),
+            ),
+            (
                 "Too many",
                 """BEGIN:VCALENDAR
 VERSION:2.0
