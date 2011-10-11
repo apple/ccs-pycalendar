@@ -786,32 +786,32 @@ class PyCalendarDateTime(ValueMixin):
     def getText( self ):
     
         if self.mDateOnly:
-            return "%4d%02d%02d" % ( self.mYear, self.mMonth, self.mDay )
+            return "%04d%02d%02d" % ( self.mYear, self.mMonth, self.mDay )
         else:
             if self.mTZUTC:
-                return "%4d%02d%02dT%02d%02d%02dZ" % ( self.mYear, self.mMonth, self.mDay, self.mHours, self.mMinutes, self.mSeconds )
+                return "%04d%02d%02dT%02d%02d%02dZ" % ( self.mYear, self.mMonth, self.mDay, self.mHours, self.mMinutes, self.mSeconds )
             elif isinstance(self.mTZID, int):
                 sign = "-" if self.mTZID < 0 else "+"
                 hours = abs(self.mTZID) / 3600
                 minutes = divmod(abs(self.mTZID) / 60, 60)[1]
-                return "%4d%02d%02dT%02d%02d%02d%s%02d%02d" % ( self.mYear, self.mMonth, self.mDay, self.mHours, self.mMinutes, self.mSeconds, sign, hours, minutes )
+                return "%04d%02d%02dT%02d%02d%02d%s%02d%02d" % ( self.mYear, self.mMonth, self.mDay, self.mHours, self.mMinutes, self.mSeconds, sign, hours, minutes )
             else:
-                return "%4d%02d%02dT%02d%02d%02d" % ( self.mYear, self.mMonth, self.mDay, self.mHours, self.mMinutes, self.mSeconds )
+                return "%04d%02d%02dT%02d%02d%02d" % ( self.mYear, self.mMonth, self.mDay, self.mHours, self.mMinutes, self.mSeconds )
 
     def getXMLText( self ):
     
         if self.mDateOnly:
-            return "%4d-%02d-%02d" % ( self.mYear, self.mMonth, self.mDay )
+            return "%04d-%02d-%02d" % ( self.mYear, self.mMonth, self.mDay )
         else:
             if self.mTZUTC:
-                return "%4d-%02d-%02dT%02d:%02d:%02dZ" % ( self.mYear, self.mMonth, self.mDay, self.mHours, self.mMinutes, self.mSeconds )
+                return "%04d-%02d-%02dT%02d:%02d:%02dZ" % ( self.mYear, self.mMonth, self.mDay, self.mHours, self.mMinutes, self.mSeconds )
             elif isinstance(self.mTZID, int):
                 sign = "-" if self.mTZID < 0 else "+"
                 hours = abs(self.mTZID) / 3600
                 minutes = divmod(abs(self.mTZID) / 60, 60)[1]
-                return "%4d-%02d-%02dT%02d:%02d:%02d%s%02d:%02d" % ( self.mYear, self.mMonth, self.mDay, self.mHours, self.mMinutes, self.mSeconds, sign, hours, minutes )
+                return "%04d-%02d-%02dT%02d:%02d:%02d%s%02d:%02d" % ( self.mYear, self.mMonth, self.mDay, self.mHours, self.mMinutes, self.mSeconds, sign, hours, minutes )
             else:
-                return "%4d-%02d-%02dT%02d:%02d:%02d" % ( self.mYear, self.mMonth, self.mDay, self.mHours, self.mMinutes, self.mSeconds )
+                return "%04d-%02d-%02dT%02d:%02d:%02d" % ( self.mYear, self.mMonth, self.mDay, self.mHours, self.mMinutes, self.mSeconds )
 
     @classmethod
     def parseText(cls, data, fullISO=False):
@@ -837,6 +837,10 @@ class PyCalendarDateTime(ValueMixin):
         self.mDay = int(data[index:index + 2])
         index += 2
 
+        if ' ' in data[:index]:
+            raise ValueError
+        if self.mYear < 0 or self.mMonth < 0 or self.mDay < 0:
+            raise ValueError
         return index
 
 
