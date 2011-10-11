@@ -215,13 +215,15 @@ if __name__ == '__main__':
     startYear = 1800
     endYear = 2018
 
-    options, args = getopt.getopt(sys.argv[1:], "h", ["prodid=", "start=", "end=", ])
+    options, args = getopt.getopt(sys.argv[1:], "h", ["prodid=", "root=", "start=", "end=", ])
 
     for option, value in options:
         if option == "-h":
             usage()
         elif option == "--prodid":
             prodid = value
+        elif option == "--root":
+            rootdir = value
         elif option == "--start":
             startYear = int(value)
         elif option == "--end":
