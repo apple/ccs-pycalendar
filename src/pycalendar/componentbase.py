@@ -30,13 +30,21 @@ class PyCalendarComponentBase(object):
     propertyCardinality_1_Fix_Empty = () # Must be present but can be fixed by adding an empty value
     propertyCardinality_0_1 = ()         # 0 or 1 only
     propertyCardinality_1_More = ()      # 1 or more
-    
+        
     propertyValueChecks = None  # Either iCalendar or vCard validation
 
     def __init__(self, parent=None):
         self.mParentComponent = parent
         self.mComponents = []
         self.mProperties = {}
+
+        # This is the set of checks we do by default for components
+        self.cardinalityChecks = (
+            self.check_cardinality_1,
+            self.check_cardinality_1_Fix_Empty,
+            self.check_cardinality_0_1,
+            self.check_cardinality_1_More,
+        )
 
     def duplicate(self, **args):
         other = self.__class__(**args)
@@ -191,37 +199,8 @@ class PyCalendarComponentBase(object):
         unfixed = []
 
         # Cardinality tests
-        for propname in self.propertyCardinality_1:
-            if self.countProperty(propname) != 1:
-                # Cannot fix a missing required property
-                logProblem = "[%s] Missing or too many required property: %s" % (self.getType(), propname,)
-                unfixed.append(logProblem)
-        
-        for propname in self.propertyCardinality_1_Fix_Empty:
-            if self.countProperty(propname) > 1:
-                # Cannot fix too many required property
-                logProblem = "[%s] Too many required property: %s" % (self.getType(), propname,)
-                unfixed.append(logProblem)
-            elif self.countProperty(propname) == 0:
-                # Possibly fix by adding empty property
-                logProblem = "[%s] Missing required property: %s" % (self.getType(), propname,)
-                if doFix:
-                    self.addProperty(PyCalendarProperty(propname, ""))
-                    fixed.append(logProblem)
-                else:
-                    unfixed.append(logProblem)
-        
-        for propname in self.propertyCardinality_0_1:
-            if self.countProperty(propname) > 1:
-                # Cannot be fixed - no idea which one to delete
-                logProblem = "[%s] Too many properties present: %s" % (self.getType(), propname,)
-                unfixed.append(logProblem)
-        
-        for propname in self.propertyCardinality_1_More:
-            if not self.countProperty(propname) > 0:
-                # Cannot fix a missing required property
-                logProblem = "[%s] Missing required property: %s" % (self.getType(), propname,)
-                unfixed.append(logProblem)
+        for check in self.cardinalityChecks:
+            check(fixed, unfixed, doFix)
         
         # Value constraints - these tests come from class specific attributes
         if self.propertyValueChecks is not None:
@@ -241,6 +220,37 @@ class PyCalendarComponentBase(object):
             unfixed.extend(moreunfixed)
 
         return fixed, unfixed
+
+    def check_cardinality_1(self, fixed, unfixed, doFix):
+        for propname in self.propertyCardinality_1:
+            if self.countProperty(propname) != 1: # Cannot fix a missing required property
+                logProblem = "[%s] Missing or too many required property: %s" % (self.getType(), propname)
+                unfixed.append(logProblem)
+
+    def check_cardinality_1_Fix_Empty(self, fixed, unfixed, doFix):
+        for propname in self.propertyCardinality_1_Fix_Empty:
+            if self.countProperty(propname) > 1: # Cannot fix too many required property
+                logProblem = "[%s] Too many required property: %s" % (self.getType(), propname)
+                unfixed.append(logProblem)
+            elif self.countProperty(propname) == 0: # Possibly fix by adding empty property
+                logProblem = "[%s] Missing required property: %s" % (self.getType(), propname)
+                if doFix:
+                    self.addProperty(PyCalendarProperty(propname, ""))
+                    fixed.append(logProblem)
+                else:
+                    unfixed.append(logProblem)
+
+    def check_cardinality_0_1(self, fixed, unfixed, doFix):
+        for propname in self.propertyCardinality_0_1:
+            if self.countProperty(propname) > 1: # Cannot be fixed - no idea which one to delete
+                logProblem = "[%s] Too many properties present: %s" % (self.getType(), propname)
+                unfixed.append(logProblem)
+
+    def check_cardinality_1_More(self, fixed, unfixed, doFix):
+        for propname in self.propertyCardinality_1_More:
+            if not self.countProperty(propname) > 0: # Cannot fix a missing required property
+                logProblem = "[%s] Missing required property: %s" % (self.getType(), propname)
+                unfixed.append(logProblem)
 
     def getText(self):
         s = StringIO()

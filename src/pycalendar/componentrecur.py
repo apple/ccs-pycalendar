@@ -26,6 +26,10 @@ import uuid
 
 class PyCalendarComponentRecur(PyCalendarComponent):
 
+    propertyCardinality_STATUS_Fix = (
+        definitions.cICalProperty_STATUS,
+    )
+
     @staticmethod
     def mapKey(uid, rid = None):
         if uid:
@@ -83,6 +87,11 @@ class PyCalendarComponentRecur(PyCalendarComponent):
         self.mAdjustPrior = False
         self.mRecurrenceID = None
         self.mRecurrences = None
+        
+        # This is a special check we do only for STATUS due to a calendarserver bug
+        self.cardinalityChecks += (
+            self.check_cardinality_STATUS_Fix,
+        )
 
     def duplicate(self, parent=None):
         other = super(PyCalendarComponentRecur, self).duplicate(parent=parent)
@@ -310,6 +319,27 @@ class PyCalendarComponentRecur(PyCalendarComponent):
                             unfixed.append(logProblem)
 
         return fixed, unfixed
+
+    def check_cardinality_STATUS_Fix(self, fixed, unfixed, doFix):
+        """
+        Special for bug with STATUS where STATUS:CANCELLED is added alongside
+        another STATUS. In this case we want STATUS:CANCELLED to win.
+        """
+        for propname in self.propertyCardinality_STATUS_Fix:
+            if self.countProperty(propname) > 1:
+                logProblem = "[%s] Too many properties: %s" % (self.getType(), propname)
+                if doFix:
+                    # Check that one of them is STATUS:CANCELLED
+                    for prop in self.getProperties(propname):
+                        if prop.getTextValue().getValue().upper() == definitions.cICalProperty_STATUS_CANCELLED:
+                            self.removeProperties(propname)
+                            self.addProperty(PyCalendarProperty(propname, definitions.cICalProperty_STATUS_CANCELLED))
+                            fixed.append(logProblem)
+                            break
+                    else:
+                        unfixed.append(logProblem)
+                else:
+                    unfixed.append(logProblem)
 
     def _resetRecurrenceSet(self):
         # May need to create items

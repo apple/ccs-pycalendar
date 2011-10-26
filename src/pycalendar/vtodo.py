@@ -102,7 +102,7 @@ class PyCalendarVToDo(PyCalendarComponentRecur):
         definitions.cICalProperty_PRIORITY,
         definitions.cICalProperty_RECURRENCE_ID,
         definitions.cICalProperty_SEQUENCE,
-        definitions.cICalProperty_STATUS,
+        # definitions.cICalProperty_STATUS, # Special fix done for multiple STATUS
         definitions.cICalProperty_SUMMARY,
         definitions.cICalProperty_URL,
         definitions.cICalProperty_RRULE,

@@ -37,7 +37,7 @@ class PyCalendarVEvent(PyCalendarComponentRecur):
         definitions.cICalProperty_ORGANIZER,
         definitions.cICalProperty_PRIORITY,
         definitions.cICalProperty_SEQUENCE,
-        definitions.cICalProperty_STATUS,
+        # definitions.cICalProperty_STATUS, # Special fix done for multiple STATUS
         definitions.cICalProperty_SUMMARY,
         definitions.cICalProperty_TRANSP,
         definitions.cICalProperty_URL,

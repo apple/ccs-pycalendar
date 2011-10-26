@@ -2399,3 +2399,471 @@ END:VCALENDAR
             self.assertEqual(set(fixed), test_fixed, msg="Failed test: %s" % (title,))
             self.assertEqual(set(unfixed), test_unfixed, msg="Failed test: %s" % (title,))
 
+    def test_STATUS_fix(self):
+        """
+        Test calendarserver issue where multiple STATUS properties can be present in components.
+        Want to make sure we report those as an error or fix them.
+        """
+        data = (
+            (
+                "1.1 Two STATUS in VEVENT - fix",
+                """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//mulberrymail.com//Mulberry v4.0//EN
+BEGIN:VEVENT
+UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
+DTSTART;VALUE=DATE:20020101
+DTEND;VALUE=DATE:20020102
+DTSTAMP:20020101T000000Z
+RRULE:FREQ=YEARLY;UNTIL=20031231;BYMONTH=1
+SUMMARY:New Year's Day
+STATUS:CONFIRMED
+STATUS:CANCELLED
+END:VEVENT
+END:VCALENDAR
+""".replace("\n", "\r\n"),
+                """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//mulberrymail.com//Mulberry v4.0//EN
+BEGIN:VEVENT
+UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
+DTSTART;VALUE=DATE:20020101
+DTEND;VALUE=DATE:20020102
+DTSTAMP:20020101T000000Z
+RRULE:FREQ=YEARLY;UNTIL=20031231;BYMONTH=1
+STATUS:CANCELLED
+SUMMARY:New Year's Day
+END:VEVENT
+END:VCALENDAR
+""".replace("\n", "\r\n"),
+                True,
+                set((
+                    "[VEVENT] Too many properties: STATUS",
+                )),
+                set(),
+            ),
+            (
+                "1.2 Two STATUS in VEVENT - no fix",
+                """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//mulberrymail.com//Mulberry v4.0//EN
+BEGIN:VEVENT
+UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
+DTSTART;VALUE=DATE:20020101
+DTEND;VALUE=DATE:20020102
+DTSTAMP:20020101T000000Z
+RRULE:FREQ=YEARLY;UNTIL=20031231;BYMONTH=1
+SUMMARY:New Year's Day
+STATUS:CONFIRMED
+STATUS:CANCELLED
+END:VEVENT
+END:VCALENDAR
+""".replace("\n", "\r\n"),
+                """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//mulberrymail.com//Mulberry v4.0//EN
+BEGIN:VEVENT
+UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
+DTSTART;VALUE=DATE:20020101
+DTEND;VALUE=DATE:20020102
+DTSTAMP:20020101T000000Z
+RRULE:FREQ=YEARLY;UNTIL=20031231;BYMONTH=1
+STATUS:CONFIRMED
+STATUS:CANCELLED
+SUMMARY:New Year's Day
+END:VEVENT
+END:VCALENDAR
+""".replace("\n", "\r\n"),
+                False,
+                set(),
+                set((
+                    "[VEVENT] Too many properties: STATUS",
+                )),
+            ),
+            (
+                "1.3 Two STATUS in VEVENT, none CANCELLED - fix",
+                """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//mulberrymail.com//Mulberry v4.0//EN
+BEGIN:VEVENT
+UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
+DTSTART;VALUE=DATE:20020101
+DTEND;VALUE=DATE:20020102
+DTSTAMP:20020101T000000Z
+RRULE:FREQ=YEARLY;UNTIL=20031231;BYMONTH=1
+SUMMARY:New Year's Day
+STATUS:CONFIRMED
+STATUS:TENTATIVE
+END:VEVENT
+END:VCALENDAR
+""".replace("\n", "\r\n"),
+                """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//mulberrymail.com//Mulberry v4.0//EN
+BEGIN:VEVENT
+UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
+DTSTART;VALUE=DATE:20020101
+DTEND;VALUE=DATE:20020102
+DTSTAMP:20020101T000000Z
+RRULE:FREQ=YEARLY;UNTIL=20031231;BYMONTH=1
+STATUS:CONFIRMED
+STATUS:TENTATIVE
+SUMMARY:New Year's Day
+END:VEVENT
+END:VCALENDAR
+""".replace("\n", "\r\n"),
+                True,
+                set(),
+                set((
+                    "[VEVENT] Too many properties: STATUS",
+                )),
+            ),
+            (
+                "1.4 Two STATUS in VEVENT, none CANCELLED - no fix",
+                """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//mulberrymail.com//Mulberry v4.0//EN
+BEGIN:VEVENT
+UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
+DTSTART;VALUE=DATE:20020101
+DTEND;VALUE=DATE:20020102
+DTSTAMP:20020101T000000Z
+RRULE:FREQ=YEARLY;UNTIL=20031231;BYMONTH=1
+SUMMARY:New Year's Day
+STATUS:CONFIRMED
+STATUS:TENTATIVE
+END:VEVENT
+END:VCALENDAR
+""".replace("\n", "\r\n"),
+                """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//mulberrymail.com//Mulberry v4.0//EN
+BEGIN:VEVENT
+UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
+DTSTART;VALUE=DATE:20020101
+DTEND;VALUE=DATE:20020102
+DTSTAMP:20020101T000000Z
+RRULE:FREQ=YEARLY;UNTIL=20031231;BYMONTH=1
+STATUS:CONFIRMED
+STATUS:TENTATIVE
+SUMMARY:New Year's Day
+END:VEVENT
+END:VCALENDAR
+""".replace("\n", "\r\n"),
+                False,
+                set(),
+                set((
+                    "[VEVENT] Too many properties: STATUS",
+                )),
+            ),
+            (
+                "2.1 Two STATUS in VTODO - fix",
+                """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//mulberrymail.com//Mulberry v4.0//EN
+BEGIN:VTODO
+UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
+DTSTART;VALUE=DATE:20020101
+DUE;VALUE=DATE:20020102
+DTSTAMP:20020101T000000Z
+RRULE:FREQ=YEARLY;UNTIL=20031231;BYMONTH=1
+STATUS:NEEDS-ACTION
+STATUS:CANCELLED
+SUMMARY:New Year's Day
+END:VTODO
+END:VCALENDAR
+""".replace("\n", "\r\n"),
+                """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//mulberrymail.com//Mulberry v4.0//EN
+BEGIN:VTODO
+UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
+DTSTART;VALUE=DATE:20020101
+DUE;VALUE=DATE:20020102
+DTSTAMP:20020101T000000Z
+RRULE:FREQ=YEARLY;UNTIL=20031231;BYMONTH=1
+STATUS:CANCELLED
+SUMMARY:New Year's Day
+END:VTODO
+END:VCALENDAR
+""".replace("\n", "\r\n"),
+                True,
+                set((
+                    "[VTODO] Too many properties: STATUS",
+                )),
+                set(),
+            ),
+            (
+                "2.2 Two STATUS in VTODO - no fix",
+                """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//mulberrymail.com//Mulberry v4.0//EN
+BEGIN:VTODO
+UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
+DTSTART;VALUE=DATE:20020101
+DUE;VALUE=DATE:20020102
+DTSTAMP:20020101T000000Z
+RRULE:FREQ=YEARLY;UNTIL=20031231;BYMONTH=1
+STATUS:NEEDS-ACTION
+STATUS:CANCELLED
+SUMMARY:New Year's Day
+END:VTODO
+END:VCALENDAR
+""".replace("\n", "\r\n"),
+                """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//mulberrymail.com//Mulberry v4.0//EN
+BEGIN:VTODO
+UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
+DTSTART;VALUE=DATE:20020101
+DUE;VALUE=DATE:20020102
+DTSTAMP:20020101T000000Z
+RRULE:FREQ=YEARLY;UNTIL=20031231;BYMONTH=1
+STATUS:NEEDS-ACTION
+STATUS:CANCELLED
+SUMMARY:New Year's Day
+END:VTODO
+END:VCALENDAR
+""".replace("\n", "\r\n"),
+                False,
+                set(),
+                set((
+                    "[VTODO] Too many properties: STATUS",
+                )),
+            ),
+            (
+                "2.3 Two STATUS in VTODO, none CANCELLED - fix",
+                """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//mulberrymail.com//Mulberry v4.0//EN
+BEGIN:VTODO
+UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
+DTSTART;VALUE=DATE:20020101
+DUE;VALUE=DATE:20020102
+DTSTAMP:20020101T000000Z
+RRULE:FREQ=YEARLY;UNTIL=20031231;BYMONTH=1
+STATUS:NEEDS-ACTION
+STATUS:COMPLETED
+SUMMARY:New Year's Day
+END:VTODO
+END:VCALENDAR
+""".replace("\n", "\r\n"),
+                """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//mulberrymail.com//Mulberry v4.0//EN
+BEGIN:VTODO
+UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
+DTSTART;VALUE=DATE:20020101
+DUE;VALUE=DATE:20020102
+DTSTAMP:20020101T000000Z
+RRULE:FREQ=YEARLY;UNTIL=20031231;BYMONTH=1
+STATUS:NEEDS-ACTION
+STATUS:COMPLETED
+SUMMARY:New Year's Day
+END:VTODO
+END:VCALENDAR
+""".replace("\n", "\r\n"),
+                True,
+                set(),
+                set((
+                    "[VTODO] Too many properties: STATUS",
+                )),
+            ),
+            (
+                "2.4 Two STATUS in VTODO, none CANCELLED - no fix",
+                """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//mulberrymail.com//Mulberry v4.0//EN
+BEGIN:VTODO
+UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
+DTSTART;VALUE=DATE:20020101
+DUE;VALUE=DATE:20020102
+DTSTAMP:20020101T000000Z
+RRULE:FREQ=YEARLY;UNTIL=20031231;BYMONTH=1
+STATUS:NEEDS-ACTION
+STATUS:COMPLETED
+SUMMARY:New Year's Day
+END:VTODO
+END:VCALENDAR
+""".replace("\n", "\r\n"),
+                """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//mulberrymail.com//Mulberry v4.0//EN
+BEGIN:VTODO
+UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
+DTSTART;VALUE=DATE:20020101
+DUE;VALUE=DATE:20020102
+DTSTAMP:20020101T000000Z
+RRULE:FREQ=YEARLY;UNTIL=20031231;BYMONTH=1
+STATUS:NEEDS-ACTION
+STATUS:COMPLETED
+SUMMARY:New Year's Day
+END:VTODO
+END:VCALENDAR
+""".replace("\n", "\r\n"),
+                False,
+                set(),
+                set((
+                    "[VTODO] Too many properties: STATUS",
+                )),
+            ),
+            (
+                "3.1 Two STATUS in VJOURNAL - fix",
+                """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//mulberrymail.com//Mulberry v4.0//EN
+BEGIN:VJOURNAL
+UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
+DTSTART;VALUE=DATE:20020101
+DTSTAMP:20020101T000000Z
+STATUS:DRAFT
+STATUS:CANCELLED
+END:VJOURNAL
+END:VCALENDAR
+""".replace("\n", "\r\n"),
+                """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//mulberrymail.com//Mulberry v4.0//EN
+BEGIN:VJOURNAL
+UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
+DTSTART;VALUE=DATE:20020101
+DTSTAMP:20020101T000000Z
+STATUS:CANCELLED
+END:VJOURNAL
+END:VCALENDAR
+""".replace("\n", "\r\n"),
+                True,
+                set((
+                    "[VJOURNAL] Too many properties: STATUS",
+                )),
+                set(),
+            ),
+            (
+                "3.2 Two STATUS in VJOURNAL - no fix",
+                """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//mulberrymail.com//Mulberry v4.0//EN
+BEGIN:VJOURNAL
+UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
+DTSTART;VALUE=DATE:20020101
+DTSTAMP:20020101T000000Z
+STATUS:DRAFT
+STATUS:CANCELLED
+END:VJOURNAL
+END:VCALENDAR
+""".replace("\n", "\r\n"),
+                """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//mulberrymail.com//Mulberry v4.0//EN
+BEGIN:VJOURNAL
+UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
+DTSTART;VALUE=DATE:20020101
+DTSTAMP:20020101T000000Z
+STATUS:DRAFT
+STATUS:CANCELLED
+END:VJOURNAL
+END:VCALENDAR
+""".replace("\n", "\r\n"),
+                False,
+                set(),
+                set((
+                    "[VJOURNAL] Too many properties: STATUS",
+                )),
+            ),
+            (
+                "3.3 Two STATUS in VJOURNAL, none CANCELLED - fix",
+                """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//mulberrymail.com//Mulberry v4.0//EN
+BEGIN:VJOURNAL
+UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
+DTSTART;VALUE=DATE:20020101
+DTSTAMP:20020101T000000Z
+STATUS:DRAFT
+STATUS:FINAL
+END:VJOURNAL
+END:VCALENDAR
+""".replace("\n", "\r\n"),
+                """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//mulberrymail.com//Mulberry v4.0//EN
+BEGIN:VJOURNAL
+UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
+DTSTART;VALUE=DATE:20020101
+DTSTAMP:20020101T000000Z
+STATUS:DRAFT
+STATUS:FINAL
+END:VJOURNAL
+END:VCALENDAR
+""".replace("\n", "\r\n"),
+                True,
+                set(),
+                set((
+                    "[VJOURNAL] Too many properties: STATUS",
+                )),
+            ),
+            (
+                "3.4 Two STATUS in VJOURNAL, none CANCELLED - no fix",
+                """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//mulberrymail.com//Mulberry v4.0//EN
+BEGIN:VJOURNAL
+UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
+DTSTART;VALUE=DATE:20020101
+DTSTAMP:20020101T000000Z
+STATUS:DRAFT
+STATUS:FINAL
+END:VJOURNAL
+END:VCALENDAR
+""".replace("\n", "\r\n"),
+                """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//mulberrymail.com//Mulberry v4.0//EN
+BEGIN:VJOURNAL
+UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
+DTSTART;VALUE=DATE:20020101
+DTSTAMP:20020101T000000Z
+STATUS:DRAFT
+STATUS:FINAL
+END:VJOURNAL
+END:VCALENDAR
+""".replace("\n", "\r\n"),
+                False,
+                set(),
+                set((
+                    "[VJOURNAL] Too many properties: STATUS",
+                )),
+            ),
+        )
+        
+        for title, test_old, test_new, test_doFix, test_fixed, test_unfixed in data:
+            cal = PyCalendar.parseText(test_old)
+            fixed, unfixed = cal.validate(doFix=test_doFix)
+            self.assertEqual(str(cal), test_new, msg="Failed test: %s" % (title,))
+            self.assertEqual(set(fixed), test_fixed, msg="Failed test: %s" % (title,))
+            self.assertEqual(set(unfixed), test_unfixed, msg="Failed test: %s" % (title,))
+
