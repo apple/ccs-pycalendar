@@ -14,7 +14,7 @@
 #    limitations under the License.
 ##
 
-#     2445 Components
+#     5545 Components
 
 cICalComponent_VCALENDAR = "VCALENDAR"
 cICalComponent_VEVENT = "VEVENT"
@@ -26,9 +26,9 @@ cICalComponent_VALARM = "VALARM"
 cICalComponent_STANDARD = "STANDARD"
 cICalComponent_DAYLIGHT = "DAYLIGHT"
 
-#     2445 Calendar Property Attributes
+#     5545 Calendar Property Attributes
 
-#     2445 Section 4.2
+#     5545 Section 3.2
 cICalAttribute_ALTREP = "ALTREP"
 cICalAttribute_CN = "CN"
 cICalAttribute_CUTYPE = "CUTYPE"
@@ -52,13 +52,13 @@ cICalAttribute_SENT_BY = "SENT-BY"
 cICalAttribute_TZID = "TZID"
 cICalAttribute_VALUE = "VALUE"
 
-#     2445 Section 4.2.9
+#     5545 Section 3.2.9
 cICalAttribute_FBTYPE_FREE = "FREE"
 cICalAttribute_FBTYPE_BUSY = "BUSY"
 cICalAttribute_FBTYPE_BUSYUNAVAILABLE = "BUSY-UNAVAILABLE"
 cICalAttribute_FBTYPE_BUSYTENTATIVE = "BUSY-TENTATIVE"
 
-#     2445 Section 4.2.12
+#     5545 Section 3.2.12
 ePartStat_NeedsAction = 0
 ePartStat_Accepted = 1
 ePartStat_Declined = 2
@@ -75,15 +75,15 @@ cICalAttribute_PARTSTAT_DELEGATED = "DELEGATED"
 cICalAttribute_PARTSTAT_COMPLETED = "COMPLETE"
 cICalAttribute_PARTSTAT_INPROCESS = "IN-PROCESS"
 
-#     2445 Section 4.2.13
+#     5545 Section 3.2.13
 cICalAttribute_RANGE_THISANDFUTURE = "THISANDFUTURE"
-cICalAttribute_RANGE_THISANDPRIOR = "THISANDPRIOR"
+cICalAttribute_RANGE_THISANDPRIOR = "THISANDPRIOR"      # 2445 only
 
-#     2445 Section 4.2.14
+#     5545 Section 3.2.14
 cICalAttribute_RELATED_START = "START"
 cICalAttribute_RELATED_END = "END"
 
-#     2445 Section 4.2.16
+#     5545 Section 3.2.16
 ePartRole_Chair = 0
 ePartRole_Required = 1
 ePartRole_Optional = 2
@@ -94,7 +94,7 @@ cICalAttribute_ROLE_REQ_PART = "REQ-PARTICIPANT"
 cICalAttribute_ROLE_OPT_PART = "OPT-PARTICIPANT"
 cICalAttribute_ROLE_NON_PART = "NON-PARTICIPANT"
 
-#     2445 Section 4.2.3
+#     5545 Section 3.2.3
 eCutype_Individual = 0
 eCutype_Group = 1
 eCutype_Resource = 2
@@ -107,9 +107,9 @@ cICalAttribute_CUTYPE_RESOURCE   = "RESOURCE"
 cICalAttribute_CUTYPE_ROOM       = "ROOM"
 cICalAttribute_CUTYPE_UNKNOWN    = "UNKNOWN"
 
-#     2445 Value types
+#     5545 Value types
 
-#     2445 Section 4.3
+#     5545 Section 3.3
 cICalValue_BINARY = "BINARY"
 cICalValue_BOOLEAN = "BOOLEAN"
 cICalValue_CAL_ADDRESS = "CAL-ADDRESS"
@@ -125,9 +125,9 @@ cICalValue_TIME = "TIME"
 cICalValue_URI = "URI"
 cICalValue_UTC_OFFSET = "UTC-OFFSET"
 
-#     2445 Calendar Properties
+#     5545 Calendar Properties
 
-#     2445 Section  4.7
+#     5545 Section  3.7
 
 cICalProperty_CALSCALE = "CALSCALE"
 cICalProperty_METHOD = "METHOD"
@@ -138,9 +138,9 @@ cICalProperty_VERSION = "VERSION"
 cICalProperty_XWRCALNAME = "X-WR-CALNAME"
 cICalProperty_XWRCALDESC = "X-WR-CALDESC"
 
-#     2445 Componenty Property names
+#     5545 Component Property names
 
-#     2445 Section 4.8.1
+#     5545 Section 3.8.1
 cICalProperty_ATTACH = "ATTACH"
 cICalProperty_CATEGORIES = "CATEGORIES"
 cICalProperty_CLASS = "CLASS"
@@ -154,7 +154,7 @@ cICalProperty_RESOURCES = "RESOURCES"
 cICalProperty_STATUS = "STATUS"
 cICalProperty_SUMMARY = "SUMMARY"
 
-#     2445 Section 4.8.2
+#     5545 Section 3.8.2
 cICalProperty_COMPLETED = "COMPLETED"
 cICalProperty_DTEND = "DTEND"
 cICalProperty_DUE = "DUE"
@@ -165,14 +165,14 @@ cICalProperty_TRANSP = "TRANSP"
 cICalProperty_OPAQUE = "OPAQUE"
 cICalProperty_TRANSPARENT = "TRANSPARENT"
 
-#     2445 Section 4.8.3
+#     5545 Section 3.8.3
 cICalProperty_TZID = "TZID"
 cICalProperty_TZNAME = "TZNAME"
 cICalProperty_TZOFFSETFROM = "TZOFFSETFROM"
 cICalProperty_TZOFFSETTO = "TZOFFSETTO"
 cICalProperty_TZURL = "TZURL"
 
-#     2445 Section 4.8.4
+#     5545 Section 3.8.4
 cICalProperty_ATTENDEE = "ATTENDEE"
 cICalProperty_CONTACT = "CONTACT"
 cICalProperty_ORGANIZER = "ORGANIZER"
@@ -181,30 +181,30 @@ cICalProperty_RELATED_TO = "RELATED-TO"
 cICalProperty_URL = "URL"
 cICalProperty_UID = "UID"
 
-#     2445 Section 4.8.5
+#     5545 Section 3.8.5
 cICalProperty_EXDATE = "EXDATE"
-cICalProperty_EXRULE = "EXRULE"
+cICalProperty_EXRULE = "EXRULE"     # 2445 only
 cICalProperty_RDATE = "RDATE"
 cICalProperty_RRULE = "RRULE"
 
-#     2445 Section 4.8.6
+#     5545 Section 3.8.6
 cICalProperty_ACTION = "ACTION"
 cICalProperty_REPEAT = "REPEAT"
 cICalProperty_TRIGGER = "TRIGGER"
 
-#     2445 Section 4.8.7
+#     5545 Section 3.8.7
 cICalProperty_CREATED = "CREATED"
 cICalProperty_DTSTAMP = "DTSTAMP"
 cICalProperty_LAST_MODIFIED = "LAST-MODIFIED"
 cICalProperty_SEQUENCE = "SEQUENCE"
 
-#     2445 Section 4.8.8.2
+#     5545 Section 3.8.8.3
 cICalProperty_REQUEST_STATUS = "REQUEST-STATUS"
 
 #     Enums
 #     Use ascending order for sensible sorting
 
-#     2445 Section 4.3.10
+#     5545 Section 3.3.10
 
 eRecurrence_SECONDLY = 0
 eRecurrence_MINUTELY = 1
@@ -271,7 +271,7 @@ cICalValue_RECUR_WEEKDAY_TH = "TH"
 cICalValue_RECUR_WEEKDAY_FR = "FR"
 cICalValue_RECUR_WEEKDAY_SA = "SA"
 
-#     2445 Section 4.8.1.11
+#     5545 Section 3.8.1.11
 eStatus_VEvent_None = 0
 eStatus_VEvent_Confirmed = 1
 eStatus_VEvent_Tentative = 2
@@ -297,7 +297,7 @@ cICalProperty_STATUS_IN_PROCESS = "IN-PROCESS"
 cICalProperty_STATUS_DRAFT = "DRAFT"
 cICalProperty_STATUS_FINAL = "FINAL"
 
-#     2445 Section 4.8.6.1
+#     5545 Section 3.8.6.1
 eAction_VAlarm_Audio = 0
 eAction_VAlarm_Display = 1
 eAction_VAlarm_Email = 2

@@ -43,7 +43,7 @@ class PyCalendarProperty(object):
 
     sDefaultValueTypeMap = {
 
-        # 2445 ?4.8.1
+        # 5545 Section 3.8.1
         definitions.cICalProperty_ATTACH           : PyCalendarValue.VALUETYPE_URI,
         definitions.cICalProperty_CATEGORIES       : PyCalendarValue.VALUETYPE_TEXT,
         definitions.cICalProperty_CLASS            : PyCalendarValue.VALUETYPE_TEXT,
@@ -57,7 +57,7 @@ class PyCalendarProperty(object):
         definitions.cICalProperty_STATUS           : PyCalendarValue.VALUETYPE_TEXT,
         definitions.cICalProperty_SUMMARY          : PyCalendarValue.VALUETYPE_TEXT,
 
-        # 2445 ?4.8.2
+        # 5545 Section 3.8.2
         definitions.cICalProperty_COMPLETED : PyCalendarValue.VALUETYPE_DATETIME,
         definitions.cICalProperty_DTEND     : PyCalendarValue.VALUETYPE_DATETIME,
         definitions.cICalProperty_DUE       : PyCalendarValue.VALUETYPE_DATETIME,
@@ -66,14 +66,14 @@ class PyCalendarProperty(object):
         definitions.cICalProperty_FREEBUSY  : PyCalendarValue.VALUETYPE_PERIOD,
         definitions.cICalProperty_TRANSP    : PyCalendarValue.VALUETYPE_TEXT,
 
-        # 2445 ?4.8.3
+        # 5545 Section 3.8.3
         definitions.cICalProperty_TZID         : PyCalendarValue.VALUETYPE_TEXT,
         definitions.cICalProperty_TZNAME       : PyCalendarValue.VALUETYPE_TEXT,
         definitions.cICalProperty_TZOFFSETFROM : PyCalendarValue.VALUETYPE_UTC_OFFSET,
         definitions.cICalProperty_TZOFFSETTO   : PyCalendarValue.VALUETYPE_UTC_OFFSET,
         definitions.cICalProperty_TZURL        : PyCalendarValue.VALUETYPE_URI,
 
-        # 2445 ?4.8.4
+        # 5545 Section 3.8.4
         definitions.cICalProperty_ATTENDEE      : PyCalendarValue.VALUETYPE_CALADDRESS,
         definitions.cICalProperty_CONTACT       : PyCalendarValue.VALUETYPE_TEXT,
         definitions.cICalProperty_ORGANIZER     : PyCalendarValue.VALUETYPE_CALADDRESS,
@@ -82,24 +82,24 @@ class PyCalendarProperty(object):
         definitions.cICalProperty_URL           : PyCalendarValue.VALUETYPE_URI,
         definitions.cICalProperty_UID           : PyCalendarValue.VALUETYPE_TEXT,
 
-        # 2445 ?4.8.5
+        # 5545 Section 3.8.5
         definitions.cICalProperty_EXDATE : PyCalendarValue.VALUETYPE_DATETIME,
-        definitions.cICalProperty_EXRULE : PyCalendarValue.VALUETYPE_RECUR,
+        definitions.cICalProperty_EXRULE : PyCalendarValue.VALUETYPE_RECUR,     # 2445 only
         definitions.cICalProperty_RDATE  : PyCalendarValue.VALUETYPE_DATETIME,
         definitions.cICalProperty_RRULE  : PyCalendarValue.VALUETYPE_RECUR,
 
-        # 2445 ?4.8.6
+        # 5545 Section 3.8.6
         definitions.cICalProperty_ACTION  : PyCalendarValue.VALUETYPE_TEXT,
         definitions.cICalProperty_REPEAT  : PyCalendarValue.VALUETYPE_INTEGER,
         definitions.cICalProperty_TRIGGER : PyCalendarValue.VALUETYPE_DURATION,
 
-        # 2445 ?4.8.7
+        # 5545 Section 3.8.7
         definitions.cICalProperty_CREATED       : PyCalendarValue.VALUETYPE_DATETIME,
         definitions.cICalProperty_DTSTAMP       : PyCalendarValue.VALUETYPE_DATETIME,
         definitions.cICalProperty_LAST_MODIFIED : PyCalendarValue.VALUETYPE_DATETIME,
         definitions.cICalProperty_SEQUENCE      : PyCalendarValue.VALUETYPE_INTEGER,
 
-        # 2445 ?4.8.8
+        # 5545 Section 3.8.8
         definitions.cICalProperty_REQUEST_STATUS : PyCalendarValue.VALUETYPE_REQUEST_STATUS,
 
         # Apple Extensions
@@ -114,7 +114,7 @@ class PyCalendarProperty(object):
 
     sValueTypeMap = {
 
-        # 2445 ?4.3
+        # 5545 Section 3.3
         definitions.cICalValue_BINARY      : PyCalendarValue.VALUETYPE_BINARY,
         definitions.cICalValue_BOOLEAN     : PyCalendarValue.VALUETYPE_BOOLEAN,
         definitions.cICalValue_CAL_ADDRESS : PyCalendarValue.VALUETYPE_CALADDRESS,
@@ -133,7 +133,7 @@ class PyCalendarProperty(object):
 
     sTypeValueMap = {
 
-        # 2445 ?4.3
+        # 5545 Section 3.3
         PyCalendarValue.VALUETYPE_BINARY         : definitions.cICalValue_BINARY,
         PyCalendarValue.VALUETYPE_BOOLEAN        : definitions.cICalValue_BOOLEAN,
         PyCalendarValue.VALUETYPE_CALADDRESS     : definitions.cICalValue_CAL_ADDRESS,
