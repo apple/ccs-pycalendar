@@ -32,4 +32,6 @@ ICALENDAR_VALUE_CHECKS = {
     definitions.cICalProperty_DTSTAMP: PropertyValueChecks.alwaysUTC,
     definitions.cICalProperty_LAST_MODIFIED: PropertyValueChecks.alwaysUTC,
     definitions.cICalProperty_SEQUENCE: PropertyValueChecks.positiveIntegerOrZero,
+
+    definitions.cICalProperty_ACKNOWLEDGED: PropertyValueChecks.alwaysUTC,
 }

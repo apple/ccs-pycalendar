@@ -318,6 +318,18 @@ cICalComponent_AVAILABLE = "AVAILABLE"
 #     Section 3.2
 cICalProperty_BUSYTYPE = "BUSYTYPE"
 
+#     Extensions: draft-daboo-valarm-extensions-03
+
+#     Section 5
+eAction_VAlarm_URI = 5
+cICalProperty_ACTION_URI = "URI"
+
+#     Section 7.1
+cICalProperty_ACKNOWLEDGED = "ACKNOWLEDGED"
+
+eAction_VAlarm_None = 6
+cICalProperty_ACTION_NONE = "NONE"
+
 #     Mulberry extensions
 cICalProperty_ACTION_X_SPEAKTEXT = "X-MULBERRY-SPEAK-TEXT"
 cICalProperty_ALARM_X_LASTTRIGGER = "X-MULBERRY-LAST-TRIGGER"

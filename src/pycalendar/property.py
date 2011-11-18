@@ -102,6 +102,9 @@ class PyCalendarProperty(object):
         # 5545 Section 3.8.8
         definitions.cICalProperty_REQUEST_STATUS : PyCalendarValue.VALUETYPE_REQUEST_STATUS,
 
+        # Extensions: draft-daboo-valarm-extensions-03
+        definitions.cICalProperty_ACKNOWLEDGED   : PyCalendarValue.VALUETYPE_DATETIME,
+
         # Apple Extensions
         definitions.cICalProperty_XWRCALNAME : PyCalendarValue.VALUETYPE_TEXT,
         definitions.cICalProperty_XWRCALDESC : PyCalendarValue.VALUETYPE_TEXT,

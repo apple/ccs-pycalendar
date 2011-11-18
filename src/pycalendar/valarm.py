@@ -25,6 +25,24 @@ from pycalendar.value import PyCalendarValue
 
 class PyCalendarVAlarm(PyCalendarComponent):
 
+    sActionMap = {
+        definitions.cICalProperty_ACTION_AUDIO: definitions.eAction_VAlarm_Audio,
+        definitions.cICalProperty_ACTION_DISPLAY: definitions.eAction_VAlarm_Display,
+        definitions.cICalProperty_ACTION_EMAIL: definitions.eAction_VAlarm_Email,
+        definitions.cICalProperty_ACTION_PROCEDURE: definitions.eAction_VAlarm_Procedure,
+        definitions.cICalProperty_ACTION_URI: definitions.eAction_VAlarm_URI,
+        definitions.cICalProperty_ACTION_NONE: definitions.eAction_VAlarm_None,
+    }
+
+    sActionValueMap = {
+        definitions.eAction_VAlarm_Audio: definitions.cICalProperty_ACTION_AUDIO,
+        definitions.eAction_VAlarm_Display: definitions.cICalProperty_ACTION_DISPLAY,
+        definitions.eAction_VAlarm_Email: definitions.cICalProperty_ACTION_EMAIL,
+        definitions.eAction_VAlarm_Procedure: definitions.cICalProperty_ACTION_PROCEDURE,
+        definitions.eAction_VAlarm_URI: definitions.cICalProperty_ACTION_URI,
+        definitions.eAction_VAlarm_None: definitions.cICalProperty_ACTION_NONE,
+    }
+
     # Classes for each action encapsulating action-specific data
     class PyCalendarVAlarmAction(object):
 
@@ -62,6 +80,7 @@ class PyCalendarVAlarm(PyCalendarComponent):
             definitions.cICalProperty_DURATION,
             definitions.cICalProperty_REPEAT,
             definitions.cICalProperty_ATTACH,
+            definitions.cICalProperty_ACKNOWLEDGED,
         )
         
         def __init__(self, speak=None):
@@ -105,6 +124,7 @@ class PyCalendarVAlarm(PyCalendarComponent):
         propertyCardinality_0_1 = (
             definitions.cICalProperty_DURATION,
             definitions.cICalProperty_REPEAT,
+            definitions.cICalProperty_ACKNOWLEDGED,
         )
         
         def __init__(self, description=None):
@@ -146,6 +166,7 @@ class PyCalendarVAlarm(PyCalendarComponent):
         propertyCardinality_0_1 = (
             definitions.cICalProperty_DURATION,
             definitions.cICalProperty_REPEAT,
+            definitions.cICalProperty_ACKNOWLEDGED,
         )
 
         propertyCardinality_1_More = (
@@ -153,7 +174,7 @@ class PyCalendarVAlarm(PyCalendarComponent):
         )
 
         def __init__(self, description=None, summary=None, attendees=None):
-            super(PyCalendarVAlarm.PyCalendarVAlarmEmail, self).__init__(type=definitions.eAction_VAlarm_Display)
+            super(PyCalendarVAlarm.PyCalendarVAlarmEmail, self).__init__(type=definitions.eAction_VAlarm_Email)
             self.mDescription = description
             self.mSummary = summary
             self.mAttendees = attendees
@@ -214,6 +235,7 @@ class PyCalendarVAlarm(PyCalendarComponent):
         propertyCardinality_0_1 = (
             definitions.cICalProperty_DURATION,
             definitions.cICalProperty_REPEAT,
+            definitions.cICalProperty_ACKNOWLEDGED,
         )
         
         def __init__(self):
@@ -222,18 +244,68 @@ class PyCalendarVAlarm(PyCalendarComponent):
         def duplicate(self):
             return PyCalendarVAlarm.PyCalendarVAlarmUnknown()
 
+    class PyCalendarVAlarmURI(PyCalendarVAlarmAction):
+
+        propertyCardinality_1 = (
+            definitions.cICalProperty_ACTION,
+            definitions.cICalProperty_TRIGGER,
+            definitions.cICalProperty_URL,
+        )
+    
+        propertyCardinality_0_1 = (
+            definitions.cICalProperty_DURATION,
+            definitions.cICalProperty_REPEAT,
+            definitions.cICalProperty_ACKNOWLEDGED,
+        )
+
+        def __init__(self, uri=None):
+            super(PyCalendarVAlarm.PyCalendarVAlarmURI, self).__init__(type=definitions.eAction_VAlarm_URI)
+            self.mURI = uri
+
+        def duplicate(self):
+            return PyCalendarVAlarm.PyCalendarVAlarmURI(self.mURI)
+
         def load(self, valarm):
-            pass
+            # Get properties
+            self.mURI = valarm.loadValueString(definitions.cICalProperty_URL)
 
         def add(self, valarm):
-            pass
+            # Delete existing then add
+            self.remove(valarm)
+
+            prop = PyCalendarProperty(definitions.cICalProperty_URL, self.mURI)
+            valarm.addProperty(prop)
 
         def remove(self, valarm):
-            pass
+            valarm.removeProperties(definitions.cICalProperty_URL)
+
+        def getURI(self):
+            return self.mURI
+
+    class PyCalendarVAlarmNone(PyCalendarVAlarmAction):
+
+        propertyCardinality_1 = (
+            definitions.cICalProperty_ACTION,
+        )
+
+        def __init__(self):
+            super(PyCalendarVAlarm.PyCalendarVAlarmNone, self).__init__(type=definitions.eAction_VAlarm_None)
+
+        def duplicate(self):
+            return PyCalendarVAlarm.PyCalendarVAlarmNone()
 
     def getMimeComponentName(self):
         # Cannot be sent as a separate MIME object
         return None
+
+
+    sActionToAlarmMap = {
+        definitions.eAction_VAlarm_Audio: PyCalendarVAlarmAudio,
+        definitions.eAction_VAlarm_Display: PyCalendarVAlarmDisplay,
+        definitions.eAction_VAlarm_Email: PyCalendarVAlarmEmail,
+        definitions.eAction_VAlarm_URI: PyCalendarVAlarmURI,
+        definitions.eAction_VAlarm_None: PyCalendarVAlarmNone,
+    }
 
     propertyValueChecks = ICALENDAR_VALUE_CHECKS
 
@@ -345,17 +417,7 @@ class PyCalendarVAlarm(PyCalendarComponent):
         # Get the ACTION
         temp = self.loadValueString(definitions.cICalProperty_ACTION)
         if temp is not None:
-            if temp == definitions.cICalProperty_ACTION_AUDIO:
-                self.mAction = definitions.eAction_VAlarm_Audio
-            elif temp == definitions.cICalProperty_ACTION_DISPLAY:
-                self.mAction = definitions.eAction_VAlarm_Display
-            elif temp == definitions.cICalProperty_ACTION_EMAIL:
-                self.mAction = definitions.eAction_VAlarm_Email
-            elif temp == definitions.cICalProperty_ACTION_PROCEDURE:
-                self.mAction = definitions.eAction_VAlarm_Procedure
-            else:
-                self.mAction = definitions.eAction_VAlarm_Unknown
-
+            self.mAction = PyCalendarVAlarm.sActionMap.get(temp, definitions.eAction_VAlarm_Unknown)
             self.loadAction()
 
         # Get the trigger
@@ -463,15 +525,7 @@ class PyCalendarVAlarm(PyCalendarComponent):
         self.mActionData = data
 
         # Add new properties to alarm
-        action_txt = ""
-        if self.mAction == definitions.eAction_VAlarm_Audio:
-            action_txt = definitions.cICalProperty_ACTION_AUDIO
-        elif self.mAction == definitions.eAction_VAlarm_Display:
-            action_txt = definitions.cICalProperty_ACTION_DISPLAY
-        elif self.mAction == definitions.eAction_VAlarm_Email:
-            action_txt = definitions.cICalProperty_ACTION_EMAIL
-        else:
-            action_txt = definitions.cICalProperty_ACTION_PROCEDURE
+        action_txt = PyCalendarVAlarm.sActionValueMap.get(self.mAction, definitions.cICalProperty_ACTION_PROCEDURE)
 
         prop = PyCalendarProperty(definitions.cICalProperty_ACTION, action_txt)
         self.addProperty(prop)
@@ -562,18 +616,8 @@ class PyCalendarVAlarm(PyCalendarComponent):
     def loadAction(self):
         # Delete current one
         self.mActionData = None
-        if self.mAction == definitions.eAction_VAlarm_Audio:
-            self.mActionData = PyCalendarVAlarm.PyCalendarVAlarmAudio()
-            self.mActionData.load(self)
-        elif self.mAction == definitions.eAction_VAlarm_Display:
-            self.mActionData = PyCalendarVAlarm.PyCalendarVAlarmDisplay()
-            self.mActionData.load(self)
-        elif self.mAction == definitions.eAction_VAlarm_Email:
-            self.mActionData = PyCalendarVAlarm.PyCalendarVAlarmEmail()
-            self.mActionData.load(self)
-        else:
-            self.mActionData = PyCalendarVAlarm.PyCalendarVAlarmUnknown()
-            self.mActionData.load(self)
+        self.mActionData = PyCalendarVAlarm.sActionToAlarmMap.get(self.mAction, PyCalendarVAlarm.PyCalendarVAlarmUnknown)()
+        self.mActionData.load(self)
 
     def initNextTrigger(self):
         # Do not bother if its completed
