@@ -23,13 +23,13 @@ class TestAdrValue(unittest.TestCase):
         
         data = (
             (
-                ("first", "last", "middle", "prefix", "suffix"),
-                "first;last;middle;prefix;suffix",
+                ("last", "first", "middle", "prefix", "suffix"),
+                "last;first;middle;prefix;suffix",
                 "prefix first middle last suffix",
             ),
             (
-                (("first",), "last", ("middle1", "middle2",), (), ("suffix",)),
-                "first;last;middle1,middle2;;suffix",
+                ("last", ("first",), ("middle1", "middle2",), (), ("suffix",)),
+                "last;first;middle1,middle2;;suffix",
                 "first middle1 middle2 last suffix",
             ),
         )
@@ -41,6 +41,39 @@ class TestAdrValue(unittest.TestCase):
                 n.getValue(),
                 args,
             )
+    
+            self.assertEqual(
+                n.getText(),
+                result,
+            )
+
+            self.assertEqual(
+                n.getFullName(),
+                fullName,
+            )
+
+            self.assertEqual(
+                n.duplicate().getText(),
+                result,
+            )
+    
+    def testInitWithKeywords(self):
+        
+        data = (
+            (
+                {"first":"first", "last":"last", "middle":"middle", "prefix":"prefix", "suffix":"suffix"},
+                "last;first;middle;prefix;suffix",
+                "prefix first middle last suffix",
+            ),
+            (
+                {"first":("first",), "last":"last", "middle":("middle1", "middle2",), "prefix":(), "suffix":("suffix",)},
+                "last;first;middle1,middle2;;suffix",
+                "first middle1 middle2 last suffix",
+            ),
+        )
+
+        for kwargs, result, fullName in data:
+            n = N(**kwargs)
     
             self.assertEqual(
                 n.getText(),

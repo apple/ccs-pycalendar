@@ -25,16 +25,16 @@ class N(ValueMixin):
     """
 
     (
-        FIRST,
         LAST,
+        FIRST,
         MIDDLE,
         PREFIX,
         SUFFIX,
         MAXITEMS
     ) = range(6)
 
-    def __init__(self, first="", last="", middle="", prefix="", suffix=""):
-        self.mValue = (first, last, middle, prefix, suffix)
+    def __init__(self, last="", first="", middle="", prefix="", suffix=""):
+        self.mValue = (last, first, middle, prefix, suffix)
 
     def duplicate(self):
         return N(*self.mValue)
