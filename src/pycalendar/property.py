@@ -43,6 +43,12 @@ class PyCalendarProperty(object):
 
     sDefaultValueTypeMap = {
 
+        # 5545 Section 3.7
+        definitions.cICalProperty_CALSCALE         : PyCalendarValue.VALUETYPE_TEXT,
+        definitions.cICalProperty_METHOD           : PyCalendarValue.VALUETYPE_TEXT,
+        definitions.cICalProperty_PRODID           : PyCalendarValue.VALUETYPE_TEXT,
+        definitions.cICalProperty_VERSION          : PyCalendarValue.VALUETYPE_TEXT,
+
         # 5545 Section 3.8.1
         definitions.cICalProperty_ATTACH           : PyCalendarValue.VALUETYPE_URI,
         definitions.cICalProperty_CATEGORIES       : PyCalendarValue.VALUETYPE_TEXT,
@@ -106,8 +112,9 @@ class PyCalendarProperty(object):
         definitions.cICalProperty_ACKNOWLEDGED   : PyCalendarValue.VALUETYPE_DATETIME,
 
         # Apple Extensions
-        definitions.cICalProperty_XWRCALNAME : PyCalendarValue.VALUETYPE_TEXT,
-        definitions.cICalProperty_XWRCALDESC : PyCalendarValue.VALUETYPE_TEXT,
+        definitions.cICalProperty_XWRCALNAME  : PyCalendarValue.VALUETYPE_TEXT,
+        definitions.cICalProperty_XWRCALDESC  : PyCalendarValue.VALUETYPE_TEXT,
+        definitions.cICalProperty_XWRALARMUID : PyCalendarValue.VALUETYPE_TEXT,
 
         # Mulberry extensions
         definitions.cICalProperty_ACTION_X_SPEAKTEXT  : PyCalendarValue.VALUETYPE_TEXT,
@@ -577,14 +584,14 @@ class PyCalendarProperty(object):
         if self.mValue is None:
             return
 
-        # See if current type is default for this property
+        # See if current type is default for this property. If there is no mapping available,
+        # then always add VALUE if it is not TEXT.
         default_type = self.sDefaultValueTypeMap.get(self.mName.upper())
-        if default_type is not None:
-            actual_type = self.mValue.getType()
-            if default_type != actual_type:
-                actual_value = self.sTypeValueMap.get(actual_type)
-                if actual_value is not None:
-                    self.mAttributes.setdefault(definitions.cICalAttribute_VALUE, []).append(PyCalendarAttribute(name=definitions.cICalAttribute_VALUE, value=actual_value))
+        actual_type = self.mValue.getType()
+        if default_type is None or default_type != actual_type:
+            actual_value = self.sTypeValueMap.get(actual_type)
+            if actual_value is not None and (default_type is not None or actual_type != PyCalendarValue.VALUETYPE_TEXT):
+                self.mAttributes.setdefault(definitions.cICalAttribute_VALUE, []).append(PyCalendarAttribute(name=definitions.cICalAttribute_VALUE, value=actual_value))
 
     # Creation
     def _init_attr_value_int(self, ival):

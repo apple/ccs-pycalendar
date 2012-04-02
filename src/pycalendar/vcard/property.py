@@ -474,14 +474,14 @@ class Property(object):
         if self.mValue is None:
             return
 
-        # See if current type is default for this property
+        # See if current type is default for this property. If there is no mapping available,
+        # then always add VALUE if it is not TEXT.
         default_type = Property.sDefaultValueTypeMap.get(self.mName.upper())
-        if default_type is not None:
-            actual_type = self.mValue.getType()
-            if default_type != actual_type:
-                actual_value = self.sTypeValueMap.get(actual_type)
-                if actual_value is not None:
-                    self.mAttributes.setdefault(definitions.Parameter_VALUE, []).append(PyCalendarAttribute(name=definitions.Parameter_VALUE, value=actual_value))
+        actual_type = self.mValue.getType()
+        if default_type is None or default_type != actual_type:
+            actual_value = self.sTypeValueMap.get(actual_type)
+            if actual_value is not None and (default_type is not None or actual_type != PyCalendarValue.VALUETYPE_TEXT):
+                self.mAttributes.setdefault(definitions.Parameter_VALUE, []).append(PyCalendarAttribute(name=definitions.Parameter_VALUE, value=actual_value))
 
     # Creation
     def _init_attr_value_int(self, ival):

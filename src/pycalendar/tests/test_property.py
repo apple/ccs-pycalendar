@@ -40,6 +40,8 @@ class TestProperty(unittest.TestCase):
         "REQUEST-STATUS:2.0;Success",
         "URI:http://www.example.com",
         "TZOFFSETFROM:-0500",
+        "X-Test:Some\, text.",
+        "X-APPLE-STRUCTURED-LOCATION;VALUE=URI:geo:123.123,123.123",
         
         # Various parameters
         "DTSTART;TZID=\"Somewhere, else\":20060226T120000",

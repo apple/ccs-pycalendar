@@ -155,6 +155,37 @@ item1.X-ABADR:us
 END:VCARD
 """.replace("\n", "\r\n"),
         ),
+        (
+"""BEGIN:VCARD
+VERSION:3.0
+N:Thompson;Default;;;
+FN:Default Thompson
+EMAIL;type=INTERNET;type=WORK;type=pref:lthompson@example.com
+TEL;type=WORK;type=pref:1-555-555-5555
+TEL;type=CELL:1-444-444-4444
+item1.ADR;type=WORK;type=pref:;;1245 Test;Sesame Street;California;11111;USA
+item1.X-ABADR:us
+UID:ED7A5AEC-AB19-4CE0-AD6A-2923A3E5C4E1:ABPerson
+X-APPLE-STRUCTURED-LOCATION;VALUE=URI:geo:123.123,123.123
+X-Test:Some\, text.
+END:VCARD
+""".replace("\n", "\r\n"),
+"""BEGIN:VCARD
+VERSION:3.0
+UID:ED7A5AEC-AB19-4CE0-AD6A-2923A3E5C4E1:ABPerson
+item1.ADR;type=WORK;type=pref:;;1245 Test;Sesame Street;California;11111;U
+ SA
+EMAIL;type=INTERNET;type=WORK;type=pref:lthompson@example.com
+FN:Default Thompson
+N:Thompson;Default;;;
+TEL;type=WORK;type=pref:1-555-555-5555
+TEL;type=CELL:1-444-444-4444
+item1.X-ABADR:us
+X-APPLE-STRUCTURED-LOCATION;VALUE=URI:geo:123.123,123.123
+X-Test:Some\, text.
+END:VCARD
+""".replace("\n", "\r\n"),
+        ),
     )
 
     def testRoundtrip(self):

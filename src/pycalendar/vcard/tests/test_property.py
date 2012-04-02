@@ -31,6 +31,8 @@ class TestProperty(unittest.TestCase):
         "NOTE:Some \\ntext",
         "note:Some \\ntext",
         "item1.ADR;type=WORK;type=pref:;;1245 Test;Sesame Street;CA;11111;USA",
+        "X-Test:Some\, text.",
+        "X-Test;VALUE=URI:geio:123.123,123.123",
     )
     
     def testParseGenerate(self):

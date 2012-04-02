@@ -137,6 +137,7 @@ cICalProperty_VERSION = "VERSION"
 #     Apple Extensions
 cICalProperty_XWRCALNAME = "X-WR-CALNAME"
 cICalProperty_XWRCALDESC = "X-WR-CALDESC"
+cICalProperty_XWRALARMUID = "X-WR-ALARMUID"
 
 #     5545 Component Property names
 
