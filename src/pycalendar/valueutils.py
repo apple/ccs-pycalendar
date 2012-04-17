@@ -42,3 +42,6 @@ class ValueMixin(object):
 
     def writeXML(self, node, namespace):
         raise NotImplementedError
+
+    def writeJSON(self, jobject):
+        raise NotImplementedError

@@ -39,6 +39,9 @@ class PyCalendarPeriodValue( PyCalendarValue ):
         value = self.getXMLNode(node, namespace)
         value.text = self.mValue.writeXML()
 
+    def writeJSON(self, jobject):
+        self.mValue.writeJSON(jobject)
+
     def getValue( self ):
         return self.mValue
 

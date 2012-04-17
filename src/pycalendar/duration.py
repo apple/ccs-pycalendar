@@ -253,3 +253,7 @@ class PyCalendarDuration(ValueMixin):
 
     def writeXML(self, node, namespace):
         node.text = self.getText()
+
+    def writeJSON(self, jobject):
+        jobject["duration"] = self.getText()
+

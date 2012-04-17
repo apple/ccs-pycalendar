@@ -42,6 +42,9 @@ class PyCalendarPlainTextValue( PyCalendarValue ):
         value = self.getXMLNode(node, namespace)
         value.text = self.mValue
 
+    def writeJSON(self, jobject):
+        jobject["text"] = self.mValue
+
     def getValue(self):
         return self.mValue
 

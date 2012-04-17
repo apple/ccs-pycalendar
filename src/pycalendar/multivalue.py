@@ -82,4 +82,16 @@ class PyCalendarMultiValue( PyCalendarValue ):
         for iter in self.mValues:
             iter.writeXML(node, namespace)
 
+    def writeJSON(self, jobject):
+        mtype = None
+        values = []
+        for iter in self.mValues:
+            result = {}
+            iter.writeJSON(result)
+            k, v = result.items()[0]
+            if mtype is None:
+                mtype = k
+            values.append(v)
+        jobject[mtype] = values
+
 PyCalendarValue.registerType(PyCalendarValue.VALUETYPE_MULTIVALUE, PyCalendarMultiValue, None)

@@ -672,6 +672,53 @@ class PyCalendarRecurrence(ValueMixin):
                 child = XML.SubElement(node, xmldefs.makeTag(namespace, name))
                 child.text = str(item)
                 
+    def writeJSON(self, jobject):
+
+        recur = {}
+        jobject["recur"] = recur
+
+        recur["freq"] = self.cFreqToXMLMap[self.mFreq]
+
+        if self.mUseCount:
+            recur["count"] = self.mCount
+        elif self.mUseUntil:
+            recur["until"] = self.mUntil.getJSONText()
+
+        if self.mInterval > 1:
+            recur["interval"] = self.mInterval
+
+        if self.mBySeconds is not None and len(self.mBySeconds) != 0:
+            recur["bysecond"] = self.mBySeconds
+        if self.mByMinutes is not None and len(self.mByMinutes) != 0:
+            recur["byminute"] = self.mByMinutes
+        if self.mByHours is not None and len(self.mByHours) != 0:
+            recur["byhour"] = self.mByHours
+            
+        if self.mByDay is not None and len(self.mByDay) != 0:
+            bydays = []
+            for iter in self.mByDay:
+                data = ""
+                if iter[0] != 0:
+                    data = str(iter[0])
+                data += self.cWeekdayRecurMap.get(iter[1], "")
+                bydays.append(data)
+            recur["byday"] = bydays
+
+        if self.mByMonthDay is not None and len(self.mByMonthDay) != 0:
+            recur["bymonthday"] = self.mByMonthDay
+        if self.mByYearDay is not None and len(self.mByYearDay) != 0:
+            recur["byyearday"] = self.mByYearDay
+        if self.mByWeekNo is not None and len(self.mByWeekNo) != 0:
+            recur["byweekno"] = self.mByWeekNo
+        if self.mByMonth is not None and len(self.mByMonth) != 0:
+            recur["bymonth"] = self.mByMonth
+        if self.mBySetPos is not None and len(self.mBySetPos) != 0:
+            recur["bysetpos"] = self.mBySetPos
+
+        # MO is the default so we do not need it
+        if self.mWeekstart != definitions.eRecurrence_WEEKDAY_MO:
+            recur["wkst"] = self.cWeekdayRecurMap.get(self.mWeekstart, definitions.cICalValue_RECUR_WEEKDAY_MO)
+
     
     def hasBy(self):
         return (self.mBySeconds is not None) and (len(self.mBySeconds) != 0) \

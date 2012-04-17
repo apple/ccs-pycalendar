@@ -308,6 +308,29 @@ class PyCalendarComponentBase(object):
         # Each component
         self.writeComponentsFilteredXML(comp, namespace, filter)
 
+    def writeJSON(self, jobject):
+        
+        # Component element
+        comp = {"type":self.getType().lower()}
+        jobject.append(comp)
+        
+        # Each property
+        self.writePropertiesJSON(comp)
+    
+        # Each component
+        self.writeComponentsJSON(comp)
+    
+    def writeJSONFiltered(self, jobject, filter):
+        # Component element
+        comp = {"type":self.getType()}
+        jobject.append(comp)
+        
+        # Each property
+        self.writePropertiesFilteredJSON(comp, filter)
+    
+        # Each component
+        self.writeComponentsFilteredJSON(comp, filter)
+
     def sortedComponents(self):
         
         components = self.mComponents[:]
@@ -370,6 +393,31 @@ class PyCalendarComponentBase(object):
                     subfilter = filter.getSubComponentFilter(subcomp.getType())
                     if subfilter is not None:
                         subcomp.writeFilteredXML(comps, namespace, subfilter)
+        
+    def writeComponentsJSON(self, jobject):
+        
+        if self.mComponents:
+            comps = []
+            jobject["components"] = comps
+            
+            # Write out the remainder 
+            for component in self.sortedComponents():
+                component.writeJSON(comps)
+
+    def writeComponentsFilteredJSON(self, jobject, filter):
+
+        if self.mComponents:
+            comps = []
+            jobject["components"] = comps
+            
+            # Shortcut for all sub-components
+            if filter.isAllSubComponents():
+                self.writeJSON(comps)
+            elif filter.hasSubComponentFilters():
+                for subcomp in self.sortedcomponents():
+                    subfilter = filter.getSubComponentFilter(subcomp.getType())
+                    if subfilter is not None:
+                        subcomp.writeFilteredJSON(comps, subfilter)
         
     def loadValue(self, value_name):
         if self.hasProperty(value_name):
@@ -528,6 +576,36 @@ class PyCalendarComponentBase(object):
             for key in keys:
                 for prop in self.getProperties(key):
                     prop.writeFilteredXML(props, namespace, filter)
+
+    def writePropertiesJSON(self, jobject):
+
+        properties = {}
+        jobject["properties"] = properties
+        
+        # Sort properties by name
+        keys = self.sortedPropertyKeys()
+        for key in keys:
+            props = self.mProperties[key]
+            for prop in props:
+                prop.writeJSON(properties)
+
+    def writePropertiesFilteredJSON(self, jobject, filter):
+
+        properties = {}
+        jobject["properties"] = properties
+        
+        # Sort properties by name
+        keys = self.sortedPropertyKeys()
+
+        # Shortcut for all properties
+        if filter.isAllProperties():
+            for key in keys:
+                for prop in self.getProperties(key):
+                    prop.writeJSON(properties)
+        elif filter.hasPropertyFilters():
+            for key in keys:
+                for prop in self.getProperties(key):
+                    prop.writeFilteredJSON(properties, filter)
 
     def loadPrivateValue(self, value_name):
         # Read it in from properties list and then delete the property from the

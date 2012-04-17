@@ -38,6 +38,9 @@ class PyCalendarDateTimeValue(PyCalendarValue):
     def writeXML(self, node, namespace):
         self.mValue.writeXML(node, namespace)
 
+    def writeJSON(self, jobject):
+        self.mValue.writeJSON(jobject)
+
     def getValue(self):
         return self.mValue
 

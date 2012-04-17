@@ -103,6 +103,18 @@ class PyCalendarPeriod(ValueMixin):
             end = XML.SubElement(node, xmldefs.makeTag(namespace, xmldefs.period_end))
             end.text = self.mEnd.getXMLText()
 
+    def writeJSON(self, jobject):
+        
+        period = {}
+        jobject["period"] = period
+        
+        period["start"] = self.mStart.getJSONText()
+        
+        if self.mUseDuration:
+            period["duration"] = self.mDuration.getText()
+        else:
+            period["end"] = self.mEnd.getJSONText()
+        
     def getStart( self ):
         return self.mStart
 

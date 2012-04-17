@@ -499,6 +499,30 @@ class PyCalendarProperty(object):
         if self.mValue and not novalue:
             self.mValue.writeXML(prop, namespace)
     
+    def writeJSON(self, jobject):
+        
+        prop = {}
+        if self.getName().lower() not in jobject:
+            jobject[self.getName().lower()] = prop
+        elif isinstance(jobject[self.getName().lower()], list):
+            jobject[self.getName().lower()].append(prop)
+        else:
+            jobject[self.getName().lower()] = [jobject[self.getName().lower()], prop]
+        
+        # Write all attributes
+        if len(self.mAttributes):
+            params = {}
+            prop["parameters"] = params
+            for key in sorted(self.mAttributes.keys()):
+                for attr in self.mAttributes[key]:
+                    if attr.getName() != "VALUE":
+                        attr.writeJSON(params)
+
+        # Write value
+        if self.mValue:
+            self.mValue.writeJSON(prop)
+        
+
     def _init_PyCalendarProperty(self):
         self.mName = ""
         self.mAttributes = {}

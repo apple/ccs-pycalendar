@@ -41,6 +41,7 @@ from pycalendar.vtodo import PyCalendarVToDo
 from pycalendar.vunknown import PyCalendarUnknownComponent
 import collections
 import xml.etree.cElementTree as XML
+import json
 
 class PyCalendar(PyCalendarComponentBase):
 
@@ -456,6 +457,20 @@ class PyCalendar(PyCalendarComponentBase):
         root = XML.Element(xmldefs.makeTag(xmldefs.iCalendar20_namespace, xmldefs.icalendar))
         super(PyCalendar, self).writeXML(root, xmldefs.iCalendar20_namespace)
         return root
+        
+    def getTextJSON(self, includeTimezones=False):
+        jobject = self.writeJSON(includeTimezones)
+        return json.dumps(jobject, indent=2)
+
+    def writeJSON(self, includeTimezones=False):
+        # Make sure all required timezones are in this object
+        if includeTimezones:
+            self.includeTimezones()
+            
+        # Root node structure
+        vcalendar = []
+        super(PyCalendar, self).writeJSON(vcalendar)
+        return vcalendar
         
     # Get expanded components
     def getVEvents(self, period, list, all_day_at_top = True):

@@ -19,7 +19,7 @@ import cStringIO as StringIO
 import difflib
 import unittest
 
-class TestCalendar(unittest.TestCase):
+class TestXML(unittest.TestCase):
     
     data = (
                 (

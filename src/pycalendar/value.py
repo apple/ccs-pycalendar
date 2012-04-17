@@ -88,6 +88,9 @@ class PyCalendarValue(ValueMixin):
     def writeXML(self, node, namespace):
         raise NotImplementedError
 
+    def writeJSON(self, jobject):
+        raise NotImplementedError
+
     def getXMLNode(self, node, namespace):
         return XML.SubElement(node, xmldefs.makeTag(namespace, self._xmlMap[self.getType()]))
 

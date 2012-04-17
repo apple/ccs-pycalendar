@@ -103,3 +103,7 @@ class PyCalendarAttribute(object):
             # TODO: need to figure out proper value types
             text = XML.SubElement(param, xmldefs.makeTag(namespace, xmldefs.value_text))
             text.text = value
+
+    def writeJSON(self, jobject):
+        jobject[self.getName().lower()] = self.mValues if len(self.mValues) > 1 else self.mValues[0]
+

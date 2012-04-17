@@ -90,7 +90,15 @@ class PyCalendarRequestStatusValue( PyCalendarValue ):
 
         if len(self.mValue) == 3 and self.mValue[2]:
             data = XML.SubElement(node, xmldefs.makeTag(namespace, xmldefs.req_status_data))
-            data.text = self.mValue[1]
+            data.text = self.mValue[2]
+
+    def writeJSON(self, jobject):
+        jobject["request-status"] = {
+            "code": self.mValue[0],
+            "description": self.mValue[1]
+        }
+        if len(self.mValue) == 3 and self.mValue[2]:
+            jobject["request-status"]["data"] = self.mValue[2]
 
     def getValue(self):
         return self.mValue
