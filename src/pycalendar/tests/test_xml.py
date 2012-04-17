@@ -49,7 +49,7 @@ END:VCALENDAR
         <ns0:text>-//mulberrymail.com//Mulberry v4.0//EN</ns0:text>
       </ns0:prodid>
       <ns0:x-test>
-        <ns0:text>Testing</ns0:text>
+        <ns0:unknown>Testing</ns0:unknown>
       </ns0:x-test>
     </ns0:properties>
     <ns0:components>

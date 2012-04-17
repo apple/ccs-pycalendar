@@ -23,7 +23,6 @@ __all__ = [
     "datetime",
     "datetimevalue",
     "definitions",
-    "dummyvalue",
     "duration",
     "durationvalue",
     "exceptions",
@@ -42,6 +41,7 @@ __all__ = [
     "textvalue",
     "timezone",
     "timezonedb",
+    "unknownvalue",
     "urivalue",
     "utcoffsetvalue",
     "valarm",
@@ -57,9 +57,9 @@ __all__ = [
 ]
 
 # Import these to register the values
-import binaryvalue, caladdressvalue, datetimevalue, dummyvalue, durationvalue, \
+import binaryvalue, caladdressvalue, datetimevalue, durationvalue, \
         integervalue, multivalue, periodvalue, recurrencevalue, \
-        requeststatusvalue, textvalue, urivalue, utcoffsetvalue
+        requeststatusvalue, textvalue, unknownvalue, urivalue, utcoffsetvalue
     
 # Import these to force static initialisation
 import property

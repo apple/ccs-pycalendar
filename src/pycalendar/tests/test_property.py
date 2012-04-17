@@ -41,6 +41,7 @@ class TestProperty(unittest.TestCase):
         "URI:http://www.example.com",
         "TZOFFSETFROM:-0500",
         "X-Test:Some\, text.",
+        "X-Test:Some:, text.",
         "X-APPLE-STRUCTURED-LOCATION;VALUE=URI:geo:123.123,123.123",
         
         # Various parameters

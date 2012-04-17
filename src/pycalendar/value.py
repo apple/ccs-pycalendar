@@ -40,12 +40,13 @@ class PyCalendarValue(ValueMixin):
         VALUETYPE_REQUEST_STATUS,
         VALUETYPE_TEXT,
         VALUETYPE_TIME,
+        VALUETYPE_UNKNOWN,
         VALUETYPE_URI,
         VALUETYPE_UTC_OFFSET,
         VALUETYPE_VCARD,
         VALUETYPE_MULTIVALUE,
         VALUETYPE_XNAME,
-    ) = range(22)
+    ) = range(23)
     
     _typeMap = {}
     _xmlMap = {}
@@ -70,7 +71,7 @@ class PyCalendarValue(ValueMixin):
         if created:
             return created()
         else:
-            return clz._typeMap.get("DUMMY")(type)
+            return clz._typeMap.get("UNKNOWN")(type)
     
     def getType(self):
         raise NotImplementedError

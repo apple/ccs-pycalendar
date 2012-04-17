@@ -35,6 +35,7 @@ value_integer = "integer"
 value_period = "period"
 value_recur = "recur"
 value_text = "text"
+value_unknown = "unknown"
 value_uri = "uri"
 value_utc_offset = "utc-offset"
 

@@ -21,7 +21,6 @@ from pycalendar.binaryvalue import PyCalendarBinaryValue
 from pycalendar.caladdressvalue import PyCalendarCalAddressValue
 from pycalendar.datetime import PyCalendarDateTime
 from pycalendar.datetimevalue import PyCalendarDateTimeValue
-from pycalendar.dummyvalue import PyCalendarDummyValue
 from pycalendar.duration import PyCalendarDuration
 from pycalendar.durationvalue import PyCalendarDurationValue
 from pycalendar.exceptions import PyCalendarInvalidProperty
@@ -33,6 +32,7 @@ from pycalendar.plaintextvalue import PyCalendarPlainTextValue
 from pycalendar.recurrence import PyCalendarRecurrence
 from pycalendar.recurrencevalue import PyCalendarRecurrenceValue
 from pycalendar.requeststatusvalue import PyCalendarRequestStatusValue
+from pycalendar.unknownvalue import PyCalendarUnknownValue
 from pycalendar.urivalue import PyCalendarURIValue
 from pycalendar.utcoffsetvalue import PyCalendarUTCOffsetValue
 from pycalendar.value import PyCalendarValue
@@ -509,7 +509,7 @@ class PyCalendarProperty(object):
         self.mValue = None
 
         # Get value type from property name
-        type = PyCalendarProperty.sDefaultValueTypeMap.get(self.mName.upper(), PyCalendarValue.VALUETYPE_TEXT)
+        type = PyCalendarProperty.sDefaultValueTypeMap.get(self.mName.upper(), PyCalendarValue.VALUETYPE_UNKNOWN)
 
         # Check whether custom value is set
         if self.mAttributes.has_key(definitions.cICalAttribute_VALUE):
@@ -605,7 +605,7 @@ class PyCalendarProperty(object):
     def _init_attr_value_text(self, txt, value_type):
         # Value
         self.mValue = PyCalendarValue.createFromType(value_type)
-        if isinstance(self.mValue, PyCalendarPlainTextValue) or isinstance(self.mValue, PyCalendarDummyValue):
+        if isinstance(self.mValue, PyCalendarPlainTextValue) or isinstance(self.mValue, PyCalendarUnknownValue):
             self.mValue.setValue(txt)
 
         # Attributes

@@ -20,7 +20,6 @@ from pycalendar.adrvalue import AdrValue
 from pycalendar.attribute import PyCalendarAttribute
 from pycalendar.datetime import PyCalendarDateTime
 from pycalendar.datetimevalue import PyCalendarDateTimeValue
-from pycalendar.dummyvalue import PyCalendarDummyValue
 from pycalendar.exceptions import PyCalendarInvalidProperty
 from pycalendar.integervalue import PyCalendarIntegerValue
 from pycalendar.multivalue import PyCalendarMultiValue
@@ -29,6 +28,7 @@ from pycalendar.nvalue import NValue
 from pycalendar.orgvalue import OrgValue
 from pycalendar.parser import ParserContext
 from pycalendar.plaintextvalue import PyCalendarPlainTextValue
+from pycalendar.unknownvalue import PyCalendarUnknownValue
 from pycalendar.utcoffsetvalue import PyCalendarUTCOffsetValue
 from pycalendar.value import PyCalendarValue
 from pycalendar.vcard import definitions
@@ -449,7 +449,7 @@ class Property(object):
         self.mValue = None
 
         # Get value type from property name
-        valueType = Property.sDefaultValueTypeMap.get(self.mName.upper(), PyCalendarDummyValue)
+        valueType = Property.sDefaultValueTypeMap.get(self.mName.upper(), PyCalendarUnknownValue)
 
         # Check whether custom value is set
         if self.mAttributes.has_key(definitions.Parameter_VALUE):
@@ -495,7 +495,7 @@ class Property(object):
     def _init_attr_value_text(self, txt, value_type):
         # Value
         self.mValue = PyCalendarValue.createFromType(value_type)
-        if isinstance(self.mValue, PyCalendarPlainTextValue) or isinstance(self.mValue, PyCalendarDummyValue):
+        if isinstance(self.mValue, PyCalendarPlainTextValue) or isinstance(self.mValue, PyCalendarUnknownValue):
             self.mValue.setValue(txt)
 
         # Attributes
