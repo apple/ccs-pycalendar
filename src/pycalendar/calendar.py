@@ -470,7 +470,7 @@ class PyCalendar(PyCalendarComponentBase):
         # Root node structure
         vcalendar = []
         super(PyCalendar, self).writeJSON(vcalendar)
-        return vcalendar
+        return vcalendar[0]
         
     # Get expanded components
     def getVEvents(self, period, list, all_day_at_top = True):

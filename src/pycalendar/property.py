@@ -501,13 +501,11 @@ class PyCalendarProperty(object):
     
     def writeJSON(self, jobject):
         
-        prop = {}
-        if self.getName().lower() not in jobject:
-            jobject[self.getName().lower()] = prop
-        elif isinstance(jobject[self.getName().lower()], list):
-            jobject[self.getName().lower()].append(prop)
-        else:
-            jobject[self.getName().lower()] = [jobject[self.getName().lower()], prop]
+        prop = {
+            "name":self.getName().lower(),
+            "value":{},
+        }
+        jobject.append(prop)
         
         # Write all attributes
         if len(self.mAttributes):
@@ -520,7 +518,7 @@ class PyCalendarProperty(object):
 
         # Write value
         if self.mValue:
-            self.mValue.writeJSON(prop)
+            self.mValue.writeJSON(prop["value"])
         
 
     def _init_PyCalendarProperty(self):

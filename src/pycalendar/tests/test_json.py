@@ -68,39 +68,48 @@ END:VEVENT
 END:VCALENDAR
 """.replace("\n", "\r\n"),
 
-"""[
-  {
-    "type": "vcalendar", 
-    "properties": {
-      "version": {
+"""{
+  "component": "vcalendar", 
+  "contents": [
+    {
+      "name": "version", 
+      "value": {
         "text": "2.0"
-      }, 
-      "prodid": {
+      }
+    }, 
+    {
+      "name": "prodid", 
+      "value": {
         "text": "-//Example Corp.//Example Client//EN"
       }
     }, 
-    "components": [
-      {
-        "type": "vtimezone", 
-        "properties": {
-          "tzid": {
+    {
+      "component": "vtimezone", 
+      "contents": [
+        {
+          "name": "tzid", 
+          "value": {
             "text": "US/Eastern"
-          }, 
-          "last-modified": {
+          }
+        }, 
+        {
+          "name": "last-modified", 
+          "value": {
             "date-time": "2004-01-10T03:28:45Z"
           }
         }, 
-        "components": [
-          {
-            "type": "daylight", 
-            "properties": {
-              "tzoffsetto": {
-                "utc-offset": "-04:00"
-              }, 
-              "dtstart": {
+        {
+          "component": "daylight", 
+          "contents": [
+            {
+              "name": "dtstart", 
+              "value": {
                 "date-time": "2000-04-04T02:00:00"
-              }, 
-              "rrule": {
+              }
+            }, 
+            {
+              "name": "rrule", 
+              "value": {
                 "recur": {
                   "bymonth": [
                     4
@@ -110,25 +119,40 @@ END:VCALENDAR
                     "1SU"
                   ]
                 }
-              }, 
-              "tzoffsetfrom": {
-                "utc-offset": "-05:00"
-              }, 
-              "tzname": {
+              }
+            }, 
+            {
+              "name": "tzname", 
+              "value": {
                 "text": "EDT"
               }
-            }
-          }, 
-          {
-            "type": "standard", 
-            "properties": {
-              "tzoffsetto": {
+            }, 
+            {
+              "name": "tzoffsetfrom", 
+              "value": {
                 "utc-offset": "-05:00"
-              }, 
-              "dtstart": {
+              }
+            }, 
+            {
+              "name": "tzoffsetto", 
+              "value": {
+                "utc-offset": "-04:00"
+              }
+            }
+          ]
+        }, 
+        {
+          "component": "standard", 
+          "contents": [
+            {
+              "name": "dtstart", 
+              "value": {
                 "date-time": "2000-10-26T02:00:00"
-              }, 
-              "rrule": {
+              }
+            }, 
+            {
+              "name": "rrule", 
+              "value": {
                 "recur": {
                   "bymonth": [
                     10
@@ -138,94 +162,148 @@ END:VCALENDAR
                     "-1SU"
                   ]
                 }
-              }, 
-              "tzoffsetfrom": {
-                "utc-offset": "-04:00"
-              }, 
-              "tzname": {
+              }
+            }, 
+            {
+              "name": "tzname", 
+              "value": {
                 "text": "EST"
               }
+            }, 
+            {
+              "name": "tzoffsetfrom", 
+              "value": {
+                "utc-offset": "-04:00"
+              }
+            }, 
+            {
+              "name": "tzoffsetto", 
+              "value": {
+                "utc-offset": "-05:00"
+              }
             }
-          }
-        ]
-      }, 
-      {
-        "type": "vevent", 
-        "properties": {
-          "dtstamp": {
-            "date-time": "2006-02-06T00:11:21Z"
-          }, 
-          "uid": {
+          ]
+        }
+      ]
+    }, 
+    {
+      "component": "vevent", 
+      "contents": [
+        {
+          "name": "uid", 
+          "value": {
             "text": "00959BC664CA650E933C892C@example.com"
+          }
+        }, 
+        {
+          "parameters": {
+            "tzid": "US/Eastern"
           }, 
-          "summary": {
-            "text": "Event #2"
+          "name": "dtstart", 
+          "value": {
+            "date-time": "2006-01-02T12:00:00"
+          }
+        }, 
+        {
+          "name": "duration", 
+          "value": {
+            "duration": "PT1H"
+          }
+        }, 
+        {
+          "name": "description", 
+          "value": {
+            "text": "We are having a meeting all this week at 12 pm for one hour, with an additional meeting on the first day 2 hours long.\\nPlease bring your own lunch for the 12 pm meetings."
+          }
+        }, 
+        {
+          "name": "dtstamp", 
+          "value": {
+            "date-time": "2006-02-06T00:11:21Z"
+          }
+        }, 
+        {
+          "parameters": {
+            "tzid": "US/Eastern"
           }, 
-          "rdate": {
+          "name": "rdate", 
+          "value": {
             "period": [
               {
                 "duration": "PT2H", 
                 "start": "2006-01-02T15:00:00"
               }
-            ], 
-            "parameters": {
-              "tzid": "US/Eastern"
-            }
-          }, 
-          "rrule": {
+            ]
+          }
+        }, 
+        {
+          "name": "rrule", 
+          "value": {
             "recur": {
               "count": 5, 
               "freq": "DAILY"
             }
-          }, 
-          "duration": {
-            "duration": "PT1H"
-          }, 
-          "dtstart": {
-            "parameters": {
-              "tzid": "US/Eastern"
-            }, 
-            "date-time": "2006-01-02T12:00:00"
-          }, 
-          "description": {
-            "text": "We are having a meeting all this week at 12 pm for one hour, with an additional meeting on the first day 2 hours long.\\nPlease bring your own lunch for the 12 pm meetings."
+          }
+        }, 
+        {
+          "name": "summary", 
+          "value": {
+            "text": "Event #2"
           }
         }
-      }, 
-      {
-        "type": "vevent", 
-        "properties": {
-          "dtstamp": {
-            "date-time": "2006-02-06T00:11:21Z"
-          }, 
-          "uid": {
+      ]
+    }, 
+    {
+      "component": "vevent", 
+      "contents": [
+        {
+          "name": "uid", 
+          "value": {
             "text": "00959BC664CA650E933C892C@example.com"
+          }
+        }, 
+        {
+          "parameters": {
+            "tzid": "US/Eastern"
           }, 
-          "recurrence-id": {
-            "parameters": {
-              "tzid": "US/Eastern"
-            }, 
+          "name": "recurrence-id", 
+          "value": {
             "date-time": "2006-01-04T12:00:00"
+          }
+        }, 
+        {
+          "parameters": {
+            "tzid": "US/Eastern"
           }, 
-          "summary": {
-            "text": "Event #2 bis"
-          }, 
-          "duration": {
-            "duration": "PT1H"
-          }, 
-          "dtstart": {
-            "parameters": {
-              "tzid": "US/Eastern"
-            }, 
+          "name": "dtstart", 
+          "value": {
             "date-time": "2006-01-04T14:00:00"
           }
+        }, 
+        {
+          "name": "duration", 
+          "value": {
+            "duration": "PT1H"
+          }
+        }, 
+        {
+          "name": "dtstamp", 
+          "value": {
+            "date-time": "2006-02-06T00:11:21Z"
+          }
+        }, 
+        {
+          "name": "summary", 
+          "value": {
+            "text": "Event #2 bis"
+          }
         }
-      }
-    ]
-  }
-]""",
-                ),
-)
+      ]
+    }
+  ]
+}""",
+            ),
+        )
 
     def testGenerateJSON(self):
 
@@ -236,7 +314,6 @@ END:VCALENDAR
             cal.parse(StringIO.StringIO(caldata))
             
             test2 = cal.getTextJSON()
-            
             self.assertEqual(
                 test1,
                 test2,
