@@ -211,7 +211,7 @@ if __name__ == '__main__':
 
     # Set the PRODID value used in generated iCalendar data
     prodid = "-//mulberrymail.com//Zonal//EN"
-    rootdir = "../../2011g"
+    rootdir = "../../stuff/temp"
     startYear = 1800
     endYear = 2018
 
@@ -260,6 +260,7 @@ if __name__ == '__main__':
         parser.generateZoneinfoFiles(os.path.join(rootdir, "zoneinfo"), startYear, endYear, filterzones=(
             #"America/Montevideo",
             #"Europe/Paris",
+            #"Africa/Cairo",
         ))
 
     if 0:

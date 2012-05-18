@@ -1,5 +1,5 @@
 ##
-#    Copyright (c) 2007-2011 Cyrus Daboo. All rights reserved.
+#    Copyright (c) 2007-2012 Cyrus Daboo. All rights reserved.
 #    
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -481,13 +481,15 @@ class Rule(object):
                 if dayOfWeek == indicatedDay:
                     rrule.setByDay(((-1, Rule.LASTDAY_NAME_TO_RDAY[self.onDay]),))
                 elif dayOfWeek < indicatedDay or dayOfWeek == 6 and indicatedDay == 0:
+                    # This is OK as we have moved back a day and thus no month transition
+                    # could have occurred 
                     fakeOffset = daysInMonth(start.getMonth(), start.getYear()) - 6
                     offset, rday, bymday = self.getOnDayDetails(start, indicatedDay, fakeOffset)
                     if bymday:
                         rrule.setByMonthDay(bymday)
                     rrule.setByDay(((offset, rday),))
                 else:
-                    # This is bad news we have moved forward a day possibly into the next month
+                    # This is bad news as we have moved forward a day possibly into the next month
                     # What we do is switch to using a BYYEARDAY rule with offset from the end of the year
                     rrule.setByMonth(())
                     daysBackStartOfMonth = (
@@ -511,8 +513,8 @@ class Rule(object):
                     if bymday:
                         rrule.setByMonthDay(bymday)
                     rrule.setByDay(((offset, rday),))
-                elif dayOfWeek < indicatedDay or dayOfWeek == 6 and indicatedDay == 0:
-                    # This is bad news we have moved forward a day possibly into the next month
+                elif dayoffset == 1 and divmod(dayoffset - indicatedDay, 7)[1] == 6:
+                    # This is bad news as we have moved backward a day possibly into the next month
                     # What we do is switch to using a BYYEARDAY rule with offset from the end of the year
                     rrule.setByMonth(())
                     daysBackStartOfMonth = (
@@ -523,6 +525,8 @@ class Rule(object):
                         ((0, divmod(indicatedDay + 1, 7)[1]),),
                     )
                 else:
+                    # This is OK as we have moved forward a day and thus no month transition
+                    # could have occurred 
                     offset, rday, bymday = self.getOnDayDetails(start, indicatedDay, int(dayoffset))
                     if bymday:
                         rrule.setByMonthDay(bymday)
