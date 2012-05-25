@@ -24,6 +24,74 @@ class TestJSON(unittest.TestCase):
     data = (
                 (
 """BEGIN:VCALENDAR
+CALSCALE:GREGORIAN
+PRODID:-//Example Inc.//Example Calendar//EN
+VERSION:2.0
+BEGIN:VEVENT
+DTSTAMP:20080205T191224Z
+DTSTART;VALUE=DATE:20081006
+SUMMARY:Planning meeting
+UID:4088E990AD89CB3DBB484909
+END:VEVENT
+END:VCALENDAR
+""".replace("\n", "\r\n"),
+
+"""{
+  "component": "vcalendar", 
+  "contents": [
+    {
+      "name": "version", 
+      "value": {
+        "text": "2.0"
+      }
+    }, 
+    {
+      "name": "calscale", 
+      "value": {
+        "text": "GREGORIAN"
+      }
+    }, 
+    {
+      "name": "prodid", 
+      "value": {
+        "text": "-//Example Inc.//Example Calendar//EN"
+      }
+    }, 
+    {
+      "component": "vevent", 
+      "contents": [
+        {
+          "name": "uid", 
+          "value": {
+            "text": "4088E990AD89CB3DBB484909"
+          }
+        }, 
+        {
+          "parameters": {}, 
+          "name": "dtstart", 
+          "value": {
+            "date": "2008-10-06"
+          }
+        }, 
+        {
+          "name": "dtstamp", 
+          "value": {
+            "date-time": "2008-02-05T19:12:24Z"
+          }
+        }, 
+        {
+          "name": "summary", 
+          "value": {
+            "text": "Planning meeting"
+          }
+        }
+      ]
+    }
+  ]
+}""",
+                ),
+                (
+"""BEGIN:VCALENDAR
 VERSION:2.0
 PRODID:-//Example Corp.//Example Client//EN
 BEGIN:VTIMEZONE
