@@ -14,7 +14,6 @@
 #    limitations under the License.
 ##
 
-from pycalendar.calendar import PyCalendar
 from pycalendar.exceptions import PyCalendarNoTimezoneInDatabase,\
     PyCalendarInvalidData
 import os
@@ -29,13 +28,16 @@ class PyCalendarTimezoneDatabase(object):
 
     @staticmethod
     def createTimezoneDatabase(dbpath):
+        PyCalendarTimezoneDatabase.sTimezoneDatabase = PyCalendarTimezoneDatabase()
         PyCalendarTimezoneDatabase.sTimezoneDatabase.setPath(dbpath)
 
     @staticmethod
     def clearTimezoneDatabase():
-        PyCalendarTimezoneDatabase.sTimezoneDatabase.clear()
+        if PyCalendarTimezoneDatabase.sTimezoneDatabase is not None:
+            PyCalendarTimezoneDatabase.sTimezoneDatabase.clear()
 
     def __init__(self):
+        from pycalendar.calendar import PyCalendar
         self.dbpath = None
         self.calendar = PyCalendar()
 
@@ -43,19 +45,27 @@ class PyCalendarTimezoneDatabase(object):
         self.dbpath = dbpath
 
     def clear(self):
+        from pycalendar.calendar import PyCalendar
         self.calendar = PyCalendar()
-        
+    
+    @staticmethod
+    def getTimezoneDatabase():
+        if PyCalendarTimezoneDatabase.sTimezoneDatabase is None:
+            PyCalendarTimezoneDatabase.sTimezoneDatabase = PyCalendarTimezoneDatabase()
+        return PyCalendarTimezoneDatabase.sTimezoneDatabase
+
     @staticmethod
     def getTimezone(tzid):
         
         # Check whether current cached
-        tz = PyCalendarTimezoneDatabase.sTimezoneDatabase.calendar.getTimezone(tzid)
+        tzdb = PyCalendarTimezoneDatabase.getTimezoneDatabase()
+        tz = tzdb.calendar.getTimezone(tzid)
         if tz is None:
             try:
-                PyCalendarTimezoneDatabase.sTimezoneDatabase.cacheTimezone(tzid)
+                tzdb.cacheTimezone(tzid)
             except PyCalendarNoTimezoneInDatabase:
                 pass
-            tz = PyCalendarTimezoneDatabase.sTimezoneDatabase.calendar.getTimezone(tzid)
+            tz = tzdb.calendar.getTimezone(tzid)
             
         return tz
 
@@ -67,6 +77,7 @@ class PyCalendarTimezoneDatabase(object):
         
         tz = PyCalendarTimezoneDatabase.getTimezone(tzid)
         if tz is not None:
+            from pycalendar.calendar import PyCalendar
             cal = PyCalendar()
             cal.addComponent(tz.duplicate(cal))
             return cal
@@ -78,7 +89,7 @@ class PyCalendarTimezoneDatabase(object):
         # Cache it first
         tz = PyCalendarTimezoneDatabase.getTimezone(tzid)
         if tz is not None:
-            return PyCalendarTimezoneDatabase.sTimezoneDatabase.calendar.getTimezoneOffsetSeconds(tzid, dt)
+            return tz.getTimezoneOffsetSeconds(dt)
         else:
             return 0
 
@@ -87,7 +98,7 @@ class PyCalendarTimezoneDatabase(object):
         # Cache it first
         tz = PyCalendarTimezoneDatabase.getTimezone(tzid)
         if tz is not None:
-            return PyCalendarTimezoneDatabase.sTimezoneDatabase.calendar.getTimezoneDescriptor(tzid, dt)
+            return tz.getTimezoneDescriptor(dt)
         else:
             return ""
 
@@ -116,13 +127,15 @@ class PyCalendarTimezoneDatabase(object):
         Merge each timezone from other calendar.
         """
         
+        tzdb = PyCalendarTimezoneDatabase.getTimezoneDatabase()
+
         # Not if our own calendar
-        if cal is PyCalendarTimezoneDatabase.sTimezoneDatabase.calendar:
+        if cal is tzdb.calendar:
             return
 
         # Merge each timezone from other calendar
         for tz in tzs:
-            PyCalendarTimezoneDatabase.sTimezoneDatabase.mergeTimezone(tz)
+            tzdb.mergeTimezone(tz)
         
     def mergeTimezone(self, tz):
         """
@@ -131,5 +144,3 @@ class PyCalendarTimezoneDatabase(object):
         
         if self.getTimezone(tz.getID()) is None:
             self.addTimezone(tz)
-
-PyCalendarTimezoneDatabase.sTimezoneDatabase = PyCalendarTimezoneDatabase()

@@ -32,11 +32,14 @@ class PyCalendarVTimezone(PyCalendarComponent):
 
     propertyValueChecks = ICALENDAR_VALUE_CHECKS
 
+    UTCOFFSET_CACHE_MAX_ENTRIES = 100000
+
     def __init__(self, parent=None):
         super(PyCalendarVTimezone, self).__init__(parent=parent)
         self.mID = ""
         self.mUTCOffsetSortKey = None
-        self.mCachedExpandAllMax = None
+        self.mCachedExpandAllMaxYear = None
+        self.mCachedOffsets = None
 
     def duplicate(self, parent=None):
         other = super(PyCalendarVTimezone, self).duplicate(parent=parent)
@@ -134,15 +137,25 @@ class PyCalendarVTimezone(PyCalendarComponent):
         temp.setTimezoneID(None)
 
         # Check whether we need to recache
-        if self.mCachedExpandAllMax is None or temp > self.mCachedExpandAllMax:
+        if self.mCachedExpandAllMaxYear is None or temp.mYear >= self.mCachedExpandAllMaxYear:
             cacheMax = temp.duplicate()
-            cacheMax.offsetYear(1)
+            cacheMax.setHHMMSS(0, 0, 0)
+            cacheMax.offsetYear(2)
+            cacheMax.setMonth(1)
+            cacheMax.setDay(1)
             self.mCachedExpandAll = self.expandAll(None, cacheMax)
-            self.mCachedExpandAllMax = cacheMax
+            self.mCachedExpandAllMaxYear = cacheMax.mYear
+            self.mCachedOffsets = {}
             
         # Now search for the transition just below the time we want
         if len(self.mCachedExpandAll):
-            i = PyCalendarVTimezone.tuple_bisect_right(self.mCachedExpandAll, temp)
+            cacheKey = (temp.mYear, temp.mMonth, temp.mDay, temp.mHours, temp.mMinutes,)
+            i = self.mCachedOffsets.get(cacheKey)
+            if i is None:
+                i = PyCalendarVTimezone.tuple_bisect_right(self.mCachedExpandAll, temp)
+                if len(self.mCachedOffsets) >= self.UTCOFFSET_CACHE_MAX_ENTRIES:
+                    self.mCachedOffsets = {}
+                self.mCachedOffsets[cacheKey] = i
             if i != 0:
                 return self.mCachedExpandAll[i-1][2]
 

@@ -174,14 +174,28 @@ class PyCalendarProperty(object):
         self._init_PyCalendarProperty()
         self.mName = name if name is not None else ""
 
-        if isinstance(value, int):
-            self._init_attr_value_int(value)
-
+        # The None check speeds up .duplicate()
+        if value is None:
+            pass
+        
+        # Order these based on most likely occurrence to speed up this method
         elif isinstance(value, str):
             self._init_attr_value_text(value, valuetype if valuetype else PyCalendarProperty.sDefaultValueTypeMap.get(self.mName.upper(), PyCalendarValue.VALUETYPE_TEXT))
 
         elif isinstance(value, PyCalendarDateTime):
             self._init_attr_value_datetime(value)
+
+        elif isinstance(value, PyCalendarDuration):
+            self._init_attr_value_duration(value)
+
+        elif isinstance(value, PyCalendarRecurrence):
+            self._init_attr_value_recur(value)
+
+        elif isinstance(value, PyCalendarPeriod):
+            self._init_attr_value_period(value)
+
+        elif isinstance(value, int):
+            self._init_attr_value_int(value)
 
         elif isinstance(value, list):
             if name.upper() == definitions.cICalProperty_REQUEST_STATUS:
@@ -194,15 +208,6 @@ class PyCalendarProperty(object):
                     self._init_attr_value_periodlist(value)
                 else:
                     self._init_attr_value_datetimelist(value)
-
-        elif isinstance(value, PyCalendarDuration):
-            self._init_attr_value_duration(value)
-
-        elif isinstance(value, PyCalendarPeriod):
-            self._init_attr_value_period(value)
-
-        elif isinstance(value, PyCalendarRecurrence):
-            self._init_attr_value_recur(value)
 
         elif isinstance(value, PyCalendarUTCOffsetValue):
             self._init_attr_value_utcoffset(value)

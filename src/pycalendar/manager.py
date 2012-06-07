@@ -21,7 +21,7 @@ class PyCalendarManager(object):
     sICalendarManager = None
 
     def __init__(self):
-        self.mDefaultTimezone = PyCalendarTimezone()
+        PyCalendarTimezone.sDefaultTimezone = PyCalendarTimezone()
 
     def initManager(self):
         # TODO: - read in timezones from vtimezones.ics file
@@ -40,15 +40,15 @@ class PyCalendarManager(object):
             self.setDefaultTimezone(temp)
 
     def setDefaultTimezone(self, tzid):
-        self.mDefaultTimezone = tzid
+        PyCalendarTimezone.sDefaultTimezone = tzid
 
     def getDefaultTimezoneID(self):
-        if self.mDefaultTimezone.getUTC():
+        if PyCalendarTimezone.sDefaultTimezone.getUTC():
             return "UTC"
         else:
-            return self.mDefaultTimezone.getTimezoneID()
+            return PyCalendarTimezone.sDefaultTimezone.getTimezoneID()
 
     def getDefaultTimezone(self):
-        return self.mDefaultTimezone
+        return PyCalendarTimezone.sDefaultTimezone
 
 PyCalendarManager.sICalendarManager = PyCalendarManager()

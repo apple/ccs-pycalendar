@@ -1,5 +1,5 @@
 ##
-#    Copyright (c) 2007-2011 Cyrus Daboo. All rights reserved.
+#    Copyright (c) 2007-2012 Cyrus Daboo. All rights reserved.
 #    
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -61,6 +61,7 @@ class PyCalendarDateTime(ValueMixin):
 
         self.mTZUTC = False
         self.mTZID = None
+        self.mTZOffset = None
 
         self.mPosixTimeCached = False
         self.mPosixTime = 0
@@ -86,6 +87,7 @@ class PyCalendarDateTime(ValueMixin):
 
         other.mTZUTC = self.mTZUTC
         other.mTZID = self.mTZID
+        other.mTZOffset = self.mTZOffset
 
         other.mPosixTimeCached = self.mPosixTimeCached
         other.mPosixTime = self.mPosixTime
@@ -608,13 +610,22 @@ class PyCalendarDateTime(ValueMixin):
 
     def adjustToUTC( self ):
         if self.local() and not self.mDateOnly:
+            # Cache, restore and adjust the posix value to avoid a recalc since we can easily do it here
+            tempPosix = self.mPosixTime if self.mPosixTimeCached else None
+
             utc = PyCalendarTimezone(utc=True)
 
             offset_from = self.timeZoneSecondsOffset()
             self.setTimezone( utc )
-            offset_to = self.timeZoneSecondsOffset()
 
-            self.offsetSeconds( offset_to - offset_from )
+            self.offsetSeconds( -offset_from )
+            
+            if tempPosix is not None:
+                self.mPosixTimeCached = True
+                self.mPosixTime = tempPosix - offset_from
+            
+            self.mTZOffset = 0
+
         return self
 
     def getAdjustedTime( self, tzid = None ):
@@ -1030,8 +1041,10 @@ class PyCalendarDateTime(ValueMixin):
     def timeZoneSecondsOffset( self ):
         if self.mTZUTC:
             return 0
-        tz = PyCalendarTimezone(utc=self.mTZUTC, tzid=self.mTZID)
-        return tz.timeZoneSecondsOffset( self )
+        if self.mTZOffset is None:
+            tz = PyCalendarTimezone(utc=self.mTZUTC, tzid=self.mTZID)
+            self.mTZOffset = tz.timeZoneSecondsOffset( self )
+        return self.mTZOffset
 
     def timeZoneDescriptor( self ):
         tz = PyCalendarTimezone(utc=self.mTZUTC, tzid=self.mTZID)
@@ -1039,6 +1052,7 @@ class PyCalendarDateTime(ValueMixin):
 
     def changed( self ):
         self.mPosixTimeCached = False
+        self.mTZOffset = None
 
     def daysSince1970( self ):
         # Add days between 1970 and current year (ignoring leap days)
