@@ -318,5 +318,5 @@ END:VCALENDAR
         # adjust preserves cache details
         dt2.adjustToUTC()
         self.assertTrue(dt2.mPosixTimeCached)
-        self.assertEqual(dt2.mPosixTime + dt.mTZOffset, dt.mPosixTime)
+        self.assertEqual(dt2.mPosixTime, dt.mPosixTime)
         self.assertEqual(dt2.mTZOffset, 0)

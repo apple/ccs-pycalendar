@@ -610,7 +610,7 @@ class PyCalendarDateTime(ValueMixin):
 
     def adjustToUTC( self ):
         if self.local() and not self.mDateOnly:
-            # Cache, restore and adjust the posix value to avoid a recalc since we can easily do it here
+            # Cache and restore and adjust the posix value to avoid a recalc since it won't change during this adjust
             tempPosix = self.mPosixTime if self.mPosixTimeCached else None
 
             utc = PyCalendarTimezone(utc=True)
@@ -622,7 +622,7 @@ class PyCalendarDateTime(ValueMixin):
             
             if tempPosix is not None:
                 self.mPosixTimeCached = True
-                self.mPosixTime = tempPosix - offset_from
+                self.mPosixTime = tempPosix
             
             self.mTZOffset = 0
 
