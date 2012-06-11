@@ -115,3 +115,17 @@ class TestProperty(unittest.TestCase):
         for propname, propvalue, result in test_data:
             prop = PyCalendarProperty(name=propname, value=propvalue)
             self.assertEqual(str(prop), result)
+
+    def testGEOValueRoundtrip(self):
+        
+        data = "GEO:123.456,789.101"
+        prop = PyCalendarProperty()
+        prop.parse(data)
+        self.assertEqual(str(prop), data + "\r\n")
+
+    def testUnknownValueRoundtrip(self):
+        
+        data = "X-FOO:Text, not escaped"
+        prop = PyCalendarProperty()
+        prop.parse(data)
+        self.assertEqual(str(prop), data + "\r\n")

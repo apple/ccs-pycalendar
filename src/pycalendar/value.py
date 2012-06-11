@@ -71,7 +71,7 @@ class PyCalendarValue(ValueMixin):
         if created:
             return created()
         else:
-            return clz._typeMap.get("UNKNOWN")(type)
+            return clz._typeMap.get(PyCalendarValue.VALUETYPE_UNKNOWN)(type)
     
     def getType(self):
         raise NotImplementedError
