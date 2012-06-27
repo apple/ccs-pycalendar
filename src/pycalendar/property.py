@@ -170,6 +170,11 @@ class PyCalendarProperty(object):
         definitions.cICalProperty_RDATE,
     ))
 
+    @staticmethod
+    def regsiterDefaultValue(propname, valuetype):
+        if propname not in PyCalendarProperty.sDefaultValueTypeMap:
+            PyCalendarProperty.sDefaultValueTypeMap[propname] = valuetype
+
     def __init__(self, name = None, value = None, valuetype = None):
         self._init_PyCalendarProperty()
         self.mName = name if name is not None else ""

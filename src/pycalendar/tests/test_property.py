@@ -18,6 +18,7 @@ from pycalendar.exceptions import PyCalendarInvalidProperty
 from pycalendar.parser import ParserContext
 from pycalendar.property import PyCalendarProperty
 import unittest
+from pycalendar.value import PyCalendarValue
 
 class TestProperty(unittest.TestCase):
     
@@ -141,3 +142,15 @@ class TestProperty(unittest.TestCase):
         
         prop = PyCalendarProperty("X-FOO", "Text\\, escaped\\n")
         self.assertEqual(str(prop), data + "\r\n")
+
+    def testNewRegistrationValueRoundtrip(self):
+        
+        PyCalendarProperty.regsiterDefaultValue("X-SPECIAL-REGISTRATION", PyCalendarValue.VALUETYPE_TEXT)
+
+        data = "X-SPECIAL-REGISTRATION:Text\\, escaped\\n"
+        prop = PyCalendarProperty()
+        prop.parse(data)
+        self.assertEqual(str(prop), "X-SPECIAL-REGISTRATION:Text\\, escaped\\n\r\n")
+        
+        prop = PyCalendarProperty("X-SPECIAL-REGISTRATION", "Text, escaped\n")
+        self.assertEqual(str(prop), "X-SPECIAL-REGISTRATION:Text\\, escaped\\n\r\n")
