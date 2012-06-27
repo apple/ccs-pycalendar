@@ -1,5 +1,5 @@
 ##
-#    Copyright (c) 2007-2011 Cyrus Daboo. All rights reserved.
+#    Copyright (c) 2007-2012 Cyrus Daboo. All rights reserved.
 #    
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -43,6 +43,7 @@ class TestProperty(unittest.TestCase):
         "X-Test:Some\, text.",
         "X-Test:Some:, text.",
         "X-APPLE-STRUCTURED-LOCATION;VALUE=URI:geo:123.123,123.123",
+        "X-CALENDARSERVER-PRIVATE-COMMENT:This\\ntest\\nis\\, here.\\n",
         
         # Various parameters
         "DTSTART;TZID=\"Somewhere, else\":20060226T120000",
@@ -128,4 +129,15 @@ class TestProperty(unittest.TestCase):
         data = "X-FOO:Text, not escaped"
         prop = PyCalendarProperty()
         prop.parse(data)
+        self.assertEqual(str(prop), data + "\r\n")
+        
+        prop = PyCalendarProperty("X-FOO", "Text, not escaped")
+        self.assertEqual(str(prop), data + "\r\n")
+        
+        data = "X-FOO:Text\\, escaped\\n"
+        prop = PyCalendarProperty()
+        prop.parse(data)
+        self.assertEqual(str(prop), data + "\r\n")
+        
+        prop = PyCalendarProperty("X-FOO", "Text\\, escaped\\n")
         self.assertEqual(str(prop), data + "\r\n")

@@ -1,5 +1,5 @@
 ##
-#    Copyright (c) 2007-2011 Cyrus Daboo. All rights reserved.
+#    Copyright (c) 2007-2012 Cyrus Daboo. All rights reserved.
 #    
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -180,7 +180,7 @@ class PyCalendarProperty(object):
         
         # Order these based on most likely occurrence to speed up this method
         elif isinstance(value, str):
-            self._init_attr_value_text(value, valuetype if valuetype else PyCalendarProperty.sDefaultValueTypeMap.get(self.mName.upper(), PyCalendarValue.VALUETYPE_TEXT))
+            self._init_attr_value_text(value, valuetype if valuetype else PyCalendarProperty.sDefaultValueTypeMap.get(self.mName.upper(), PyCalendarValue.VALUETYPE_UNKNOWN))
 
         elif isinstance(value, PyCalendarDateTime):
             self._init_attr_value_datetime(value)
