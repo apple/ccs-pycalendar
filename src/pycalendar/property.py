@@ -172,7 +172,7 @@ class PyCalendarProperty(object):
     ))
 
     @staticmethod
-    def regsiterDefaultValue(propname, valuetype):
+    def registerDefaultValue(propname, valuetype):
         if propname not in PyCalendarProperty.sDefaultValueTypeMap:
             PyCalendarProperty.sDefaultValueTypeMap[propname] = valuetype
 

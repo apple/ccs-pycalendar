@@ -149,7 +149,7 @@ class TestProperty(unittest.TestCase):
 
     def testNewRegistrationValueRoundtrip(self):
         
-        PyCalendarProperty.regsiterDefaultValue("X-SPECIAL-REGISTRATION", PyCalendarValue.VALUETYPE_TEXT)
+        PyCalendarProperty.registerDefaultValue("X-SPECIAL-REGISTRATION", PyCalendarValue.VALUETYPE_TEXT)
 
         data = "X-SPECIAL-REGISTRATION:Text\\, escaped\\n"
         prop = PyCalendarProperty()
