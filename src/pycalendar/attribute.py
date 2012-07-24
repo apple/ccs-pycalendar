@@ -19,8 +19,10 @@ ICalendar attribute.
 
 The attribute can consist of one or more values, all string.
 """
-import xml.etree.cElementTree as XML
+
 from pycalendar import xmldefs
+from pycalendar.utils import encodeParameterValue
+import xml.etree.cElementTree as XML
 
 class PyCalendarAttribute(object):
 
@@ -91,6 +93,10 @@ class PyCalendarAttribute(object):
             pass
     
     def generateValue(self, os, str):
+
+        # ^-escaping        
+        str = encodeParameterValue(str)
+
         # Look for quoting
         if str.find(":") != -1 or str.find(";") != -1 or str.find(",") != -1:
             os.write("\"%s\"" % (str,))

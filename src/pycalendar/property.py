@@ -35,6 +35,7 @@ from pycalendar.requeststatusvalue import PyCalendarRequestStatusValue
 from pycalendar.unknownvalue import PyCalendarUnknownValue
 from pycalendar.urivalue import PyCalendarURIValue
 from pycalendar.utcoffsetvalue import PyCalendarUTCOffsetValue
+from pycalendar.utils import decodeParameterValue
 from pycalendar.value import PyCalendarValue
 import cStringIO as StringIO
 import xml.etree.cElementTree as XML
@@ -380,8 +381,8 @@ class PyCalendarProperty(object):
                     if attribute_value is None:
                         raise PyCalendarInvalidProperty("Invalid property", data)
     
-                    # Now add attribute value
-                    attrvalue = PyCalendarAttribute(name = attribute_name, value=attribute_value)
+                    # Now add attribute value (decode ^-escpaing)
+                    attrvalue = PyCalendarAttribute(name = attribute_name, value=decodeParameterValue(attribute_value))
                     self.mAttributes.setdefault(attribute_name.upper(), []).append(attrvalue)
     
                     # Look for additional values
@@ -390,7 +391,7 @@ class PyCalendarProperty(object):
                         attribute_value2, txt = stringutils.strduptokenstr(txt, ":;,")
                         if attribute_value2 is None:
                             raise PyCalendarInvalidProperty("Invalid property", data)
-                        attrvalue.addValue(attribute_value2)
+                        attrvalue.addValue(decodeParameterValue(attribute_value2))
                 elif txt[0] == ':':
                     txt = txt[1:]
                     self.createValue(txt)

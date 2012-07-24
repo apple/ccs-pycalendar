@@ -186,6 +186,60 @@ def decodeTextValue(value):
 
     return os.getvalue()
 
+def encodeParameterValue(value):
+    
+    encoded = []
+    last = ''
+    for c in value:
+        if c == '\t':
+            encoded.append('^')
+            encoded.append('t')
+        elif c == '\r':
+            encoded.append('^')
+            encoded.append('n')
+        elif c == '\n':
+            if last != '\r':
+                encoded.append('^')
+                encoded.append('n')
+        elif c == '"':
+            encoded.append('^')
+            encoded.append('\'')
+        elif c == '^':
+            encoded.append('^')
+            encoded.append('^')
+        else:
+            encoded.append(c)
+        last = c
+
+    return "".join(encoded)
+    
+def decodeParameterValue(value):
+    
+    if value is None:
+        return None
+    decoded = []
+    last = ''
+    for c in value:
+        if last == '^':
+            if c == 't':
+                decoded.append('\t')
+            elif c == 'n':
+                decoded.append('\n')
+            elif c == '\'':
+                decoded.append('"')
+            elif c == '^':
+                decoded.append('^')
+                c = ''
+            else:
+                decoded.append('^')
+                decoded.append(c)
+        elif c != '^':
+            decoded.append(c)
+        last = c
+    if last == '^':
+        decoded.append('^')
+    return "".join(decoded)
+
 # vCard text list parsing/generation
 def parseTextList(data, sep=';'):
     """

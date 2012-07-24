@@ -14,6 +14,7 @@
 #    limitations under the License.
 ##
 
+from pycalendar.attribute import PyCalendarAttribute
 from pycalendar.exceptions import PyCalendarInvalidProperty
 from pycalendar.parser import ParserContext
 from pycalendar.vcard.property import Property
@@ -88,4 +89,23 @@ class TestProperty(unittest.TestCase):
         for propname, propvalue, result in test_data:
             prop = Property(name=propname, value=propvalue)
             self.assertEqual(str(prop), result)
-    
+
+    def testParameterEncodingDecoding(self):
+        
+        prop = Property(name="X-FOO", value="Test")
+        prop.addAttribute(PyCalendarAttribute("X-BAR", "\"Check\""))
+        self.assertEqual(str(prop), "X-FOO;X-BAR=^'Check^':Test\r\n")
+        
+        prop.addAttribute(PyCalendarAttribute("X-BAR2", "Check\nThis\tOut\n"))
+        self.assertEqual(str(prop), "X-FOO;X-BAR=^'Check^';X-BAR2=Check^nThis^tOut^n:Test\r\n")
+
+        data = "X-FOO;X-BAR=^'Check^':Test"
+        prop = Property()
+        prop.parse(data)
+        self.assertEqual(prop.getAttributeValue("X-BAR"), "\"Check\"")
+
+        data = "X-FOO;X-BAR=^'Check^';X-BAR2=Check^nThis^tOut^n:Test"
+        prop = Property()
+        prop.parse(data)
+        self.assertEqual(prop.getAttributeValue("X-BAR"), "\"Check\"")
+        self.assertEqual(prop.getAttributeValue("X-BAR2"), "Check\nThis\tOut\n")
