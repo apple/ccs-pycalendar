@@ -1,5 +1,5 @@
 ##
-#    Copyright (c) 2007-2011 Cyrus Daboo. All rights reserved.
+#    Copyright (c) 2007-2012 Cyrus Daboo. All rights reserved.
 #    
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -326,8 +326,8 @@ class PyCalendarComponentBase(object):
             for component in sorted(namedcomponents, key=lambda x:x.getSortKey()):
                 sortedcomponents.append(component)
         
-        # Write out the remainder 
-        for component in components:
+        # Write out the remainder sorted by name, sortKey
+        for component in sorted(components, key=lambda x:(x.getType().upper(), x.getSortKey(),)):
             sortedcomponents.append(component)
             
         return sortedcomponents

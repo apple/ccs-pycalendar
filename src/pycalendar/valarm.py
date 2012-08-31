@@ -1,5 +1,5 @@
 ##
-#    Copyright (c) 2007-2011 Cyrus Daboo. All rights reserved.
+#    Copyright (c) 2007-2012 Cyrus Daboo. All rights reserved.
 #    
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -452,6 +452,9 @@ class PyCalendarVAlarm(PyCalendarComponent):
         temp = self.loadValueDuration(definitions.cICalProperty_DURATION)
         if temp is not None:
             self.mRepeatInterval = temp
+
+        # Set a map key for sorting
+        self.mMapKey = "%s:%s" % (self.mAction, self.mTriggerOn if self.mTriggerAbsolute else self.mTriggerBy,)
 
         # Alarm status - private to Mulberry
         status = self.loadValueString(definitions.cICalProperty_ALARM_X_ALARMSTATUS)
