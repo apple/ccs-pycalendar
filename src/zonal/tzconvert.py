@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 ##
-#    Copyright (c) 2007-2011 Cyrus Daboo. All rights reserved.
+#    Copyright (c) 2007-2012 Cyrus Daboo. All rights reserved.
 #    
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -36,10 +36,11 @@ __all__ = (
 
 class tzconvert(object):
     
-    def __init__(self):
+    def __init__(self, verbose=False):
         self.rules = {}
         self.zones = {}
         self.links = {}
+        self.verbose = verbose
         
     def getZoneNames(self):
         return set(self.zones.keys())
@@ -152,7 +153,8 @@ class tzconvert(object):
                 os.makedirs(os.path.dirname(fpath))
             with open(fpath, "w") as f:
                 f.write(icsdata)
-            print "Write path: %s" % (fpath,)
+            if self.verbose:
+                print "Write path: %s" % (fpath,)
         
         if links:
             link_list = []
@@ -173,7 +175,8 @@ class tzconvert(object):
                     os.makedirs(os.path.dirname(toPath))
                 with open(toPath, "w") as f:
                     f.write(icsdata)
-                print "Write link: %s" % (linkTo,)
+                if self.verbose:
+                    print "Write link: %s" % (linkTo,)
                 
                 link_list.append("%s\t%s" % (linkTo, linkFrom,))
             
@@ -252,7 +255,7 @@ if __name__ == '__main__':
         "backward",
     )
 
-    parser = tzconvert()
+    parser = tzconvert(verbose=True)
     for file in zonefiles:
         parser.parse(os.path.join(zonedir, file))
 

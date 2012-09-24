@@ -30,8 +30,10 @@ class PyCalendarComponentBase(object):
     propertyCardinality_1_Fix_Empty = () # Must be present but can be fixed by adding an empty value
     propertyCardinality_0_1 = ()         # 0 or 1 only
     propertyCardinality_1_More = ()      # 1 or more
-        
+
     propertyValueChecks = None  # Either iCalendar or vCard validation
+
+    sortSubComponents = True
 
     def __init__(self, parent=None):
         self.mParentComponent = parent
@@ -48,7 +50,7 @@ class PyCalendarComponentBase(object):
 
     def duplicate(self, **args):
         other = self.__class__(**args)
-        
+
         for component in self.mComponents:
             other.addComponent(component.duplicate(parent=other))
 
@@ -56,7 +58,7 @@ class PyCalendarComponentBase(object):
         for propname, props in self.mProperties.iteritems():
             other.mProperties[propname] = [i.duplicate() for i in props]
         return other
-    
+
     def __str__(self):
         return self.getText()
 
@@ -79,14 +81,14 @@ class PyCalendarComponentBase(object):
 
     def getParentComponent(self):
         return self.mParentComponent
-    
+
     def setParentComponent(self, parent):
         self.mParentComponent = parent
 
     def compareComponents(self, other):
         mine = set(self.mComponents)
         theirs = set(other.mComponents)
-        
+
         for item in mine:
             for another in theirs:
                 if item == another:
@@ -99,14 +101,14 @@ class PyCalendarComponentBase(object):
     def getComponents(self, compname=None):
         compname = compname.upper() if compname else None
         return [component for component in self.mComponents if compname is None or component.getType().upper() == compname]
-        
+
     def getComponentByKey(self, key):
         for component in self.mComponents:
             if component.getMapKey() == key:
                 return component
         else:
             return None
-        
+
     def removeComponentByKey(self, key):
 
         for component in self.mComponents:
@@ -175,7 +177,7 @@ class PyCalendarComponentBase(object):
         if self.mProperties.has_key(propname.upper()):
             del self.mProperties[propname.upper()]
 
-    def getPropertyInteger(self, prop, type = None):
+    def getPropertyInteger(self, prop, type=None):
         return self.loadValueInteger(prop, type)
 
     def getPropertyString(self, prop):
@@ -194,14 +196,14 @@ class PyCalendarComponentBase(object):
         second problems that were not fixed. Caller can then decide what to do with unfixed
         issues.
         """
-        
+
         fixed = []
         unfixed = []
 
         # Cardinality tests
         for check in self.cardinalityChecks:
             check(fixed, unfixed, doFix)
-        
+
         # Value constraints - these tests come from class specific attributes
         if self.propertyValueChecks is not None:
             for properties in self.mProperties.values():
@@ -288,35 +290,35 @@ class PyCalendarComponentBase(object):
         os.write("\r\n")
 
     def writeXML(self, node, namespace):
-        
+
         # Component element
         comp = XML.SubElement(node, xmldefs.makeTag(namespace, self.getType()))
-        
+
         # Each property
         self.writePropertiesXML(comp, namespace)
-    
+
         # Each component
         self.writeComponentsXML(comp, namespace)
-    
+
     def writeXMLFiltered(self, node, namespace, filter):
         # Component element
         comp = XML.SubElement(node, xmldefs.makeTag(namespace, self.getType()))
-        
+
         # Each property
         self.writePropertiesFilteredXML(comp, namespace, filter)
-    
+
         # Each component
         self.writeComponentsFilteredXML(comp, namespace, filter)
 
     def sortedComponents(self):
-        
+
         components = self.mComponents[:]
         sortedcomponents = []
 
         # Write each component based on specific order
         orderedNames = self.sortedComponentNames()
         for name in orderedNames:
-            
+
             # Group by name then sort by map key (UID/R-ID)
             namedcomponents = []
             for component in tuple(components):
@@ -325,19 +327,23 @@ class PyCalendarComponentBase(object):
                     components.remove(component)
             for component in sorted(namedcomponents, key=lambda x:x.getSortKey()):
                 sortedcomponents.append(component)
-        
+
         # Write out the remainder sorted by name, sortKey
-        for component in sorted(components, key=lambda x:(x.getType().upper(), x.getSortKey(),)):
+        if self.sortSubComponents:
+            remainder = sorted(components, key=lambda x:(x.getType().upper(), x.getSortKey(),))
+        else:
+            remainder = components
+        for component in remainder:
             sortedcomponents.append(component)
-            
+
         return sortedcomponents
-        
+
     def writeComponents(self, os):
-        
+
         # Write out the remainder 
         for component in self.sortedComponents():
             component.generate(os)
-        
+
     def writeComponentsFiltered(self, os, filter):
         # Shortcut for all sub-components
         if filter.isAllSubComponents():
@@ -347,21 +353,21 @@ class PyCalendarComponentBase(object):
                 subfilter = filter.getSubComponentFilter(subcomp.getType())
                 if subfilter is not None:
                     subcomp.generateFiltered(os, subfilter)
-        
+
     def writeComponentsXML(self, node, namespace):
-        
+
         if self.mComponents:
             comps = XML.SubElement(node, xmldefs.makeTag(namespace, xmldefs.components))
-            
+
             # Write out the remainder 
             for component in self.sortedComponents():
                 component.writeXML(comps, namespace)
-        
+
     def writeComponentsFilteredXML(self, node, namespace, filter):
 
         if self.mComponents:
             comps = XML.SubElement(node, xmldefs.makeTag(namespace, xmldefs.components))
-            
+
             # Shortcut for all sub-components
             if filter.isAllSubComponents():
                 self.writeXML(comps, namespace)
@@ -370,7 +376,7 @@ class PyCalendarComponentBase(object):
                     subfilter = filter.getSubComponentFilter(subcomp.getType())
                     if subfilter is not None:
                         subcomp.writeFilteredXML(comps, namespace, subfilter)
-        
+
     def loadValue(self, value_name):
         if self.hasProperty(value_name):
             return self.findFirstProperty(value_name)
@@ -388,7 +394,7 @@ class PyCalendarComponentBase(object):
                     uvalue = self.findFirstProperty(value_name).getUTCOffsetValue()
                     if (uvalue is not None):
                         return uvalue.getValue()
-    
+
             return None
         else:
             return self.loadValueInteger(value_name, PyCalendarValue.VALUETYPE_INTEGER)
@@ -466,7 +472,7 @@ class PyCalendarComponentBase(object):
     def sortedPropertyKeys(self):
         keys = self.mProperties.keys()
         keys.sort()
-        
+
         results = []
         for skey in self.sortedPropertyKeyOrder():
             if skey in keys:
@@ -504,7 +510,7 @@ class PyCalendarComponentBase(object):
     def writePropertiesXML(self, node, namespace):
 
         properties = XML.SubElement(node, xmldefs.makeTag(namespace, xmldefs.properties))
-        
+
         # Sort properties by name
         keys = self.sortedPropertyKeys()
         for key in keys:
@@ -515,7 +521,7 @@ class PyCalendarComponentBase(object):
     def writePropertiesFilteredXML(self, node, namespace, filter):
 
         props = XML.SubElement(node, xmldefs.makeTag(namespace, xmldefs.properties))
-        
+
         # Sort properties by name
         keys = self.sortedPropertyKeys()
 
