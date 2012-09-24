@@ -1,12 +1,12 @@
 ##
-#    Copyright (c) 2007-2011 Cyrus Daboo. All rights reserved.
-#    
+#    Copyright (c) 2007-2012 Cyrus Daboo. All rights reserved.
+#
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
 #    You may obtain a copy of the License at
-#    
+#
 #        http://www.apache.org/licenses/LICENSE-2.0
-#    
+#
 #    Unless required by applicable law or agreed to in writing, software
 #    distributed under the License is distributed on an "AS IS" BASIS,
 #    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -25,10 +25,10 @@ import cStringIO as StringIO
 class PyCalendarVToDo(PyCalendarComponentRecur):
 
     OVERDUE = 0
-    DUE_NOW= 1
+    DUE_NOW = 1
     DUE_LATER = 2
     DONE = 3
-    CANCELLED= 4
+    CANCELLED = 4
 
     @staticmethod
     def sort_for_display(e1, e2):
@@ -120,6 +120,7 @@ class PyCalendarVToDo(PyCalendarComponentRecur):
         self.mCompleted = PyCalendarDateTime()
         self.mHasCompleted = False
 
+
     def duplicate(self, parent=None):
         other = super(PyCalendarVToDo, self).duplicate(parent=parent)
         other.mPriority = self.mPriority
@@ -129,11 +130,14 @@ class PyCalendarVToDo(PyCalendarComponentRecur):
         other.mHasCompleted = self.mHasCompleted
         return other
 
+
     def getType(self):
         return definitions.cICalComponent_VTODO
 
+
     def getMimeComponentName(self):
         return itipdefinitions.cICalMIMEComponent_VTODO
+
 
     def addComponent(self, comp):
         # We can embed the alarm components only
@@ -142,11 +146,14 @@ class PyCalendarVToDo(PyCalendarComponentRecur):
         else:
             raise ValueError
 
+
     def getStatus(self):
         return self.mStatus
 
+
     def setStatus(self, status):
         self.mStatus = status
+
 
     def getStatusText(self):
         sout = StringIO()
@@ -188,6 +195,7 @@ class PyCalendarVToDo(PyCalendarComponentRecur):
 
         return sout.toString()
 
+
     def getCompletionState(self):
         if self.mStatus in (definitions.eStatus_VToDo_NeedsAction, definitions.eStatus_VToDo_InProcess):
             if self.hasEnd():
@@ -207,17 +215,22 @@ class PyCalendarVToDo(PyCalendarComponentRecur):
         elif self.mStatus == definitions.eStatus_VToDo_Cancelled:
             return PyCalendarVToDo.CANCELLED
 
+
     def getPriority(self):
         return self.mPriority
+
 
     def setPriority(self, priority):
         self.mPriority = priority
 
+
     def getCompleted(self):
         return self.mCompleted
 
+
     def hasCompleted(self):
         return self.mHasCompleted
+
 
     def finalise(self):
         # Do inherited
@@ -261,13 +274,14 @@ class PyCalendarVToDo(PyCalendarComponentRecur):
         if self.mHasCompleted:
             self.mCompleted = temp
 
+
     def validate(self, doFix=False):
         """
         Validate the data in this component and optionally fix any problems, else raise. If
         loggedProblems is not None it must be a C{list} and problem descriptions are appended
-        to that. 
+        to that.
         """
-        
+
         fixed, unfixed = super(PyCalendarVToDo, self).validate(doFix)
 
         # Extra constraint: only one of DUE or DURATION
@@ -283,7 +297,7 @@ class PyCalendarVToDo(PyCalendarComponentRecur):
                 fixed.append(logProblem)
             else:
                 unfixed.append(logProblem)
-                
+
         # Extra constraint: DTSTART must be present if DURATION is present
         if self.hasProperty(definitions.cICalProperty_DURATION) and not self.hasProperty(definitions.cICalProperty_DTSTART):
             # Cannot fix this one
@@ -293,9 +307,10 @@ class PyCalendarVToDo(PyCalendarComponentRecur):
                 definitions.cICalProperty_DURATION,
             )
             unfixed.append(logProblem)
-        
+
         return fixed, unfixed
-                
+
+
     # Editing
     def editStatus(self, status):
         # Only if it is different
@@ -326,6 +341,7 @@ class PyCalendarVToDo(PyCalendarComponentRecur):
             prop = PyCalendarProperty(definitions.cICalProperty_STATUS, value)
             self.addProperty(prop)
 
+
     def editCompleted(self, completed):
         # Remove existing COMPLETED item
         self.removeProperties(definitions.cICalProperty_COMPLETED)
@@ -337,6 +353,7 @@ class PyCalendarVToDo(PyCalendarComponentRecur):
         self.mHasCompleted = True
         prop = PyCalendarProperty(definitions.cICalProperty_STATUS_COMPLETED, self.mCompleted)
         self.addProperty(prop)
+
 
     def sortedPropertyKeyOrder(self):
         return (

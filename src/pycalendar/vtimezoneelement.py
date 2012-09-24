@@ -1,12 +1,12 @@
 ##
-#    Copyright (c) 2007-2011 Cyrus Daboo. All rights reserved.
-#    
+#    Copyright (c) 2007-2012 Cyrus Daboo. All rights reserved.
+#
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
 #    You may obtain a copy of the License at
-#    
+#
 #        http://www.apache.org/licenses/LICENSE-2.0
-#    
+#
 #    Unless required by applicable law or agreed to in writing, software
 #    distributed under the License is distributed on an "AS IS" BASIS,
 #    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -47,6 +47,7 @@ class PyCalendarVTimezoneElement(PyCalendarComponent):
         self.mCachedExpandBelow = None
         self.mCachedExpandBelowItems = None
 
+
     def duplicate(self, parent=None):
         other = super(PyCalendarVTimezoneElement, self).duplicate(parent=parent)
         other.mStart = self.mStart.duplicate()
@@ -57,6 +58,7 @@ class PyCalendarVTimezoneElement(PyCalendarComponent):
         other.mCachedExpandBelow = None
         other.mCachedExpandBelowItems = None
         return other
+
 
     def finalise(self):
         # Get DTSTART
@@ -88,26 +90,32 @@ class PyCalendarVTimezoneElement(PyCalendarComponent):
         # Do inherited
         super(PyCalendarVTimezoneElement, self).finalise()
 
+
     def getSortKey(self):
         """
         We do not want these components sorted.
         """
         return ""
 
+
     def getStart(self):
         return self.mStart
+
 
     def getUTCOffset(self):
         return self.mUTCOffset
 
+
     def getUTCOffsetFrom(self):
         return self.mUTCOffsetFrom
+
 
     def getTZName(self):
         return self.mTZName
 
+
     def expandBelow(self, below):
-        
+
         # Look for recurrences
         if not self.mRecurrences.hasRecurrence() or self.mStart > below:
             # Return DTSTART even if it is newer
@@ -135,18 +143,19 @@ class PyCalendarVTimezoneElement(PyCalendarComponent):
                 period = PyCalendarPeriod(self.mStart, temp)
                 self.mRecurrences.expand(self.mStart, period, self.mCachedExpandBelowItems, float_offset=self.mUTCOffsetFrom)
                 self.mCachedExpandBelow = temp
-            
+
             if len(self.mCachedExpandBelowItems) != 0:
                 # List comes back sorted so we pick the element just less than
                 # the dt value we want
                 i = bisect_right(self.mCachedExpandBelowItems, below)
                 if i != 0:
                     return self.mCachedExpandBelowItems[i - 1]
-                
+
                 # The first one in the list is the one we want
                 return self.mCachedExpandBelowItems[0]
 
             return self.mStart
+
 
     def expandAll(self, start, end, with_name):
 
@@ -195,7 +204,7 @@ class PyCalendarVTimezoneElement(PyCalendarComponent):
                 period = PyCalendarPeriod(self.mStart, end)
                 self.mRecurrences.expand(self.mStart, period, self.mCachedExpandBelowItems, float_offset=self.mUTCOffsetFrom)
                 self.mCachedExpandBelow = temp
-            
+
             if len(self.mCachedExpandBelowItems) != 0:
                 # Return them all within the range
                 results = []

@@ -1,12 +1,12 @@
 ##
 #    Copyright (c) 2011-2012 Cyrus Daboo. All rights reserved.
-#    
+#
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
 #    You may obtain a copy of the License at
-#    
+#
 #        http://www.apache.org/licenses/LICENSE-2.0
-#    
+#
 #    Unless required by applicable law or agreed to in writing, software
 #    distributed under the License is distributed on an "AS IS" BASIS,
 #    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -22,16 +22,16 @@ class ParserContext(object):
     """
 
     (
-        PARSER_ALLOW,       # Pass the "suspect" data through to the object model
-        PARSER_IGNORE,      # Ignore the "suspect" data
-        PARSER_FIX,         # Fix (or if not possible ignore) the "suspect" data
-        PARSER_RAISE,       # Raise an exception
+        PARSER_ALLOW, # Pass the "suspect" data through to the object model
+        PARSER_IGNORE, # Ignore the "suspect" data
+        PARSER_FIX, # Fix (or if not possible ignore) the "suspect" data
+        PARSER_RAISE, # Raise an exception
     ) = range(4)
 
-    # Some clients escape ":" - fix 
+    # Some clients escape ":" - fix
     INVALID_COLON_ESCAPE_SEQUENCE = PARSER_FIX
 
-    # Other escape sequences - raise 
+    # Other escape sequences - raise
     INVALID_ESCAPE_SEQUENCES = PARSER_RAISE
 
     # Some client generate empty lines in the body of the data

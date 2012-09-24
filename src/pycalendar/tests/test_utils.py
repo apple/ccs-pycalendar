@@ -1,12 +1,12 @@
 ##
 #    Copyright (c) 2012 Cyrus Daboo. All rights reserved.
-#    
+#
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
 #    You may obtain a copy of the License at
-#    
+#
 #        http://www.apache.org/licenses/LICENSE-2.0
-#    
+#
 #    Unless required by applicable law or agreed to in writing, software
 #    distributed under the License is distributed on an "AS IS" BASIS,
 #    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -17,13 +17,13 @@
 import unittest
 from pycalendar.utils import encodeParameterValue, decodeParameterValue
 
-class TestUtils(unittest.TestCase):   
+class TestUtils(unittest.TestCase):
 
     def test_encodeParameterValue(self):
         """
-        Roundrtrip encodeParameterValue and decodeParameterValue.
+        Round trip encodeParameterValue and decodeParameterValue.
         """
-        
+
         data = (
             ("abc", "abc", None),
             ("\"abc\"", "^'abc^'", None),
@@ -34,22 +34,23 @@ class TestUtils(unittest.TestCase):
             ("abc^2", "abc^^2", None),
             ("^abc^", "^^abc^^", None),
         )
-        
+
         for value, encoded, decoded in data:
             if decoded is None:
                 decoded = value
             self.assertEqual(encodeParameterValue(value), encoded)
             self.assertEqual(decodeParameterValue(encoded), decoded)
 
+
     def test_decodeParameterValue(self):
         """
         Special cases for decodeParameterValue.
         """
-        
+
         data = (
             ("^a^bc^", "^a^bc^"),
             ("^^^abc", "^^abc"),
         )
-        
+
         for value, decoded in data:
             self.assertEqual(decodeParameterValue(value), decoded)

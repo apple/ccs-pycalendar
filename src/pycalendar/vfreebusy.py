@@ -1,12 +1,12 @@
 ##
-#    Copyright (c) 2007-2011 Cyrus Daboo. All rights reserved.
-#    
+#    Copyright (c) 2007-2012 Cyrus Daboo. All rights reserved.
+#
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
 #    You may obtain a copy of the License at
-#    
+#
 #        http://www.apache.org/licenses/LICENSE-2.0
-#    
+#
 #    Unless required by applicable law or agreed to in writing, software
 #    distributed under the License is distributed on an "AS IS" BASIS,
 #    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -53,6 +53,7 @@ class PyCalendarVFreeBusy(PyCalendarComponent):
         self.mSpanPeriod = None
         self.mBusyTime = None
 
+
     def duplicate(self, parent=None):
         other = super(PyCalendarVFreeBusy, self).duplicate(parent=parent)
         other.mStart = self.mStart.duplicate()
@@ -64,11 +65,14 @@ class PyCalendarVFreeBusy(PyCalendarComponent):
         other.mBusyTime = None
         return other
 
+
     def getType(self):
         return definitions.cICalComponent_VFREEBUSY
 
+
     def getMimeComponentName(self):
         return itipdefinitions.cICalMIMEComponent_VFREEBUSY
+
 
     def finalise(self):
         # Do inherited
@@ -97,6 +101,7 @@ class PyCalendarVFreeBusy(PyCalendarComponent):
             self.mDuration = False
             self.mEnd = temp
 
+
     def fixStartEnd(self):
         # End is always greater than start if start exists
         if self.mHasStart and self.mEnd <= self.mStart:
@@ -115,26 +120,34 @@ class PyCalendarVFreeBusy(PyCalendarComponent):
                 self.mEnd.offsetDay(1)
                 self.mEnd.setHHMMSS(0, 0, 0)
 
+
     def getStart(self):
         return self.mStart
+
 
     def hasStart(self):
         return self.mHasStart
 
+
     def getEnd(self):
         return self.mEnd
+
 
     def hasEnd(self):
         return self.mHasEnd
 
+
     def useDuration(self):
         return self.mDuration
+
 
     def getSpanPeriod(self):
         return self.mSpanPeriod
 
+
     def getBusyTime(self):
         return self.mBusyTime
+
 
     def editTiming(self):
         # Updated cached values
@@ -148,6 +161,7 @@ class PyCalendarVFreeBusy(PyCalendarComponent):
         self.removeProperties(definitions.cICalProperty_DTSTART)
         self.removeProperties(definitions.cICalProperty_DTEND)
         self.removeProperties(definitions.cICalProperty_DURATION)
+
 
     def editTimingStartEnd(self, start, end):
         # Updated cached values
@@ -173,6 +187,7 @@ class PyCalendarVFreeBusy(PyCalendarComponent):
             prop = PyCalendarProperty(definitions.cICalProperty_DTEND, end)
             self.addProperty(prop)
 
+
     def editTimingStartDuration(self, start, duration):
         # Updated cached values
         self.mHasStart = True
@@ -197,6 +212,7 @@ class PyCalendarVFreeBusy(PyCalendarComponent):
             prop = PyCalendarProperty(definitions.cICalProperty_DURATION, duration)
             self.addProperty(prop)
 
+
     # Generating info
     def expandPeriodComp(self, period, list):
         # Cache the busy-time details if not done already
@@ -207,6 +223,7 @@ class PyCalendarVFreeBusy(PyCalendarComponent):
         if (self.mBusyTime is not None) and period.isPeriodOverlap(self.mSpanPeriod):
             list.append(self)
 
+
     def expandPeriodFB(self, period, list):
         # Cache the busy-time details if not done already
         if not self.mCachedBusyTime:
@@ -216,6 +233,7 @@ class PyCalendarVFreeBusy(PyCalendarComponent):
         if (self.mBusyTime is not None) and period.isPeriodOverlap(self.mSpanPeriod):
             for fb in self.mBusyTime:
                 list.append(PyCalendarFreeBusy(fb))
+
 
     def cacheBusyTime(self):
 
@@ -273,12 +291,12 @@ class PyCalendarVFreeBusy(PyCalendarComponent):
                         period = None
                         if isinstance(o, PyCalendarPeriodValue):
                             period = o
-                        
+
                         # Double-check type
                         if period is not None:
 
                             self.mBusyTime.append(PyCalendarFreeBusy(type, period.getValue()))
-                            
+
                             if len(self.mBusyTime) == 1:
 
                                 min_start = period.getValue().getStart()
@@ -298,9 +316,8 @@ class PyCalendarVFreeBusy(PyCalendarComponent):
 
         else:
 
-        
             # Sort the list by period
-            self.mBusyTime.sort(cmp=lambda x,y: x.getPeriod().getStart().compareDateTime(y.getPeriod().getStart()))
+            self.mBusyTime.sort(cmp=lambda x, y: x.getPeriod().getStart().compareDateTime(y.getPeriod().getStart()))
 
             # Determine range
             start = PyCalendarDateTime()
@@ -313,10 +330,11 @@ class PyCalendarVFreeBusy(PyCalendarComponent):
                 end = self.mEnd
             else:
                 end = max_end
-            
+
             self.mSpanPeriod = PyCalendarPeriod(start, end)
-        
+
         self.mCachedBusyTime = True
+
 
     def sortedPropertyKeyOrder(self):
         return (

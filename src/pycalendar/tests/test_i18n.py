@@ -1,13 +1,13 @@
 # coding: utf-8
 ##
-#    Copyright (c) 2007-2011 Cyrus Daboo. All rights reserved.
-#    
+#    Copyright (c) 2007-2012 Cyrus Daboo. All rights reserved.
+#
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
 #    You may obtain a copy of the License at
-#    
+#
 #        http://www.apache.org/licenses/LICENSE-2.0
-#    
+#
 #    Unless required by applicable law or agreed to in writing, software
 #    distributed under the License is distributed on an "AS IS" BASIS,
 #    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -21,7 +21,6 @@ import cStringIO as StringIO
 import unittest
 
 class TestCalendar(unittest.TestCase):
-    
 
     def testAddCN(self):
 
@@ -43,7 +42,7 @@ END:VCALENDAR
 """.replace("\n", "\r\n"),
 
     "まだ",
-    
+
 """BEGIN:VCALENDAR
 VERSION:2.0
 CALSCALE:GREGORIAN
@@ -64,7 +63,7 @@ END:VCALENDAR
 
         cal1 = PyCalendar()
         cal1.parse(StringIO.StringIO(data[0]))
-        
+
         vevent = cal1.getComponents("VEVENT")[0]
         organizer = vevent.getProperties("ORGANIZER")[0]
         organizer.addAttribute(PyCalendarAttribute("CN", data[1]))

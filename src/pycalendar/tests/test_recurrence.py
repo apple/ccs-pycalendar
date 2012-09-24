@@ -1,12 +1,12 @@
 ##
-#    Copyright (c) 2011 Cyrus Daboo. All rights reserved.
-#    
+#    Copyright (c) 2011-2012 Cyrus Daboo. All rights reserved.
+#
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
 #    You may obtain a copy of the License at
-#    
+#
 #        http://www.apache.org/licenses/LICENSE-2.0
-#    
+#
 #    Unless required by applicable law or agreed to in writing, software
 #    distributed under the License is distributed on an "AS IS" BASIS,
 #    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -18,7 +18,7 @@ from pycalendar.recurrence import PyCalendarRecurrence
 import unittest
 
 class TestRecurrence(unittest.TestCase):
-    
+
     items = (
         "FREQ=DAILY",
         "FREQ=YEARLY;COUNT=400",
@@ -26,7 +26,7 @@ class TestRecurrence(unittest.TestCase):
         "FREQ=MONTHLY;UNTIL=20110102T090000",
         "FREQ=MONTHLY;UNTIL=20110102T100000Z",
         "FREQ=MONTHLY;COUNT=3;BYDAY=TU,WE,TH;BYSETPOS=-1",
-        
+
         # These are from RFC5545 examples
         "FREQ=YEARLY;INTERVAL=2;BYMINUTE=30;BYHOUR=8,9;BYDAY=SU;BYMONTH=1",
         "FREQ=YEARLY;UNTIL=19730429T070000Z;BYDAY=-1SU;BYMONTH=4",
@@ -49,16 +49,18 @@ class TestRecurrence(unittest.TestCase):
         "FREQ=MONTHLY;COUNT=3;BYDAY=TU,WE,TH;BYSETPOS=3",
         "FREQ=DAILY;BYMINUTE=0,20,40;BYHOUR=9,10,11,12,13,14,15,16",
     )
-    
+
+
     def testParse(self):
-        
+
         for item in TestRecurrence.items:
             recur = PyCalendarRecurrence()
             recur.parse(item)
             self.assertEqual(recur.getText(), item, "Failed to parse and re-generate '%s'" % (item,))
 
+
     def testParseInvalid(self):
-        
+
         items = (
             "",
             "FREQ=",
@@ -74,30 +76,33 @@ class TestRecurrence(unittest.TestCase):
             "FREQ=MONTHLY;BYHOUR=A",
             "FREQ=MONTHLY;BYHOUR=54",
         )
-        
+
         for item in items:
             self.assertRaises(ValueError, PyCalendarRecurrence().parse, item)
-    
+
+
     def testEquality(self):
-        
+
         recur1 = PyCalendarRecurrence()
         recur1.parse("FREQ=YEARLY;COUNT=400")
         recur2 = PyCalendarRecurrence()
         recur2.parse("COUNT=400;FREQ=YEARLY")
 
         self.assertEqual(recur1, recur2)
-    
+
+
     def testInequality(self):
-        
+
         recur1 = PyCalendarRecurrence()
         recur1.parse("FREQ=YEARLY;COUNT=400")
         recur2 = PyCalendarRecurrence()
         recur2.parse("COUNT=400;FREQ=YEARLY;BYMONTH=1")
 
         self.assertNotEqual(recur1, recur2)
-    
+
+
     def testHash(self):
-        
+
         hashes = []
         for item in TestRecurrence.items:
             recur = PyCalendarRecurrence()
@@ -105,4 +110,4 @@ class TestRecurrence(unittest.TestCase):
             hashes.append(hash(recur))
         hashes.sort()
         for i in range(1, len(hashes)):
-            self.assertNotEqual(hashes[i-1], hashes[i])
+            self.assertNotEqual(hashes[i - 1], hashes[i])

@@ -1,12 +1,12 @@
 ##
-#    Copyright (c) 2011 Cyrus Daboo. All rights reserved.
-#    
+#    Copyright (c) 2011-2012 Cyrus Daboo. All rights reserved.
+#
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
 #    You may obtain a copy of the License at
-#    
+#
 #        http://www.apache.org/licenses/LICENSE-2.0
-#    
+#
 #    Unless required by applicable law or agreed to in writing, software
 #    distributed under the License is distributed on an "AS IS" BASIS,
 #    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -47,25 +47,30 @@ class PyCalendarVAvailability(PyCalendarComponent):
     def __init__(self, parent=None):
         super(PyCalendarVAvailability, self).__init__(parent=parent)
 
+
     def duplicate(self, parent=None):
         return super(PyCalendarVAvailability, self).duplicate(parent=parent)
+
 
     def getType(self):
         return definitions.cICalComponent_VAVAILABILITY
 
+
     def getMimeComponentName(self):
         return itipdefinitions.cICalMIMEComponent_VAVAILABILITY
 
+
     def finalise(self):
         super(PyCalendarVAvailability, self).finalise()
+
 
     def validate(self, doFix=False):
         """
         Validate the data in this component and optionally fix any problems, else raise. If
         loggedProblems is not None it must be a C{list} and problem descriptions are appended
-        to that. 
+        to that.
         """
-        
+
         fixed, unfixed = super(PyCalendarVAvailability, self).validate(doFix)
 
         # Extra constraint: only one of DTEND or DURATION
@@ -81,15 +86,17 @@ class PyCalendarVAvailability(PyCalendarComponent):
                 fixed.append(logProblem)
             else:
                 unfixed.append(logProblem)
-        
+
         return fixed, unfixed
-                
+
+
     def addComponent(self, comp):
         # We can embed the available components only
         if comp.getType() == definitions.cICalComponent_AVAILABLE:
             super(PyCalendarVAvailability, self).addComponent(comp)
         else:
             raise ValueError
+
 
     def sortedPropertyKeyOrder(self):
         return (

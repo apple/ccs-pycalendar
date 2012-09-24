@@ -1,12 +1,12 @@
 ##
 #    Copyright (c) 2011-2012 Cyrus Daboo. All rights reserved.
-#    
+#
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
 #    You may obtain a copy of the License at
-#    
+#
 #        http://www.apache.org/licenses/LICENSE-2.0
-#    
+#
 #    Unless required by applicable law or agreed to in writing, software
 #    distributed under the License is distributed on an "AS IS" BASIS,
 #    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,9 +20,9 @@ from pycalendar.timezone import PyCalendarTimezone
 import unittest
 
 class TestDateTime(unittest.TestCase):
-    
+
     def testDuplicateASUTC(self):
-        
+
         items = (
             (
                 PyCalendarDateTime(2011, 1, 1, 0, 0, 0, tzid=PyCalendarTimezone(utc=True)),
@@ -37,25 +37,27 @@ class TestDateTime(unittest.TestCase):
                 PyCalendarDateTime(2011, 1, 1),
             )
         )
-        
+
         for item, result in items:
             dup = item.duplicateAsUTC()
             self.assertEqual(str(dup), str(result), "Failed to convert '%s'" % (item,))
 
+
     def testDuplicateInSet(self):
-        
+
         s = set(
             (
                 PyCalendarDateTime(2011, 1, 1, 0, 0, 0, tzid=PyCalendarTimezone(utc=True)),
                 PyCalendarDateTime(2011, 1, 2, 0, 0, 0, tzid=PyCalendarTimezone(utc=True)),
             )
         )
-        
+
         self.assertTrue(PyCalendarDateTime(2011, 1, 1, 0, 0, 0, tzid=PyCalendarTimezone(utc=True)) in s)
         self.assertFalse(PyCalendarDateTime(2011, 1, 3, 0, 0, 0, tzid=PyCalendarTimezone(utc=True)) in s)
 
+
     def testRoundtrip(self):
-        
+
         data1 = (
             "20110102",
             "20110103T121212",
@@ -64,7 +66,7 @@ class TestDateTime(unittest.TestCase):
             "00010103T121212",
             "00010103T121212Z",
         )
-        
+
         data2 = (
             ("20110102", "20110102"),
             ("2011-01-02", "20110102"),
@@ -85,13 +87,14 @@ class TestDateTime(unittest.TestCase):
         for item in data1:
             dt = PyCalendarDateTime.parseText(item, False)
             self.assertEqual(dt.getText(), item, "Failed on: %s" % (item,))
-        
+
         for item, result in data2:
             dt = PyCalendarDateTime.parseText(item, True)
             self.assertEqual(dt.getText(), result, "Failed on: %s" % (item,))
-        
+
+
     def testBadParse(self):
-        
+
         data1 = (
             "2011",
             "201101023",
@@ -120,17 +123,17 @@ class TestDateTime(unittest.TestCase):
 
         for item in data1:
             self.assertRaises(ValueError, PyCalendarDateTime.parseText, item, False)
-        
+
         for item in data2:
             self.assertRaises(ValueError, PyCalendarDateTime.parseText, item, False)
-        
-        
+
+
     def testCachePreserveOnAdjustment(self):
-        
+
         # UTC first
         dt = PyCalendarDateTime(2012, 6, 7, 12, 0, 0, PyCalendarTimezone(tzid="utc"))
         dt.getPosixTime()
-        
+
         # check existing cache is complete
         self.assertTrue(dt.mPosixTimeCached)
         self.assertNotEqual(dt.mPosixTime, 0)
@@ -297,13 +300,12 @@ END:STANDARD
 END:VTIMEZONE
 END:VCALENDAR
 """.replace("\n", "\r\n")
-            
-            
+
         PyCalendar.parseText(tzdata)
 
         dt = PyCalendarDateTime(2012, 6, 7, 12, 0, 0, PyCalendarTimezone(tzid="America/Pittsburgh"))
         dt.getPosixTime()
-        
+
         # check existing cache is complete
         self.assertTrue(dt.mPosixTimeCached)
         self.assertNotEqual(dt.mPosixTime, 0)

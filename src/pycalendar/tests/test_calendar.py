@@ -1,12 +1,12 @@
 ##
-#    Copyright (c) 2007-2011 Cyrus Daboo. All rights reserved.
-#    
+#    Copyright (c) 2007-2012 Cyrus Daboo. All rights reserved.
+#
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
 #    You may obtain a copy of the License at
-#    
+#
 #        http://www.apache.org/licenses/LICENSE-2.0
-#    
+#
 #    Unless required by applicable law or agreed to in writing, software
 #    distributed under the License is distributed on an "AS IS" BASIS,
 #    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -25,7 +25,7 @@ import difflib
 import unittest
 
 class TestCalendar(unittest.TestCase):
-    
+
     data = (
 """BEGIN:VCALENDAR
 VERSION:2.0
@@ -312,18 +312,20 @@ END:VCALENDAR
                 ),
 )
 
+
     def testRoundtrip(self):
+
 
         def _doRoundtrip(caldata, resultdata=None):
             test1 = resultdata if resultdata is not None else caldata
 
             cal = PyCalendar()
             cal.parse(StringIO.StringIO(caldata))
-            
+
             s = StringIO.StringIO()
             cal.generate(s)
             test2 = s.getvalue()
-            
+
             self.assertEqual(
                 test1,
                 test2,
@@ -336,13 +338,15 @@ END:VCALENDAR
         for item1, item2 in self.data2:
             _doRoundtrip(item1, item2)
 
+
     def testRoundtripDuplicate(self):
+
 
         def _doDuplicateRoundtrip(caldata):
             cal = PyCalendar()
             cal.parse(StringIO.StringIO(caldata))
             cal = cal.duplicate()
-            
+
             s = StringIO.StringIO()
             cal.generate(s)
             self.assertEqual(caldata, s.getvalue())
@@ -350,7 +354,9 @@ END:VCALENDAR
         for item in self.data:
             _doDuplicateRoundtrip(item)
 
+
     def testEquality(self):
+
 
         def _doEquality(caldata):
             cal1 = PyCalendar()
@@ -360,6 +366,7 @@ END:VCALENDAR
             cal2.parse(StringIO.StringIO(caldata))
 
             self.assertEqual(cal1, cal2, "%s\n\n%s" % (cal1, cal2,))
+
 
         def _doNonEquality(caldata):
             cal1 = PyCalendar()
@@ -375,8 +382,9 @@ END:VCALENDAR
             _doEquality(item)
             _doNonEquality(item)
 
+
     def testParseComponent(self):
-        
+
         data1 = """BEGIN:VCALENDAR
 VERSION:2.0
 CALSCALE:GREGORIAN
@@ -417,7 +425,6 @@ END:VTIMEZONE
 END:VCALENDAR
 """.replace("\n", "\r\n")
 
-
         result = """BEGIN:VCALENDAR
 VERSION:2.0
 CALSCALE:GREGORIAN
@@ -451,14 +458,14 @@ END:VEVENT
 END:VCALENDAR
 """.replace("\n", "\r\n")
 
-
         cal = PyCalendar()
         cal.parse(StringIO.StringIO(data1))
         cal.parseComponent(StringIO.StringIO(data2))
         self.assertEqual(str(cal), result)
 
+
     def testParseFail(self):
-        
+
         data = (
 """BEGIN:VCALENDAR
 VERSION:2.0
@@ -551,8 +558,9 @@ BOGUS
         for item in data:
             self.assertRaises(PyCalendarInvalidData, PyCalendar.parseText, item)
 
+
     def testParseBlank(self):
-        
+
         data = (
 """
 BEGIN:VCALENDAR
@@ -649,6 +657,7 @@ END:VCALENDAR
             self.assertEqual(str(PyCalendar.parseText(item)), result)
 
         ParserContext.BLANK_LINES_IN_DATA = save
+
 
     def testGetVEvents(self):
 
@@ -831,7 +840,7 @@ END:VCALENDAR
             ),
         )
 
-        for title, caldata, result in data: 
+        for title, caldata, result in data:
             calendar = PyCalendar.parseText(caldata)
             instances = []
             calendar.getVEvents(

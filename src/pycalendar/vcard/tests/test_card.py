@@ -1,12 +1,12 @@
 ##
-#    Copyright (c) 2007-2011 Cyrus Daboo. All rights reserved.
-#    
+#    Copyright (c) 2007-2012 Cyrus Daboo. All rights reserved.
+#
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
 #    You may obtain a copy of the License at
-#    
+#
 #        http://www.apache.org/licenses/LICENSE-2.0
-#    
+#
 #    Unless required by applicable law or agreed to in writing, software
 #    distributed under the License is distributed on an "AS IS" BASIS,
 #    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -23,7 +23,7 @@ import difflib
 import unittest
 
 class TestCard(unittest.TestCase):
-    
+
     data = (
         (
 """BEGIN:VCARD
@@ -188,18 +188,20 @@ END:VCARD
         ),
     )
 
+
     def testRoundtrip(self):
+
 
         def _doRoundtrip(caldata, resultdata=None):
             test1 = resultdata if resultdata is not None else caldata
 
             card = Card()
             card.parse(StringIO.StringIO(caldata))
-            
+
             s = StringIO.StringIO()
             card.generate(s)
             test2 = s.getvalue()
-            
+
             self.assertEqual(
                 test1,
                 test2,
@@ -209,13 +211,15 @@ END:VCARD
         for item, result in self.data:
             _doRoundtrip(item, result)
 
+
     def testRoundtripDuplicate(self):
+
 
         def _doDuplicateRoundtrip(caldata, result):
             card = Card()
             card.parse(StringIO.StringIO(caldata))
             card = card.duplicate()
-            
+
             s = StringIO.StringIO()
             card.generate(s)
             test = s.getvalue()
@@ -224,7 +228,9 @@ END:VCARD
         for item, result in self.data:
             _doDuplicateRoundtrip(item, result)
 
+
     def testEquality(self):
+
 
         def _doEquality(caldata):
             card1 = Card()
@@ -234,6 +240,7 @@ END:VCARD
             card2.parse(StringIO.StringIO(caldata))
 
             self.assertEqual(card1, card2, "\n".join(difflib.unified_diff(str(card1).splitlines(), str(card2).splitlines())))
+
 
         def _doNonEquality(caldata):
             card1 = Card()
@@ -249,8 +256,9 @@ END:VCARD
             _doEquality(item)
             _doNonEquality(item)
 
+
     def testMultiple(self):
-        
+
         data = (
             (
 """BEGIN:VCARD
@@ -334,14 +342,15 @@ END:VCARD
         )
 
         for item, results in data:
-            
+
             cards = Card.parseMultiple(StringIO.StringIO(item))
             self.assertEqual(len(cards), len(results))
             for card, result in zip(cards, results):
                 self.assertEqual(str(card), result, "\n".join(difflib.unified_diff(str(card).splitlines(), result.splitlines())))
-    
+
+
     def testABapp(self):
-        
+
         data = """BEGIN:VCARD
 VERSION:3.0
 N:Card;Test;;;
@@ -359,7 +368,7 @@ UID:128ad7ee-a656-4773-95ce-f07f77e8cc23
 REV:2011-03-23T20:20:04Z
 END:VCARD
 """.replace("\n", "\r\n")
-        
+
         result = """BEGIN:VCARD
 VERSION:3.0
 UID:128ad7ee-a656-4773-95ce-f07f77e8cc23
@@ -381,8 +390,9 @@ END:VCARD
         card = Card.parseText(data)
         self.assertEqual(str(card), result)
 
+
     def testParseFail(self):
-        
+
         data = (
 """BEGIN:VCARD
 VERSION:3.0
@@ -465,8 +475,9 @@ BOGUS
         for item in data:
             self.assertRaises(PyCalendarInvalidData, Card.parseText, item)
 
+
     def testParseBlank(self):
-        
+
         data = (
 """
 BEGIN:VCARD
