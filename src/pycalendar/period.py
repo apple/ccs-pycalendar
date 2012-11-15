@@ -104,16 +104,13 @@ class PyCalendarPeriod(ValueMixin):
             end.text = self.mEnd.getXMLText()
 
     def writeJSON(self, jobject):
-        
-        period = {}
-        jobject["period"] = period
-        
-        period["start"] = self.mStart.getJSONText()
-        
+        value = self.mStart.getXMLText()
+        value += "/"
         if self.mUseDuration:
-            period["duration"] = self.mDuration.getText()
+            value += self.mDuration.getText()
         else:
-            period["end"] = self.mEnd.getJSONText()
+            value += self.mEnd.getXMLText()
+        jobject.append(value)
         
     def getStart( self ):
         return self.mStart

@@ -968,7 +968,7 @@ class PyCalendarDateTime(ValueMixin):
         value.text = self.getXMLText()
 
     def writeJSON(self, jobject):
-        jobject["date" if self.isDateOnly() else "date-time"] = self.getJSONText()
+        jobject.append(self.getJSONText())
 
     def normalise( self ):
         # Normalise seconds

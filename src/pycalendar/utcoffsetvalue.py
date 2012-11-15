@@ -96,14 +96,14 @@ class PyCalendarUTCOffsetValue( PyCalendarValue ):
         value = self.getXMLNode(node, namespace)
         value.text = text
 
-    def writeJSON(self, jobject):
+    def writeJSONValue(self, jobject):
         
         os = StringIO()
         self.generate(os)
         text = os.getvalue()
         text = text[:-2] + ":" + text[-2:]
 
-        jobject["utc-offset"] = text
+        jobject.append(text)
 
     def getValue( self ):
         return self.mValue

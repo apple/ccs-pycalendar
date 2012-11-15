@@ -311,31 +311,27 @@ class PyCalendarComponentBase(object):
     def writeJSON(self, jobject):
         
         # Component element
-        comp = {
-            "component":self.getType().lower(),
-            "contents":[]
-        }
-        jobject.append(comp)
+        comp = [self.getType().lower(), [], []]
         
         # Each property
-        self.writePropertiesJSON(comp["contents"])
+        self.writePropertiesJSON(comp[1])
     
         # Each component
-        self.writeComponentsJSON(comp["contents"])
+        self.writeComponentsJSON(comp[2])
+
+        jobject.append(comp)
     
     def writeJSONFiltered(self, jobject, filter):
         # Component element
-        comp = {
-            "component":self.getType().lower(),
-            "contents":[]
-        }
-        jobject.append(comp)
+        comp = [self.getType().lower(), [], []]
         
         # Each property
-        self.writePropertiesFilteredJSON(comp["contents"], filter)
+        self.writePropertiesFilteredJSON(comp[1], filter)
     
         # Each component
-        self.writeComponentsFilteredJSON(comp["contents"], filter)
+        self.writeComponentsFilteredJSON(comp[2], filter)
+
+        jobject.append(comp)
 
     def sortedComponents(self):
         

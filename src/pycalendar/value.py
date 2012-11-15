@@ -1,12 +1,12 @@
 ##
 #    Copyright (c) 2007-2011 Cyrus Daboo. All rights reserved.
-#    
+#
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
 #    You may obtain a copy of the License at
-#    
+#
 #        http://www.apache.org/licenses/LICENSE-2.0
-#    
+#
 #    Unless required by applicable law or agreed to in writing, software
 #    distributed under the License is distributed on an "AS IS" BASIS,
 #    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -47,10 +47,10 @@ class PyCalendarValue(ValueMixin):
         VALUETYPE_MULTIVALUE,
         VALUETYPE_XNAME,
     ) = range(23)
-    
+
     _typeMap = {}
     _xmlMap = {}
-    
+
     def __hash__(self):
         return hash((self.getType(), self.getValue()))
 
@@ -63,7 +63,7 @@ class PyCalendarValue(ValueMixin):
     def registerType(clz, type, cls, xmlNode):
         clz._typeMap[type] = cls
         clz._xmlMap[type] = xmlNode
-    
+
     @classmethod
     def createFromType(clz, type):
         # Create the type
@@ -72,23 +72,27 @@ class PyCalendarValue(ValueMixin):
             return created()
         else:
             return clz._typeMap.get("UNKNOWN")(type)
-    
+
     def getType(self):
         raise NotImplementedError
 
     def getRealType(self):
         return self.getType()
 
-    def getValue( self ):
+    def getValue(self):
         raise NotImplementedError
 
-    def setValue( self, value ):
+    def setValue(self, value):
         raise NotImplementedError
 
     def writeXML(self, node, namespace):
         raise NotImplementedError
 
     def writeJSON(self, jobject):
+        jobject.append(self._xmlMap[self.getType()])
+        self.writeJSONValue(jobject)
+
+    def writeJSONValue(self, jobject):
         raise NotImplementedError
 
     def getXMLNode(self, node, namespace):

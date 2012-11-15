@@ -255,5 +255,5 @@ class PyCalendarDuration(ValueMixin):
         node.text = self.getText()
 
     def writeJSON(self, jobject):
-        jobject["duration"] = self.getText()
+        jobject.append(self.getText())
 

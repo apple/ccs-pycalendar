@@ -21,12 +21,12 @@ from pycalendar.parser import ParserContext
 from pycalendar.value import PyCalendarValue
 import xml.etree.cElementTree as XML
 
-class PyCalendarRequestStatusValue( PyCalendarValue ):
+class PyCalendarRequestStatusValue(PyCalendarValue):
     """
     The value is a list of strings (either 2 or 3 items)
     """
 
-    def __init__(self, value = None):
+    def __init__(self, value=None):
         self.mValue = value if value is not None else ["2.0", "Success"]
 
     def __hash__(self):
@@ -38,8 +38,8 @@ class PyCalendarRequestStatusValue( PyCalendarValue ):
     def getType(self):
         return PyCalendarValue.VALUETYPE_REQUEST_STATUS
 
-    def parse( self, data ):
-        
+    def parse(self, data):
+
         # Split fields based on ;
         code, rest = data.split(";", 1)
 
@@ -47,37 +47,37 @@ class PyCalendarRequestStatusValue( PyCalendarValue ):
             code = code.replace("\\", "")
         elif ParserContext.INVALID_REQUEST_STATUS_VALUE == ParserContext.PARSER_RAISE:
             raise ValueError
-        
+
         # The next two items are text with possible \; sequences so we have to punt on those
         desc = ""
         semicolon = rest.find(";")
         while semicolon != -1:
-            if rest[semicolon-1] == "\\":
-                desc += rest[:semicolon+1]
-                rest = rest[semicolon+1:]
+            if rest[semicolon - 1] == "\\":
+                desc += rest[:semicolon + 1]
+                rest = rest[semicolon + 1:]
                 semicolon = rest.find(";")
             else:
                 desc += rest[:semicolon]
-                rest = rest[semicolon+1:]
+                rest = rest[semicolon + 1:]
                 break
 
         if semicolon == -1:
             desc += rest
             rest = ""
-                
+
         # Decoding required
-        self.mValue = [code, utils.decodeTextValue( desc), utils.decodeTextValue( rest ) if rest else None]
-        
+        self.mValue = [code, utils.decodeTextValue(desc), utils.decodeTextValue(rest) if rest else None]
+
     # os - StringIO object
-    def generate( self, os ):
+    def generate(self, os):
         try:
             # Encoding required
-            utils.writeTextValue( os, self.mValue[0] )
+            utils.writeTextValue(os, self.mValue[0])
             os.write(";")
-            utils.writeTextValue( os, self.mValue[1] )
+            utils.writeTextValue(os, self.mValue[1])
             if len(self.mValue) == 3 and self.mValue[2]:
                 os.write(";")
-                utils.writeTextValue( os, self.mValue[2] )
+                utils.writeTextValue(os, self.mValue[2])
         except:
             pass
 
@@ -92,19 +92,17 @@ class PyCalendarRequestStatusValue( PyCalendarValue ):
             data = XML.SubElement(node, xmldefs.makeTag(namespace, xmldefs.req_status_data))
             data.text = self.mValue[2]
 
-    def writeJSON(self, jobject):
-        jobject["request-status"] = {
-            "code": self.mValue[0],
-            "description": self.mValue[1]
-        }
-        if len(self.mValue) == 3 and self.mValue[2]:
-            jobject["request-status"]["data"] = self.mValue[2]
+    def writeJSONValue(self, jobject):
+        jobject.append(self.mValue[0])
+        jobject.append(self.mValue[1])
+        if len(self.mValue) == 3:
+            jobject.append(self.mValue[2])
 
     def getValue(self):
         return self.mValue
 
-    def setValue( self, value ):
+    def setValue(self, value):
         self.mValue = value
 
 PyCalendarValue.registerType(PyCalendarValue.VALUETYPE_REQUEST_STATUS, PyCalendarRequestStatusValue, None)
-    
+

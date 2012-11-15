@@ -460,7 +460,7 @@ class PyCalendar(PyCalendarComponentBase):
         
     def getTextJSON(self, includeTimezones=False):
         jobject = self.writeJSON(includeTimezones)
-        return json.dumps(jobject, indent=2)
+        return json.dumps(jobject, indent=2, separators=(',', ':'))
 
     def writeJSON(self, includeTimezones=False):
         # Make sure all required timezones are in this object

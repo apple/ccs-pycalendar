@@ -1,12 +1,12 @@
 ##
 #    Copyright (c) 2007-2011 Cyrus Daboo. All rights reserved.
-#    
+#
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
 #    You may obtain a copy of the License at
-#    
+#
 #        http://www.apache.org/licenses/LICENSE-2.0
-#    
+#
 #    Unless required by applicable law or agreed to in writing, software
 #    distributed under the License is distributed on an "AS IS" BASIS,
 #    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -90,7 +90,7 @@ class PyCalendarProperty(object):
 
         # 5545 Section 3.8.5
         definitions.cICalProperty_EXDATE : PyCalendarValue.VALUETYPE_DATETIME,
-        definitions.cICalProperty_EXRULE : PyCalendarValue.VALUETYPE_RECUR,     # 2445 only
+        definitions.cICalProperty_EXRULE : PyCalendarValue.VALUETYPE_RECUR, # 2445 only
         definitions.cICalProperty_RDATE  : PyCalendarValue.VALUETYPE_DATETIME,
         definitions.cICalProperty_RRULE  : PyCalendarValue.VALUETYPE_RECUR,
 
@@ -170,7 +170,7 @@ class PyCalendarProperty(object):
         definitions.cICalProperty_RDATE,
     ))
 
-    def __init__(self, name = None, value = None, valuetype = None):
+    def __init__(self, name=None, value=None, valuetype=None):
         self._init_PyCalendarProperty()
         self.mName = name if name is not None else ""
 
@@ -243,7 +243,7 @@ class PyCalendarProperty(object):
         return self.mAttributes
 
     def setAttributes(self, attributes):
-        self.mAttributes = dict([(k.upper(), v) for k,v in attributes.iteritems()])
+        self.mAttributes = dict([(k.upper(), v) for k, v in attributes.iteritems()])
 
     def hasAttribute(self, attr):
         return self.mAttributes.has_key(attr.upper())
@@ -349,7 +349,7 @@ class PyCalendarProperty(object):
 
         # We have the name
         self.mName = prop_name
-        
+
         # TODO: Try to use static string for the name
 
         # Now loop getting data
@@ -357,10 +357,10 @@ class PyCalendarProperty(object):
             while txt:
                 if txt[0] == ';':
                     # Parse attribute
-    
+
                     # Move past delimiter
                     txt = txt[1:]
-    
+
                     # Get quoted string or token
                     attribute_name, txt = stringutils.strduptokenstr(txt, "=")
                     if attribute_name is None:
@@ -369,11 +369,11 @@ class PyCalendarProperty(object):
                     attribute_value, txt = stringutils.strduptokenstr(txt, ":;,")
                     if attribute_value is None:
                         raise PyCalendarInvalidProperty("Invalid property", data)
-    
+
                     # Now add attribute value
-                    attrvalue = PyCalendarAttribute(name = attribute_name, value=attribute_value)
+                    attrvalue = PyCalendarAttribute(name=attribute_name, value=attribute_value)
                     self.mAttributes.setdefault(attribute_name.upper(), []).append(attrvalue)
-    
+
                     # Look for additional values
                     while txt[0] == ',':
                         txt = txt[1:]
@@ -395,7 +395,7 @@ class PyCalendarProperty(object):
         # We must have a value of some kind
         if self.mValue is None:
             raise PyCalendarInvalidProperty("Invalid property", data)
-        
+
         return True
 
 
@@ -411,7 +411,7 @@ class PyCalendarProperty(object):
 
 
     def generateFiltered(self, os, filter):
-        
+
         # Check for property in filter and whether value is written out
         test, novalue = filter.testPropertyValue(self.mName.upper())
         if test:
@@ -460,15 +460,15 @@ class PyCalendarProperty(object):
                     while (temp[offset] > 0x7F) and ((ord(temp[offset]) & 0xC0) == 0x80):
                         # Step back until we have a valid char
                         offset -= 1
-                    
+
                     line = temp[start:offset]
                     os.write(line)
                     os.write("\r\n ")
                     written += offset - start
                     start = offset
-    
+
         os.write("\r\n")
-    
+
     def writeXML(self, node, namespace):
 
         # Write it out always with value
@@ -476,7 +476,7 @@ class PyCalendarProperty(object):
 
 
     def generateFilteredXML(self, node, namespace, filter):
-        
+
         # Check for property in filter and whether value is written out
         test, novalue = filter.testPropertyValue(self.mName.upper())
         if test:
@@ -486,40 +486,37 @@ class PyCalendarProperty(object):
     def generateValueXML(self, node, namespace, novalue):
 
         prop = XML.SubElement(node, xmldefs.makeTag(namespace, self.getName()))
-        
+
         # Write all attributes
         if len(self.mAttributes):
             params = XML.SubElement(prop, xmldefs.makeTag(namespace, xmldefs.parameters))
             for key in sorted(self.mAttributes.keys()):
                 for attr in self.mAttributes[key]:
-                    if attr.getName() != "VALUE":
+                    if attr.getName().lower() != "value":
                         attr.writeXML(params, namespace)
 
         # Write value
         if self.mValue and not novalue:
             self.mValue.writeXML(prop, namespace)
-    
+
     def writeJSON(self, jobject):
-        
-        prop = {
-            "name":self.getName().lower(),
-            "value":{},
-        }
+
+        prop = [
+            self.getName().lower(),
+            {},
+        ]
         jobject.append(prop)
-        
+
         # Write all attributes
-        if len(self.mAttributes):
-            params = {}
-            prop["parameters"] = params
-            for key in sorted(self.mAttributes.keys()):
-                for attr in self.mAttributes[key]:
-                    if attr.getName() != "VALUE":
-                        attr.writeJSON(params)
+        for key in sorted(self.mAttributes.keys()):
+            for attr in self.mAttributes[key]:
+                if attr.getName().lower() != "value":
+                    attr.writeJSON(prop[1])
 
         # Write value
         if self.mValue:
-            self.mValue.writeJSON(prop["value"])
-        
+            self.mValue.writeJSON(prop)
+
 
     def _init_PyCalendarProperty(self):
         self.mName = ""
@@ -556,7 +553,7 @@ class PyCalendarProperty(object):
             tzid = None
             if (self.hasAttribute(definitions.cICalAttribute_TZID)):
                 tzid = self.getAttributeValue(definitions.cICalAttribute_TZID)
-                
+
                 if isinstance(self.mValue, PyCalendarDateTimeValue):
                     self.mValue.getValue().setTimezoneID(tzid)
                 elif isinstance(self.mValue, PyCalendarMultiValue):
@@ -590,7 +587,7 @@ class PyCalendarProperty(object):
             tzid = None
             if (self.hasAttribute(definitions.cICalAttribute_TZID)):
                 tzid = self.getAttributeValue(definitions.cICalAttribute_TZID)
-                
+
                 if isinstance(self.mValue, PyCalendarDateTimeValue):
                     self.mValue.getValue().setTimezoneID(tzid)
                 elif isinstance(self.mValue, PyCalendarMultiValue):
@@ -653,7 +650,7 @@ class PyCalendarProperty(object):
                 del self.mAttributes[definitions.cICalAttribute_TZID]
             self.mAttributes.setdefault(definitions.cICalAttribute_TZID, []).append(
                     PyCalendarAttribute(name=definitions.cICalAttribute_TZID, value=dt.getTimezoneID()))
-    
+
     def _init_attr_value_datetimelist(self, dtl):
         # Value
         date_only = (len(dtl) > 0) and dtl[0].isDateOnly()

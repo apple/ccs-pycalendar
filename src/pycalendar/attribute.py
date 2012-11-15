@@ -24,7 +24,7 @@ from pycalendar import xmldefs
 
 class PyCalendarAttribute(object):
 
-    def __init__(self, name, value = None):
+    def __init__(self, name, value=None):
         self.mName = name
         if value is None:
             self.mValues = []
@@ -71,25 +71,25 @@ class PyCalendarAttribute(object):
     def generate(self, os):
         try:
             os.write(self.mName)
-            
+
             # To support vCard 2.1 syntax we allow parameters without values
             if self.mValues:
                 os.write("=")
-    
+
                 first = True
                 for s in self.mValues:
                     if first:
                         first = False
                     else:
                         os.write(",")
-    
+
                     # Write with quotation if required
                     self.generateValue(os, s)
 
         except:
             # We ignore errors
             pass
-    
+
     def generateValue(self, os, str):
         # Look for quoting
         if str.find(":") != -1 or str.find(";") != -1 or str.find(",") != -1:
@@ -105,5 +105,4 @@ class PyCalendarAttribute(object):
             text.text = value
 
     def writeJSON(self, jobject):
-        jobject[self.getName().lower()] = self.mValues if len(self.mValues) > 1 else self.mValues[0]
-
+        jobject[self.getName().lower()] = self.mValues if len(self.mValues) != 1 else self.mValues[0]

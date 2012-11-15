@@ -44,8 +44,8 @@ class PyCalendarIntegerValue( PyCalendarValue ):
         value = self.getXMLNode(node, namespace)
         value.text = str(self.mValue)
 
-    def writeJSON(self, jobject):
-        jobject["integer"] = self.mValue
+    def writeJSONValue(self, jobject):
+        jobject.append(self.mValue)
 
     def getValue(self):
         return self.mValue

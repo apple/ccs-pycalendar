@@ -1,12 +1,12 @@
 ##
 #    Copyright (c) 2007-2011 Cyrus Daboo. All rights reserved.
-#    
+#
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
 #    You may obtain a copy of the License at
-#    
+#
 #        http://www.apache.org/licenses/LICENSE-2.0
-#    
+#
 #    Unless required by applicable law or agreed to in writing, software
 #    distributed under the License is distributed on an "AS IS" BASIS,
 #    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,7 +20,7 @@ import difflib
 import unittest
 
 class TestJSON(unittest.TestCase):
-    
+
     data = (
                 (
 """BEGIN:VCALENDAR
@@ -36,59 +36,61 @@ END:VEVENT
 END:VCALENDAR
 """.replace("\n", "\r\n"),
 
-"""{
-  "component": "vcalendar", 
-  "contents": [
-    {
-      "name": "version", 
-      "value": {
-        "text": "2.0"
-      }
-    }, 
-    {
-      "name": "calscale", 
-      "value": {
-        "text": "GREGORIAN"
-      }
-    }, 
-    {
-      "name": "prodid", 
-      "value": {
-        "text": "-//Example Inc.//Example Calendar//EN"
-      }
-    }, 
-    {
-      "component": "vevent", 
-      "contents": [
-        {
-          "name": "uid", 
-          "value": {
-            "text": "4088E990AD89CB3DBB484909"
-          }
-        }, 
-        {
-          "parameters": {}, 
-          "name": "dtstart", 
-          "value": {
-            "date": "2008-10-06"
-          }
-        }, 
-        {
-          "name": "dtstamp", 
-          "value": {
-            "date-time": "2008-02-05T19:12:24Z"
-          }
-        }, 
-        {
-          "name": "summary", 
-          "value": {
-            "text": "Planning meeting"
-          }
-        }
-      ]
-    }
+"""[
+  "vcalendar",
+  [
+    [
+      "version",
+      {},
+      "text",
+      "2.0"
+    ],
+    [
+      "calscale",
+      {},
+      "text",
+      "GREGORIAN"
+    ],
+    [
+      "prodid",
+      {},
+      "text",
+      "-//Example Inc.//Example Calendar//EN"
+    ]
+  ],
+  [
+    [
+      "vevent",
+      [
+        [
+          "uid",
+          {},
+          "text",
+          "4088E990AD89CB3DBB484909"
+        ],
+        [
+          "dtstart",
+          {},
+          "date",
+          "2008-10-06"
+        ],
+        [
+          "dtstamp",
+          {},
+          "date-time",
+          "2008-02-05T19:12:24Z"
+        ],
+        [
+          "summary",
+          {},
+          "text",
+          "Planning meeting"
+        ]
+      ],
+      []
+    ]
   ]
-}""",
+]""",
                 ),
                 (
 """BEGIN:VCALENDAR
@@ -136,240 +138,220 @@ END:VEVENT
 END:VCALENDAR
 """.replace("\n", "\r\n"),
 
-"""{
-  "component": "vcalendar", 
-  "contents": [
-    {
-      "name": "version", 
-      "value": {
-        "text": "2.0"
-      }
-    }, 
-    {
-      "name": "prodid", 
-      "value": {
-        "text": "-//Example Corp.//Example Client//EN"
-      }
-    }, 
-    {
-      "component": "vtimezone", 
-      "contents": [
-        {
-          "name": "tzid", 
-          "value": {
-            "text": "US/Eastern"
-          }
-        }, 
-        {
-          "name": "last-modified", 
-          "value": {
-            "date-time": "2004-01-10T03:28:45Z"
-          }
-        }, 
-        {
-          "component": "daylight", 
-          "contents": [
-            {
-              "name": "dtstart", 
-              "value": {
-                "date-time": "2000-04-04T02:00:00"
-              }
-            }, 
-            {
-              "name": "rrule", 
-              "value": {
-                "recur": {
-                  "bymonth": [
-                    4
-                  ], 
-                  "freq": "YEARLY", 
-                  "byday": [
-                    "1SU"
-                  ]
-                }
-              }
-            }, 
-            {
-              "name": "tzname", 
-              "value": {
-                "text": "EDT"
-              }
-            }, 
-            {
-              "name": "tzoffsetfrom", 
-              "value": {
-                "utc-offset": "-05:00"
-              }
-            }, 
-            {
-              "name": "tzoffsetto", 
-              "value": {
-                "utc-offset": "-04:00"
-              }
-            }
-          ]
-        }, 
-        {
-          "component": "standard", 
-          "contents": [
-            {
-              "name": "dtstart", 
-              "value": {
-                "date-time": "2000-10-26T02:00:00"
-              }
-            }, 
-            {
-              "name": "rrule", 
-              "value": {
-                "recur": {
-                  "bymonth": [
-                    10
-                  ], 
-                  "freq": "YEARLY", 
-                  "byday": [
-                    "-1SU"
-                  ]
-                }
-              }
-            }, 
-            {
-              "name": "tzname", 
-              "value": {
-                "text": "EST"
-              }
-            }, 
-            {
-              "name": "tzoffsetfrom", 
-              "value": {
-                "utc-offset": "-04:00"
-              }
-            }, 
-            {
-              "name": "tzoffsetto", 
-              "value": {
-                "utc-offset": "-05:00"
-              }
-            }
-          ]
-        }
-      ]
-    }, 
-    {
-      "component": "vevent", 
-      "contents": [
-        {
-          "name": "uid", 
-          "value": {
-            "text": "00959BC664CA650E933C892C@example.com"
-          }
-        }, 
-        {
-          "parameters": {
-            "tzid": "US/Eastern"
-          }, 
-          "name": "dtstart", 
-          "value": {
-            "date-time": "2006-01-02T12:00:00"
-          }
-        }, 
-        {
-          "name": "duration", 
-          "value": {
-            "duration": "PT1H"
-          }
-        }, 
-        {
-          "name": "description", 
-          "value": {
-            "text": "We are having a meeting all this week at 12 pm for one hour, with an additional meeting on the first day 2 hours long.\\nPlease bring your own lunch for the 12 pm meetings."
-          }
-        }, 
-        {
-          "name": "dtstamp", 
-          "value": {
-            "date-time": "2006-02-06T00:11:21Z"
-          }
-        }, 
-        {
-          "parameters": {
-            "tzid": "US/Eastern"
-          }, 
-          "name": "rdate", 
-          "value": {
-            "period": [
-              {
-                "duration": "PT2H", 
-                "start": "2006-01-02T15:00:00"
-              }
+"""[
+  "vcalendar",
+  [
+    [
+      "version",
+      {},
+      "text",
+      "2.0"
+    ],
+    [
+      "prodid",
+      {},
+      "text",
+      "-//Example Corp.//Example Client//EN"
+    ]
+  ],
+  [
+    [
+      "vtimezone",
+      [
+        [
+          "tzid",
+          {},
+          "text",
+          "US/Eastern"
+        ],
+        [
+          "last-modified",
+          {},
+          "date-time",
+          "2004-01-10T03:28:45Z"
+        ]
+      ],
+      [
+        [
+          "daylight",
+          [
+            [
+              "dtstart",
+              {},
+              "date-time",
+              "2000-04-04T02:00:00"
+            ],
+            [
+              "rrule",
+              {},
+              "recur",
+              "FREQ=YEARLY;BYDAY=1SU;BYMONTH=4"
+            ],
+            [
+              "tzname",
+              {},
+              "text",
+              "EDT"
+            ],
+            [
+              "tzoffsetfrom",
+              {},
+              "utc-offset",
+              "-05:00"
+            ],
+            [
+              "tzoffsetto",
+              {},
+              "utc-offset",
+              "-04:00"
             ]
-          }
-        }, 
-        {
-          "name": "rrule", 
-          "value": {
-            "recur": {
-              "count": 5, 
-              "freq": "DAILY"
-            }
-          }
-        }, 
-        {
-          "name": "summary", 
-          "value": {
-            "text": "Event #2"
-          }
-        }
+          ],
+          []
+        ],
+        [
+          "standard",
+          [
+            [
+              "dtstart",
+              {},
+              "date-time",
+              "2000-10-26T02:00:00"
+            ],
+            [
+              "rrule",
+              {},
+              "recur",
+              "FREQ=YEARLY;BYDAY=-1SU;BYMONTH=10"
+            ],
+            [
+              "tzname",
+              {},
+              "text",
+              "EST"
+            ],
+            [
+              "tzoffsetfrom",
+              {},
+              "utc-offset",
+              "-04:00"
+            ],
+            [
+              "tzoffsetto",
+              {},
+              "utc-offset",
+              "-05:00"
+            ]
+          ],
+          []
+        ]
       ]
-    }, 
-    {
-      "component": "vevent", 
-      "contents": [
-        {
-          "name": "uid", 
-          "value": {
-            "text": "00959BC664CA650E933C892C@example.com"
-          }
-        }, 
-        {
-          "parameters": {
-            "tzid": "US/Eastern"
-          }, 
-          "name": "recurrence-id", 
-          "value": {
-            "date-time": "2006-01-04T12:00:00"
-          }
-        }, 
-        {
-          "parameters": {
-            "tzid": "US/Eastern"
-          }, 
-          "name": "dtstart", 
-          "value": {
-            "date-time": "2006-01-04T14:00:00"
-          }
-        }, 
-        {
-          "name": "duration", 
-          "value": {
-            "duration": "PT1H"
-          }
-        }, 
-        {
-          "name": "dtstamp", 
-          "value": {
-            "date-time": "2006-02-06T00:11:21Z"
-          }
-        }, 
-        {
-          "name": "summary", 
-          "value": {
-            "text": "Event #2 bis"
-          }
-        }
-      ]
-    }
+    ],
+    [
+      "vevent",
+      [
+        [
+          "uid",
+          {},
+          "text",
+          "00959BC664CA650E933C892C@example.com"
+        ],
+        [
+          "dtstart",
+          {
+            "tzid":"US/Eastern"
+          },
+          "date-time",
+          "2006-01-02T12:00:00"
+        ],
+        [
+          "duration",
+          {},
+          "duration",
+          "PT1H"
+        ],
+        [
+          "description",
+          {},
+          "text",
+          "We are having a meeting all this week at 12 pm for one hour, with an additional meeting on the first day 2 hours long.\\nPlease bring your own lunch for the 12 pm meetings."
+        ],
+        [
+          "dtstamp",
+          {},
+          "date-time",
+          "2006-02-06T00:11:21Z"
+        ],
+        [
+          "rdate",
+          {
+            "tzid":"US/Eastern"
+          },
+          "period",
+          "2006-01-02T15:00:00/PT2H"
+        ],
+        [
+          "rrule",
+          {},
+          "recur",
+          "FREQ=DAILY;COUNT=5"
+        ],
+        [
+          "summary",
+          {},
+          "text",
+          "Event #2"
+        ]
+      ],
+      []
+    ],
+    [
+      "vevent",
+      [
+        [
+          "uid",
+          {},
+          "text",
+          "00959BC664CA650E933C892C@example.com"
+        ],
+        [
+          "recurrence-id",
+          {
+            "tzid":"US/Eastern"
+          },
+          "date-time",
+          "2006-01-04T12:00:00"
+        ],
+        [
+          "dtstart",
+          {
+            "tzid":"US/Eastern"
+          },
+          "date-time",
+          "2006-01-04T14:00:00"
+        ],
+        [
+          "duration",
+          {},
+          "duration",
+          "PT1H"
+        ],
+        [
+          "dtstamp",
+          {},
+          "date-time",
+          "2006-02-06T00:11:21Z"
+        ],
+        [
+          "summary",
+          {},
+          "text",
+          "Event #2 bis"
+        ]
+      ],
+      []
+    ]
   ]
-}""",
+]""",
             ),
         )
 
@@ -380,7 +362,7 @@ END:VCALENDAR
 
             cal = PyCalendar()
             cal.parse(StringIO.StringIO(caldata))
-            
+
             test2 = cal.getTextJSON()
             self.assertEqual(
                 test1,
@@ -390,4 +372,3 @@ END:VCALENDAR
 
         for item1, item2 in self.data:
             _doRoundtrip(item1, item2)
-
