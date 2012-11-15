@@ -1,12 +1,12 @@
 ##
-#    Copyright (c) 2007-2011 Cyrus Daboo. All rights reserved.
-#    
+#    Copyright (c) 2007-2012 Cyrus Daboo. All rights reserved.
+#
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
 #    You may obtain a copy of the License at
-#    
+#
 #        http://www.apache.org/licenses/LICENSE-2.0
-#    
+#
 #    Unless required by applicable law or agreed to in writing, software
 #    distributed under the License is distributed on an "AS IS" BASIS,
 #    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -69,20 +69,21 @@ class PyCalendarVAlarm(PyCalendarComponent):
         def getType(self):
             return self.mType
 
+
     class PyCalendarVAlarmAudio(PyCalendarVAlarmAction):
 
         propertyCardinality_1 = (
             definitions.cICalProperty_ACTION,
             definitions.cICalProperty_TRIGGER,
         )
-    
+
         propertyCardinality_0_1 = (
             definitions.cICalProperty_DURATION,
             definitions.cICalProperty_REPEAT,
             definitions.cICalProperty_ATTACH,
             definitions.cICalProperty_ACKNOWLEDGED,
         )
-        
+
         def __init__(self, speak=None):
             super(PyCalendarVAlarm.PyCalendarVAlarmAudio, self).__init__(type=definitions.eAction_VAlarm_Audio)
             self.mSpeakText = speak
@@ -110,13 +111,14 @@ class PyCalendarVAlarm(PyCalendarComponent):
         def getSpeakText(self):
             return self.mSpeakText
 
+
     class PyCalendarVAlarmDisplay(PyCalendarVAlarmAction):
 
         propertyCardinality_1 = (
             definitions.cICalProperty_ACTION,
             definitions.cICalProperty_TRIGGER,
         )
-    
+
         propertyCardinality_1_Fix_Empty = (
             definitions.cICalProperty_DESCRIPTION,
         )
@@ -126,7 +128,7 @@ class PyCalendarVAlarm(PyCalendarComponent):
             definitions.cICalProperty_REPEAT,
             definitions.cICalProperty_ACKNOWLEDGED,
         )
-        
+
         def __init__(self, description=None):
             super(PyCalendarVAlarm.PyCalendarVAlarmDisplay, self).__init__(type=definitions.eAction_VAlarm_Display)
             self.mDescription = description
@@ -151,13 +153,14 @@ class PyCalendarVAlarm(PyCalendarComponent):
         def getDescription(self):
             return self.mDescription
 
+
     class PyCalendarVAlarmEmail(PyCalendarVAlarmAction):
 
         propertyCardinality_1 = (
             definitions.cICalProperty_ACTION,
             definitions.cICalProperty_TRIGGER,
         )
-    
+
         propertyCardinality_1_Fix_Empty = (
             definitions.cICalProperty_DESCRIPTION,
             definitions.cICalProperty_SUMMARY,
@@ -225,24 +228,26 @@ class PyCalendarVAlarm(PyCalendarComponent):
         def getAttendees(self):
             return self.mAttendees
 
+
     class PyCalendarVAlarmUnknown(PyCalendarVAlarmAction):
 
         propertyCardinality_1 = (
             definitions.cICalProperty_ACTION,
             definitions.cICalProperty_TRIGGER,
         )
-    
+
         propertyCardinality_0_1 = (
             definitions.cICalProperty_DURATION,
             definitions.cICalProperty_REPEAT,
             definitions.cICalProperty_ACKNOWLEDGED,
         )
-        
+
         def __init__(self):
             super(PyCalendarVAlarm.PyCalendarVAlarmUnknown, self).__init__(type=definitions.eAction_VAlarm_Unknown)
 
         def duplicate(self):
             return PyCalendarVAlarm.PyCalendarVAlarmUnknown()
+
 
     class PyCalendarVAlarmURI(PyCalendarVAlarmAction):
 
@@ -251,7 +256,7 @@ class PyCalendarVAlarm(PyCalendarComponent):
             definitions.cICalProperty_TRIGGER,
             definitions.cICalProperty_URL,
         )
-    
+
         propertyCardinality_0_1 = (
             definitions.cICalProperty_DURATION,
             definitions.cICalProperty_REPEAT,
@@ -282,6 +287,7 @@ class PyCalendarVAlarm(PyCalendarComponent):
         def getURI(self):
             return self.mURI
 
+
     class PyCalendarVAlarmNone(PyCalendarVAlarmAction):
 
         propertyCardinality_1 = (
@@ -294,10 +300,10 @@ class PyCalendarVAlarm(PyCalendarComponent):
         def duplicate(self):
             return PyCalendarVAlarm.PyCalendarVAlarmNone()
 
+
     def getMimeComponentName(self):
         # Cannot be sent as a separate MIME object
         return None
-
 
     sActionToAlarmMap = {
         definitions.eAction_VAlarm_Audio: PyCalendarVAlarmAudio,
@@ -310,7 +316,7 @@ class PyCalendarVAlarm(PyCalendarComponent):
     propertyValueChecks = ICALENDAR_VALUE_CHECKS
 
     def __init__(self, parent=None):
-        
+
         super(PyCalendarVAlarm, self).__init__(parent=parent)
 
         self.mAction = definitions.eAction_VAlarm_Display
@@ -337,6 +343,7 @@ class PyCalendarVAlarm(PyCalendarComponent):
         # Create action data
         self.mActionData = PyCalendarVAlarm.PyCalendarVAlarmDisplay("")
 
+
     def duplicate(self, parent=None):
         other = super(PyCalendarVAlarm, self).duplicate(parent=parent)
         other.mAction = self.mAction
@@ -358,32 +365,42 @@ class PyCalendarVAlarm(PyCalendarComponent):
         other.mActionData = self.mActionData.duplicate()
         return other
 
+
     def getType(self):
         return definitions.cICalComponent_VALARM
+
 
     def getAction(self):
         return self.mAction
 
+
     def getActionData(self):
         return self.mActionData
+
 
     def isTriggerAbsolute(self):
         return self.mTriggerAbsolute
 
+
     def getTriggerOn(self):
         return self.mTriggerOn
 
+
     def getTriggerDuration(self):
         return self.mTriggerBy
-  
+
+
     def isTriggerOnStart(self):
         return self.mTriggerOnStart
+
 
     def getRepeats(self):
         return self.mRepeats
 
+
     def getInterval(self):
         return self.mRepeatInterval
+
 
     def added(self):
         # Added to calendar so add to calendar notifier
@@ -392,12 +409,14 @@ class PyCalendarVAlarm(PyCalendarComponent):
         # Do inherited
         super(PyCalendarVAlarm, self).added()
 
+
     def removed(self):
         # Removed from calendar so add to calendar notifier
         # calstore::CCalendarNotifier::sCalendarNotifier.RemoveAlarm(this)
 
         # Do inherited
         super(PyCalendarVAlarm, self).removed()
+
 
     def changed(self):
         # Always force recalc of trigger status
@@ -409,6 +428,7 @@ class PyCalendarVAlarm(PyCalendarComponent):
         # Do not do inherited as this is always a sub-component and we do not
         # do top-level component changes
         # super.changed()
+
 
     def finalise(self):
         # Do inherited
@@ -453,6 +473,9 @@ class PyCalendarVAlarm(PyCalendarComponent):
         if temp is not None:
             self.mRepeatInterval = temp
 
+        # Set a map key for sorting
+        self.mMapKey = "%s:%s" % (self.mAction, self.mTriggerOn if self.mTriggerAbsolute else self.mTriggerBy,)
+
         # Alarm status - private to Mulberry
         status = self.loadValueString(definitions.cICalProperty_ALARM_X_ALARMSTATUS)
         if status is not None:
@@ -470,13 +493,14 @@ class PyCalendarVAlarm(PyCalendarComponent):
         if temp is not None:
             self.mLastTrigger = temp
 
+
     def validate(self, doFix=False):
         """
         Validate the data in this component and optionally fix any problems, else raise. If
         loggedProblems is not None it must be a C{list} and problem descriptions are appended
-        to that. 
+        to that.
         """
-        
+
         # Validate using action specific constraints
         self.propertyCardinality_1 = self.mActionData.propertyCardinality_1
         self.propertyCardinality_1_Fix_Empty = self.mActionData.propertyCardinality_1_Fix_Empty
@@ -494,8 +518,9 @@ class PyCalendarVAlarm(PyCalendarComponent):
                 definitions.cICalProperty_REPEAT,
             )
             unfixed.append(logProblem)
-        
+
         return fixed, unfixed
+
 
     def editStatus(self, status):
         # Remove existing
@@ -513,6 +538,7 @@ class PyCalendarVAlarm(PyCalendarComponent):
         elif self.mAlarmStatus == definitions.eAlarm_Status_Disabled:
             status_txt = definitions.cICalProperty_ALARM_X_ALARMSTATUS_DISABLED
         self.addProperty(PyCalendarProperty(definitions.cICalProperty_ALARM_X_ALARMSTATUS, status_txt))
+
 
     def editAction(self, action, data):
         # Remove existing
@@ -532,6 +558,7 @@ class PyCalendarVAlarm(PyCalendarComponent):
 
         self.mActionData.add(self)
 
+
     def editTriggerOn(self, dt):
         # Remove existing
         self.removeProperties(definitions.cICalProperty_TRIGGER)
@@ -543,6 +570,7 @@ class PyCalendarVAlarm(PyCalendarComponent):
         # Add new
         prop = PyCalendarProperty(definitions.cICalProperty_TRIGGER, dt)
         self.addProperty(prop)
+
 
     def editTriggerBy(self, duration, trigger_start):
         # Remove existing
@@ -561,6 +589,7 @@ class PyCalendarVAlarm(PyCalendarComponent):
         prop.addAttribute(attr)
         self.addProperty(prop)
 
+
     def editRepeats(self, repeat, interval):
         # Remove existing
         self.removeProperties(definitions.cICalProperty_REPEAT)
@@ -575,13 +604,16 @@ class PyCalendarVAlarm(PyCalendarComponent):
             self.addProperty(PyCalendarProperty(definitions.cICalProperty_REPEAT, repeat))
             self.addProperty(PyCalendarProperty(definitions.cICalProperty_DURATION, interval))
 
+
     def getAlarmStatus(self):
         return self.mAlarmStatus
+
 
     def getNextTrigger(self, dt):
         if not self.mStatusInit:
             self.initNextTrigger()
         dt.copy(self.mNextTrigger)
+
 
     def alarmTriggered(self, dt):
         # Remove existing
@@ -613,11 +645,13 @@ class PyCalendarVAlarm(PyCalendarComponent):
         # Now update dt to the next alarm time
         return self.mAlarmStatus == definitions.eAlarm_Status_Pending
 
+
     def loadAction(self):
         # Delete current one
         self.mActionData = None
         self.mActionData = PyCalendarVAlarm.sActionToAlarmMap.get(self.mAction, PyCalendarVAlarm.PyCalendarVAlarmUnknown)()
         self.mActionData.load(self)
+
 
     def initNextTrigger(self):
         # Do not bother if its completed
@@ -653,6 +687,7 @@ class PyCalendarVAlarm(PyCalendarComponent):
                 self.mDoneCount += 1
 
         self.mNextTrigger = trigger
+
 
     def getFirstTrigger(self, dt):
         # If absolute trigger, use that

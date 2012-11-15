@@ -1,12 +1,12 @@
 ##
-#    Copyright (c) 2011 Cyrus Daboo. All rights reserved.
-#    
+#    Copyright (c) 2011-2012 Cyrus Daboo. All rights reserved.
+#
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
 #    You may obtain a copy of the License at
-#    
+#
 #        http://www.apache.org/licenses/LICENSE-2.0
-#    
+#
 #    Unless required by applicable law or agreed to in writing, software
 #    distributed under the License is distributed on an "AS IS" BASIS,
 #    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -29,14 +29,18 @@ class PyCalendarRequestStatusValue(PyCalendarValue):
     def __init__(self, value=None):
         self.mValue = value if value is not None else ["2.0", "Success"]
 
+
     def __hash__(self):
         return hash(tuple(self.mValue))
+
 
     def duplicate(self):
         return PyCalendarRequestStatusValue(self.mValue[:])
 
+
     def getType(self):
         return PyCalendarValue.VALUETYPE_REQUEST_STATUS
+
 
     def parse(self, data):
 
@@ -68,6 +72,7 @@ class PyCalendarRequestStatusValue(PyCalendarValue):
         # Decoding required
         self.mValue = [code, utils.decodeTextValue(desc), utils.decodeTextValue(rest) if rest else None]
 
+
     # os - StringIO object
     def generate(self, os):
         try:
@@ -81,6 +86,7 @@ class PyCalendarRequestStatusValue(PyCalendarValue):
         except:
             pass
 
+
     def writeXML(self, node, namespace):
         code = XML.SubElement(node, xmldefs.makeTag(namespace, xmldefs.req_status_code))
         code.text = self.mValue[0]
@@ -92,17 +98,19 @@ class PyCalendarRequestStatusValue(PyCalendarValue):
             data = XML.SubElement(node, xmldefs.makeTag(namespace, xmldefs.req_status_data))
             data.text = self.mValue[2]
 
+
     def writeJSONValue(self, jobject):
         jobject.append(self.mValue[0])
         jobject.append(self.mValue[1])
         if len(self.mValue) == 3:
             jobject.append(self.mValue[2])
 
+
     def getValue(self):
         return self.mValue
+
 
     def setValue(self, value):
         self.mValue = value
 
 PyCalendarValue.registerType(PyCalendarValue.VALUETYPE_REQUEST_STATUS, PyCalendarRequestStatusValue, None)
-

@@ -1,12 +1,12 @@
 ##
-#    Copyright (c) 2007-2011 Cyrus Daboo. All rights reserved.
-#    
+#    Copyright (c) 2007-2012 Cyrus Daboo. All rights reserved.
+#
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
 #    You may obtain a copy of the License at
-#    
+#
 #        http://www.apache.org/licenses/LICENSE-2.0
-#    
+#
 #    Unless required by applicable law or agreed to in writing, software
 #    distributed under the License is distributed on an "AS IS" BASIS,
 #    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -32,11 +32,17 @@ class PyCalendarVTimezone(PyCalendarComponent):
 
     propertyValueChecks = ICALENDAR_VALUE_CHECKS
 
+    UTCOFFSET_CACHE_MAX_ENTRIES = 100000
+
+    sortSubComponents = False
+
     def __init__(self, parent=None):
         super(PyCalendarVTimezone, self).__init__(parent=parent)
         self.mID = ""
         self.mUTCOffsetSortKey = None
-        self.mCachedExpandAllMax = None
+        self.mCachedExpandAllMaxYear = None
+        self.mCachedOffsets = None
+
 
     def duplicate(self, parent=None):
         other = super(PyCalendarVTimezone, self).duplicate(parent=parent)
@@ -44,12 +50,15 @@ class PyCalendarVTimezone(PyCalendarComponent):
         other.mUTCOffsetSortKey = self.mUTCOffsetSortKey
         return other
 
+
     def getType(self):
         return definitions.cICalComponent_VTIMEZONE
+
 
     def getMimeComponentName(self):
         # Cannot be sent as a separate MIME object
         return None
+
 
     def addComponent(self, comp):
         # We can embed the timezone components only
@@ -59,8 +68,10 @@ class PyCalendarVTimezone(PyCalendarComponent):
         else:
             raise ValueError
 
+
     def getMapKey(self):
         return self.mID
+
 
     def finalise(self):
         # Get TZID
@@ -69,18 +80,19 @@ class PyCalendarVTimezone(PyCalendarComponent):
             self.mID = temp
 
         # Sort sub-components by DTSTART
-        self.mComponents.sort(key=lambda x:x.getStart())
+        self.mComponents.sort(key=lambda x: x.getStart())
 
         # Do inherited
         super(PyCalendarVTimezone, self).finalise()
+
 
     def validate(self, doFix=False):
         """
         Validate the data in this component and optionally fix any problems, else raise. If
         loggedProblems is not None it must be a C{list} and problem descriptions are appended
-        to that. 
+        to that.
         """
-        
+
         fixed, unfixed = super(PyCalendarVTimezone, self).validate(doFix)
 
         # Must have at least one STANDARD or DAYLIGHT sub-component
@@ -95,11 +107,13 @@ class PyCalendarVTimezone(PyCalendarComponent):
                 definitions.cICalComponent_DAYLIGHT,
             )
             unfixed.append(logProblem)
-        
+
         return fixed, unfixed
-                
+
+
     def getID(self):
         return self.mID
+
 
     def getUTCOffsetSortKey(self):
         if self.mUTCOffsetSortKey is None:
@@ -120,12 +134,13 @@ class PyCalendarVTimezone(PyCalendarComponent):
 
         return self.mUTCOffsetSortKey
 
+
     def getTimezoneOffsetSeconds(self, dt):
         """
         Caching implementation of expansion. We cache the entire set of transitions up to one year ahead
         of the requested time.
         """
-        
+
         # Need to make the incoming date-time relative to the DTSTART in the
         # timezone component for proper comparison.
         # This means making the incoming date-time a floating (no timezone)
@@ -134,19 +149,30 @@ class PyCalendarVTimezone(PyCalendarComponent):
         temp.setTimezoneID(None)
 
         # Check whether we need to recache
-        if self.mCachedExpandAllMax is None or temp > self.mCachedExpandAllMax:
+        if self.mCachedExpandAllMaxYear is None or temp.mYear >= self.mCachedExpandAllMaxYear:
             cacheMax = temp.duplicate()
-            cacheMax.offsetYear(1)
+            cacheMax.setHHMMSS(0, 0, 0)
+            cacheMax.offsetYear(2)
+            cacheMax.setMonth(1)
+            cacheMax.setDay(1)
             self.mCachedExpandAll = self.expandAll(None, cacheMax)
-            self.mCachedExpandAllMax = cacheMax
-            
+            self.mCachedExpandAllMaxYear = cacheMax.mYear
+            self.mCachedOffsets = {}
+
         # Now search for the transition just below the time we want
         if len(self.mCachedExpandAll):
-            i = PyCalendarVTimezone.tuple_bisect_right(self.mCachedExpandAll, temp)
+            cacheKey = (temp.mYear, temp.mMonth, temp.mDay, temp.mHours, temp.mMinutes,)
+            i = self.mCachedOffsets.get(cacheKey)
+            if i is None:
+                i = PyCalendarVTimezone.tuple_bisect_right(self.mCachedExpandAll, temp)
+                if len(self.mCachedOffsets) >= self.UTCOFFSET_CACHE_MAX_ENTRIES:
+                    self.mCachedOffsets = {}
+                self.mCachedOffsets[cacheKey] = i
             if i != 0:
-                return self.mCachedExpandAll[i-1][2]
+                return self.mCachedExpandAll[i - 1][2]
 
         return 0
+
 
     def getTimezoneDescriptor(self, dt):
         result = ""
@@ -178,8 +204,10 @@ class PyCalendarVTimezone(PyCalendarComponent):
 
         return result
 
+
     def mergeTimezone(self, tz):
         pass
+
 
     @staticmethod
     def tuple_bisect_right(a, x):
@@ -187,14 +215,17 @@ class PyCalendarVTimezone(PyCalendarComponent):
         Same as bisect_right except that the values being compared are the first elements
         of a tuple.
         """
-    
+
         lo = 0
         hi = len(a)
         while lo < hi:
-            mid = (lo+hi)//2
-            if x < a[mid][0]: hi = mid
-            else: lo = mid+1
+            mid = (lo + hi) // 2
+            if x < a[mid][0]:
+                hi = mid
+            else:
+                lo = mid + 1
         return lo
+
 
     def findTimezoneElement(self, dt):
         # Need to make the incoming date-time relative to the DTSTART in the
@@ -226,13 +257,15 @@ class PyCalendarVTimezone(PyCalendarComponent):
 
         return found
 
+
     def expandAll(self, start, end, with_name=False):
         results = []
         for item in self.mComponents:
             results.extend(item.expandAll(start, end, with_name))
         results = [x for x in set(results)]
-        results.sort(key=lambda x:x[0].getPosixTime())
+        results.sort(key=lambda x: x[0].getPosixTime())
         return results
+
 
     def sortedPropertyKeyOrder(self):
         return (
@@ -240,6 +273,7 @@ class PyCalendarVTimezone(PyCalendarComponent):
             definitions.cICalProperty_LAST_MODIFIED,
             definitions.cICalProperty_TZURL,
         )
+
 
     @staticmethod
     def sortByUTCOffsetComparator(tz1, tz2):

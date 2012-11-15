@@ -1,12 +1,12 @@
 ##
-#    Copyright (c) 2011 Cyrus Daboo. All rights reserved.
-#    
+#    Copyright (c) 2011-2012 Cyrus Daboo. All rights reserved.
+#
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
 #    You may obtain a copy of the License at
-#    
+#
 #        http://www.apache.org/licenses/LICENSE-2.0
-#    
+#
 #    Unless required by applicable law or agreed to in writing, software
 #    distributed under the License is distributed on an "AS IS" BASIS,
 #    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -19,9 +19,9 @@ from pycalendar.vcard.card import Card
 import unittest
 
 class TestValidation(unittest.TestCase):
-    
+
     def test_basic(self):
-        
+
         data = (
             (
                 "No problems",
@@ -59,15 +59,16 @@ END:VCARD
                 )),
             ),
         )
-        
+
         for title, item, test_fixed, test_unfixed in data:
             card = Card.parseText(item)
             fixed, unfixed = card.validate(doFix=False)
             self.assertEqual(set(fixed), test_fixed, msg="Failed test: %s" % (title,))
             self.assertEqual(set(unfixed), test_unfixed, msg="Failed test: %s" % (title,))
 
+
     def test_mode_no_raise(self):
-        
+
         data = (
             (
                 "OK",
@@ -138,8 +139,9 @@ END:VCARD
             self.assertEqual(set(fixed), test_fixed, msg="Failed test: %s" % (title,))
             self.assertEqual(set(unfixed), test_unfixed, msg="Failed test: %s" % (title,))
 
+
     def test_mode_raise(self):
-        
+
         data = (
             (
                 "OK",

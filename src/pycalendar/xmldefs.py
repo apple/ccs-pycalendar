@@ -1,12 +1,12 @@
 ##
-#    Copyright (c) 2007-2011 Cyrus Daboo. All rights reserved.
-#    
+#    Copyright (c) 2007-2012 Cyrus Daboo. All rights reserved.
+#
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
 #    You may obtain a copy of the License at
-#    
+#
 #        http://www.apache.org/licenses/LICENSE-2.0
-#    
+#
 #    Unless required by applicable law or agreed to in writing, software
 #    distributed under the License is distributed on an "AS IS" BASIS,
 #    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,7 +20,7 @@ import xml.etree.cElementTree as XML
 
 iCalendar20_namespace = "urn:ietf:params:xml:ns:icalendar-2.0"
 
-icalendar  = "icalendar"
+icalendar = "icalendar"
 components = "components"
 properties = "properties"
 parameters = "parameters"
@@ -76,15 +76,17 @@ vCard40_namespace = "urn:ietf:params:xml:ns:vcard-4.0"
 def makeTag(namespace, name):
     return "{%s}%s" % (namespace, name.lower(),)
 
+
+
 def toString(root):
-    
+
     data = """<?xml version="1.0" encoding="utf-8"?>\n"""
 
     INDENT = 2
 
     # Generate indentation
     def _indentNode(node, level=0):
-        
+
         if node.text is not None and node.text.strip():
             return
         elif len(node.getchildren()):
@@ -100,4 +102,3 @@ def toString(root):
     data += XML.tostring(root) + "\n"
 
     return data
-

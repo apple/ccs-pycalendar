@@ -1,12 +1,12 @@
 ##
-#    Copyright (c) 2007-2011 Cyrus Daboo. All rights reserved.
-#    
+#    Copyright (c) 2007-2012 Cyrus Daboo. All rights reserved.
+#
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
 #    You may obtain a copy of the License at
-#    
+#
 #        http://www.apache.org/licenses/LICENSE-2.0
-#    
+#
 #    Unless required by applicable law or agreed to in writing, software
 #    distributed under the License is distributed on an "AS IS" BASIS,
 #    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -53,16 +53,20 @@ class PyCalendarVEvent(PyCalendarComponentRecur):
         super(PyCalendarVEvent, self).__init__(parent=parent)
         self.mStatus = definitions.eStatus_VEvent_None
 
+
     def duplicate(self, parent=None):
         other = super(PyCalendarVEvent, self).duplicate(parent=parent)
         other.mStatus = self.mStatus
         return other
 
+
     def getType(self):
         return definitions.cICalComponent_VEVENT
 
+
     def getMimeComponentName(self):
         return itipdefinitions.cICalMIMEComponent_VEVENT
+
 
     def addComponent(self, comp):
         # We can embed the alarm components only
@@ -71,11 +75,14 @@ class PyCalendarVEvent(PyCalendarComponentRecur):
         else:
             raise ValueError
 
+
     def getStatus(self):
         return self.mStatus
 
+
     def setStatus(self, status):
         self.mStatus = status
+
 
     def finalise(self):
         # Do inherited
@@ -90,13 +97,14 @@ class PyCalendarVEvent(PyCalendarComponentRecur):
             elif temp == definitions.cICalProperty_STATUS_CANCELLED:
                 self.mStatus = definitions.eStatus_VEvent_Cancelled
 
+
     def validate(self, doFix=False):
         """
         Validate the data in this component and optionally fix any problems, else raise. If
         loggedProblems is not None it must be a C{list} and problem descriptions are appended
-        to that. 
+        to that.
         """
-        
+
         fixed, unfixed = super(PyCalendarVEvent, self).validate(doFix)
 
         # Extra constraint: if METHOD not present, DTSTART must be
@@ -105,7 +113,7 @@ class PyCalendarVEvent(PyCalendarComponentRecur):
                 # Cannot fix a missing required property
                 logProblem = "[%s] Missing required property: %s" % (self.getType(), definitions.cICalProperty_DTSTART,)
                 unfixed.append(logProblem)
-        
+
         # Extra constraint: only one of DTEND or DURATION
         if self.hasProperty(definitions.cICalProperty_DTEND) and self.hasProperty(definitions.cICalProperty_DURATION):
             # Fix by removing the DTEND
@@ -119,9 +127,10 @@ class PyCalendarVEvent(PyCalendarComponentRecur):
                 fixed.append(logProblem)
             else:
                 unfixed.append(logProblem)
-        
+
         return fixed, unfixed
-                
+
+
     # Editing
     def editStatus(self, status):
         # Only if it is different
@@ -148,6 +157,7 @@ class PyCalendarVEvent(PyCalendarComponentRecur):
             if value is not None:
                 prop = PyCalendarProperty(definitions.cICalProperty_STATUS, value)
                 self.addProperty(prop)
+
 
     def sortedPropertyKeyOrder(self):
         return (

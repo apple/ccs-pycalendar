@@ -1,12 +1,12 @@
 ##
-#    Copyright (c) 2007-2011 Cyrus Daboo. All rights reserved.
-#    
+#    Copyright (c) 2007-2012 Cyrus Daboo. All rights reserved.
+#
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
 #    You may obtain a copy of the License at
-#    
+#
 #        http://www.apache.org/licenses/LICENSE-2.0
-#    
+#
 #    Unless required by applicable law or agreed to in writing, software
 #    distributed under the License is distributed on an "AS IS" BASIS,
 #    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -89,7 +89,7 @@ ePartRole_Required = 1
 ePartRole_Optional = 2
 ePartRole_Non = 3
 
-cICalAttribute_ROLE_CHAIR    = "CHAIR"
+cICalAttribute_ROLE_CHAIR = "CHAIR"
 cICalAttribute_ROLE_REQ_PART = "REQ-PARTICIPANT"
 cICalAttribute_ROLE_OPT_PART = "OPT-PARTICIPANT"
 cICalAttribute_ROLE_NON_PART = "NON-PARTICIPANT"
@@ -102,10 +102,10 @@ eCutype_Room = 3
 eCutype_Unknown = 4
 
 cICalAttribute_CUTYPE_INDIVIDUAL = "INDIVIDUAL"
-cICalAttribute_CUTYPE_GROUP      = "GROUP"
-cICalAttribute_CUTYPE_RESOURCE   = "RESOURCE"
-cICalAttribute_CUTYPE_ROOM       = "ROOM"
-cICalAttribute_CUTYPE_UNKNOWN    = "UNKNOWN"
+cICalAttribute_CUTYPE_GROUP = "GROUP"
+cICalAttribute_CUTYPE_RESOURCE = "RESOURCE"
+cICalAttribute_CUTYPE_ROOM = "ROOM"
+cICalAttribute_CUTYPE_UNKNOWN = "UNKNOWN"
 
 #     5545 Value types
 
@@ -215,20 +215,20 @@ eRecurrence_WEEKLY = 4
 eRecurrence_MONTHLY = 5
 eRecurrence_YEARLY = 6
 
-eRecurrence_FREQ       = 0
-eRecurrence_UNTIL      = 1
-eRecurrence_COUNT      = 2
-eRecurrence_INTERVAL   = 3
-eRecurrence_BYSECOND   = 4
-eRecurrence_BYMINUTE   = 5
-eRecurrence_BYHOUR     = 6
-eRecurrence_BYDAY      = 7
+eRecurrence_FREQ = 0
+eRecurrence_UNTIL = 1
+eRecurrence_COUNT = 2
+eRecurrence_INTERVAL = 3
+eRecurrence_BYSECOND = 4
+eRecurrence_BYMINUTE = 5
+eRecurrence_BYHOUR = 6
+eRecurrence_BYDAY = 7
 eRecurrence_BYMONTHDAY = 8
-eRecurrence_BYYEARDAY  = 9
-eRecurrence_BYWEEKNO   = 10
-eRecurrence_BYMONTH    = 11
-eRecurrence_BYSETPOS   = 12
-eRecurrence_WKST       = 13
+eRecurrence_BYYEARDAY = 9
+eRecurrence_BYWEEKNO = 10
+eRecurrence_BYMONTH = 11
+eRecurrence_BYSETPOS = 12
+eRecurrence_WKST = 13
 
 cICalValue_RECUR_FREQ = "FREQ"
 cICalValue_RECUR_FREQ_LEN = 5

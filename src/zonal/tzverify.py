@@ -1,13 +1,13 @@
 #!/usr/bin/env python
 ##
-#    Copyright (c) 2007-2011 Cyrus Daboo. All rights reserved.
-#    
+#    Copyright (c) 2007-2012 Cyrus Daboo. All rights reserved.
+#
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
 #    You may obtain a copy of the License at
-#    
+#
 #        http://www.apache.org/licenses/LICENSE-2.0
-#    
+#
 #    Unless required by applicable law or agreed to in writing, software
 #    distributed under the License is distributed on an "AS IS" BASIS,
 #    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -24,7 +24,7 @@ import getopt
 from pycalendar.exceptions import PyCalendarInvalidData
 
 def loadCalendarFromZoneinfo(zoneinfopath, skips=(), verbose=False, quiet=False):
-    
+
     if not quiet:
         print "Scanning for calendar data in: %s" % (zoneinfopath,)
     paths = []
@@ -47,8 +47,10 @@ def loadCalendarFromZoneinfo(zoneinfopath, skips=(), verbose=False, quiet=False)
         print "Parsing calendar data in: %s" % (zoneinfopath,)
     return loadCalendar(paths, verbose)
 
+
+
 def loadCalendar(files, verbose):
-    
+
     cal = PyCalendar()
     for file in files:
         if verbose:
@@ -61,6 +63,8 @@ def loadCalendar(files, verbose):
             raise
     return CalendarZonesWrapper(calendar=cal)
 
+
+
 def parseTZData(zonedir, zonefiles):
     parser = tzconvert()
     for file in zonefiles:
@@ -70,37 +74,43 @@ def parseTZData(zonedir, zonefiles):
         parser.parse(zonefile)
     return CalendarZonesWrapper(zones=parser)
 
+
+
 class CalendarZonesWrapper(object):
-    
+
     def __init__(self, calendar=None, zones=None):
         self.calendar = calendar
         self.zones = zones
         assert self.calendar is not None or self.zones is not None
-        
+
+
     def getTZIDs(self):
         if self.calendar:
             return getTZIDs(self.calendar)
         elif self.zones:
             return self.zones.getZoneNames()
-        
+
+
     def expandTransitions(self, tzid, start, end):
         if self.calendar:
             return getExpandedDates(self.calendar, tzid, start, end)
         elif self.zones:
             return self.zones.expandZone(tzid, start.getYear(), end.getYear())
 
+
+
 def compareCalendars(calendar1, calendar2, start, end, filterTzids=(), verbose=False, quiet=False):
-    
+
     # Get all TZIDs from the calendar
     tzids1 = calendar1.getTZIDs()
     tzids2 = calendar2.getTZIDs()
-    
+
     # Find TZIDs that do not have a corresponding zone
     missing = tzids1.difference(tzids2)
     if missing:
         print """TZIDs in calendar 1 not in calendar 2 files: %s
 These cannot be checked.""" % (", ".join(missing),)
-    
+
     for tzid in tzids1.intersection(tzids2):
         if filterTzids and tzid not in filterTzids:
             continue
@@ -130,7 +140,9 @@ These cannot be checked.""" % (", ".join(missing),)
             print "In calendar 2 but not in calendar 1 tzid=%s: %s" % (tzid, formattedExpandedDates(d2),)
         if not d1 and not d2 and not quiet:
             print "Matched: %s" % (tzid,)
-        
+
+
+
 def getTZIDs(cal):
     results = set()
 
@@ -141,19 +153,27 @@ def getTZIDs(cal):
 
     return results
 
+
+
 def getExpandedDates(cal, tzid, start, end):
-    
+
     db = cal.getVTimezoneDB()
     return db[tzid].expandAll(start, end)
 
+
+
 def sortedList(setdata):
     l = list(setdata)
-    l.sort(cmp=lambda x,y: PyCalendarDateTime.sort(x[0], y[0]))
+    l.sort(cmp=lambda x, y: PyCalendarDateTime.sort(x[0], y[0]))
     return l
+
+
 
 def formattedExpandedDates(expanded):
     items = sortedList([(item[0], secondsToTime(item[1]), secondsToTime(item[2]),) for item in expanded])
     return ", ".join(["(%s, %s, %s)" % item for item in items])
+
+
 
 def secondsToTime(seconds):
     if seconds < 0:
@@ -162,12 +182,14 @@ def secondsToTime(seconds):
     else:
         negative = ""
     secs = divmod(seconds, 60)[1]
-    mins = divmod(seconds/60, 60)[1]
-    hours = divmod(seconds/(60*60), 60)[1]
+    mins = divmod(seconds / 60, 60)[1]
+    hours = divmod(seconds / (60 * 60), 60)[1]
     if secs:
         return "%s%02d:%02d:%02d" % (negative, hours, mins, secs,)
     else:
         return "%s%02d:%02d" % (negative, hours, mins,)
+
+
 
 def usage(error_msg=None):
     if error_msg:
@@ -204,7 +226,7 @@ if __name__ == '__main__':
     endYear = 2018
     zonedir1 = None
     zonedir2 = None
-    
+
     options, args = getopt.getopt(sys.argv[1:], "hvq", ["start=", "end=", ])
 
     for option, value in options:
@@ -239,7 +261,7 @@ if __name__ == '__main__':
         "australasia",
         "antarctica",
     )
-    
+
     skips = (
         #"Europe/Sofia",
         #"Africa/Cairo",
@@ -253,8 +275,7 @@ if __name__ == '__main__':
         checkcalendar2,
         start,
         end,
-        filterTzids=
-        (
+        filterTzids=(
             #"America/Goose_Bay",
         ),
         verbose=verbose,

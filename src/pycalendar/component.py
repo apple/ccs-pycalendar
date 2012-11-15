@@ -1,12 +1,12 @@
 ##
-#    Copyright (c) 2007-2011 Cyrus Daboo. All rights reserved.
-#    
+#    Copyright (c) 2007-2012 Cyrus Daboo. All rights reserved.
+#
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
 #    You may obtain a copy of the License at
-#    
+#
 #        http://www.apache.org/licenses/LICENSE-2.0
-#    
+#
 #    Unless required by applicable law or agreed to in writing, software
 #    distributed under the License is distributed on an "AS IS" BASIS,
 #    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -28,29 +28,33 @@ class PyCalendarComponent(PyCalendarComponentBase):
     uid_ctr = 1
 
     def __init__(self, parent=None):
-        
+
         super(PyCalendarComponent, self).__init__(parent)
         self.mUID = ""
         self.mSeq = 0
         self.mOriginalSeq = 0
         self.mChanged = False
 
+
     def duplicate(self, parent=None, **args):
-        
+
         other = super(PyCalendarComponent, self).duplicate(parent=parent, **args)
         other.mUID = self.mUID
         other.mSeq = self.mSeq
         other.mOriginalSeq = self.mOriginalSeq
 
         other.mChanged = self.mChanged
-        
+
         return other
+
 
     def __repr__(self):
         return "%s: UID: %s" % (self.getType(), self.getMapKey(),)
- 
+
+
     def getMimeComponentName(self):
         raise NotImplementedError
+
 
     def getMapKey(self):
         if hasattr(self, "mMapKey"):
@@ -61,14 +65,18 @@ class PyCalendarComponent(PyCalendarComponentBase):
             self.mMapKey = str(uuid.uuid4())
             return self.mMapKey
 
+
     def getSortKey(self):
         return self.getMapKey()
+
 
     def getMasterKey(self):
         return self.mUID
 
+
     def getUID(self):
         return self.mUID
+
 
     def setUID(self, uid):
         if uid:
@@ -109,8 +117,10 @@ class PyCalendarComponent(PyCalendarComponentBase):
         prop = PyCalendarProperty(definitions.cICalProperty_UID, self.mUID)
         self.addProperty(prop)
 
+
     def getSeq(self):
         return self.mSeq
+
 
     def setSeq(self, seq):
         self.mSeq = seq
@@ -120,14 +130,18 @@ class PyCalendarComponent(PyCalendarComponentBase):
         prop = PyCalendarProperty(definitions.cICalProperty_SEQUENCE, self.mSeq)
         self.addProperty(prop)
 
+
     def getOriginalSeq(self):
         return self.mOriginalSeq
+
 
     def getChanged(self):
         return self.mChanged
 
+
     def setChanged(self, changed):
         self.mChanged = changed
+
 
     def initDTSTAMP(self):
         self.removeProperties(definitions.cICalProperty_DTSTAMP)
@@ -136,12 +150,14 @@ class PyCalendarComponent(PyCalendarComponentBase):
                                   PyCalendarDateTime.getNowUTC())
         self.addProperty(prop)
 
+
     def updateLastModified(self):
         self.removeProperties(definitions.cICalProperty_LAST_MODIFIED)
 
         prop = PyCalendarProperty(definitions.cICalProperty_LAST_MODIFIED,
                                   PyCalendarDateTime.getNowUTC())
         self.addProperty(prop)
+
 
     def finalise(self):
         # Get UID
@@ -159,8 +175,10 @@ class PyCalendarComponent(PyCalendarComponentBase):
         # same calendar
         self.mOriginalSeq = self.mSeq
 
+
     def canGenerateInstance(self):
         return True
+
 
     def getTimezones(self, tzids):
         # Look for all date-time properties

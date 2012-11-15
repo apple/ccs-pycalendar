@@ -1,12 +1,12 @@
 ##
-#    Copyright (c) 2007-2011 Cyrus Daboo. All rights reserved.
-#    
+#    Copyright (c) 2007-2012 Cyrus Daboo. All rights reserved.
+#
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
 #    You may obtain a copy of the License at
-#    
+#
 #        http://www.apache.org/licenses/LICENSE-2.0
-#    
+#
 #    Unless required by applicable law or agreed to in writing, software
 #    distributed under the License is distributed on an "AS IS" BASIS,
 #    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -31,7 +31,7 @@ class PyCalendarComponentRecur(PyCalendarComponent):
     )
 
     @staticmethod
-    def mapKey(uid, rid = None):
+    def mapKey(uid, rid=None):
         if uid:
             result = "u:" + uid
             if rid is not None:
@@ -39,6 +39,7 @@ class PyCalendarComponentRecur(PyCalendarComponent):
             return result
         else:
             return None
+
 
     @staticmethod
     def sort_by_dtstart_allday(e1, e2):
@@ -59,6 +60,7 @@ class PyCalendarComponentRecur(PyCalendarComponent):
         else:
             return e1.self.mStart < e2.self.mStart
 
+
     @staticmethod
     def sort_by_dtstart(e1, e2):
         if e1.self.mStart == e2.self.mStart:
@@ -69,6 +71,7 @@ class PyCalendarComponentRecur(PyCalendarComponent):
                 return e1.self.mStart.isDateOnly()
         else:
             return e1.self.mStart < e2.self.mStart
+
 
     def __init__(self, parent=None):
         super(PyCalendarComponentRecur, self).__init__(parent=parent)
@@ -87,11 +90,12 @@ class PyCalendarComponentRecur(PyCalendarComponent):
         self.mAdjustPrior = False
         self.mRecurrenceID = None
         self.mRecurrences = None
-        
+
         # This is a special check we do only for STATUS due to a calendarserver bug
         self.cardinalityChecks += (
             self.check_cardinality_STATUS_Fix,
         )
+
 
     def duplicate(self, parent=None):
         other = super(PyCalendarComponentRecur, self).duplicate(parent=parent)
@@ -120,30 +124,37 @@ class PyCalendarComponentRecur(PyCalendarComponent):
             other.mRecurrenceID = self.mRecurrenceID.duplicate()
 
         other._resetRecurrenceSet()
-        
+
         return other
+
 
     def canGenerateInstance(self):
         return not self.mHasRecurrenceID
 
+
     def recurring(self):
         return (self.mMaster is not None) and (self.mMaster is not self)
+
 
     def setMaster(self, master):
         self.mMaster = master
         self.initFromMaster()
 
+
     def getMaster(self):
         return self.mMaster
 
+
     def getMapKey(self):
-        
+
         if self.mMapKey is None:
             self.mMapKey = str(uuid.uuid4())
         return self.mMapKey
 
+
     def getMasterKey(self):
         return PyCalendarComponentRecur.mapKey(self.mUID)
+
 
     def initDTSTAMP(self):
         # Save new one
@@ -154,45 +165,59 @@ class PyCalendarComponentRecur(PyCalendarComponent):
         self.mHasStamp = temp is not None
         if self.mHasStamp:
             self.mStamp = temp
-    
+
+
     def getStamp(self):
         return self.mStamp
+
 
     def hasStamp(self):
         return self.mHasStamp
 
+
     def getStart(self):
         return self.mStart
+
 
     def hasStart(self):
         return self.mHasStart
 
+
     def getEnd(self):
         return self.mEnd
+
 
     def hasEnd(self):
         return self.mHasEnd
 
+
     def useDuration(self):
         return self.mDuration
+
 
     def isRecurrenceInstance(self):
         return self.mHasRecurrenceID
 
+
     def isAdjustFuture(self):
         return self.mAdjustFuture
+
 
     def isAdjustPrior(self):
         return self.mAdjustPrior
 
+
     def getRecurrenceID(self):
         return self.mRecurrenceID
+
 
     def isRecurring(self):
         return (self.mRecurrences is not None) and self.mRecurrences.hasRecurrence()
 
+
     def getRecurrenceSet(self):
         return self.mRecurrences
+
 
     def setUID(self, uid):
         super(PyCalendarComponentRecur, self).setUID(uid)
@@ -203,11 +228,14 @@ class PyCalendarComponentRecur(PyCalendarComponent):
         else:
             self.mMapKey = self.mapKey(self.mUID)
 
+
     def getSummary(self):
         return self.mSummary
 
+
     def setSummary(self, summary):
         self.mSummary = summary
+
 
     def getDescription(self):
         # Get DESCRIPTION
@@ -217,6 +245,7 @@ class PyCalendarComponentRecur(PyCalendarComponent):
         else:
             return ""
 
+
     def getLocation(self):
         # Get LOCATION
         txt = self.loadValueString(definitions.cICalProperty_LOCATION)
@@ -224,6 +253,7 @@ class PyCalendarComponentRecur(PyCalendarComponent):
             return txt
         else:
             return ""
+
 
     def finalise(self):
         super(PyCalendarComponentRecur, self).finalise()
@@ -275,7 +305,7 @@ class PyCalendarComponentRecur(PyCalendarComponent):
 
             # Also get the RANGE attribute
             attrs = self.findFirstProperty(definitions.cICalProperty_RECURRENCE_ID).getAttributes()
-            if attrs.has_key(definitions.cICalAttribute_RANGE):
+            if definitions.cICalAttribute_RANGE in attrs:
                 self.mAdjustFuture = (attrs[definitions.cICalAttribute_RANGE][0].getFirstValue() == definitions.cICalAttribute_RANGE_THISANDFUTURE)
                 self.mAdjustPrior = (attrs[definitions.cICalAttribute_RANGE][0].getFirstValue() == definitions.cICalAttribute_RANGE_THISANDPRIOR)
             else:
@@ -286,6 +316,7 @@ class PyCalendarComponentRecur(PyCalendarComponent):
 
         self._resetRecurrenceSet()
 
+
     def validate(self, doFix=False):
         """
         Validate the data in this component and optionally fix any problems. Return
@@ -293,7 +324,7 @@ class PyCalendarComponentRecur(PyCalendarComponent):
         second problems that were not fixed. Caller can then decide what to do with unfixed
         issues.
         """
-        
+
         # Do normal checks
         fixed, unfixed = super(PyCalendarComponentRecur, self).validate(doFix)
 
@@ -320,6 +351,7 @@ class PyCalendarComponentRecur(PyCalendarComponent):
 
         return fixed, unfixed
 
+
     def check_cardinality_STATUS_Fix(self, fixed, unfixed, doFix):
         """
         Special for bug with STATUS where STATUS:CANCELLED is added alongside
@@ -341,12 +373,13 @@ class PyCalendarComponentRecur(PyCalendarComponent):
                 else:
                     unfixed.append(logProblem)
 
+
     def _resetRecurrenceSet(self):
         # May need to create items
         self.mRecurrences = None
         if ((self.countProperty(definitions.cICalProperty_RRULE) != 0) or
-            (self.countProperty(definitions.cICalProperty_RDATE) != 0) or 
-            (self.countProperty(definitions.cICalProperty_EXRULE) != 0) or 
+            (self.countProperty(definitions.cICalProperty_RDATE) != 0) or
+            (self.countProperty(definitions.cICalProperty_EXRULE) != 0) or
             (self.countProperty(definitions.cICalProperty_EXDATE) != 0)):
 
             self.mRecurrences = PyCalendarRecurrenceSet()
@@ -362,6 +395,7 @@ class PyCalendarComponentRecur(PyCalendarComponent):
 
             # Get EXDATEs
             self.loadValueRDATE(definitions.cICalProperty_EXDATE, self.mRecurrences, False)
+
 
     def FixStartEnd(self):
         # End is always greater than start if start exists
@@ -380,6 +414,7 @@ class PyCalendarComponentRecur(PyCalendarComponent):
                 # Use end of current day
                 self.mEnd.offsetDay(1)
                 self.mEnd.setHHMMSS(0, 0, 0)
+
 
     def expandPeriod(self, period, results):
         # Check for recurrence and True master
@@ -460,6 +495,7 @@ class PyCalendarComponentRecur(PyCalendarComponent):
                 rid = None
             results.append(PyCalendarComponentExpanded(self, rid))
 
+
     def withinPeriod(self, period):
         # Check for recurrence
         if ((self.mRecurrences is not None) and self.mRecurrences.hasRecurrence()):
@@ -474,10 +510,12 @@ class PyCalendarComponentRecur(PyCalendarComponent):
             else:
                 return True
 
+
     def changedRecurrence(self):
         # Clear cached values
         if self.mRecurrences is not None:
             self.mRecurrences.changed()
+
 
     # Editing
     def editSummary(self, summary):
@@ -487,11 +525,13 @@ class PyCalendarComponentRecur(PyCalendarComponent):
         # Remove existing items
         self.editProperty(definitions.cICalProperty_SUMMARY, summary)
 
+
     def editDetails(self, description, location):
 
         # Edit existing items
         self.editProperty(definitions.cICalProperty_DESCRIPTION, description)
         self.editProperty(definitions.cICalProperty_LOCATION, location)
+
 
     def editTiming(self):
         # Updated cached values
@@ -506,6 +546,7 @@ class PyCalendarComponentRecur(PyCalendarComponent):
         self.removeProperties(definitions.cICalProperty_DTEND)
         self.removeProperties(definitions.cICalProperty_DURATION)
         self.removeProperties(definitions.cICalProperty_DUE)
+
 
     def editTimingDue(self, due):
         # Updated cached values
@@ -524,6 +565,7 @@ class PyCalendarComponentRecur(PyCalendarComponent):
         # Now create properties
         prop = PyCalendarProperty(definitions.cICalProperty_DUE, due)
         self.addProperty(prop)
+
 
     def editTimingStartEnd(self, start, end):
         # Updated cached values
@@ -549,6 +591,7 @@ class PyCalendarComponentRecur(PyCalendarComponent):
             prop = PyCalendarProperty(definitions.cICalProperty_DTEND, end)
             self.addProperty(prop)
 
+
     def editTimingStartDuration(self, start, duration):
         # Updated cached values
         self.mHasStart = True
@@ -572,6 +615,7 @@ class PyCalendarComponentRecur(PyCalendarComponent):
                 or (duration.getDays() > 1)):
             prop = PyCalendarProperty(definitions.cICalProperty_DURATION, duration)
             self.addProperty(prop)
+
 
     def editRecurrenceSet(self, recurs):
         # Must have items
@@ -601,6 +645,7 @@ class PyCalendarComponentRecur(PyCalendarComponent):
             prop = PyCalendarProperty(definitions.cICalProperty_EXDATE, iter)
             self.addProperty(prop)
 
+
     def excludeRecurrence(self, start):
         # Must have items
         if self.mRecurrences is None:
@@ -612,6 +657,7 @@ class PyCalendarComponentRecur(PyCalendarComponent):
         # Add property
         prop = PyCalendarProperty(definitions.cICalProperty_EXDATE, start)
         self.addProperty(prop)
+
 
     def excludeFutureRecurrence(self, start):
         # Must have items
@@ -632,6 +678,7 @@ class PyCalendarComponentRecur(PyCalendarComponent):
         for iter in  self.mRecurrences.getDates():
             prop = PyCalendarProperty(definitions.cICalProperty_RDATE, iter)
             self.addProperty(prop)
+
 
     def initFromMaster(self):
         # Only if not master
@@ -661,6 +708,7 @@ class PyCalendarComponentRecur(PyCalendarComponent):
                   not self.hasProperty(definitions.cICalProperty_DTSTART)):
                 temp = self.loadValueDuration(definitions.cICalProperty_DURATION)
                 self.mEnd = self.mStart + temp
+
 
     def createExpanded(self, master, recurid):
         return PyCalendarComponentExpanded(master, recurid)

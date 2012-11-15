@@ -23,28 +23,36 @@ class PyCalendarMultiValue(PyCalendarValue):
         self.mType = type
         self.mValues = []
 
+
     def __hash__(self):
         return hash(tuple(self.mValues))
+
 
     def duplicate(self):
         other = PyCalendarMultiValue(self.mType)
         other.mValues = [i.duplicate() for i in self.mValues]
         return other
 
+
     def getType(self):
         return self.mType
+
 
     def getRealType(self):
         return PyCalendarValue.VALUETYPE_MULTIVALUE
 
+
     def getValue(self):
         return self.mValues
+
 
     def getValues(self):
         return self.mValues
 
+
     def addValue(self, value):
         self.mValues.append(value)
+
 
     def setValue(self, value):
         newValues = []
@@ -53,6 +61,7 @@ class PyCalendarMultiValue(PyCalendarValue):
             pyCalendarValue.setValue(v)
             newValues.append(pyCalendarValue)
         self.mValues = newValues
+
 
     def parse(self, data):
         # Tokenize on comma
@@ -66,6 +75,7 @@ class PyCalendarMultiValue(PyCalendarValue):
             value.parse(token)
             self.mValues.append(value)
 
+
     def generate(self, os):
         try:
             first = True
@@ -78,9 +88,11 @@ class PyCalendarMultiValue(PyCalendarValue):
         except:
             pass
 
+
     def writeXML(self, node, namespace):
         for iter in self.mValues:
             iter.writeXML(node, namespace)
+
 
     def writeJSONValue(self, jobject):
         for iter in self.mValues:

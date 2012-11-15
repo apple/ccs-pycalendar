@@ -1,12 +1,12 @@
 ##
-#    Copyright (c) 2007-2011 Cyrus Daboo. All rights reserved.
-#    
+#    Copyright (c) 2007-2012 Cyrus Daboo. All rights reserved.
+#
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
 #    You may obtain a copy of the License at
-#    
+#
 #        http://www.apache.org/licenses/LICENSE-2.0
-#    
+#
 #    Unless required by applicable law or agreed to in writing, software
 #    distributed under the License is distributed on an "AS IS" BASIS,
 #    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -26,6 +26,7 @@ class PyCalendarRecurrenceSet(object):
         self.mRperiods = []
         self.mExperiods = []
 
+
     def duplicate(self):
         other = PyCalendarRecurrenceSet()
         other.mRrules = [i.duplicate() for i in self.mRrules]
@@ -36,10 +37,12 @@ class PyCalendarRecurrenceSet(object):
         other.mExperiods = [i.duplicate() for i in self.mExperiods]
         return other
 
+
     def hasRecurrence(self):
         return ((len(self.mRrules) != 0) or (len(self.mRdates) != 0) or (len(self.mRperiods) != 0)
                     or (len(self.mExrules) != 0) or (len(self.mExdates) != 0)
                     or (len(self.mExperiods) != 0))
+
 
     def equals(self, comp):
         # Look at RRULEs
@@ -64,6 +67,7 @@ class PyCalendarRecurrenceSet(object):
 
         # If we get here they match
         return True
+
 
     def equalsRules(self, rules1, rules2):
         # Check sizes first
@@ -93,6 +97,7 @@ class PyCalendarRecurrenceSet(object):
 
         return True
 
+
     def equalsDates(self, dates1, dates2):
         # Check sizes first
         if len(dates1) != len(dates2):
@@ -104,10 +109,11 @@ class PyCalendarRecurrenceSet(object):
         dt1 = dates1[:]
         dt2 = dates2[:]
 
-        dt1.sort(key=lambda x:x.getPosixTime())
-        dt2.sort(key=lambda x:x.getPosixTime())
+        dt1.sort(key=lambda x: x.getPosixTime())
+        dt2.sort(key=lambda x: x.getPosixTime())
 
         return dt1.equal(dt2)
+
 
     def equalsPeriods(self, periods1, periods2):
         # Check sizes first
@@ -125,41 +131,54 @@ class PyCalendarRecurrenceSet(object):
 
         return p1.equal(p2)
 
+
     def addRule(self, rule):
         self.mRrules.append(rule)
+
 
     def subtractRule(self, rule):
         self.mExrules.append(rule)
 
+
     def addDT(self, dt):
         self.mRdates.append(dt)
+
 
     def subtractDT(self, dt):
         self.mExdates.append(dt)
 
+
     def addPeriod(self, p):
         self.mRperiods.append(p)
+
 
     def subtractPeriod(self, p):
         self.mExperiods.append(p)
 
+
     def getRules(self):
         return self.mRrules
+
 
     def getExrules(self):
         return self.mExrules
 
+
     def getDates(self):
         return self.mRdates
+
 
     def getExdates(self):
         return self.mExdates
 
+
     def getPeriods(self):
         return self.mRperiods
 
+
     def getExperiods(self):
         return self.mExperiods
+
 
     def expand(self, start, range, items, float_offset=0):
         # Need to return whether the limit was applied or not
@@ -193,7 +212,7 @@ class PyCalendarRecurrenceSet(object):
 
         # Make sure the list is unique
         include = [x for x in set(include)]
-        include.sort(key=lambda x:x.getPosixTime())
+        include.sort(key=lambda x: x.getPosixTime())
 
         # Now create list of items to exclude
         exclude = []
@@ -212,12 +231,13 @@ class PyCalendarRecurrenceSet(object):
 
         # Make sure the list is unique
         exclude = [x for x in set(exclude)]
-        exclude.sort(key=lambda x:x.getPosixTime())
+        exclude.sort(key=lambda x: x.getPosixTime())
 
         # Add difference between to the two sets (include - exclude) to the
         # results
         items.extend(set_difference(include, exclude))
         return limited
+
 
     def changed(self):
         # RRULES
@@ -227,6 +247,7 @@ class PyCalendarRecurrenceSet(object):
         # EXRULES
         for iter in self.mExrules:
             iter.clear()
+
 
     def excludeFutureRecurrence(self, exclude):
         # Adjust RRULES to end before start
@@ -238,6 +259,7 @@ class PyCalendarRecurrenceSet(object):
         for iter in self.mRperiods:
             if iter > exclude:
                 self.mRperiods.remove(iter)
+
 
     # UI operations
     def isSimpleUI(self):
@@ -254,6 +276,7 @@ class PyCalendarRecurrenceSet(object):
         else:
             return True
 
+
     def isAdvancedUI(self):
         # Right now the Event dialog only handles a single RRULE
         if ((len(self.mRrules) > 1) or (len(self.mExrules) > 0)
@@ -266,11 +289,13 @@ class PyCalendarRecurrenceSet(object):
         else:
             return True
 
+
     def getUIRecurrence(self):
         if len(self.mRrules) == 1:
             return self.mRrules[0]
         else:
             return None
+
 
     def getUIDescription(self):
         # Check for anything

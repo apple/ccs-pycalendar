@@ -1,13 +1,13 @@
 #!/usr/bin/env python
 ##
-#    Copyright (c) 2007-2011 Cyrus Daboo. All rights reserved.
-#    
+#    Copyright (c) 2007-2012 Cyrus Daboo. All rights reserved.
+#
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
 #    You may obtain a copy of the License at
-#    
+#
 #        http://www.apache.org/licenses/LICENSE-2.0
-#    
+#
 #    Unless required by applicable law or agreed to in writing, software
 #    distributed under the License is distributed on an "AS IS" BASIS,
 #    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -23,7 +23,7 @@ import getopt
 from pycalendar.exceptions import PyCalendarInvalidData
 
 def loadCalendar(file, verbose):
-    
+
     cal = PyCalendar()
     if verbose:
         print "Parsing calendar data: %s" % (file,)
@@ -35,12 +35,16 @@ def loadCalendar(file, verbose):
         raise
     return cal
 
+
+
 def getExpandedDates(cal, start, end):
-    
+
     vtz = cal.getComponents()[0]
     expanded = vtz.expandAll(start, end)
-    expanded.sort(cmp=lambda x,y: PyCalendarDateTime.sort(x[0], y[0]))
+    expanded.sort(cmp=lambda x, y: PyCalendarDateTime.sort(x[0], y[0]))
     return expanded
+
+
 
 def formattedExpandedDates(expanded):
     items = []
@@ -51,6 +55,8 @@ def formattedExpandedDates(expanded):
         items.append((item[0], utc, secondsToTime(item[1]), secondsToTime(item[2]),))
     return "\n".join(["(%s, %s, %s, %s)" % item for item in items])
 
+
+
 def secondsToTime(seconds):
     if seconds < 0:
         seconds = -seconds
@@ -58,12 +64,14 @@ def secondsToTime(seconds):
     else:
         negative = ""
     secs = divmod(seconds, 60)[1]
-    mins = divmod(seconds/60, 60)[1]
-    hours = divmod(seconds/(60*60), 60)[1]
+    mins = divmod(seconds / 60, 60)[1]
+    hours = divmod(seconds / (60 * 60), 60)[1]
     if secs:
         return "%s%02d:%02d:%02d" % (negative, hours, mins, secs,)
     else:
         return "%s%02d:%02d" % (negative, hours, mins,)
+
+
 
 def usage(error_msg=None):
     if error_msg:
@@ -90,13 +98,14 @@ Description:
     else:
         sys.exit(0)
 
+
 if __name__ == '__main__':
 
     verbose = False
     startYear = 1918
     endYear = 2018
     fpath = None
-    
+
     options, args = getopt.getopt(sys.argv[1:], "hv", ["start=", "end=", ])
 
     for option, value in options:

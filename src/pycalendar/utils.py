@@ -1,12 +1,12 @@
 ##
-#    Copyright (c) 2007-2011 Cyrus Daboo. All rights reserved.
-#    
+#    Copyright (c) 2007-2012 Cyrus Daboo. All rights reserved.
+#
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
 #    You may obtain a copy of the License at
-#    
+#
 #        http://www.apache.org/licenses/LICENSE-2.0
-#    
+#
 #    Unless required by applicable law or agreed to in writing, software
 #    distributed under the License is distributed on an "AS IS" BASIS,
 #    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -17,7 +17,7 @@
 from pycalendar.parser import ParserContext
 import cStringIO as StringIO
 
-def readFoldedLine( ins, lines ):
+def readFoldedLine(ins, lines):
 
     # If line2 already has data, transfer that into line1
     if lines[1] is not None:
@@ -42,7 +42,7 @@ def readFoldedLine( ins, lines ):
         except:
             lines[0] = None
             return False
- 
+
     # Now loop looking ahead at the next line to see if it is folded
     while True:
         # Get next line
@@ -79,25 +79,31 @@ def readFoldedLine( ins, lines ):
 
     return True
 
-def find_first_of( text, tokens, offset ):
+
+
+def find_first_of(text, tokens, offset):
     for ctr, c in enumerate(text[offset:]):
         if c in tokens:
             return offset + ctr
     return -1
+
+
 
 def escapeTextValue(value):
     os = StringIO.StringIO()
     writeTextValue(os, value)
     return os.getvalue()
 
-def writeTextValue( os, value ):
+
+
+def writeTextValue(os, value):
     try:
         start_pos = 0
-        end_pos = find_first_of( value, "\r\n;\\,", start_pos )
+        end_pos = find_first_of(value, "\r\n;\\,", start_pos)
         if end_pos != -1:
             while True:
                 # Write current segment
-                os.write( value[start_pos:end_pos] )
+                os.write(value[start_pos:end_pos])
 
                 # Write escape
                 os.write("\\")
@@ -122,10 +128,12 @@ def writeTextValue( os, value ):
                     break
         else:
             os.write(value)
-    
+
     except:
         pass
-    
+
+
+
 def decodeTextValue(value):
     os = StringIO.StringIO()
 
@@ -164,7 +172,7 @@ def decodeTextValue(value):
                     raise ValueError
                 elif ParserContext.INVALID_COLON_ESCAPE_SEQUENCE == ParserContext.PARSER_FIX:
                     os.write(':')
-                    
+
             # Other escaped chars normally not allowed
             elif ParserContext.INVALID_ESCAPE_SEQUENCES == ParserContext.PARSER_RAISE:
                 raise ValueError
@@ -186,6 +194,66 @@ def decodeTextValue(value):
 
     return os.getvalue()
 
+
+
+def encodeParameterValue(value):
+
+    encoded = []
+    last = ''
+    for c in value:
+        if c == '\t':
+            encoded.append('^')
+            encoded.append('t')
+        elif c == '\r':
+            encoded.append('^')
+            encoded.append('n')
+        elif c == '\n':
+            if last != '\r':
+                encoded.append('^')
+                encoded.append('n')
+        elif c == '"':
+            encoded.append('^')
+            encoded.append('\'')
+        elif c == '^':
+            encoded.append('^')
+            encoded.append('^')
+        else:
+            encoded.append(c)
+        last = c
+
+    return "".join(encoded)
+
+
+
+def decodeParameterValue(value):
+
+    if value is None:
+        return None
+    decoded = []
+    last = ''
+    for c in value:
+        if last == '^':
+            if c == 't':
+                decoded.append('\t')
+            elif c == 'n':
+                decoded.append('\n')
+            elif c == '\'':
+                decoded.append('"')
+            elif c == '^':
+                decoded.append('^')
+                c = ''
+            else:
+                decoded.append('^')
+                decoded.append(c)
+        elif c != '^':
+            decoded.append(c)
+        last = c
+    if last == '^':
+        decoded.append('^')
+    return "".join(decoded)
+
+
+
 # vCard text list parsing/generation
 def parseTextList(data, sep=';'):
     """
@@ -201,10 +269,12 @@ def parseTextList(data, sep=';'):
         else:
             item.append(s)
         pre_s = s
-    
+
     results.append(decodeTextValue("".join(item)))
 
     return tuple(results) if len(results) > 1 else (results[0] if len(results) else "")
+
+
 
 def generateTextList(os, data, sep=';'):
     """
@@ -218,6 +288,8 @@ def generateTextList(os, data, sep=';'):
     except:
         pass
 
+
+
 # vCard double-nested list parsing/generation
 def parseDoubleNestedList(data, maxsize):
     results = []
@@ -225,21 +297,21 @@ def parseDoubleNestedList(data, maxsize):
     pre_s = ''
     for s in data:
         if s == ';' and pre_s != '\\':
-            
+
             if len(items) > 1:
                 results.append(tuple([decodeTextValue(item) for item in items]))
             elif len(items) == 1:
                 results.append(decodeTextValue(items[0]))
             else:
                 results.append("")
-            
+
             items = [""]
         elif s == ',' and pre_s != '\\':
             items.append("")
         else:
             items[-1] += s
         pre_s = s
-    
+
     if len(items) > 1:
         results.append(tuple([decodeTextValue(item) for item in items]))
     elif len(items) == 1:
@@ -258,6 +330,8 @@ def parseDoubleNestedList(data, maxsize):
 
     return tuple(results)
 
+
+
 def generateDoubleNestedList(os, data):
     try:
         def _writeElement(item):
@@ -269,18 +343,18 @@ def generateDoubleNestedList(os, data):
                     for bit in item[1:]:
                         os.write(",")
                         writeTextValue(os, bit)
-            
+
         for item in data[:-1]:
             _writeElement(item)
             os.write(";")
         _writeElement(data[-1])
-        
+
     except:
         pass
 
 # Date/time calcs
-days_in_month      = ( 0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 )
-days_in_month_leap = ( 0, 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 )
+days_in_month = (0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31)
+days_in_month_leap = (0, 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31)
 
 def daysInMonth(month, year):
     # NB month is 1..12 so use dummy value at start of array to avoid index
@@ -290,8 +364,8 @@ def daysInMonth(month, year):
     else:
         return days_in_month[month]
 
-days_upto_month      = ( 0, 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334 )
-days_upto_month_leap = ( 0, 0, 31, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335 )
+days_upto_month = (0, 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334)
+days_upto_month_leap = (0, 0, 31, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335)
 
 def daysUptoMonth(month, year):
     # NB month is 1..12 so use dummy value at start of array to avoid index
@@ -303,7 +377,7 @@ def daysUptoMonth(month, year):
 
 cachedLeapYears = {}
 def isLeapYear(year):
-    
+
     try:
         return cachedLeapYears[year]
     except KeyError:
@@ -316,7 +390,7 @@ def isLeapYear(year):
 
 cachedLeapDaysSince1970 = {}
 def leapDaysSince1970(year_offset):
-    
+
     try:
         return cachedLeapDaysSince1970[year_offset]
     except KeyError:
@@ -331,26 +405,37 @@ def leapDaysSince1970(year_offset):
         cachedLeapDaysSince1970[year_offset] = result
         return result
 
+
+
 # Packed date
 def packDate(year, month, day):
     return (year << 16) | (month << 8) | (day + 128)
+
+
 
 def unpackDate(data, unpacked):
     unpacked[0] = (data & 0xFFFF0000) >> 16
     unpacked[1] = (data & 0x0000FF00) >> 8
     unpacked[2] = (data & 0xFF) - 128
 
+
+
 def unpackDateYear(data):
     return (data & 0xFFFF0000) >> 16
+
+
 
 def unpackDateMonth(data):
     return (data & 0x0000FF00) >> 8
 
+
+
 def unpackDateDay(data):
     return (data & 0xFF) - 128
 
-# Display elements
 
+
+# Display elements
 def getMonthTable(month, year, weekstart, table, today_index):
     from pycalendar.datetime import PyCalendarDateTime
 
@@ -373,7 +458,7 @@ def getMonthTable(month, year, weekstart, table, today_index):
     max_day = daysInMonth(month, year)
 
     # Fill up each row
-    for day in range( 1, max_day + 1):
+    for day in range(1, max_day + 1):
         # Insert new row if we are at the start of a row
         if (col == 0) or (day == 1):
             table.extend([0] * 7)
@@ -401,7 +486,7 @@ def getMonthTable(month, year, weekstart, table, today_index):
             # Check on today
             if (temp.getYear() == today.getYear()) and (temp.getMonth() == today.getMonth()) and (day == today.getDay()):
                 today_index = [row, col]
-                                                 
+
             day += 1
             col += 1
 
@@ -416,11 +501,13 @@ def getMonthTable(month, year, weekstart, table, today_index):
             # Check on today
             if (temp.getYear() == today.getYear()) and (temp.getMonth() == today.getMonth()) and (day == today.getDay()):
                 today_index = [0, back_col]
-                                                              
+
             back_col -= 1
             day -= 1
 
     return table, today_index
+
+
 
 def set_difference(v1, v2):
     if len(v1) == 0 or len(v2) == 0:

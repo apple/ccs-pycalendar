@@ -1,12 +1,12 @@
 ##
-#    Copyright (c) 2007-2011 Cyrus Daboo. All rights reserved.
-#    
+#    Copyright (c) 2007-2012 Cyrus Daboo. All rights reserved.
+#
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
 #    You may obtain a copy of the License at
-#    
+#
 #        http://www.apache.org/licenses/LICENSE-2.0
-#    
+#
 #    Unless required by applicable law or agreed to in writing, software
 #    distributed under the License is distributed on an "AS IS" BASIS,
 #    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -23,25 +23,31 @@ class ValueMixin(object):
     def __str__(self):
         return self.getText()
 
+
     @classmethod
     def parseText(cls, data):
         value = cls()
         value.parse(data)
         return value
 
+
     def parse(self, data):
         raise NotImplementedError
-    
+
+
     def generate(self, os):
         raise NotImplementedError
-    
+
+
     def getText(self):
         os = StringIO()
         self.generate(os)
         return os.getvalue()
 
+
     def writeXML(self, node, namespace):
         raise NotImplementedError
+
 
     def writeJSON(self, jobject):
         raise NotImplementedError

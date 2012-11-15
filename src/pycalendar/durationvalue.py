@@ -1,5 +1,5 @@
 ##
-#    Copyright (c) 2007 Cyrus Daboo. All rights reserved.
+#    Copyright (c) 2007-2012 Cyrus Daboo. All rights reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -23,27 +23,35 @@ class PyCalendarDurationValue(PyCalendarValue):
     def __init__(self, value=None):
         self.mValue = value if value is not None else PyCalendarDuration()
 
+
     def duplicate(self):
         return PyCalendarDurationValue(self.mValue.duplicate())
+
 
     def getType(self):
         return PyCalendarValue.VALUETYPE_DURATION
 
+
     def parse(self, data):
         self.mValue.parse(data)
 
+
     def generate(self, os):
         self.mValue.generate(os)
+
 
     def writeXML(self, node, namespace):
         value = self.getXMLNode(node, namespace)
         value.text = self.mValue.writeXML()
 
+
     def writeJSONValue(self, jobject):
         self.mValue.writeJSON(jobject)
 
+
     def getValue(self):
         return self.mValue
+
 
     def setValue(self, value):
         self.mValue = value

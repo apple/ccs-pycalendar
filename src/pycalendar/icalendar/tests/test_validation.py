@@ -1,12 +1,12 @@
 ##
-#    Copyright (c) 2011 Cyrus Daboo. All rights reserved.
-#    
+#    Copyright (c) 2011-2012 Cyrus Daboo. All rights reserved.
+#
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
 #    You may obtain a copy of the License at
-#    
+#
 #        http://www.apache.org/licenses/LICENSE-2.0
-#    
+#
 #    Unless required by applicable law or agreed to in writing, software
 #    distributed under the License is distributed on an "AS IS" BASIS,
 #    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -19,9 +19,9 @@ from pycalendar.exceptions import PyCalendarValidationError
 import unittest
 
 class TestValidation(unittest.TestCase):
-    
+
     def test_basic(self):
-        
+
         data = (
             (
                 "No problems",
@@ -63,15 +63,16 @@ END:VCALENDAR
                 )),
             ),
         )
-        
+
         for title, item, test_fixed, test_unfixed in data:
             cal = PyCalendar.parseText(item)
             fixed, unfixed = cal.validate(doFix=False)
             self.assertEqual(set(fixed), test_fixed, msg="Failed test: %s" % (title,))
             self.assertEqual(set(unfixed), test_unfixed, msg="Failed test: %s" % (title,))
 
+
     def test_mode_no_fix_no_raise(self):
-        
+
         data = (
             (
                 "OK",
@@ -221,8 +222,9 @@ END:VCALENDAR
             self.assertEqual(set(fixed), test_fixed, msg="Failed test: %s" % (title,))
             self.assertEqual(set(unfixed), test_unfixed, msg="Failed test: %s" % (title,))
 
+
     def test_mode_fix_no_raise(self):
-        
+
         data = (
             (
                 "OK",
@@ -371,8 +373,9 @@ END:VCALENDAR
             self.assertEqual(set(fixed), test_fixed, msg="Failed test: %s" % (title,))
             self.assertEqual(set(unfixed), test_unfixed, msg="Failed test: %s" % (title,))
 
+
     def test_mode_no_fix_raise(self):
-        
+
         data = (
             (
                 "OK",
@@ -532,8 +535,9 @@ END:VCALENDAR
                 self.assertEqual(set(fixed), test_fixed, msg="Failed test: %s" % (title,))
                 self.assertEqual(set(unfixed), test_unfixed, msg="Failed test: %s" % (title,))
 
+
     def test_mode_fix_raise(self):
-        
+
         data = (
             (
                 "OK",
@@ -692,6 +696,7 @@ END:VCALENDAR
                 self.assertEqual(str(cal), test_new, msg="Failed test: %s" % (title,))
                 self.assertEqual(set(fixed), test_fixed, msg="Failed test: %s" % (title,))
                 self.assertEqual(set(unfixed), test_unfixed, msg="Failed test: %s" % (title,))
+
 
     def test_vevent(self):
         data = (
@@ -970,13 +975,14 @@ END:VCALENDAR
                 set(),
             ),
         )
-        
+
         for title, test_old, test_new, test_fixed, test_unfixed in data:
             cal = PyCalendar.parseText(test_old)
             fixed, unfixed = cal.validate(doFix=True)
             self.assertEqual(str(cal), test_new, msg="Failed test: %s" % (title,))
             self.assertEqual(set(fixed), test_fixed, msg="Failed test: %s" % (title,))
             self.assertEqual(set(unfixed), test_unfixed, msg="Failed test: %s" % (title,))
+
 
     def test_vfreebusy(self):
         data = (
@@ -1039,13 +1045,14 @@ END:VCALENDAR
                 )),
             ),
         )
-        
+
         for title, test_old, test_new, test_fixed, test_unfixed in data:
             cal = PyCalendar.parseText(test_old)
             fixed, unfixed = cal.validate(doFix=True)
             self.assertEqual(str(cal), test_new, msg="Failed test: %s" % (title,))
             self.assertEqual(set(fixed), test_fixed, msg="Failed test: %s" % (title,))
             self.assertEqual(set(unfixed), test_unfixed, msg="Failed test: %s" % (title,))
+
 
     def test_vjournal(self):
         data = (
@@ -1106,13 +1113,14 @@ END:VCALENDAR
                 )),
             ),
         )
-        
+
         for title, test_old, test_new, test_fixed, test_unfixed in data:
             cal = PyCalendar.parseText(test_old)
             fixed, unfixed = cal.validate(doFix=True)
             self.assertEqual(str(cal), test_new, msg="Failed test: %s" % (title,))
             self.assertEqual(set(fixed), test_fixed, msg="Failed test: %s" % (title,))
             self.assertEqual(set(unfixed), test_unfixed, msg="Failed test: %s" % (title,))
+
 
     def test_vtimezone(self):
         data = (
@@ -1250,13 +1258,14 @@ END:VCALENDAR
                 )),
             ),
         )
-        
+
         for title, test_old, test_new, test_fixed, test_unfixed in data:
             cal = PyCalendar.parseText(test_old)
             fixed, unfixed = cal.validate(doFix=True)
             self.assertEqual(str(cal), test_new, msg="Failed test: %s" % (title,))
             self.assertEqual(set(fixed), test_fixed, msg="Failed test: %s" % (title,))
             self.assertEqual(set(unfixed), test_unfixed, msg="Failed test: %s" % (title,))
+
 
     def test_vtodo(self):
         data = (
@@ -1471,13 +1480,14 @@ END:VCALENDAR
                 set(),
             ),
         )
-        
+
         for title, test_old, test_new, test_fixed, test_unfixed in data:
             cal = PyCalendar.parseText(test_old)
             fixed, unfixed = cal.validate(doFix=True)
             self.assertEqual(str(cal), test_new, msg="Failed test: %s" % (title,))
             self.assertEqual(set(fixed), test_fixed, msg="Failed test: %s" % (title,))
             self.assertEqual(set(unfixed), test_unfixed, msg="Failed test: %s" % (title,))
+
 
     def test_vavailability(self):
         data = (
@@ -1668,13 +1678,14 @@ END:VCALENDAR
                 set(),
             ),
         )
-        
+
         for title, test_old, test_new, test_fixed, test_unfixed in data:
             cal = PyCalendar.parseText(test_old)
             fixed, unfixed = cal.validate(doFix=True)
             self.assertEqual(str(cal), test_new, msg="Failed test: %s" % (title,))
             self.assertEqual(set(fixed), test_fixed, msg="Failed test: %s" % (title,))
             self.assertEqual(set(unfixed), test_unfixed, msg="Failed test: %s" % (title,))
+
 
     def test_available(self):
         data = (
@@ -1861,13 +1872,14 @@ END:VCALENDAR
                 set(),
             ),
         )
-        
+
         for title, test_old, test_new, test_fixed, test_unfixed in data:
             cal = PyCalendar.parseText(test_old)
             fixed, unfixed = cal.validate(doFix=True)
             self.assertEqual(str(cal), test_new, msg="Failed test: %s" % (title,))
             self.assertEqual(set(fixed), test_fixed, msg="Failed test: %s" % (title,))
             self.assertEqual(set(unfixed), test_unfixed, msg="Failed test: %s" % (title,))
+
 
     def test_valarm(self):
         data = (
@@ -2550,13 +2562,14 @@ END:VCALENDAR
                 set(),
             ),
         )
-        
+
         for title, test_old, test_new, test_fixed, test_unfixed in data:
             cal = PyCalendar.parseText(test_old)
             fixed, unfixed = cal.validate(doFix=True)
             self.assertEqual(str(cal), test_new, msg="Failed test: %s" % (title,))
             self.assertEqual(set(fixed), test_fixed, msg="Failed test: %s" % (title,))
             self.assertEqual(set(unfixed), test_unfixed, msg="Failed test: %s" % (title,))
+
 
     def test_xcomponents(self):
         data = (
@@ -2698,13 +2711,14 @@ END:VCALENDAR
                 )),
             ),
         )
-        
+
         for title, test_old, test_new, test_fixed, test_unfixed in data:
             cal = PyCalendar.parseText(test_old)
             fixed, unfixed = cal.validate(doFix=True)
             self.assertEqual(str(cal), test_new, msg="Failed test: %s" % (title,))
             self.assertEqual(set(fixed), test_fixed, msg="Failed test: %s" % (title,))
             self.assertEqual(set(unfixed), test_unfixed, msg="Failed test: %s" % (title,))
+
 
     def test_STATUS_fix(self):
         """
@@ -3166,11 +3180,10 @@ END:VCALENDAR
                 )),
             ),
         )
-        
+
         for title, test_old, test_new, test_doFix, test_fixed, test_unfixed in data:
             cal = PyCalendar.parseText(test_old)
             fixed, unfixed = cal.validate(doFix=test_doFix)
             self.assertEqual(str(cal), test_new, msg="Failed test: %s" % (title,))
             self.assertEqual(set(fixed), test_fixed, msg="Failed test: %s" % (title,))
             self.assertEqual(set(unfixed), test_unfixed, msg="Failed test: %s" % (title,))
-
