@@ -437,17 +437,17 @@ def unpackDateDay(data):
 
 # Display elements
 def getMonthTable(month, year, weekstart, table, today_index):
-    from pycalendar.datetime import PyCalendarDateTime
+    from pycalendar.datetime import DateTime
 
     # Get today
-    today = PyCalendarDateTime.getToday(None)
+    today = DateTime.getToday(None)
     today_index = [-1, -1]
 
     # Start with empty table
     table = []
 
     # Determine first weekday in month
-    temp = PyCalendarDateTime(year, month, 1, 0)
+    temp = DateTime(year, month, 1, 0)
     row = -1
     initial_col = temp.getDayOfWeek() - weekstart
     if initial_col < 0:

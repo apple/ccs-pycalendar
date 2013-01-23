@@ -15,7 +15,7 @@
 ##
 
 
-class PyCalendarOutputFilter(object):
+class OutputFilter(object):
 
     def __init__(self, type):
         self.mType = type

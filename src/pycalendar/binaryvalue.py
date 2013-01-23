@@ -16,13 +16,13 @@
 
 # iCalendar Binary value
 
-from pycalendar import xmldefs
-from pycalendar.plaintextvalue import PyCalendarPlainTextValue
-from pycalendar.value import PyCalendarValue
+from pycalendar import xmldefinitions
+from pycalendar.plaintextvalue import PlainTextValue
+from pycalendar.value import Value
 
-class PyCalendarBinaryValue(PyCalendarPlainTextValue):
+class BinaryValue(PlainTextValue):
 
     def getType(self):
-        return PyCalendarValue.VALUETYPE_BINARY
+        return Value.VALUETYPE_BINARY
 
-PyCalendarValue.registerType(PyCalendarValue.VALUETYPE_BINARY, PyCalendarBinaryValue, xmldefs.value_binary)
+Value.registerType(Value.VALUETYPE_BINARY, BinaryValue, xmldefinitions.value_binary)

@@ -14,9 +14,9 @@
 #    limitations under the License.
 ##
 
-from pycalendar.value import PyCalendarValue
+from pycalendar.value import Value
 
-class PyCalendarMultiValue(PyCalendarValue):
+class MultiValue(Value):
 
     def __init__(self, type):
 
@@ -29,7 +29,7 @@ class PyCalendarMultiValue(PyCalendarValue):
 
 
     def duplicate(self):
-        other = PyCalendarMultiValue(self.mType)
+        other = MultiValue(self.mType)
         other.mValues = [i.duplicate() for i in self.mValues]
         return other
 
@@ -39,7 +39,7 @@ class PyCalendarMultiValue(PyCalendarValue):
 
 
     def getRealType(self):
-        return PyCalendarValue.VALUETYPE_MULTIVALUE
+        return Value.VALUETYPE_MULTIVALUE
 
 
     def getValue(self):
@@ -57,13 +57,13 @@ class PyCalendarMultiValue(PyCalendarValue):
     def setValue(self, value):
         newValues = []
         for v in value:
-            pyCalendarValue = PyCalendarValue.createFromType(self.mType)
-            pyCalendarValue.setValue(v)
-            newValues.append(pyCalendarValue)
+            val = Value.createFromType(self.mType)
+            val.setValue(v)
+            newValues.append(val)
         self.mValues = newValues
 
 
-    def parse(self, data):
+    def parse(self, data, variant):
         # Tokenize on comma
         if "," in data:
             tokens = data.split(",")
@@ -71,8 +71,8 @@ class PyCalendarMultiValue(PyCalendarValue):
             tokens = (data,)
         for token in tokens:
             # Create single value, and parse data
-            value = PyCalendarValue.createFromType(self.mType)
-            value.parse(token)
+            value = Value.createFromType(self.mType)
+            value.parse(token, variant)
             self.mValues.append(value)
 
 
@@ -94,8 +94,15 @@ class PyCalendarMultiValue(PyCalendarValue):
             iter.writeXML(node, namespace)
 
 
+    def parseJSONValue(self, jobject):
+        for jvalue in jobject:
+            value = Value.createFromType(self.mType)
+            value.parseJSONValue(jvalue)
+            self.mValues.append(value)
+
+
     def writeJSONValue(self, jobject):
         for iter in self.mValues:
             iter.writeJSONValue(jobject)
 
-PyCalendarValue.registerType(PyCalendarValue.VALUETYPE_MULTIVALUE, PyCalendarMultiValue, None)
+Value.registerType(Value.VALUETYPE_MULTIVALUE, MultiValue, None)

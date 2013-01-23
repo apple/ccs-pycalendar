@@ -86,3 +86,6 @@ Parameter_TYPE = "TYPE"
 Parameter_VALUE = "VALUE"
 
 Parameter_Value_ENCODING_B = "B"
+
+# Extensions
+Property_X_ABUID = "X-ABUID"

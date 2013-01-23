@@ -14,46 +14,18 @@
 #    limitations under the License.
 ##
 
-from pycalendar import xmldefs
-from pycalendar.duration import PyCalendarDuration
-from pycalendar.value import PyCalendarValue
+from pycalendar import xmldefinitions
+from pycalendar.duration import Duration
+from pycalendar.value import Value
+from pycalendar.valueutils import WrapperValue
 
-class PyCalendarDurationValue(PyCalendarValue):
+class DurationValue(WrapperValue, Value):
 
     def __init__(self, value=None):
-        self.mValue = value if value is not None else PyCalendarDuration()
-
-
-    def duplicate(self):
-        return PyCalendarDurationValue(self.mValue.duplicate())
+        self.mValue = value if value is not None else Duration()
 
 
     def getType(self):
-        return PyCalendarValue.VALUETYPE_DURATION
+        return Value.VALUETYPE_DURATION
 
-
-    def parse(self, data):
-        self.mValue.parse(data)
-
-
-    def generate(self, os):
-        self.mValue.generate(os)
-
-
-    def writeXML(self, node, namespace):
-        value = self.getXMLNode(node, namespace)
-        value.text = self.mValue.writeXML()
-
-
-    def writeJSONValue(self, jobject):
-        self.mValue.writeJSON(jobject)
-
-
-    def getValue(self):
-        return self.mValue
-
-
-    def setValue(self, value):
-        self.mValue = value
-
-PyCalendarValue.registerType(PyCalendarValue.VALUETYPE_DURATION, PyCalendarDurationValue, xmldefs.value_duration)
+Value.registerType(Value.VALUETYPE_DURATION, DurationValue, xmldefinitions.value_duration)

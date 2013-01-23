@@ -14,7 +14,7 @@
 #    limitations under the License.
 ##
 
-from pycalendar.exceptions import PyCalendarInvalidData
+from pycalendar.exceptions import InvalidData
 from pycalendar.parser import ParserContext
 from pycalendar.vcard.card import Card
 from pycalendar.vcard.property import Property
@@ -473,7 +473,7 @@ BOGUS
         )
 
         for item in data:
-            self.assertRaises(PyCalendarInvalidData, Card.parseText, item)
+            self.assertRaises(InvalidData, Card.parseText, item)
 
 
     def testParseBlank(self):
@@ -561,7 +561,7 @@ END:VCARD
         save = ParserContext.BLANK_LINES_IN_DATA
         for item in data:
             ParserContext.BLANK_LINES_IN_DATA = ParserContext.PARSER_RAISE
-            self.assertRaises(PyCalendarInvalidData, Card.parseText, item)
+            self.assertRaises(InvalidData, Card.parseText, item)
 
             ParserContext.BLANK_LINES_IN_DATA = ParserContext.PARSER_IGNORE
             lines = item.split("\r\n")

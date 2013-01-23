@@ -14,7 +14,7 @@
 #    limitations under the License.
 ##
 
-from pycalendar import definitions
+from pycalendar.icalendar import definitions
 from pycalendar.validation import partial, PropertyValueChecks
 
 ICALENDAR_VALUE_CHECKS = {

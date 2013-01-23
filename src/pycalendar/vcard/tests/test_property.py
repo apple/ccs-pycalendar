@@ -14,8 +14,8 @@
 #    limitations under the License.
 ##
 
-from pycalendar.attribute import PyCalendarAttribute
-from pycalendar.exceptions import PyCalendarInvalidProperty
+from pycalendar.parameter import Parameter
+from pycalendar.exceptions import InvalidProperty
 from pycalendar.parser import ParserContext
 from pycalendar.vcard.property import Property
 import unittest
@@ -65,7 +65,7 @@ class TestProperty(unittest.TestCase):
         for data in test_bad_data:
             ParserContext.INVALID_ESCAPE_SEQUENCES = ParserContext.PARSER_RAISE
             prop = Property()
-            self.assertRaises(PyCalendarInvalidProperty, prop.parse, data)
+            self.assertRaises(InvalidProperty, prop.parse, data)
         ParserContext.INVALID_ESCAPE_SEQUENCES = save
 
 
@@ -98,19 +98,19 @@ class TestProperty(unittest.TestCase):
     def testParameterEncodingDecoding(self):
 
         prop = Property(name="X-FOO", value="Test")
-        prop.addAttribute(PyCalendarAttribute("X-BAR", "\"Check\""))
+        prop.addParameter(Parameter("X-BAR", "\"Check\""))
         self.assertEqual(str(prop), "X-FOO;X-BAR=^'Check^':Test\r\n")
 
-        prop.addAttribute(PyCalendarAttribute("X-BAR2", "Check\nThis\tOut\n"))
+        prop.addParameter(Parameter("X-BAR2", "Check\nThis\tOut\n"))
         self.assertEqual(str(prop), "X-FOO;X-BAR=^'Check^';X-BAR2=Check^nThis^tOut^n:Test\r\n")
 
         data = "X-FOO;X-BAR=^'Check^':Test"
         prop = Property()
         prop.parse(data)
-        self.assertEqual(prop.getAttributeValue("X-BAR"), "\"Check\"")
+        self.assertEqual(prop.getParameterValue("X-BAR"), "\"Check\"")
 
         data = "X-FOO;X-BAR=^'Check^';X-BAR2=Check^nThis^tOut^n:Test"
         prop = Property()
         prop.parse(data)
-        self.assertEqual(prop.getAttributeValue("X-BAR"), "\"Check\"")
-        self.assertEqual(prop.getAttributeValue("X-BAR2"), "Check\nThis\tOut\n")
+        self.assertEqual(prop.getParameterValue("X-BAR"), "\"Check\"")
+        self.assertEqual(prop.getParameterValue("X-BAR2"), "Check\nThis\tOut\n")

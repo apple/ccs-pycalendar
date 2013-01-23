@@ -14,17 +14,17 @@
 #    limitations under the License.
 ##
 
-from pycalendar import xmldefs
-from pycalendar.datetime import PyCalendarDateTime
-from pycalendar.duration import PyCalendarDuration
+from pycalendar import xmldefinitions, xmlutils
+from pycalendar.datetime import DateTime
+from pycalendar.duration import Duration
 from pycalendar.valueutils import ValueMixin
 import xml.etree.cElementTree as XML
 
-class PyCalendarPeriod(ValueMixin):
+class Period(ValueMixin):
 
     def __init__(self, start=None, end=None, duration=None):
 
-        self.mStart = start if start is not None else PyCalendarDateTime()
+        self.mStart = start if start is not None else DateTime()
 
         if end is not None:
             self.mEnd = end
@@ -36,12 +36,12 @@ class PyCalendarPeriod(ValueMixin):
             self.mUseDuration = True
         else:
             self.mEnd = self.mStart.duplicate()
-            self.mDuration = PyCalendarDuration()
+            self.mDuration = Duration()
             self.mUseDuration = False
 
 
     def duplicate(self):
-        other = PyCalendarPeriod(start=self.mStart.duplicate(), end=self.mEnd.duplicate())
+        other = Period(start=self.mStart.duplicate(), end=self.mEnd.duplicate())
         other.mUseDuration = self.mUseDuration
         return other
 
@@ -51,7 +51,7 @@ class PyCalendarPeriod(ValueMixin):
 
 
     def __repr__(self):
-        return "PyCalendarPeriod %s" % (self.getText(),)
+        return "Period %s" % (self.getText(),)
 
 
     def __str__(self):
@@ -71,19 +71,19 @@ class PyCalendarPeriod(ValueMixin):
                 or (self.mStart == comp.mStart) and self.mEnd < comp.mEnd
 
 
-    def parse(self, data):
+    def parse(self, data, fullISO=False):
         splits = data.split('/', 1)
         if len(splits) == 2:
             start = splits[0]
             end = splits[1]
 
-            self.mStart.parse(start)
+            self.mStart.parse(start, fullISO)
             if end[0] == 'P':
                 self.mDuration.parse(end)
                 self.mUseDuration = True
                 self.mEnd = self.mStart + self.mDuration
             else:
-                self.mEnd.parse(end)
+                self.mEnd.parse(end, fullISO)
                 self.mUseDuration = False
                 self.mDuration = self.mEnd - self.mStart
         else:
@@ -103,15 +103,19 @@ class PyCalendarPeriod(ValueMixin):
 
 
     def writeXML(self, node, namespace):
-        start = XML.SubElement(node, xmldefs.makeTag(namespace, xmldefs.period_start))
+        start = XML.SubElement(node, xmlutils.makeTag(namespace, xmldefinitions.period_start))
         start.text = self.mStart.getXMLText()
 
         if self.mUseDuration:
-            duration = XML.SubElement(node, xmldefs.makeTag(namespace, xmldefs.period_duration))
+            duration = XML.SubElement(node, xmlutils.makeTag(namespace, xmldefinitions.period_duration))
             duration.text = self.mDuration.getText()
         else:
-            end = XML.SubElement(node, xmldefs.makeTag(namespace, xmldefs.period_end))
+            end = XML.SubElement(node, xmlutils.makeTag(namespace, xmldefinitions.period_end))
             end.text = self.mEnd.getXMLText()
+
+
+    def parseJSON(self, jobject):
+        self.parse(str(jobject), True)
 
 
     def writeJSON(self, jobject):

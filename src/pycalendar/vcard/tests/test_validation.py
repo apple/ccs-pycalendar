@@ -14,7 +14,7 @@
 #    limitations under the License.
 ##
 
-from pycalendar.exceptions import PyCalendarValidationError
+from pycalendar.exceptions import ValidationError
 from pycalendar.vcard.card import Card
 import unittest
 
@@ -210,7 +210,7 @@ END:VCARD
         for title, test_old, test_new, test_fixed, test_unfixed, test_raises in data:
             card = Card.parseText(test_old)
             if test_raises:
-                self.assertRaises(PyCalendarValidationError, card.validate, doFix=False, doRaise=True)
+                self.assertRaises(ValidationError, card.validate, doFix=False, doRaise=True)
             else:
                 try:
                     fixed, unfixed = card.validate(doFix=False, doRaise=False)
