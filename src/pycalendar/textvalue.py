@@ -1,12 +1,12 @@
 ##
-#    Copyright (c) 2007 Cyrus Daboo. All rights reserved.
-#    
+#    Copyright (c) 2007-2012 Cyrus Daboo. All rights reserved.
+#
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
 #    You may obtain a copy of the License at
-#    
+#
 #        http://www.apache.org/licenses/LICENSE-2.0
-#    
+#
 #    Unless required by applicable law or agreed to in writing, software
 #    distributed under the License is distributed on an "AS IS" BASIS,
 #    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,26 +16,27 @@
 
 # iCalendar UTC Offset value
 
-from plaintextvalue import PyCalendarPlainTextValue
-from value import PyCalendarValue
-import utils
+from pycalendar import utils, xmldefs
+from pycalendar.plaintextvalue import PyCalendarPlainTextValue
+from pycalendar.value import PyCalendarValue
 
-class PyCalendarTextValue( PyCalendarPlainTextValue ):
+class PyCalendarTextValue(PyCalendarPlainTextValue):
 
-    def getType( self ):
+    def getType(self):
         return PyCalendarValue.VALUETYPE_TEXT
 
-    def parse( self, data ):
+
+    def parse(self, data):
         # Decoding required
-        self.mValue = utils.decodeTextValue( data )
-        
+        self.mValue = utils.decodeTextValue(data)
+
+
     # os - StringIO object
-    def generate( self, os ):
+    def generate(self, os):
         try:
             # Encoding required
-            utils.writeTextValue( os, self.mValue )
+            utils.writeTextValue(os, self.mValue)
         except:
             pass
 
-PyCalendarValue.registerType(PyCalendarValue.VALUETYPE_TEXT, PyCalendarTextValue)
-    
+PyCalendarValue.registerType(PyCalendarValue.VALUETYPE_TEXT, PyCalendarTextValue, xmldefs.value_text)

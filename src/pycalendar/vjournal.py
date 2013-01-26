@@ -1,12 +1,12 @@
 ##
-#    Copyright (c) 2007 Cyrus Daboo. All rights reserved.
-#    
+#    Copyright (c) 2007-2012 Cyrus Daboo. All rights reserved.
+#
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
 #    You may obtain a copy of the License at
-#    
+#
 #        http://www.apache.org/licenses/LICENSE-2.0
-#    
+#
 #    Unless required by applicable law or agreed to in writing, software
 #    distributed under the License is distributed on an "AS IS" BASIS,
 #    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -14,45 +14,57 @@
 #    limitations under the License.
 ##
 
-from component import PyCalendarComponent
-from componentrecur import PyCalendarComponentRecur
-import definitions
-import itipdefinitions
+from pycalendar import definitions
+from pycalendar import itipdefinitions
+from pycalendar.componentrecur import PyCalendarComponentRecur
+from pycalendar.icalendar.validation import ICALENDAR_VALUE_CHECKS
 
 class PyCalendarVJournal(PyCalendarComponentRecur):
 
-    sBeginDelimiter = definitions.cICalComponent_BEGINVJOURNAL
+    propertyCardinality_1 = (
+        definitions.cICalProperty_DTSTAMP,
+        definitions.cICalProperty_UID,
+    )
 
-    sEndDelimiter = definitions.cICalComponent_ENDVJOURNAL
+    propertyCardinality_0_1 = (
+        definitions.cICalProperty_CLASS,
+        definitions.cICalProperty_CREATED,
+        definitions.cICalProperty_DTSTART,
+        definitions.cICalProperty_LAST_MODIFIED,
+        definitions.cICalProperty_ORGANIZER,
+        definitions.cICalProperty_RECURRENCE_ID,
+        definitions.cICalProperty_SEQUENCE,
+        # definitions.cICalProperty_STATUS, # Special fix done for multiple STATUS
+        definitions.cICalProperty_SUMMARY,
+        definitions.cICalProperty_URL,
+        definitions.cICalProperty_RRULE,
+    )
 
-    @staticmethod
-    def getVBegin():
-        return PyCalendarVJournal.sBeginDelimiter
+    propertyValueChecks = ICALENDAR_VALUE_CHECKS
 
-    @staticmethod
-    def getVEnd():
-        return PyCalendarVJournal.sEndDelimiter
+    def __init__(self, parent=None):
+        super(PyCalendarVJournal, self).__init__(parent=parent)
 
-    def __init__(self, calendar=None, copyit=None):
-        if calendar is not None:
-            super(PyCalendarVJournal, self).__init__(calendar=calendar)
-        elif copyit is not None:
-            super(PyCalendarVJournal, self).__init__(copyit=copyit)
 
-    def clone_it(self):
-        return PyCalendarVJournal(copyit=self)
+    def duplicate(self, parent=None):
+        return super(PyCalendarVJournal, self).duplicate(parent=parent)
+
 
     def getType(self):
-        return PyCalendarComponent.eVJOURNAL
+        return definitions.cICalComponent_VJOURNAL
 
-    def getBeginDelimiter(self):
-        return PyCalendarVJournal.sBeginDelimiter
-
-    def getEndDelimiter(self):
-        return PyCalendarVJournal.sEndDelimiter
 
     def getMimeComponentName(self):
         return itipdefinitions.cICalMIMEComponent_VJOURNAL
 
+
     def finalise(self):
         super(PyCalendarVJournal, self).finalise()
+
+
+    def sortedPropertyKeyOrder(self):
+        return (
+            definitions.cICalProperty_UID,
+            definitions.cICalProperty_RECURRENCE_ID,
+            definitions.cICalProperty_DTSTART,
+        )

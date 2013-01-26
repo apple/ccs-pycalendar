@@ -1,12 +1,12 @@
 ##
-#    Copyright (c) 2007 Cyrus Daboo. All rights reserved.
-#    
+#    Copyright (c) 2007-2012 Cyrus Daboo. All rights reserved.
+#
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
 #    You may obtain a copy of the License at
-#    
+#
 #        http://www.apache.org/licenses/LICENSE-2.0
-#    
+#
 #    Unless required by applicable law or agreed to in writing, software
 #    distributed under the License is distributed on an "AS IS" BASIS,
 #    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -14,133 +14,69 @@
 #    limitations under the License.
 ##
 
-from componentbase import PyCalendarComponentBase
-from datetime import PyCalendarDateTime
-from property import PyCalendarProperty
+from pycalendar import definitions
+from pycalendar import stringutils
+from pycalendar.componentbase import PyCalendarComponentBase
+from pycalendar.datetime import PyCalendarDateTime
+from pycalendar.property import PyCalendarProperty
 import os
-import definitions
-import stringutils
 import time
+import uuid
 
 class PyCalendarComponent(PyCalendarComponentBase):
 
     uid_ctr = 1
 
-    eVCALENDAR = -1
-    eVEVENT = 0
-    eVTODO = 1
-    eVJOURNAL = 2
-    eVFREEBUSY = 3
-    eVTIMEZONE = 4
-    eVALARM = 5
+    def __init__(self, parent=None):
 
-    # Pseudo components
-    eVTIMEZONESTANDARD = 6
-    eVTIMEZONEDAYLIGHT = 7
+        super(PyCalendarComponent, self).__init__(parent)
+        self.mUID = ""
+        self.mSeq = 0
+        self.mOriginalSeq = 0
+        self.mChanged = False
 
-    def __init__(self, calendar=None, copyit=None):
-        
-        if calendar:
-            super(PyCalendarComponent, self).__init__()
-            self.mCalendarRef = calendar
-            self.mUID = ""
-            self.mSeq = 0
-            self.mOriginalSeq = 0
-            self.mEmbedder = None
-            self.mEmbedded = None
-            self.mETag = None
-            self.mRURL = None
-            self.mChanged = False
-        elif copyit:
-            super(PyCalendarComponent, self).__init__(copyit=copyit)
-            self.mCalendarRef = copyit.mCalendarRef
-            self.mUID = copyit.mUID
-            self.mSeq = copyit.mSeq
-            self.mOriginalSeq = copyit.mOriginalSeq
-    
-            self.mEmbedder = None
-            self.mEmbedded = None
-            if copyit.mEmbedded != None:
-                # Do deep copy of element list
-                self.mEmbedded = []
-                for iter in copyit.mEmbedded:
-                    self.mEmbedded.append(iter.clone_it())
-                    self.mEmbedded[-1].setEmbedder(self)
 
-            self.mETag = copyit.mETag
-            self.mRURL = copyit.mRURL
-            self.mChanged = copyit.mChanged
+    def duplicate(self, parent=None, **args):
 
-    def close(self):
+        other = super(PyCalendarComponent, self).duplicate(parent=parent, **args)
+        other.mUID = self.mUID
+        other.mSeq = self.mSeq
+        other.mOriginalSeq = self.mOriginalSeq
 
-        self.mEmbedder = None
+        other.mChanged = self.mChanged
 
-        # Also close sub-components if present
-        if (self.mEmbedded != None):
-            for iter in self.mEmbedded:
-                iter.close()
-            self.mEmbedded = None
+        return other
 
-    def clone_it(self):
-        raise NotImplemented
 
-    def getType(self):
-        raise NotImplemented
+    def __repr__(self):
+        return "%s: UID: %s" % (self.getType(), self.getMapKey(),)
 
-    def getBeginDelimiter(self):
-        raise NotImplemented
-
-    def getEndDelimiter(self):
-        raise NotImplemented
 
     def getMimeComponentName(self):
-        raise NotImplemented
+        raise NotImplementedError
 
-    def addComponent(self, comp): #@UnusedVariable
-        # Sub-classes decide what can be embedded
-        return False
-
-    def removeComponent(self, comp):
-        if self.mEmbedded != None:
-            try:
-                self.mEmbedded.remove(comp)
-            except ValueError:
-                pass
-
-    def hasEmbeddedComponent(self, type):
-        if self.mEmbedded != None:
-            for iter in self.mEmbedded:
-                if iter.getType() == type:
-                    return True
-        return False
-
-    def getFirstEmbeddedComponent(self, type):
-        if self.mEmbedded != None:
-            for iter in self.mEmbedded:
-                if iter.getType() == type:
-                    return iter
-        return None
-
-    def setEmbedder(self, embedder):
-        self.mEmbedder = embedder
-
-    def getEmbedder(self):
-        return self.mEmbedder
-
-    def setCalendar(self, ref):
-        self.mCalendarRef = ref
-
-    def getCalendar(self):
-        return self.mCalendarRef
 
     def getMapKey(self):
-        return self.mUID
+        if hasattr(self, "mMapKey"):
+            return self.mMapKey
+        elif self.mUID:
+            return self.mUID
+        else:
+            self.mMapKey = str(uuid.uuid4())
+            return self.mMapKey
+
+
+    def getSortKey(self):
+        return self.getMapKey()
+
 
     def getMasterKey(self):
         return self.mUID
 
+
     def getUID(self):
         return self.mUID
+
 
     def setUID(self, uid):
         if uid:
@@ -181,8 +117,10 @@ class PyCalendarComponent(PyCalendarComponentBase):
         prop = PyCalendarProperty(definitions.cICalProperty_UID, self.mUID)
         self.addProperty(prop)
 
+
     def getSeq(self):
         return self.mSeq
+
 
     def setSeq(self, seq):
         self.mSeq = seq
@@ -192,51 +130,18 @@ class PyCalendarComponent(PyCalendarComponentBase):
         prop = PyCalendarProperty(definitions.cICalProperty_SEQUENCE, self.mSeq)
         self.addProperty(prop)
 
+
     def getOriginalSeq(self):
         return self.mOriginalSeq
 
-    def getRURL(self):
-        return self.mRURL
-
-    def setRURL(self, rurl):
-        self.mRURL = rurl
-
-    def generateRURL(self):
-        # Format is:
-        #
-        # <<hash code>> *("-0"> .ics
-        if (self.mRURL is None) or (len(self.mRURL) == 0):
-            # Generate hash code
-            hash = ""
-            hash += self.getMapKey()
-            hash += ":"
-            hash += str(self.getSeq())
-            hash += ":"
-
-            dt = self.loadValueDateTime(definitions.cICalProperty_DTSTAMP)
-            if dt is not None:
-                hash += dt.getText()
-
-            self.mRURL = stringutils.md5digest(hash)
-        else:
-            # Strip off .ics
-            if self.mRURL.endswith(".ics"):
-                self.mRURL = self.mRURL[:-4]
-
-        # Add trailer
-        self.mRURL += "-0.ics"
-
-    def getETag(self):
-        return self.mETag
-
-    def setETag(self, etag):
-        self.mETag = etag
 
     def getChanged(self):
         return self.mChanged
 
+
     def setChanged(self, changed):
         self.mChanged = changed
+
 
     def initDTSTAMP(self):
         self.removeProperties(definitions.cICalProperty_DTSTAMP)
@@ -245,6 +150,7 @@ class PyCalendarComponent(PyCalendarComponentBase):
                                   PyCalendarDateTime.getNowUTC())
         self.addProperty(prop)
 
+
     def updateLastModified(self):
         self.removeProperties(definitions.cICalProperty_LAST_MODIFIED)
 
@@ -252,73 +158,16 @@ class PyCalendarComponent(PyCalendarComponentBase):
                                   PyCalendarDateTime.getNowUTC())
         self.addProperty(prop)
 
-    def added(self):
-        # Also add sub-components if present
-        if self.mEmbedded != None:
-            for iter in self.mEmbedded:
-                iter.added()
-
-        self.mChanged = True
-
-    def removed(self):
-        # Also remove sub-components if present
-        if self.mEmbedded != None:
-            for iter in self.mEmbedded:
-                iter.removed()
-
-        self.mChanged = True
-
-    def duplicated(self):
-        # Remove SEQ, UID, DTSTAMP
-        # These will be re-created when it is added to the calendar
-        self.removeProperties(definitions.cICalProperty_UID)
-        self.removeProperties(definitions.cICalProperty_SEQUENCE)
-        self.removeProperties(definitions.cICalProperty_DTSTAMP)
-
-        # Remove the cached values as well
-        self.mUID = ""
-        self.mSeq = 0
-        self.mOriginalSeq = 0
-
-        # Also duplicate sub-components if present
-        if self.mEmbedded != None:
-            for iter in self.mEmbedded:
-                iter.duplicated()
-
-        # Reset CalDAV items
-        self.mETag = None
-        self.mRURL = None
-        self.mChanged = True
-
-    def changed(self):
-        # Bump the sequence
-        self.setSeq(self.getSeq() + 1)
-
-        # Update last-modified
-        self.updateLastModified()
-
-        # Also change sub-components
-        if self.mEmbedded != None:
-            for iter in self.mEmbedded:
-                iter.changed()
-
-        self.mChanged = True
-
-        # Mark calendar as dirty
-        from calendar import PyCalendar
-        cal = PyCalendar.getICalendar(self.getCalendar())
-        if cal != None:
-            cal.changedComponent(self)
 
     def finalise(self):
         # Get UID
         temps = self.loadValueString(definitions.cICalProperty_UID)
-        if temps != None:
+        if temps is not None:
             self.mUID = temps
 
         # Get SEQ
         temp = self.loadValueInteger(definitions.cICalProperty_SEQUENCE)
-        if temp != None:
+        if temp is not None:
             self.mSeq = temp
 
         # Cache the original sequence when the component is read in.
@@ -326,69 +175,10 @@ class PyCalendarComponent(PyCalendarComponentBase):
         # same calendar
         self.mOriginalSeq = self.mSeq
 
-        # Get CalDAV info if present
-        temps = self.loadPrivateValue(definitions.cICalProperty_X_PRIVATE_RURL)
-        if temps != None:
-            self.mRURL = temps
-        temps = self.loadPrivateValue(definitions.cICalProperty_X_PRIVATE_ETAG)
-        if temps != None:
-            self.mETag = temps
 
     def canGenerateInstance(self):
         return True
 
-    def generate(self, os, for_cache):
-        # Header
-        os.write(self.getBeginDelimiter())
-        os.write("\n")
-
-        # Write each property
-        self.writeProperties(os)
-
-        # Do private properties if caching
-        if for_cache:
-            if self.mRURL:
-                self.writePrivateProperty(os,
-                        definitions.cICalProperty_X_PRIVATE_RURL,
-                        self.mRURL)
-            if self.mETag:
-                self.writePrivateProperty(os,
-                        definitions.cICalProperty_X_PRIVATE_ETAG,
-                        self.mETag)
-
-        # Write each embedded component
-        if self.mEmbedded != None:
-            for iter in self.mEmbedded:
-                iter.generate(os, for_cache)
-
-        # Footer
-        os.write(self.getEndDelimiter())
-        os.write("\n")
-
-    def generateFiltered(self, os, filter):
-            # Header
-            os.write(self.getBeginDelimiter())
-            os.write("\n")
-
-            # Write each property
-            self.writePropertiesFiltered(os, filter)
-
-            # Write each embedded component
-            if self.mEmbedded != None:
-                # Shortcut for alll sub-components
-                if filter.isAllSubComponents():
-                    for iter in self.mEmbedded:
-                        iter.generate(os, False)
-                elif filter.hasSubComponentFilters():
-                    for iter in self.mEmbedded:
-                        subcomp = iter
-                        subfilter = filter.getSubComponentFilter(self.getType())
-                        if subfilter != None:
-                            subcomp.generateFiltered(os, subfilter)
-
-            # Footer
-            os.write(self.getEndDelimiter())
-            os.write("\n")
 
     def getTimezones(self, tzids):
         # Look for all date-time properties

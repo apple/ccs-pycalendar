@@ -1,12 +1,12 @@
 ##
-#    Copyright (c) 2007 Cyrus Daboo. All rights reserved.
-#    
+#    Copyright (c) 2007-2012 Cyrus Daboo. All rights reserved.
+#
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
 #    You may obtain a copy of the License at
-#    
+#
 #        http://www.apache.org/licenses/LICENSE-2.0
-#    
+#
 #    Unless required by applicable law or agreed to in writing, software
 #    distributed under the License is distributed on an "AS IS" BASIS,
 #    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -14,38 +14,21 @@
 #    limitations under the License.
 ##
 
+from pycalendar import definitions
+from pycalendar import itipdefinitions
+from pycalendar.componentrecur import PyCalendarComponentRecur
+from pycalendar.datetime import PyCalendarDateTime
+from pycalendar.icalendar.validation import ICALENDAR_VALUE_CHECKS
+from pycalendar.property import PyCalendarProperty
 import cStringIO as StringIO
-
-from component import PyCalendarComponent
-from componentrecur import PyCalendarComponentRecur
-from datetime import PyCalendarDateTime
-from property import PyCalendarProperty
-import definitions
-import itipdefinitions
 
 class PyCalendarVToDo(PyCalendarComponentRecur):
 
     OVERDUE = 0
-
-    DUE_NOW= 1
-
+    DUE_NOW = 1
     DUE_LATER = 2
-
     DONE = 3
-
-    CANCELLED= 4
-
-    sBeginDelimiter = definitions.cICalComponent_BEGINVTODO
-
-    sEndDelimiter = definitions.cICalComponent_ENDVTODO
-
-    @staticmethod
-    def getVBegin():
-        return PyCalendarVToDo.sBeginDelimiter
-
-    @staticmethod
-    def getVEnd():
-        return PyCalendarVToDo.sEndDelimiter
+    CANCELLED = 4
 
     @staticmethod
     def sort_for_display(e1, e2):
@@ -100,53 +83,77 @@ class PyCalendarVToDo(PyCalendarComponentRecur):
         # Just use start time - older ones at the top
         return s1.mStart < s2.mStart
 
-    def __init__(self, calendar=None, copyit=None):
-        if calendar is not None:
-            super(PyCalendarVToDo, self).__init__(calendar=calendar)
-            self.mPriority = 0
-            self.mStatus = definitions.eStatus_VToDo_None
-            self.mPercentComplete = 0
-            self.mCompleted = PyCalendarDateTime()
-            self.mHasCompleted = False
-        elif copyit is not None:
-            super(PyCalendarVToDo, self).__init__(copyit=copyit)
-            self.mPriority = copyit.mPriority
-            self.mStatus = copyit.mStatus
-            self.mPercentComplete = copyit.mPercentComplete
-            self.mCompleted = PyCalendarDateTime(copyit=copyit.mCompleted)
-            self.mHasCompleted = copyit.mHasCompleted
+    propertyCardinality_1 = (
+        definitions.cICalProperty_DTSTAMP,
+        definitions.cICalProperty_UID,
+    )
 
-    def clone_it(self):
-        return PyCalendarVToDo(copyit=self)
+    propertyCardinality_0_1 = (
+        definitions.cICalProperty_CLASS,
+        definitions.cICalProperty_COMPLETED,
+        definitions.cICalProperty_CREATED,
+        definitions.cICalProperty_DESCRIPTION,
+        definitions.cICalProperty_DTSTART,
+        definitions.cICalProperty_GEO,
+        definitions.cICalProperty_LAST_MODIFIED,
+        definitions.cICalProperty_LOCATION,
+        definitions.cICalProperty_ORGANIZER,
+        definitions.cICalProperty_PERCENT_COMPLETE,
+        definitions.cICalProperty_PRIORITY,
+        definitions.cICalProperty_RECURRENCE_ID,
+        definitions.cICalProperty_SEQUENCE,
+        # definitions.cICalProperty_STATUS, # Special fix done for multiple STATUS
+        definitions.cICalProperty_SUMMARY,
+        definitions.cICalProperty_URL,
+        definitions.cICalProperty_RRULE,
+        definitions.cICalProperty_DUE,
+        definitions.cICalProperty_DURATION,
+    )
+
+    propertyValueChecks = ICALENDAR_VALUE_CHECKS
+
+    def __init__(self, parent=None):
+        super(PyCalendarVToDo, self).__init__(parent=parent)
+        self.mPriority = 0
+        self.mStatus = definitions.eStatus_VToDo_None
+        self.mPercentComplete = 0
+        self.mCompleted = PyCalendarDateTime()
+        self.mHasCompleted = False
+
+
+    def duplicate(self, parent=None):
+        other = super(PyCalendarVToDo, self).duplicate(parent=parent)
+        other.mPriority = self.mPriority
+        other.mStatus = self.mStatus
+        other.mPercentComplete = self.mPercentComplete
+        other.mCompleted = self.mCompleted.duplicate()
+        other.mHasCompleted = self.mHasCompleted
+        return other
+
 
     def getType(self):
-        return PyCalendarComponent.eVTODO
+        return definitions.cICalComponent_VTODO
 
-    def getBeginDelimiter(self):
-        return PyCalendarVToDo.sBeginDelimiter
-
-    def getEndDelimiter(self):
-        return PyCalendarVToDo.sEndDelimiter
 
     def getMimeComponentName(self):
         return itipdefinitions.cICalMIMEComponent_VTODO
 
+
     def addComponent(self, comp):
         # We can embed the alarm components only
-        if comp.getType() == PyCalendarComponent.eVALARM:
-            if self.mEmbedded is None:
-                self.mEmbedded = []
-            self.mEmbedded.append(comp)
-            comp.setEmbedder(self)
-            return True
+        if comp.getType() == definitions.cICalComponent_VALARM:
+            super(PyCalendarVToDo, self).addComponent(comp)
         else:
-            return False
+            raise ValueError
+
 
     def getStatus(self):
         return self.mStatus
 
+
     def setStatus(self, status):
         self.mStatus = status
+
 
     def getStatusText(self):
         sout = StringIO()
@@ -188,6 +195,7 @@ class PyCalendarVToDo(PyCalendarComponentRecur):
 
         return sout.toString()
 
+
     def getCompletionState(self):
         if self.mStatus in (definitions.eStatus_VToDo_NeedsAction, definitions.eStatus_VToDo_InProcess):
             if self.hasEnd():
@@ -207,17 +215,22 @@ class PyCalendarVToDo(PyCalendarComponentRecur):
         elif self.mStatus == definitions.eStatus_VToDo_Cancelled:
             return PyCalendarVToDo.CANCELLED
 
+
     def getPriority(self):
         return self.mPriority
+
 
     def setPriority(self, priority):
         self.mPriority = priority
 
+
     def getCompleted(self):
         return self.mCompleted
 
+
     def hasCompleted(self):
         return self.mHasCompleted
+
 
     def finalise(self):
         # Do inherited
@@ -261,6 +274,43 @@ class PyCalendarVToDo(PyCalendarComponentRecur):
         if self.mHasCompleted:
             self.mCompleted = temp
 
+
+    def validate(self, doFix=False):
+        """
+        Validate the data in this component and optionally fix any problems, else raise. If
+        loggedProblems is not None it must be a C{list} and problem descriptions are appended
+        to that.
+        """
+
+        fixed, unfixed = super(PyCalendarVToDo, self).validate(doFix)
+
+        # Extra constraint: only one of DUE or DURATION
+        if self.hasProperty(definitions.cICalProperty_DUE) and self.hasProperty(definitions.cICalProperty_DURATION):
+            # Fix by removing the DURATION
+            logProblem = "[%s] Properties must not both be present: %s, %s" % (
+                self.getType(),
+                definitions.cICalProperty_DUE,
+                definitions.cICalProperty_DURATION,
+            )
+            if doFix:
+                self.removeProperties(definitions.cICalProperty_DURATION)
+                fixed.append(logProblem)
+            else:
+                unfixed.append(logProblem)
+
+        # Extra constraint: DTSTART must be present if DURATION is present
+        if self.hasProperty(definitions.cICalProperty_DURATION) and not self.hasProperty(definitions.cICalProperty_DTSTART):
+            # Cannot fix this one
+            logProblem = "[%s] Property must be present: %s with %s" % (
+                self.getType(),
+                definitions.cICalProperty_DTSTART,
+                definitions.cICalProperty_DURATION,
+            )
+            unfixed.append(logProblem)
+
+        return fixed, unfixed
+
+
     # Editing
     def editStatus(self, status):
         # Only if it is different
@@ -291,14 +341,26 @@ class PyCalendarVToDo(PyCalendarComponentRecur):
             prop = PyCalendarProperty(definitions.cICalProperty_STATUS, value)
             self.addProperty(prop)
 
+
     def editCompleted(self, completed):
         # Remove existing COMPLETED item
         self.removeProperties(definitions.cICalProperty_COMPLETED)
         self.mHasCompleted = False
 
         # Always UTC
-        self.mCompleted = PyCalendarDateTime(copyit=completed)
+        self.mCompleted = completed.duplicate()
         self.mCompleted.adjustToUTC()
         self.mHasCompleted = True
         prop = PyCalendarProperty(definitions.cICalProperty_STATUS_COMPLETED, self.mCompleted)
         self.addProperty(prop)
+
+
+    def sortedPropertyKeyOrder(self):
+        return (
+            definitions.cICalProperty_UID,
+            definitions.cICalProperty_RECURRENCE_ID,
+            definitions.cICalProperty_DTSTART,
+            definitions.cICalProperty_DURATION,
+            definitions.cICalProperty_DUE,
+            definitions.cICalProperty_COMPLETED,
+        )

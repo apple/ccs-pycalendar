@@ -1,12 +1,12 @@
 ##
-#    Copyright (c) 2007 Cyrus Daboo. All rights reserved.
-#    
+#    Copyright (c) 2007-2012 Cyrus Daboo. All rights reserved.
+#
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
 #    You may obtain a copy of the License at
-#    
+#
 #        http://www.apache.org/licenses/LICENSE-2.0
-#    
+#
 #    Unless required by applicable law or agreed to in writing, software
 #    distributed under the License is distributed on an "AS IS" BASIS,
 #    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -14,7 +14,7 @@
 #    limitations under the License.
 ##
 
-from datetime import PyCalendarDateTime
+from pycalendar.datetime import PyCalendarDateTime
 
 class PyCalendarComponentExpanded(object):
 
@@ -37,6 +37,7 @@ class PyCalendarComponentExpanded(object):
         else:
             return e1.mInstanceStart < e2.mInstanceStart
 
+
     @staticmethod
     def sort_by_dtstart(e1, e2):
         if e1.mInstanceStart == e2.mInstanceStart:
@@ -48,40 +49,55 @@ class PyCalendarComponentExpanded(object):
         else:
             return e1.mInstanceStart < e2.mInstanceStart
 
-    def __init__(self, owner=None, rid=None, copyit=None):
 
-        if owner is not None:
-            self.mOwner = owner
-            self.initFromOwner(rid)
-        elif copyit is not None:
-            self._copy_PyCalendarComponentExpanded(copyit)
+    def __init__(self, owner, rid):
+
+        self.mOwner = owner
+        self.initFromOwner(rid)
+
+
+    def duplicate(self):
+        other = PyCalendarComponentExpanded(self.mOwner, None)
+        other.mInstanceStart = self.mInstanceStart.duplicate()
+        other.mInstanceEnd = self.mInstanceEnd.duplicate()
+        other.mRecurring = self.mRecurring
+        return other
+
 
     def close(self):
         # Clean-up
         self.mOwner = None
 
+
     def getOwner(self):
         return self.mOwner
+
 
     def getMaster(self):
         return self.mOwner
 
+
     def getTrueMaster(self):
         return self.mOwner.getMaster()
+
 
     def getInstanceStart(self):
         return self.mInstanceStart
 
+
     def getInstanceEnd(self):
         return self.mInstanceEnd
 
+
     def recurring(self):
         return self.mRecurring
+
 
     def isNow(self):
         # Check instance start/end against current date-time
         now = PyCalendarDateTime.getNowUTC()
         return self.mInstanceStart <= now and self.mInstanceEnd > now
+
 
     def initFromOwner(self, rid):
         # There are four possibilities here:
@@ -116,7 +132,7 @@ class PyCalendarComponentExpanded(object):
             if self.mOwner.hasEnd():
                 self.mInstanceEnd = self.mInstanceStart + (self.mOwner.getEnd() - self.mOwner.getStart())
             else:
-                self.mInstanceEnd = PyCalendarDateTime(copyit=self.mInstanceStart)
+                self.mInstanceEnd = self.mInstanceStart.duplicate()
 
             self.mRecurring = True
 
@@ -140,9 +156,3 @@ class PyCalendarComponentExpanded(object):
             self.mInstanceEnd = self.mInstanceStart + (self.mOwner.getEnd() - self.mOwner.getStart())
 
             self.mRecurring = True
-
-    def _copy_ICalendarComponentExpanded(self, copy):
-        self.mOwner = copy.self.mOwner
-        self.mInstanceStart = PyCalendarDateTime(copyit=copy.mInstanceStart)
-        self.mInstanceEnd = PyCalendarDateTime(copyit=copy.mInstanceEnd)
-        self.mRecurring = copy.mRecurring

@@ -1,12 +1,12 @@
 ##
-#    Copyright (c) 2007 Cyrus Daboo. All rights reserved.
-#    
+#    Copyright (c) 2007-2012 Cyrus Daboo. All rights reserved.
+#
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
 #    You may obtain a copy of the License at
-#    
+#
 #        http://www.apache.org/licenses/LICENSE-2.0
-#    
+#
 #    Unless required by applicable law or agreed to in writing, software
 #    distributed under the License is distributed on an "AS IS" BASIS,
 #    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -14,10 +14,10 @@
 #    limitations under the License.
 ##
 
-import md5
+from hashlib import md5
 
 def strduptokenstr(txt, tokens):
-    
+
     result = None
     start = 0
 
@@ -32,7 +32,7 @@ def strduptokenstr(txt, tokens):
 
     # Handle quoted string
     if txt[start] == '\"':
-        
+
         maxlen = len(txt)
         # Punt leading quote
         start += 1
@@ -58,11 +58,33 @@ def strduptokenstr(txt, tokens):
         for relend, s in enumerate(txt[start:]):
             if s in tokens:
                 if relend:
-                    result = txt[start:start+relend]
+                    result = txt[start:start + relend]
                 else:
                     result = ""
-                return result, txt[start+relend:]
+                return result, txt[start + relend:]
         return txt[start:], ""
+
+
+
+def strtoul(s, offset=0):
+
+    max = len(s)
+    startoffset = offset
+    while offset < max:
+        if s[offset] in "0123456789":
+            offset += 1
+            continue
+        elif offset == 0:
+            raise ValueError
+        else:
+            return int(s[startoffset:offset]), offset
+    else:
+        if offset == 0:
+            raise ValueError
+        else:
+            return int(s[startoffset:]), offset
+
+
 
 def strindexfind(s, ss, default_index):
     if s and ss:
@@ -75,6 +97,8 @@ def strindexfind(s, ss, default_index):
 
     return default_index
 
+
+
 def strnindexfind(s, ss, default_index):
     if s and ss:
         i = 0
@@ -86,6 +110,8 @@ def strnindexfind(s, ss, default_index):
 
     return default_index
 
+
+
 def compareStringsSafe(s1, s2):
     if s1 is None and s2 is None:
         return True
@@ -93,6 +119,8 @@ def compareStringsSafe(s1, s2):
         return False
     else:
         return s1 == s2
+
+
 
 def md5digest(txt):
     return md5.new(txt).hexdigest()
