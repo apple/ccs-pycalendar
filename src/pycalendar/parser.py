@@ -43,6 +43,9 @@ class ParserContext(object):
     # Use this to fix v2 BASE64 to v3 ENCODING=b - only PARSER_FIX or PARSER_ALLOW
     VCARD_2_BASE64 = PARSER_FIX
 
+    # Allow DATE values when DATETIME specified (and vice versa)
+    INVALID_DATETIME_VALUE = PARSER_FIX
+
     # Allow slightly invalid DURATION values
     INVALID_DURATION_VALUE = PARSER_FIX
 
@@ -54,3 +57,18 @@ class ParserContext(object):
 
     # Remove \-escaping in URI values when parsing - only PARSER_FIX or PARSER_ALLOW
     BACKSLASH_IN_URI_VALUE = PARSER_FIX
+
+    @staticmethod
+    def allRaise():
+        """
+        Make all tests raise an error - never fix
+        """
+        ParserContext.INVALID_COLON_ESCAPE_SEQUENCE = ParserContext.PARSER_RAISE
+        ParserContext.INVALID_ESCAPE_SEQUENCES = ParserContext.PARSER_RAISE
+        ParserContext.BLANK_LINES_IN_DATA = ParserContext.PARSER_RAISE
+        ParserContext.VCARD_2_NO_PARAMETER_VALUES = ParserContext.PARSER_RAISE
+        ParserContext.VCARD_2_BASE64 = ParserContext.PARSER_RAISE
+        ParserContext.INVALID_DURATION_VALUE = ParserContext.PARSER_RAISE
+        ParserContext.INVALID_ADR_N_VALUES = ParserContext.PARSER_RAISE
+        ParserContext.INVALID_REQUEST_STATUS_VALUE = ParserContext.PARSER_RAISE
+        ParserContext.BACKSLASH_IN_URI_VALUE = ParserContext.PARSER_RAISE
