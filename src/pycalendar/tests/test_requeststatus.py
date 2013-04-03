@@ -1,5 +1,5 @@
 ##
-#    Copyright (c) 2011-2012 Cyrus Daboo. All rights reserved.
+#    Copyright (c) 2011-2013 Cyrus Daboo. All rights reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -42,6 +42,26 @@ class TestRequestStatus(unittest.TestCase):
 
         bad_value = "2.0\;Success"
         ok_value = "2.0;Success"
+
+        # Fix the value
+        oldContext = ParserContext.INVALID_REQUEST_STATUS_VALUE
+        ParserContext.INVALID_REQUEST_STATUS_VALUE = ParserContext.PARSER_FIX
+        req = PyCalendarRequestStatusValue()
+        req.parse(bad_value)
+        self.assertEqual(req.getText(), ok_value, "Failed to parse and re-generate '%s'" % (bad_value,))
+
+        # Raise the value
+        ParserContext.INVALID_REQUEST_STATUS_VALUE = ParserContext.PARSER_RAISE
+        req = PyCalendarRequestStatusValue()
+        self.assertRaises(ValueError, req.parse, bad_value)
+
+        ParserContext.INVALID_REQUEST_STATUS_VALUE = oldContext
+
+
+    def testTruncatedValue(self):
+
+        bad_value = "2.0"
+        ok_value = "2.0;"
 
         # Fix the value
         oldContext = ParserContext.INVALID_REQUEST_STATUS_VALUE

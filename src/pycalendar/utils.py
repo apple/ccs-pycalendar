@@ -1,5 +1,5 @@
 ##
-#    Copyright (c) 2007-2012 Cyrus Daboo. All rights reserved.
+#    Copyright (c) 2007-2013 Cyrus Daboo. All rights reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -255,7 +255,7 @@ def decodeParameterValue(value):
 
 
 # vCard text list parsing/generation
-def parseTextList(data, sep=';'):
+def parseTextList(data, sep=';', always_list=False):
     """
     Each element of the list has to be separately un-escaped
     """
@@ -272,7 +272,7 @@ def parseTextList(data, sep=';'):
 
     results.append(decodeTextValue("".join(item)))
 
-    return tuple(results) if len(results) > 1 else (results[0] if len(results) else "")
+    return tuple(results) if len(results) > 1 or always_list else (results[0] if len(results) else "")
 
 
 

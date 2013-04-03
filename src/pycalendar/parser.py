@@ -1,5 +1,5 @@
 ##
-#    Copyright (c) 2011-2012 Cyrus Daboo. All rights reserved.
+#    Copyright (c) 2011-2013 Cyrus Daboo. All rights reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -52,7 +52,7 @@ class ParserContext(object):
     # Truncate over long ADR and N values
     INVALID_ADR_N_VALUES = PARSER_FIX
 
-    # REQUEST-STATUS values with \; as the first separator
+    # REQUEST-STATUS values with \; as the first separator or single element
     INVALID_REQUEST_STATUS_VALUE = PARSER_FIX
 
     # Remove \-escaping in URI values when parsing - only PARSER_FIX or PARSER_ALLOW
@@ -72,3 +72,4 @@ class ParserContext(object):
         ParserContext.INVALID_ADR_N_VALUES = ParserContext.PARSER_RAISE
         ParserContext.INVALID_REQUEST_STATUS_VALUE = ParserContext.PARSER_RAISE
         ParserContext.BACKSLASH_IN_URI_VALUE = ParserContext.PARSER_RAISE
+        ParserContext.INVALID_REQUEST_STATUS = ParserContext.PARSER_RAISE

@@ -89,7 +89,6 @@ class TestProperty(unittest.TestCase):
             "FREEBUSY:20060226T120000Z/ABC",
             "SUMMARY:Some \\qtext",
             "RRULE:FREQ=MONTHLY;COUNT=3;BYDAY=TU,WE,VE;BYSETPOS=-1",
-            "REQUEST-STATUS:2.0,Success",
             "TZOFFSETFROM:-050",
             """ATTENDEE;CN="\\";CUTYPE=INDIVIDUAL;PARTSTAT=X-UNDELIVERABLE:invalid:nomai
  l""",

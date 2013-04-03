@@ -1,5 +1,5 @@
 ##
-#    Copyright (c) 2011-2012 Cyrus Daboo. All rights reserved.
+#    Copyright (c) 2011-2013 Cyrus Daboo. All rights reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -44,47 +44,40 @@ class PyCalendarRequestStatusValue(PyCalendarValue):
 
     def parse(self, data):
 
-        # Split fields based on ;
-        code, rest = data.split(";", 1)
+        result = utils.parseTextList(data, always_list=True)
+        if len(result) == 1:
+            if ParserContext.INVALID_REQUEST_STATUS_VALUE != ParserContext.PARSER_RAISE:
+                if ";" in result[0]:
+                    code, desc = result[0].split(";", 1)
+                else:
+                    code = result[0]
+                    desc = ""
+                rest = None
+            else:
+                raise ValueError
+        elif len(result) == 2:
+            code, desc = result
+            rest = None
+        elif len(result) == 3:
+            code, desc, rest = result
+        else:
+            if ParserContext.INVALID_REQUEST_STATUS_VALUE != ParserContext.PARSER_RAISE:
+                code, desc, rest = result[:3]
+            else:
+                raise ValueError
 
         if "\\" in code and ParserContext.INVALID_REQUEST_STATUS_VALUE in (ParserContext.PARSER_IGNORE, ParserContext.PARSER_FIX):
             code = code.replace("\\", "")
         elif ParserContext.INVALID_REQUEST_STATUS_VALUE == ParserContext.PARSER_RAISE:
             raise ValueError
 
-        # The next two items are text with possible \; sequences so we have to punt on those
-        desc = ""
-        semicolon = rest.find(";")
-        while semicolon != -1:
-            if rest[semicolon - 1] == "\\":
-                desc += rest[:semicolon + 1]
-                rest = rest[semicolon + 1:]
-                semicolon = rest.find(";")
-            else:
-                desc += rest[:semicolon]
-                rest = rest[semicolon + 1:]
-                break
-
-        if semicolon == -1:
-            desc += rest
-            rest = ""
-
         # Decoding required
-        self.mValue = [code, utils.decodeTextValue(desc), utils.decodeTextValue(rest) if rest else None]
+        self.mValue = [code, desc, rest, ] if rest else [code, desc, ]
 
 
     # os - StringIO object
     def generate(self, os):
-        try:
-            # Encoding required
-            utils.writeTextValue(os, self.mValue[0])
-            os.write(";")
-            utils.writeTextValue(os, self.mValue[1])
-            if len(self.mValue) == 3 and self.mValue[2]:
-                os.write(";")
-                utils.writeTextValue(os, self.mValue[2])
-        except:
-            pass
+        utils.generateTextList(os, self.mValue if len(self.mValue) < 3 or self.mValue[2] else self.mValue[:2])
 
 
     def writeXML(self, node, namespace):
