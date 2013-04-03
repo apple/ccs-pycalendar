@@ -1,5 +1,5 @@
 ##
-#    Copyright (c) 2007-2012 Cyrus Daboo. All rights reserved.
+#    Copyright (c) 2007-2013 Cyrus Daboo. All rights reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -35,5 +35,21 @@ class PyCalendarURIValue(PyCalendarPlainTextValue):
         else:
             # No decoding required
             self.mValue = data
+
+
+    # os - StringIO object
+    def generate(self, os):
+        """
+        Handle a client bug where it sometimes includes a \n in the value and we need
+        to make sure that gets encoded rather than included literally which would break syntax.
+        """
+        if '\n' in self.mValue:
+            try:
+                # No encoding required
+                os.write(self.mValue.replace("\n", "\\n"))
+            except:
+                pass
+        else:
+            super(PyCalendarURIValue, self).generate(os)
 
 PyCalendarValue.registerType(PyCalendarValue.VALUETYPE_URI, PyCalendarURIValue, xmldefs.value_uri)

@@ -1,5 +1,5 @@
 ##
-#    Copyright (c) 2007-2012 Cyrus Daboo. All rights reserved.
+#    Copyright (c) 2007-2013 Cyrus Daboo. All rights reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -50,6 +50,7 @@ class TestProperty(unittest.TestCase):
         # Various parameters
         "DTSTART;TZID=\"Somewhere, else\":20060226T120000",
         "ATTENDEE;PARTSTAT=ACCEPTED;ROLE=CHAIR:mailto:jdoe@example.com",
+        "X-APPLE-STRUCTURED-LOCATION;VALUE=URI;X-APPLE-ABUID=ab\\://Work;X-TITLE=\"10\\n XX S. XXX Dr.\\nSuite XXX\\nXX XX XXXXX\\nUnited States\":\"geo:11.111111,-11.111111\"",
 
         # Parameter escaping
         "ATTENDEE;CN=My ^'Test^' Name;ROLE=CHAIR:mailto:jdoe@example.com",
@@ -61,7 +62,7 @@ class TestProperty(unittest.TestCase):
         for data in TestProperty.test_data:
             prop = PyCalendarProperty()
             prop.parse(data)
-            propstr = str(prop)
+            propstr = str(prop).replace("\r\n ", "")
             self.assertEqual(propstr[:-2], data, "Failed parse/generate: %s to %s" % (data, propstr,))
 
 
