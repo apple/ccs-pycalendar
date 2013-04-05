@@ -197,14 +197,14 @@ def decodeTextValue(value):
 
 
 def encodeParameterValue(value):
+    """
+    RFC6868 parameter encoding.
+    """
 
     encoded = []
     last = ''
     for c in value:
-        if c == '\t':
-            encoded.append('^')
-            encoded.append('t')
-        elif c == '\r':
+        if c == '\r':
             encoded.append('^')
             encoded.append('n')
         elif c == '\n':
@@ -226,6 +226,9 @@ def encodeParameterValue(value):
 
 
 def decodeParameterValue(value):
+    """
+    RFC6868 parameter decoding.
+    """
 
     if value is None:
         return None
@@ -233,9 +236,7 @@ def decodeParameterValue(value):
     last = ''
     for c in value:
         if last == '^':
-            if c == 't':
-                decoded.append('\t')
-            elif c == 'n':
+            if c == 'n':
                 decoded.append('\n')
             elif c == '\'':
                 decoded.append('"')
