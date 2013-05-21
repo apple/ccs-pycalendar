@@ -71,6 +71,13 @@ class PyCalendarPeriod(ValueMixin):
                 or (self.mStart == comp.mStart) and self.mEnd < comp.mEnd
 
 
+    @classmethod
+    def parseText(cls, data):
+        period = cls()
+        period.parse(data)
+        return period
+
+
     def parse(self, data):
         splits = data.split('/', 1)
         if len(splits) == 2:
