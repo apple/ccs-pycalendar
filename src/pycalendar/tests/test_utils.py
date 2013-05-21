@@ -30,7 +30,7 @@ class TestUtils(unittest.TestCase):
             ("abc\ndef", "abc^ndef", None),
             ("abc\rdef", "abc^ndef", "abc\ndef"),
             ("abc\r\ndef", "abc^ndef", "abc\ndef"),
-            ("abc\n\tdef", "abc^n^tdef", None),
+            ("abc\n\tdef", "abc^n\tdef", None),
             ("abc^2", "abc^^2", None),
             ("^abc^", "^^abc^^", None),
         )

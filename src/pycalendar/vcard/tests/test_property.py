@@ -102,14 +102,14 @@ class TestProperty(unittest.TestCase):
         self.assertEqual(str(prop), "X-FOO;X-BAR=^'Check^':Test\r\n")
 
         prop.addAttribute(PyCalendarAttribute("X-BAR2", "Check\nThis\tOut\n"))
-        self.assertEqual(str(prop), "X-FOO;X-BAR=^'Check^';X-BAR2=Check^nThis^tOut^n:Test\r\n")
+        self.assertEqual(str(prop), "X-FOO;X-BAR=^'Check^';X-BAR2=Check^nThis\tOut^n:Test\r\n")
 
         data = "X-FOO;X-BAR=^'Check^':Test"
         prop = Property()
         prop.parse(data)
         self.assertEqual(prop.getAttributeValue("X-BAR"), "\"Check\"")
 
-        data = "X-FOO;X-BAR=^'Check^';X-BAR2=Check^nThis^tOut^n:Test"
+        data = "X-FOO;X-BAR=^'Check^';X-BAR2=Check^nThis\tOut^n:Test"
         prop = Property()
         prop.parse(data)
         self.assertEqual(prop.getAttributeValue("X-BAR"), "\"Check\"")
