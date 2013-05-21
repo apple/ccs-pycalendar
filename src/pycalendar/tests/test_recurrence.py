@@ -14,6 +14,8 @@
 #    limitations under the License.
 ##
 
+from pycalendar.datetime import PyCalendarDateTime
+from pycalendar.period import PyCalendarPeriod
 from pycalendar.recurrence import PyCalendarRecurrence
 import unittest
 
@@ -111,3 +113,28 @@ class TestRecurrence(unittest.TestCase):
         hashes.sort()
         for i in range(1, len(hashes)):
             self.assertNotEqual(hashes[i - 1], hashes[i])
+
+
+    def testByWeekNoExpand(self):
+
+        recur = PyCalendarRecurrence()
+        recur.parse("FREQ=YEARLY;BYWEEKNO=1,2")
+        start = PyCalendarDateTime(2013, 1, 1, 0, 0, 0)
+        end = PyCalendarDateTime(2017, 1, 1, 0, 0, 0)
+        items = []
+        range = PyCalendarPeriod(start, end)
+        recur.expand(start, range, items)
+        self.assertEqual(
+            items,
+            [
+                PyCalendarDateTime(2013, 1, 1, 0, 0, 0),
+                PyCalendarDateTime(2013, 1, 8, 0, 0, 0),
+                PyCalendarDateTime(2014, 1, 1, 0, 0, 0),
+                PyCalendarDateTime(2014, 1, 8, 0, 0, 0),
+                PyCalendarDateTime(2015, 1, 1, 0, 0, 0),
+                PyCalendarDateTime(2015, 1, 8, 0, 0, 0),
+                PyCalendarDateTime(2016, 1, 8, 0, 0, 0),
+                PyCalendarDateTime(2016, 1, 15, 0, 0, 0),
+            ],
+        )
+        print items

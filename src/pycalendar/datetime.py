@@ -412,35 +412,71 @@ class PyCalendarDateTime(ValueMixin):
 
 
     def setWeekNo(self, weekno):
-        # This is the iso 8601 week number definition
+        """
+        Set the current date to one with the same day of the week in the current year with the
+        specified week number. Note this might cause the year to shift backwards or forwards
+        if the date is at the boundary between two years.
 
-        # What day does the current year start on
+        @param weekno: the week number to set (currently must be positive)
+        @type weekno: C{int}
+        """
+
+        # Don't both if already correct
+        if self.getWeekNo() == weekno:
+            return
+
+        # What day does the current year start on, and diff that with the current day
         temp = PyCalendarDateTime(year=self.mYear, month=1, day=1)
         first_day = temp.getDayOfWeek()
+        current_day = self.getDayOfWeek()
 
-        # Calculate and set yearday for start of week
-        if (first_day == PyCalendarDateTime.SUNDAY) or (first_day == PyCalendarDateTime.MONDAY) or \
-            (first_day == PyCalendarDateTime.TUESDAY) or (first_day == PyCalendarDateTime.WEDNESDAY) or (first_day == PyCalendarDateTime.THURSDAY):
-            self.setYearDay((weekno - 1) * 7 - first_day)
-        elif (first_day == PyCalendarDateTime.FRIDAY) or (first_day == PyCalendarDateTime.SATURDAY):
-            self.setYearDay((weekno - 1) * 7 - first_day + 7)
+        # Calculate and set yearday for start of week. The first week is the one that contains at least
+        # four days (with week start defaulting to MONDAY), so that means the 1st of January would fall
+        # on MO, TU, WE, TH.
+        if first_day in (PyCalendarDateTime.MONDAY, PyCalendarDateTime.TUESDAY, PyCalendarDateTime.WEDNESDAY, PyCalendarDateTime.THURSDAY):
+            year_day = (weekno - 1) * 7 + current_day - first_day
+        else:
+            year_day = weekno * 7 + current_day - first_day
+
+        # It is possible we have a negative offset which means go back to the prior year as part of
+        # week #1 exists at the end of that year.
+        if year_day < 0:
+            self.offsetYear(-1)
+        else:
+            year_day += 1
+        self.setYearDay(year_day)
 
 
     def getWeekNo(self):
-        # This is the iso 8601 week number definition
+        """
+        Return the ISO week number for the current date.
+        """
 
         # What day does the current year start on
         temp = PyCalendarDateTime(year=self.mYear, month=1, day=1)
         first_day = temp.getDayOfWeek()
+        if first_day == 0:
+            first_day = 7
+        current_day = self.getDayOfWeek()
+        if current_day == 0:
+            current_day = 7
 
-        # Get days upto the current one
-        yearday = self.getYearDay()
+        # This arithmetic uses the ISO day of week (1-7) and the year day to get the week number
+        week_no = (self.getYearDay() - current_day + 10) / 7
 
-        if (first_day == PyCalendarDateTime.SUNDAY) or (first_day == PyCalendarDateTime.MONDAY) or \
-            (first_day == PyCalendarDateTime.TUESDAY) or (first_day == PyCalendarDateTime.WEDNESDAY) or (first_day == PyCalendarDateTime.THURSDAY):
-            return (yearday + first_day) / 7 + 1
-        elif (first_day == PyCalendarDateTime.FRIDAY) or (first_day == PyCalendarDateTime.SATURDAY):
-            return (yearday + first_day - 7) / 7 + 1
+        # Might need to adjust forward/backwards based on year boundaries
+        if week_no == 0:
+            # Last week of previous year
+            temp = PyCalendarDateTime(year=self.mYear - 1, month=12, day=31)
+            week_no = temp.getWeekNo()
+        elif week_no == 53:
+            # Might be first week of next year
+            temp = PyCalendarDateTime(year=self.mYear + 1, month=1, day=1)
+            first_day = temp.getDayOfWeek()
+            if first_day in (PyCalendarDateTime.MONDAY, PyCalendarDateTime.TUESDAY, PyCalendarDateTime.WEDNESDAY, PyCalendarDateTime.THURSDAY):
+                week_no = 1
+
+        return week_no
 
 
     def isWeekNo(self, weekno):

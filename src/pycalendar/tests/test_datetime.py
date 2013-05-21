@@ -322,3 +322,51 @@ END:VCALENDAR
         self.assertTrue(dt2.mPosixTimeCached)
         self.assertEqual(dt2.mPosixTime, dt.mPosixTime)
         self.assertEqual(dt2.mTZOffset, 0)
+
+
+    def testSetWeekNo(self):
+
+        dt = PyCalendarDateTime(2013, 1, 1, 0, 0, 0, tzid=PyCalendarTimezone(utc=True))
+        self.assertEqual(dt.getWeekNo(), 1)
+        dt.setWeekNo(1)
+        self.assertEqual(dt, PyCalendarDateTime(2013, 1, 1, 0, 0, 0, tzid=PyCalendarTimezone(utc=True)))
+        self.assertEqual(dt.getWeekNo(), 1)
+
+        dt = PyCalendarDateTime(2013, 1, 1, 0, 0, 0, tzid=PyCalendarTimezone(utc=True))
+        self.assertEqual(dt.getWeekNo(), 1)
+        dt.setWeekNo(2)
+        self.assertEqual(dt, PyCalendarDateTime(2013, 1, 8, 0, 0, 0, tzid=PyCalendarTimezone(utc=True)))
+        self.assertEqual(dt.getWeekNo(), 2)
+
+        dt = PyCalendarDateTime(2013, 1, 8, 0, 0, 0, tzid=PyCalendarTimezone(utc=True))
+        self.assertEqual(dt.getWeekNo(), 2)
+        dt.setWeekNo(1)
+        self.assertEqual(dt, PyCalendarDateTime(2013, 1, 1, 0, 0, 0, tzid=PyCalendarTimezone(utc=True)))
+        self.assertEqual(dt.getWeekNo(), 1)
+
+        dt = PyCalendarDateTime(2014, 1, 7, 0, 0, 0, tzid=PyCalendarTimezone(utc=True))
+        self.assertEqual(dt.getWeekNo(), 2)
+        dt.setWeekNo(1)
+        self.assertEqual(dt, PyCalendarDateTime(2013, 12, 31, 0, 0, 0, tzid=PyCalendarTimezone(utc=True)))
+        self.assertEqual(dt.getWeekNo(), 1)
+
+        dt = PyCalendarDateTime(2012, 12, 31, 0, 0, 0, tzid=PyCalendarTimezone(utc=True))
+        self.assertEqual(dt.getWeekNo(), 1)
+        dt.setWeekNo(1)
+        self.assertEqual(dt, PyCalendarDateTime(2012, 12, 31, 0, 0, 0, tzid=PyCalendarTimezone(utc=True)))
+        self.assertEqual(dt.getWeekNo(), 1)
+
+        dt = PyCalendarDateTime(2016, 1, 1, 0, 0, 0, tzid=PyCalendarTimezone(utc=True))
+        self.assertEqual(dt.getWeekNo(), 53)
+        dt.setWeekNo(1)
+        self.assertEqual(dt, PyCalendarDateTime(2016, 1, 8, 0, 0, 0, tzid=PyCalendarTimezone(utc=True)))
+        self.assertEqual(dt.getWeekNo(), 1)
+        dt.setWeekNo(2)
+        self.assertEqual(dt, PyCalendarDateTime(2016, 1, 15, 0, 0, 0, tzid=PyCalendarTimezone(utc=True)))
+        self.assertEqual(dt.getWeekNo(), 2)
+
+        dt = PyCalendarDateTime(2016, 1, 8, 0, 0, 0, tzid=PyCalendarTimezone(utc=True))
+        self.assertEqual(dt.getWeekNo(), 1)
+        dt.setWeekNo(1)
+        self.assertEqual(dt, PyCalendarDateTime(2016, 1, 8, 0, 0, 0, tzid=PyCalendarTimezone(utc=True)))
+        self.assertEqual(dt.getWeekNo(), 1)

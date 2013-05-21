@@ -884,7 +884,6 @@ class PyCalendarRecurrence(ValueMixin):
                 float_until.offsetSeconds(float_offset)
 
         # Always add the initial instance DTSTART
-        items.append(start.duplicate())
         if self.mUseCount:
             # Bump counter and exit if over
             ctr += 1
