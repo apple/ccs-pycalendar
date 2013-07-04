@@ -266,12 +266,18 @@ class PyCalendarRecurrence(ValueMixin):
         return True
 
 
+    def _setAndclearIfChanged(self, attr, value):
+        if getattr(self, attr) != value:
+            self.clear()
+            setattr(self, attr, value)
+
+
     def getFreq(self):
         return self.mFreq
 
 
     def setFreq(self, freq):
-        self.mFreq = freq
+        self._setAndclearIfChanged("mFreq", freq)
 
 
     def getUseUntil(self):
@@ -279,7 +285,7 @@ class PyCalendarRecurrence(ValueMixin):
 
 
     def setUseUntil(self, use_until):
-        self.mUseUntil = use_until
+        self._setAndclearIfChanged("mUseUntil", use_until)
 
 
     def getUntil(self):
@@ -287,7 +293,7 @@ class PyCalendarRecurrence(ValueMixin):
 
 
     def setUntil(self, until):
-        self.mUntil = until
+        self._setAndclearIfChanged("mUntil", until)
 
 
     def getUseCount(self):
@@ -295,7 +301,7 @@ class PyCalendarRecurrence(ValueMixin):
 
 
     def setUseCount(self, use_count):
-        self.mUseCount = use_count
+        self._setAndclearIfChanged("mUseCount", use_count)
 
 
     def getCount(self):
@@ -303,7 +309,7 @@ class PyCalendarRecurrence(ValueMixin):
 
 
     def setCount(self, count):
-        self.mCount = count
+        self._setAndclearIfChanged("mCount", count)
 
 
     def getInterval(self):
@@ -311,7 +317,7 @@ class PyCalendarRecurrence(ValueMixin):
 
 
     def setInterval(self, interval):
-        self.mInterval = interval
+        self._setAndclearIfChanged("mInterval", interval)
 
 
     def getByMonth(self):
@@ -319,7 +325,7 @@ class PyCalendarRecurrence(ValueMixin):
 
 
     def setByMonth(self, by):
-        self.mByMonth = by[:]
+        self._setAndclearIfChanged("mByMonth", by[:])
 
 
     def getByMonthDay(self):
@@ -327,7 +333,7 @@ class PyCalendarRecurrence(ValueMixin):
 
 
     def setByMonthDay(self, by):
-        self.mByMonthDay = by[:]
+        self._setAndclearIfChanged("mByMonthDay", by[:])
 
 
     def getByYearDay(self):
@@ -335,7 +341,7 @@ class PyCalendarRecurrence(ValueMixin):
 
 
     def setByYearDay(self, by):
-        self.mByYearDay = by[:]
+        self._setAndclearIfChanged("mByYearDay", by[:])
 
 
     def getByDay(self):
@@ -343,7 +349,7 @@ class PyCalendarRecurrence(ValueMixin):
 
 
     def setByDay(self, by):
-        self.mByDay = by[:]
+        self._setAndclearIfChanged("mByDay", by[:])
 
 
     def getBySetPos(self):
@@ -351,7 +357,7 @@ class PyCalendarRecurrence(ValueMixin):
 
 
     def setBySetPos(self, by):
-        self.mBySetPos = by
+        self._setAndclearIfChanged("mBySetPos", by[:])
 
 
     def parse(self, data):
@@ -734,7 +740,7 @@ class PyCalendarRecurrence(ValueMixin):
     def isAdvancedRule(self):
         # One that has BYMONTH,
         # BYMONTHDAY (with no negative value),
-        # BYDAY (with multiple unumbered, or numbered with all the same number
+        # BYDAY (with multiple unnumbered, or numbered with all the same number
         # (1..4, -2, -1)
         # BYSETPOS with +1, or -1 only
         # no others
@@ -979,7 +985,7 @@ class PyCalendarRecurrence(ValueMixin):
 
     # Exclude dates on or after the chosen one
     def excludeFutureRecurrence(self, exclude):
-        # Expand the rule upto the exclude date
+        # Expand the rule up to the exclude date
         items = []
         period = PyCalendarPeriod()
         period.init(self.mCacheStart, exclude)
