@@ -138,3 +138,24 @@ class TestRecurrence(unittest.TestCase):
             ],
         )
         print items
+
+
+    def testClearOnChange(self):
+
+        recur = PyCalendarRecurrence()
+        recur.parse("FREQ=DAILY")
+
+        start = PyCalendarDateTime(2013, 1, 1, 0, 0, 0)
+        end = PyCalendarDateTime(2017, 1, 1, 0, 0, 0)
+        range = PyCalendarPeriod(start, end)
+        items = []
+        recur.expand(start, range, items)
+        self.assertTrue(recur.mCached)
+        self.assertTrue(len(items) > 100)
+
+        recur.setUseCount(True)
+        recur.setCount(10)
+        self.assertFalse(recur.mCached)
+        items = []
+        recur.expand(start, range, items)
+        self.assertEqual(len(items), 10)

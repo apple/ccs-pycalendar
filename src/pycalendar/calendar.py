@@ -147,6 +147,33 @@ class PyCalendar(PyCalendarComponentBase):
         return result
 
 
+    def changeUID(self, oldUID, newUID):
+        """
+        Change the UID of all components with a matching UID to a new value. We need to
+        do this at the calendar level because this object maintains mappings based on UID
+        which need to be updated whenever the UID changes.
+
+        @param oldUID: the old value to match
+        @type oldUID: C{str}
+        @param newUID: the new value to match
+        @type newUID: C{str}
+        """
+
+        # Each component
+        for component in self.mComponents:
+            if component.getUID() == oldUID:
+                component.setUID(newUID)
+
+        # Maps
+        if oldUID in self.mOverriddenComponentsByUID:
+            self.mOverriddenComponentsByUID[newUID] = self.mOverriddenComponentsByUID[oldUID]
+            del self.mOverriddenComponentsByUID[oldUID]
+        for ctype in self.mMasterComponentsByTypeAndUID:
+            if oldUID in self.mMasterComponentsByTypeAndUID[ctype]:
+                self.mMasterComponentsByTypeAndUID[ctype][newUID] = self.mMasterComponentsByTypeAndUID[ctype][oldUID]
+                del self.mMasterComponentsByTypeAndUID[ctype][oldUID]
+
+
     def finalise(self):
         # Get calendar name if present
 
