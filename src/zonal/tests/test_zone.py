@@ -17,7 +17,7 @@
 import unittest
 from zonal.zone import Zone
 from zonal.rule import RuleSet
-from pycalendar.calendar import PyCalendar
+from pycalendar.icalendar.calendar import Calendar
 
 class TestZone(unittest.TestCase):
 
@@ -92,7 +92,7 @@ END:VTIMEZONE
         ruleset.parse(rules)
         rules = {ruleset.name: ruleset}
 
-        cal = PyCalendar()
+        cal = Calendar()
         vtz = zone.vtimezone(cal, rules, 2006, 2011)
 
         self.assertEqual(str(vtz), result)

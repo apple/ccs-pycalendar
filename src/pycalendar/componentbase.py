@@ -15,14 +15,13 @@
 ##
 
 from cStringIO import StringIO
-from pycalendar import xmldefs
-from pycalendar.datetimevalue import PyCalendarDateTimeValue
-from pycalendar.periodvalue import PyCalendarPeriodValue
-from pycalendar.property import PyCalendarProperty
-from pycalendar.value import PyCalendarValue
+from pycalendar import xmldefinitions, xmlutils
+from pycalendar.datetimevalue import DateTimeValue
+from pycalendar.periodvalue import PeriodValue
+from pycalendar.value import Value
 import xml.etree.cElementTree as XML
 
-class PyCalendarComponentBase(object):
+class ComponentBase(object):
 
     # These are class attributes for sets of properties for testing cardinality constraints. The sets
     # must contain property names.
@@ -34,6 +33,9 @@ class PyCalendarComponentBase(object):
     propertyValueChecks = None  # Either iCalendar or vCard validation
 
     sortSubComponents = True
+
+    sComponentType = None
+    sPropertyType = None
 
     def __init__(self, parent=None):
         self.mParentComponent = parent
@@ -70,7 +72,7 @@ class PyCalendarComponentBase(object):
 
 
     def __eq__(self, other):
-        if not isinstance(other, PyCalendarComponentBase):
+        if not isinstance(other, ComponentBase):
             return False
         return self.getType() == other.getType() and self.compareProperties(other) and self.compareComponents(other)
 
@@ -276,7 +278,7 @@ class PyCalendarComponentBase(object):
             elif self.countProperty(propname) == 0: # Possibly fix by adding empty property
                 logProblem = "[%s] Missing required property: %s" % (self.getType(), propname)
                 if doFix:
-                    self.addProperty(PyCalendarProperty(propname, ""))
+                    self.addProperty(self.sPropertyType(propname, ""))
                     fixed.append(logProblem)
                 else:
                     unfixed.append(logProblem)
@@ -337,7 +339,7 @@ class PyCalendarComponentBase(object):
     def writeXML(self, node, namespace):
 
         # Component element
-        comp = XML.SubElement(node, xmldefs.makeTag(namespace, self.getType()))
+        comp = XML.SubElement(node, xmlutils.makeTag(namespace, self.getType()))
 
         # Each property
         self.writePropertiesXML(comp, namespace)
@@ -348,7 +350,7 @@ class PyCalendarComponentBase(object):
 
     def writeXMLFiltered(self, node, namespace, filter):
         # Component element
-        comp = XML.SubElement(node, xmldefs.makeTag(namespace, self.getType()))
+        comp = XML.SubElement(node, xmlutils.makeTag(namespace, self.getType()))
 
         # Each property
         self.writePropertiesFilteredXML(comp, namespace, filter)
@@ -407,7 +409,7 @@ class PyCalendarComponentBase(object):
     def writeComponentsXML(self, node, namespace):
 
         if self.mComponents:
-            comps = XML.SubElement(node, xmldefs.makeTag(namespace, xmldefs.components))
+            comps = XML.SubElement(node, xmlutils.makeTag(namespace, xmldefinitions.components))
 
             # Write out the remainder
             for component in self.sortedComponents():
@@ -417,7 +419,7 @@ class PyCalendarComponentBase(object):
     def writeComponentsFilteredXML(self, node, namespace, filter):
 
         if self.mComponents:
-            comps = XML.SubElement(node, xmldefs.makeTag(namespace, xmldefs.components))
+            comps = XML.SubElement(node, xmlutils.makeTag(namespace, xmldefinitions.components))
 
             # Shortcut for all sub-components
             if filter.isAllSubComponents():
@@ -426,7 +428,7 @@ class PyCalendarComponentBase(object):
                 for subcomp in self.sortedcomponents():
                     subfilter = filter.getSubComponentFilter(subcomp.getType())
                     if subfilter is not None:
-                        subcomp.writeFilteredXML(comps, namespace, subfilter)
+                        subcomp.writeXMLFiltered(comps, namespace, subfilter)
 
 
     def loadValue(self, value_name):
@@ -439,18 +441,18 @@ class PyCalendarComponentBase(object):
     def loadValueInteger(self, value_name, type=None):
         if type:
             if self.hasProperty(value_name):
-                if type == PyCalendarValue.VALUETYPE_INTEGER:
+                if type == Value.VALUETYPE_INTEGER:
                     ivalue = self.findFirstProperty(value_name).getIntegerValue()
                     if ivalue is not None:
                         return ivalue.getValue()
-                elif type == PyCalendarValue.VALUETYPE_UTC_OFFSET:
+                elif type == Value.VALUETYPE_UTC_OFFSET:
                     uvalue = self.findFirstProperty(value_name).getUTCOffsetValue()
                     if (uvalue is not None):
                         return uvalue.getValue()
 
             return None
         else:
-            return self.loadValueInteger(value_name, PyCalendarValue.VALUETYPE_INTEGER)
+            return self.loadValueInteger(value_name, Value.VALUETYPE_INTEGER)
 
 
     def loadValueString(self, value_name):
@@ -513,12 +515,12 @@ class PyCalendarComponentBase(object):
                 if (mvalue is not None):
                     for obj in mvalue.getValues():
                         # cast to date-time
-                        if isinstance(obj, PyCalendarDateTimeValue):
+                        if isinstance(obj, DateTimeValue):
                             if add:
                                 value.addDT(obj.getValue())
                             else:
                                 value.subtractDT(obj.getValue())
-                        elif isinstance(obj, PyCalendarPeriodValue):
+                        elif isinstance(obj, PeriodValue):
                             if add:
                                 value.addPeriod(obj.getValue().getStart())
                             else:
@@ -573,7 +575,7 @@ class PyCalendarComponentBase(object):
 
     def writePropertiesXML(self, node, namespace):
 
-        properties = XML.SubElement(node, xmldefs.makeTag(namespace, xmldefs.properties))
+        properties = XML.SubElement(node, xmlutils.makeTag(namespace, xmldefinitions.properties))
 
         # Sort properties by name
         keys = self.sortedPropertyKeys()
@@ -585,7 +587,7 @@ class PyCalendarComponentBase(object):
 
     def writePropertiesFilteredXML(self, node, namespace, filter):
 
-        props = XML.SubElement(node, xmldefs.makeTag(namespace, xmldefs.properties))
+        props = XML.SubElement(node, xmlutils.makeTag(namespace, xmldefinitions.properties))
 
         # Sort properties by name
         keys = self.sortedPropertyKeys()
@@ -598,7 +600,7 @@ class PyCalendarComponentBase(object):
         elif filter.hasPropertyFilters():
             for key in keys:
                 for prop in self.getProperties(key):
-                    prop.writeFilteredXML(props, namespace, filter)
+                    prop.writeXMLFiltered(props, namespace, filter)
 
 
     def loadPrivateValue(self, value_name):
@@ -611,7 +613,7 @@ class PyCalendarComponentBase(object):
 
 
     def writePrivateProperty(self, os, key, value):
-        prop = PyCalendarProperty(name=key, value=value)
+        prop = self.sPropertyType(name=key, value=value)
         prop.generate(os)
 
 
@@ -622,4 +624,4 @@ class PyCalendarComponentBase(object):
 
         # Now create properties
         if propvalue:
-            self.addProperty(PyCalendarProperty(name=propname, value=propvalue))
+            self.addProperty(self.sPropertyType(name=propname, value=propvalue))

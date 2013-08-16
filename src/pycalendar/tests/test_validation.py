@@ -14,7 +14,7 @@
 #    limitations under the License.
 ##
 
-from pycalendar.property import PyCalendarProperty
+from pycalendar.icalendar.property import Property
 from pycalendar.validation import partial, PropertyValueChecks
 import unittest
 
@@ -40,7 +40,7 @@ class TestValidation(unittest.TestCase):
         )
 
         for prop, test, result in props:
-            property = PyCalendarProperty()
+            property = Property()
             property.parse(prop)
             self.assertEqual(PropertyValueChecks.stringValue(test, property), result)
 
@@ -55,7 +55,7 @@ class TestValidation(unittest.TestCase):
         )
 
         for prop, result in props:
-            property = PyCalendarProperty()
+            property = Property()
             property.parse(prop)
             self.assertEqual(PropertyValueChecks.alwaysUTC(property), result)
 
@@ -72,7 +72,7 @@ class TestValidation(unittest.TestCase):
         )
 
         for prop, low, high, result in props:
-            property = PyCalendarProperty()
+            property = Property()
             property.parse(prop)
             self.assertEqual(PropertyValueChecks.numericRange(low, high, property), result)
 
@@ -87,6 +87,6 @@ class TestValidation(unittest.TestCase):
         )
 
         for prop, result in props:
-            property = PyCalendarProperty()
+            property = Property()
             property.parse(prop)
             self.assertEqual(PropertyValueChecks.positiveIntegerOrZero(property), result)

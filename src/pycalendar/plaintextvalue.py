@@ -14,11 +14,11 @@
 #    limitations under the License.
 ##
 
-# iCalendar UTC Offset value
+# iCalendar generic text-like value
 
-from pycalendar.value import PyCalendarValue
+from pycalendar.value import Value
 
-class PyCalendarPlainTextValue(PyCalendarValue):
+class PlainTextValue(Value):
 
     def __init__(self, value=''):
         self.mValue = value
@@ -28,7 +28,7 @@ class PyCalendarPlainTextValue(PyCalendarValue):
         return self.__class__(self.mValue)
 
 
-    def parse(self, data):
+    def parse(self, data, variant):
         # No decoding required
         self.mValue = data
 

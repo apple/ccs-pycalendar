@@ -18,7 +18,7 @@
 from __future__ import with_statement
 
 from difflib import unified_diff
-from pycalendar.calendar import PyCalendar
+from pycalendar.icalendar.calendar import Calendar
 import cStringIO as StringIO
 import getopt
 import os
@@ -126,7 +126,7 @@ class tzconvert(object):
         Generate iCalendar data for all VTIMEZONEs or just those specified
         """
 
-        cal = PyCalendar()
+        cal = Calendar()
         for zone in self.zones.itervalues():
             if filterzones and zone.name not in filterzones:
                 continue
@@ -151,7 +151,7 @@ class tzconvert(object):
         for zone in self.zones.itervalues():
             if filterzones and zone.name not in filterzones:
                 continue
-            cal = PyCalendar()
+            cal = Calendar()
             vtz = zone.vtimezone(cal, self.rules, minYear, maxYear)
             cal.addComponent(vtz)
 
@@ -251,7 +251,7 @@ if __name__ == '__main__':
     if len(args) == 1:
         rootdir = os.path.expanduser(args[0])
 
-    PyCalendar.sProdID = prodid
+    Calendar.sProdID = prodid
 
     zonedir = os.path.join(rootdir, "tzdata")
     zonefiles = (
@@ -284,14 +284,14 @@ if __name__ == '__main__':
         ))
 
         icsdir = "../2008i/zoneinfo"
-        cal = PyCalendar()
+        cal = Calendar()
         for file in (checkName,):
             fin = open(os.path.join(icsdir, file + ".ics"), "r")
             cal.parse(fin)
 
         for vtz in cal.getVTimezoneDB():
-            #from pycalendar.vtimezoneelement import PyCalendarVTimezoneElement
-            #vtz.mEmbedded.sort(PyCalendarVTimezoneElement.sort_dtstart)
+            #from pycalendar.vtimezoneelement import VTimezoneElement
+            #vtz.mEmbedded.sort(VTimezoneElement.sort_dtstart)
             for embedded in vtz.mEmbedded:
                 embedded.finalise()
             vtz.finalise()

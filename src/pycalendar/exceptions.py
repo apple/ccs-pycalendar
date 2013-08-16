@@ -14,7 +14,7 @@
 #    limitations under the License.
 ##
 
-class PyCalendarError(Exception):
+class ErrorBase(Exception):
 
     def __init__(self, reason, data=""):
         self.mReason = reason
@@ -22,22 +22,22 @@ class PyCalendarError(Exception):
 
 
 
-class PyCalendarInvalidData(PyCalendarError):
+class InvalidData(ErrorBase):
     pass
 
 
 
-class PyCalendarInvalidProperty(PyCalendarError):
+class InvalidProperty(ErrorBase):
     pass
 
 
 
-class PyCalendarValidationError(PyCalendarError):
+class ValidationError(ErrorBase):
     pass
 
 
 
-class PyCalendarNoTimezoneInDatabase(Exception):
+class NoTimezoneInDatabase(Exception):
 
     def __init__(self, dbpath, tzid):
         self.mTZDBpath = dbpath

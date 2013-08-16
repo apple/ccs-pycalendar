@@ -15,9 +15,9 @@
 ##
 
 from cStringIO import StringIO
-from pycalendar.componentbase import PyCalendarComponentBase
-from pycalendar.exceptions import PyCalendarInvalidData, \
-    PyCalendarValidationError
+from pycalendar.componentbase import ComponentBase
+from pycalendar.exceptions import InvalidData, \
+    ValidationError
 from pycalendar.parser import ParserContext
 from pycalendar.utils import readFoldedLine
 from pycalendar.vcard import definitions
@@ -26,10 +26,13 @@ from pycalendar.vcard.definitions import VCARD, Property_VERSION, \
 from pycalendar.vcard.property import Property
 from pycalendar.vcard.validation import VCARD_VALUE_CHECKS
 
-class Card(PyCalendarComponentBase):
+class Card(ComponentBase):
 
     sProdID = "-//mulberrymail.com//Mulberry v4.0//EN"
     sDomain = "mulberrymail.com"
+
+    sComponentType = None
+    sPropertyType = Property
 
     @staticmethod
     def setPRODID(prodid):
@@ -88,7 +91,7 @@ class Card(PyCalendarComponentBase):
         # Optional raise behavior
         fixed, unfixed = super(Card, self).validate(doFix)
         if doRaise and unfixed:
-            raise PyCalendarValidationError(";".join(unfixed))
+            raise ValidationError(";".join(unfixed))
         return fixed, unfixed
 
 
@@ -129,11 +132,11 @@ class Card(PyCalendarComponentBase):
                 elif len(line) == 0:
                     # Raise if requested, otherwise just ignore
                     if ParserContext.BLANK_LINES_IN_DATA == ParserContext.PARSER_RAISE:
-                        raise PyCalendarInvalidData("vCard data has blank lines")
+                        raise InvalidData("vCard data has blank lines")
 
                 # Unrecognized data
                 else:
-                    raise PyCalendarInvalidData("vCard data not recognized", line)
+                    raise InvalidData("vCard data not recognized", line)
 
             elif state == GET_PROPERTY:
 
@@ -145,7 +148,7 @@ class Card(PyCalendarComponentBase):
 
                     # Validate some things
                     if not card.hasProperty("VERSION"):
-                        raise PyCalendarInvalidData("vCard missing VERSION", "")
+                        raise InvalidData("vCard missing VERSION", "")
 
                     results.append(card)
 
@@ -157,24 +160,24 @@ class Card(PyCalendarComponentBase):
                 elif len(line) == 0:
                     # Raise if requested, otherwise just ignore
                     if ParserContext.BLANK_LINES_IN_DATA == ParserContext.PARSER_RAISE:
-                        raise PyCalendarInvalidData("vCard data has blank lines")
+                        raise InvalidData("vCard data has blank lines")
 
                 # Must be a property
                 else:
 
-                    # Parse attribute/value for top-level calendar item
+                    # Parse parameter/value for top-level calendar item
                     prop = Property()
                     if prop.parse(line):
 
                         # Check for valid property
                         if not card.validProperty(prop):
-                            raise PyCalendarInvalidData("Invalid property", str(prop))
+                            raise InvalidData("Invalid property", str(prop))
                         else:
                             card.addProperty(prop)
 
         # Check for truncated data
         if state != LOOK_FOR_VCARD:
-            raise PyCalendarInvalidData("vCard data not complete")
+            raise InvalidData("vCard data not complete")
 
         return results
 
@@ -220,11 +223,11 @@ class Card(PyCalendarComponentBase):
                 elif len(line) == 0:
                     # Raise if requested, otherwise just ignore
                     if ParserContext.BLANK_LINES_IN_DATA == ParserContext.PARSER_RAISE:
-                        raise PyCalendarInvalidData("vCard data has blank lines")
+                        raise InvalidData("vCard data has blank lines")
 
                 # Unrecognized data
                 else:
-                    raise PyCalendarInvalidData("vCard data not recognized", line)
+                    raise InvalidData("vCard data not recognized", line)
 
             elif state == GET_PROPERTY:
 
@@ -241,19 +244,19 @@ class Card(PyCalendarComponentBase):
                 elif len(line) == 0:
                     # Raise if requested, otherwise just ignore
                     if ParserContext.BLANK_LINES_IN_DATA == ParserContext.PARSER_RAISE:
-                        raise PyCalendarInvalidData("vCard data has blank lines")
+                        raise InvalidData("vCard data has blank lines")
 
                 # Must be a property
                 else:
 
-                    # Parse attribute/value for top-level calendar item
+                    # Parse parameter/value for top-level calendar item
                     prop = Property()
                     try:
                         if prop.parse(line):
 
                             # Check for valid property
                             if not self.validProperty(prop):
-                                raise PyCalendarInvalidData("Invalid property", str(prop))
+                                raise InvalidData("Invalid property", str(prop))
                             else:
                                 self.addProperty(prop)
                     except IndexError:
@@ -261,11 +264,11 @@ class Card(PyCalendarComponentBase):
 
         # Check for truncated data
         if state != LOOK_FOR_VCARD:
-            raise PyCalendarInvalidData("vCard data not complete", "")
+            raise InvalidData("vCard data not complete", "")
 
         # Validate some things
         if result and not self.hasProperty("VERSION"):
-            raise PyCalendarInvalidData("vCard missing VERSION", "")
+            raise InvalidData("vCard missing VERSION", "")
 
         return result
 

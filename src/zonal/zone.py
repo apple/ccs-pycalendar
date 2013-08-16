@@ -14,14 +14,14 @@
 #    limitations under the License.
 ##
 
-from pycalendar.datetime import PyCalendarDateTime
-from pycalendar.vtimezone import PyCalendarVTimezone
-from pycalendar.property import PyCalendarProperty
-from pycalendar import definitions
-from pycalendar.vtimezonestandard import PyCalendarVTimezoneStandard
-from pycalendar.utcoffsetvalue import PyCalendarUTCOffsetValue
-import utils
+from pycalendar.datetime import DateTime
+from pycalendar.icalendar import definitions
+from pycalendar.icalendar.property import Property
+from pycalendar.icalendar.vtimezone import VTimezone
+from pycalendar.icalendar.vtimezonestandard import Standard
+from pycalendar.utcoffsetvalue import UTCOffsetValue
 import rule
+import utils
 
 """
 Class that maintains a TZ data Zone.
@@ -129,7 +129,7 @@ class Zone(object):
         """
 
         # Start at 1/1/1800 with the offset from the initial zone rule
-        start = PyCalendarDateTime(year=1800, month=1, day=1, hours=0, minutes=0, seconds=0)
+        start = DateTime(year=1800, month=1, day=1, hours=0, minutes=0, seconds=0)
         start_offset = self.rules[0].getUTCOffset()
         start_stdoffset = self.rules[0].getUTCOffset()
         startdt = start.duplicate()
@@ -178,7 +178,7 @@ class Zone(object):
         """
         Generate a VTIMEZONE for this Zone.
 
-        @param calendar: the L{PyCalendar} object for the VCALENDAR in which the VTIMEZONE
+        @param calendar: the L{Calendar} object for the VCALENDAR in which the VTIMEZONE
             will be created.
         @param rules: the C{dict} containing the set of Rules currently defined.
         @param startYear: a C{int} containing the first year that should be present
@@ -187,11 +187,11 @@ class Zone(object):
         """
 
         # Get a VTIMEZONE component
-        vtz = PyCalendarVTimezone(parent=calendar)
+        vtz = VTimezone(parent=calendar)
 
         # Add TZID property
-        vtz.addProperty(PyCalendarProperty(definitions.cICalProperty_TZID, self.name))
-        vtz.addProperty(PyCalendarProperty("X-LIC-LOCATION", self.name))
+        vtz.addProperty(Property(definitions.cICalProperty_TZID, self.name))
+        vtz.addProperty(Property("X-LIC-LOCATION", self.name))
 
         transitions = self.expand(rules, minYear, maxYear)
 
@@ -270,7 +270,7 @@ class Zone(object):
         RDATEs assuming all other properties are the same.
 
         @param vtz: the VTIMEZONE object to compress
-        @type vtz: L{PyCalendarVTimezone}
+        @type vtz: L{VTimezone}
         """
 
         # Map the similar sub-components together
@@ -385,16 +385,16 @@ class ZoneRule(object):
                 month = int(rule.Rule.MONTH_NAME_TO_POS[splits[1]])
                 if len(splits) > 2 and not splits[2].startswith("#"):
                     if splits[2] == "lastSun":
-                        dt = PyCalendarDateTime(year=year, month=month, day=1)
-                        dt.setDayOfWeekInMonth(-1, PyCalendarDateTime.SUNDAY)
+                        dt = DateTime(year=year, month=month, day=1)
+                        dt.setDayOfWeekInMonth(-1, DateTime.SUNDAY)
                         splits[2] = dt.getDay()
                     elif splits[2] == "lastSat":
-                        dt = PyCalendarDateTime(year=year, month=month, day=1)
-                        dt.setDayOfWeekInMonth(-1, PyCalendarDateTime.SATURDAY)
+                        dt = DateTime(year=year, month=month, day=1)
+                        dt.setDayOfWeekInMonth(-1, DateTime.SATURDAY)
                         splits[2] = dt.getDay()
                     elif splits[2] == "Sun>=1":
-                        dt = PyCalendarDateTime(year=year, month=month, day=1)
-                        dt.setDayOfWeekInMonth(1, PyCalendarDateTime.SUNDAY)
+                        dt = DateTime(year=year, month=month, day=1)
+                        dt.setDayOfWeekInMonth(1, DateTime.SUNDAY)
                         splits[2] = dt.getDay()
                     day = int(splits[2])
                     if len(splits) > 3 and not splits[3].startswith("#"):
@@ -408,7 +408,7 @@ class ZoneRule(object):
                         if len(splits) > 2:
                             seconds = int(splits[2])
 
-        dt = PyCalendarDateTime(year=year, month=month, day=day, hours=hours, minutes=minutes, seconds=seconds)
+        dt = DateTime(year=year, month=month, day=day, hours=hours, minutes=minutes, seconds=seconds)
         self._cached_until = utils.DateTime(dt, mode)
         return self._cached_until
 
@@ -493,27 +493,27 @@ class ZoneRule(object):
     def vtimezone(self, vtz, zonerule, start, end, offsetfrom, offsetto):
 
         # Determine type of component based on offset
-        comp = PyCalendarVTimezoneStandard(parent=vtz)
+        comp = Standard(parent=vtz)
 
         # Do offsets
-        tzoffsetfrom = PyCalendarUTCOffsetValue(offsetfrom)
-        tzoffsetto = PyCalendarUTCOffsetValue(offsetto)
+        tzoffsetfrom = UTCOffsetValue(offsetfrom)
+        tzoffsetto = UTCOffsetValue(offsetto)
 
-        comp.addProperty(PyCalendarProperty(definitions.cICalProperty_TZOFFSETFROM, tzoffsetfrom))
-        comp.addProperty(PyCalendarProperty(definitions.cICalProperty_TZOFFSETTO, tzoffsetto))
+        comp.addProperty(Property(definitions.cICalProperty_TZOFFSETFROM, tzoffsetfrom))
+        comp.addProperty(Property(definitions.cICalProperty_TZOFFSETTO, tzoffsetto))
 
         # Do TZNAME
         if self.format.find("%") != -1:
             tzname = self.format % ("S",)
         else:
             tzname = self.format
-        comp.addProperty(PyCalendarProperty(definitions.cICalProperty_TZNAME, tzname))
+        comp.addProperty(Property(definitions.cICalProperty_TZNAME, tzname))
 
         # Do DTSTART
-        comp.addProperty(PyCalendarProperty(definitions.cICalProperty_DTSTART, start))
+        comp.addProperty(Property(definitions.cICalProperty_DTSTART, start))
 
         # Recurrence
-        comp.addProperty(PyCalendarProperty(definitions.cICalProperty_RDATE, start))
+        comp.addProperty(Property(definitions.cICalProperty_RDATE, start))
 
         comp.finalise()
         vtz.addComponent(comp)

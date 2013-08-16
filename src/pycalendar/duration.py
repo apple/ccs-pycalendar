@@ -18,7 +18,7 @@ from pycalendar.parser import ParserContext
 from pycalendar.stringutils import strtoul
 from pycalendar.valueutils import ValueMixin
 
-class PyCalendarDuration(ValueMixin):
+class Duration(ValueMixin):
 
     def __init__(self, duration=None, weeks=0, days=0, hours=0, minutes=0, seconds=0):
         self.mForward = True
@@ -36,7 +36,7 @@ class PyCalendarDuration(ValueMixin):
 
 
     def duplicate(self):
-        other = PyCalendarDuration(None)
+        other = Duration(None)
         other.mForward = self.mForward
 
         other.mWeeks = self.mWeeks

@@ -19,6 +19,9 @@
 from cStringIO import StringIO
 
 class ValueMixin(object):
+    """
+    Mix-in for operations common to Value's and value-specific classes.
+    """
 
     def __str__(self):
         return self.getText()
@@ -47,3 +50,38 @@ class ValueMixin(object):
 
     def writeXML(self, node, namespace):
         raise NotImplementedError
+
+
+
+class WrapperValue(object):
+    """
+    Mix-in for Value derived classes that wrap a value-specific class.
+    """
+
+    def duplicate(self):
+        return self.__class__(self.mValue.duplicate())
+
+
+    def getType(self):
+        raise NotImplementedError
+
+
+    def parse(self, data, variant):
+        self.mValue.parse(data)
+
+
+    def generate(self, os):
+        self.mValue.generate(os)
+
+
+    def writeXML(self, node, namespace):
+        value = self.getXMLNode(node, namespace)
+        value.text = self.mValue.writeXML()
+
+
+    def getValue(self):
+        return self.mValue
+
+
+    def setValue(self, value):
+        self.mValue = value

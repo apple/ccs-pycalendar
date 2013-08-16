@@ -1,5 +1,5 @@
 ##
-#    Copyright (c) 2007-2013 Cyrus Daboo. All rights reserved.
+#    Copyright (c) 2007-2012 Cyrus Daboo. All rights reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -16,18 +16,18 @@
 
 # iCalendar URI value
 
-from pycalendar import xmldefs, utils
-from pycalendar.plaintextvalue import PyCalendarPlainTextValue
-from pycalendar.value import PyCalendarValue
+from pycalendar import xmldefinitions, utils
+from pycalendar.plaintextvalue import PlainTextValue
+from pycalendar.value import Value
 from pycalendar.parser import ParserContext
 
-class PyCalendarURIValue(PyCalendarPlainTextValue):
+class URIValue(PlainTextValue):
 
     def getType(self):
-        return PyCalendarURIValue.VALUETYPE_URI
+        return URIValue.VALUETYPE_URI
 
 
-    def parse(self, data):
+    def parse(self, data, variant):
 
         if ParserContext.BACKSLASH_IN_URI_VALUE == ParserContext.PARSER_FIX:
             # Decoding required
@@ -50,6 +50,6 @@ class PyCalendarURIValue(PyCalendarPlainTextValue):
             except:
                 pass
         else:
-            super(PyCalendarURIValue, self).generate(os)
+            super(URIValue, self).generate(os)
 
-PyCalendarValue.registerType(PyCalendarValue.VALUETYPE_URI, PyCalendarURIValue, xmldefs.value_uri)
+Value.registerType(Value.VALUETYPE_URI, URIValue, xmldefinitions.value_uri)

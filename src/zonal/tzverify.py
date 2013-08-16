@@ -15,13 +15,13 @@
 #    limitations under the License.
 ##
 
-from pycalendar.calendar import PyCalendar
-from pycalendar.datetime import PyCalendarDateTime
+from pycalendar.datetime import DateTime
+from pycalendar.exceptions import InvalidData
+from pycalendar.icalendar.calendar import Calendar
 from tzconvert import tzconvert
+import getopt
 import os
 import sys
-import getopt
-from pycalendar.exceptions import PyCalendarInvalidData
 
 def loadCalendarFromZoneinfo(zoneinfopath, skips=(), verbose=False, quiet=False):
 
@@ -51,14 +51,14 @@ def loadCalendarFromZoneinfo(zoneinfopath, skips=(), verbose=False, quiet=False)
 
 def loadCalendar(files, verbose):
 
-    cal = PyCalendar()
+    cal = Calendar()
     for file in files:
         if verbose:
             print "Parsing calendar data: %s" % (file,)
         fin = open(file, "r")
         try:
             cal.parse(fin)
-        except PyCalendarInvalidData, e:
+        except InvalidData, e:
             print "Failed to parse bad data: %s" % (e.mData,)
             raise
     return CalendarZonesWrapper(calendar=cal)
@@ -164,7 +164,7 @@ def getExpandedDates(cal, tzid, start, end):
 
 def sortedList(setdata):
     l = list(setdata)
-    l.sort(cmp=lambda x, y: PyCalendarDateTime.sort(x[0], y[0]))
+    l.sort(cmp=lambda x, y: DateTime.sort(x[0], y[0]))
     return l
 
 
@@ -249,8 +249,8 @@ if __name__ == '__main__':
     zonedir1 = os.path.expanduser(args[0])
     zonedir2 = os.path.expanduser(args[1])
 
-    start = PyCalendarDateTime(year=startYear, month=1, day=1)
-    end = PyCalendarDateTime(year=endYear, month=1, day=1)
+    start = DateTime(year=startYear, month=1, day=1)
+    end = DateTime(year=endYear, month=1, day=1)
 
     zonefiles = (
         "northamerica",

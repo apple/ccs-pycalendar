@@ -15,11 +15,11 @@
 ##
 
 from pycalendar.parser import ParserContext
-from pycalendar.urivalue import PyCalendarURIValue
-from pycalendar.vcard.property import Property
+from pycalendar.urivalue import URIValue
+from pycalendar.icalendar.property import Property
 import unittest
 
-class TestNValue(unittest.TestCase):
+class TestURIValue(unittest.TestCase):
 
     def testParseValue(self):
 
@@ -35,8 +35,8 @@ class TestNValue(unittest.TestCase):
         )
 
         for item, result in items:
-            req = PyCalendarURIValue()
-            req.parse(item)
+            req = URIValue()
+            req.parse(item, "icalendar")
             test = req.getText()
             self.assertEqual(test, result, "Failed to parse and re-generate '%s'" % (item,))
 
@@ -48,8 +48,8 @@ class TestNValue(unittest.TestCase):
         )
 
         for item, result in items:
-            req = PyCalendarURIValue()
-            req.parse(item)
+            req = URIValue()
+            req.parse(item, "icalendar")
             test = req.getText()
             self.assertEqual(test, result, "Failed to parse and re-generate '%s'" % (item,))
 

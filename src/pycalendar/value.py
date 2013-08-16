@@ -16,11 +16,11 @@
 
 # ICalendar Value class
 
+from pycalendar import xmlutils
 from pycalendar.valueutils import ValueMixin
-from pycalendar import xmldefs
 import xml.etree.cElementTree as XML
 
-class PyCalendarValue(ValueMixin):
+class Value(ValueMixin):
 
     (
         VALUETYPE_ADR,
@@ -61,7 +61,7 @@ class PyCalendarValue(ValueMixin):
 
 
     def __eq__(self, other):
-        if not isinstance(other, PyCalendarValue):
+        if not isinstance(other, Value):
             return False
         return self.getType() == other.getType() and self.getValue() == other.getValue()
 
@@ -73,13 +73,13 @@ class PyCalendarValue(ValueMixin):
 
 
     @classmethod
-    def createFromType(clz, type):
-        # Create the type
-        created = clz._typeMap.get(type, None)
+    def createFromType(clz, value_type):
+        # Create the value type
+        created = clz._typeMap.get(value_type, None)
         if created:
             return created()
         else:
-            return clz._typeMap.get(PyCalendarValue.VALUETYPE_UNKNOWN)(type)
+            return clz._typeMap.get(Value.VALUETYPE_UNKNOWN)(value_type)
 
 
     def getType(self):
@@ -98,9 +98,13 @@ class PyCalendarValue(ValueMixin):
         raise NotImplementedError
 
 
+    def parse(self, data, variant):
+        raise NotImplementedError
+
+
     def writeXML(self, node, namespace):
         raise NotImplementedError
 
 
     def getXMLNode(self, node, namespace):
-        return XML.SubElement(node, xmldefs.makeTag(namespace, self._xmlMap[self.getType()]))
+        return XML.SubElement(node, xmlutils.makeTag(namespace, self._xmlMap[self.getType()]))

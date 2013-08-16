@@ -15,22 +15,22 @@
 #    limitations under the License.
 ##
 
-from pycalendar.calendar import PyCalendar
-from pycalendar.datetime import PyCalendarDateTime
+from pycalendar.datetime import DateTime
+from pycalendar.exceptions import InvalidData
+from pycalendar.icalendar.calendar import Calendar
+import getopt
 import os
 import sys
-import getopt
-from pycalendar.exceptions import PyCalendarInvalidData
 
 def loadCalendar(file, verbose):
 
-    cal = PyCalendar()
+    cal = Calendar()
     if verbose:
         print "Parsing calendar data: %s" % (file,)
     fin = open(file, "r")
     try:
         cal.parse(fin)
-    except PyCalendarInvalidData, e:
+    except InvalidData, e:
         print "Failed to parse bad data: %s" % (e.mData,)
         raise
     return cal
@@ -41,7 +41,7 @@ def getExpandedDates(cal, start, end):
 
     vtz = cal.getComponents()[0]
     expanded = vtz.expandAll(start, end)
-    expanded.sort(cmp=lambda x, y: PyCalendarDateTime.sort(x[0], y[0]))
+    expanded.sort(cmp=lambda x, y: DateTime.sort(x[0], y[0]))
     return expanded
 
 
@@ -125,8 +125,8 @@ if __name__ == '__main__':
         usage("Must have one argument")
     fpath = os.path.expanduser(args[0])
 
-    start = PyCalendarDateTime(year=startYear, month=1, day=1)
-    end = PyCalendarDateTime(year=endYear, month=1, day=1)
+    start = DateTime(year=startYear, month=1, day=1)
+    end = DateTime(year=endYear, month=1, day=1)
 
     cal = loadCalendar(fpath, verbose)
     dates = getExpandedDates(cal, start, end)
