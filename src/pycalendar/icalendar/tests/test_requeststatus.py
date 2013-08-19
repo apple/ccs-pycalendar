@@ -90,6 +90,5 @@ class TestRequestStatus(unittest.TestCase):
         )
 
         for item in items:
-            req = Property()
-            req.parse(item)
+            req = Property.parseText(item)
             self.assertEqual(req.getText(), item + "\r\n", "Failed to parse and re-generate '%s'" % (item,))

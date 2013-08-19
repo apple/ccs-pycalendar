@@ -40,8 +40,7 @@ class TestValidation(unittest.TestCase):
         )
 
         for prop, test, result in props:
-            property = Property()
-            property.parse(prop)
+            property = Property.parseText(prop)
             self.assertEqual(PropertyValueChecks.stringValue(test, property), result)
 
 
@@ -55,8 +54,7 @@ class TestValidation(unittest.TestCase):
         )
 
         for prop, result in props:
-            property = Property()
-            property.parse(prop)
+            property = Property.parseText(prop)
             self.assertEqual(PropertyValueChecks.alwaysUTC(property), result)
 
 
@@ -72,8 +70,7 @@ class TestValidation(unittest.TestCase):
         )
 
         for prop, low, high, result in props:
-            property = Property()
-            property.parse(prop)
+            property = Property.parseText(prop)
             self.assertEqual(PropertyValueChecks.numericRange(low, high, property), result)
 
 
@@ -87,6 +84,5 @@ class TestValidation(unittest.TestCase):
         )
 
         for prop, result in props:
-            property = Property()
-            property.parse(prop)
+            property = Property.parseText(prop)
             self.assertEqual(PropertyValueChecks.positiveIntegerOrZero(property), result)

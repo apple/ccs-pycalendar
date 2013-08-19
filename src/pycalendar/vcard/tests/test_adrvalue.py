@@ -56,7 +56,6 @@ class TestAdrValue(unittest.TestCase):
         )
 
         for item, result in items:
-            prop = Property()
-            prop.parse(item)
+            prop = Property.parseText(item)
             test = prop.getText()
             self.assertEqual(test, result + "\r\n", "Failed to parse and re-generate '%s'" % (item,))

@@ -209,7 +209,7 @@ class Property(PropertyBase):
         )
 
 
-    def parseParameters(self, txt, data):
+    def parseTextParameters(self, txt, data):
         """
         Parse parameters, return string point at value.
         """

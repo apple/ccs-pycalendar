@@ -207,38 +207,65 @@ class PropertyBase(object):
             return None
 
 
-    def parse(self, data):
-        # Look for parameter or value delimiter
-        prop_name, txt = stringutils.strduptokenstr(data, ";:")
-        if not prop_name:
-            raise InvalidProperty("Invalid property", data)
+    @classmethod
+    def parseText(cls, data):
+        """
+        Parse the text format data and return a L{Property}
 
-        # We have the name
-        if self.sUsesGroup:
-            # Check for group prefix
-            splits = prop_name.split(".", 1)
-            if len(splits) == 2:
-                # We have both group and name
-                self.mGroup = splits[0]
-                self.mName = splits[1]
+        @param data: text data
+        @type data: C{str}
+        """
+
+        try:
+            prop = cls()
+
+            # Look for parameter or value delimiter
+            prop_name, txt = stringutils.strduptokenstr(data, ";:")
+            if not prop_name:
+                raise InvalidProperty("Invalid property", data)
+
+            # Get the name
+            if prop.sUsesGroup:
+                # Check for group prefix
+                splits = prop_name.split(".", 1)
+                if len(splits) == 2:
+                    # We have both group and name
+                    prop.mGroup = splits[0]
+                    prop.mName = splits[1]
+                else:
+                    # We have the name
+                    prop.mName = prop_name
             else:
-                # We have the name
-                self.mName = prop_name
-        else:
-            self.mName = prop_name
+                prop.mName = prop_name
 
-        # Now loop getting data
-        txt = self.parseParameters(txt, data)
-        self.createValue(txt)
+            # Get the parameters
+            txt = prop.parseTextParameters(txt, data)
 
-        # We must have a value of some kind
-        if self.mValue is None:
+            # Tidy first
+            prop.mValue = None
+
+            # Get value type from property name
+            value_type = prop.determineValueType()
+
+            # Check for multivalued
+            if prop.mName.upper() in prop.sMultiValues:
+                prop.mValue = MultiValue(value_type)
+            else:
+                # Create the type
+                prop.mValue = Value.createFromType(value_type)
+
+            # Now parse the data
+            prop.mValue.parse(txt, prop.sVariant)
+
+            prop._postCreateValue(value_type)
+
+            return prop
+
+        except Exception:
             raise InvalidProperty("Invalid property", data)
 
-        return True
 
-
-    def parseParameters(self, txt, data):
+    def parseTextParameters(self, txt, data):
         """
         Parse parameters, return string point at value.
         """
@@ -403,7 +430,11 @@ class PropertyBase(object):
 
         try:
             prop = cls()
+
+            # Get the name
             prop.mName = jobject[0].upper()
+
+            # Get the parameters
             if jobject[1]:
                 for name, value in jobject[1].items():
                     # Now add parameter value
@@ -411,19 +442,15 @@ class PropertyBase(object):
                     attrvalue = Parameter(name=name, value=value)
                     prop.mParameters.setdefault(name, []).append(attrvalue)
 
-            value_type = cls.sValueTypeMap.get(jobject[2].upper(), Value.VALUETYPE_UNKNOWN)
-
             # Get default value type from property name and insert a VALUE parameter if current value type is not default
+            value_type = cls.sValueTypeMap.get(jobject[2].upper(), Value.VALUETYPE_UNKNOWN)
             default_type = cls.sDefaultValueTypeMap.get(prop.mName.upper(), Value.VALUETYPE_UNKNOWN)
             if default_type != value_type:
-                attrvalue = Parameter(name=cls.sValue, value=value_type)
+                attrvalue = Parameter(name=cls.sValue, value=jobject[2].upper())
                 prop.mParameters.setdefault(cls.sValue, []).append(attrvalue)
 
-            # Check for specials
-            if prop.mName.upper() in cls.sSpecialVariants:
-                # Make sure we have the default value for the special
-                if value_type == cls.sDefaultValueTypeMap.get(prop.mName.upper(), Value.VALUETYPE_UNKNOWN):
-                    value_type = cls.sSpecialVariants[prop.mName.upper()]
+            # Get value type from property name
+            value_type = prop.determineValueType()
 
             # Check for multivalued
             values = jobject[3:]
@@ -477,10 +504,7 @@ class PropertyBase(object):
             self.mValue.writeJSON(prop)
 
 
-    def createValue(self, data):
-        # Tidy first
-        self.mValue = None
-
+    def determineValueType(self):
         # Get value type from property name
         value_type = self.sDefaultValueTypeMap.get(self.mName.upper(), Value.VALUETYPE_UNKNOWN)
 
@@ -495,6 +519,16 @@ class PropertyBase(object):
             # Make sure we have the default value for the special
             if value_type == self.sDefaultValueTypeMap.get(self.mName.upper(), Value.VALUETYPE_UNKNOWN):
                 value_type = self.sSpecialVariants[self.mName.upper()]
+
+        return value_type
+
+
+    def createValue(self, data):
+        # Tidy first
+        self.mValue = None
+
+        # Get value type from property name
+        value_type = self.determineValueType()
 
         # Check for multivalued
         if self.mName.upper() in self.sMultiValues:

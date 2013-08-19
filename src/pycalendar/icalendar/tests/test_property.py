@@ -62,8 +62,7 @@ class TestProperty(unittest.TestCase):
     def testParseGenerate(self):
 
         for data in TestProperty.test_data:
-            prop = Property()
-            prop.parse(data)
+            prop = Property.parseText(data)
             propstr = str(prop).replace("\r\n ", "")
             self.assertEqual(propstr[:-2], data, "Failed parse/generate: %s to %s" % (data, propstr,))
 
@@ -71,10 +70,8 @@ class TestProperty(unittest.TestCase):
     def testEquality(self):
 
         for data in TestProperty.test_data:
-            prop1 = Property()
-            prop1.parse(data)
-            prop2 = Property()
-            prop2.parse(data)
+            prop1 = Property.parseText(data)
+            prop2 = Property.parseText(data)
             self.assertEqual(prop1, prop2, "Failed equality: %s" % (data,))
 
 
@@ -98,8 +95,7 @@ class TestProperty(unittest.TestCase):
         save = ParserContext.INVALID_ESCAPE_SEQUENCES
         for data in test_bad_data:
             ParserContext.INVALID_ESCAPE_SEQUENCES = ParserContext.PARSER_RAISE
-            prop = Property()
-            self.assertRaises(InvalidProperty, prop.parse, data)
+            self.assertRaises(InvalidProperty, Property.parseText, data)
         ParserContext.INVALID_ESCAPE_SEQUENCES = save
 
 
@@ -107,8 +103,7 @@ class TestProperty(unittest.TestCase):
 
         hashes = []
         for item in TestProperty.test_data:
-            prop = Property()
-            prop.parse(item)
+            prop = Property.parseText(item)
             hashes.append(hash(prop))
         hashes.sort()
         for i in range(1, len(hashes)):
@@ -133,24 +128,21 @@ class TestProperty(unittest.TestCase):
     def testGEOValueRoundtrip(self):
 
         data = "GEO:123.456;789.101"
-        prop = Property()
-        prop.parse(data)
+        prop = Property.parseText(data)
         self.assertEqual(str(prop), data + "\r\n")
 
 
     def testUnknownValueRoundtrip(self):
 
         data = "X-FOO:Text, not escaped"
-        prop = Property()
-        prop.parse(data)
+        prop = Property.parseText(data)
         self.assertEqual(str(prop), data + "\r\n")
 
         prop = Property("X-FOO", "Text, not escaped")
         self.assertEqual(str(prop), data + "\r\n")
 
         data = "X-FOO:Text\\, escaped\\n"
-        prop = Property()
-        prop.parse(data)
+        prop = Property.parseText(data)
         self.assertEqual(str(prop), data + "\r\n")
 
         prop = Property("X-FOO", "Text\\, escaped\\n")
@@ -162,8 +154,7 @@ class TestProperty(unittest.TestCase):
         Property.registerDefaultValue("X-SPECIAL-REGISTRATION", Value.VALUETYPE_TEXT)
 
         data = "X-SPECIAL-REGISTRATION:Text\\, escaped\\n"
-        prop = Property()
-        prop.parse(data)
+        prop = Property.parseText(data)
         self.assertEqual(str(prop), "X-SPECIAL-REGISTRATION:Text\\, escaped\\n\r\n")
 
         prop = Property("X-SPECIAL-REGISTRATION", "Text, escaped\n")
@@ -180,12 +171,10 @@ class TestProperty(unittest.TestCase):
         self.assertEqual(str(prop), "X-FOO;X-BAR=^'Check^';X-BAR2=Check^nThis\tOut^n:Test\r\n")
 
         data = "X-FOO;X-BAR=^'Check^':Test"
-        prop = Property()
-        prop.parse(data)
+        prop = Property.parseText(data)
         self.assertEqual(prop.getParameterValue("X-BAR"), "\"Check\"")
 
         data = "X-FOO;X-BAR=^'Check^';X-BAR2=Check^nThis\tOut^n:Test"
-        prop = Property()
-        prop.parse(data)
+        prop = Property.parseText(data)
         self.assertEqual(prop.getParameterValue("X-BAR"), "\"Check\"")
         self.assertEqual(prop.getParameterValue("X-BAR2"), "Check\nThis\tOut\n")

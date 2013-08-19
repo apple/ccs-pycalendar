@@ -16,9 +16,9 @@
 
 from cStringIO import StringIO
 from pycalendar import xmlutils
-from pycalendar.componentbase import ComponentBase
+from pycalendar.containerbase import ContainerBase
 from pycalendar.datetime import DateTime
-from pycalendar.exceptions import InvalidData, ValidationError
+from pycalendar.exceptions import InvalidData
 from pycalendar.icalendar import definitions, xmldefinitions
 from pycalendar.icalendar.component import Component
 from pycalendar.icalendar.componentexpanded import ComponentExpanded
@@ -33,7 +33,7 @@ import collections
 import json
 import xml.etree.cElementTree as XML
 
-class Calendar(ComponentBase):
+class Calendar(ContainerBase):
 
     REMOVE_ALL = 0
     REMOVE_ONLY_THIS = 1
@@ -45,17 +45,9 @@ class Calendar(ComponentBase):
     sProdID = "-//mulberrymail.com//Mulberry v4.0//EN"
     sDomain = "mulberrymail.com"
 
+    sContainerDescriptor = "iCalendar"
     sComponentType = Component
     sPropertyType = Property
-
-    @staticmethod
-    def setPRODID(prodid):
-        Calendar.sProdID = prodid
-
-
-    @staticmethod
-    def setDomain(domain):
-        Calendar.sDomain = domain
 
     propertyCardinality_1 = (
         definitions.cICalProperty_PRODID,
@@ -76,9 +68,6 @@ class Calendar(ComponentBase):
         self.mDescription = ""
         self.mMasterComponentsByTypeAndUID = collections.defaultdict(lambda: collections.defaultdict(list))
         self.mOverriddenComponentsByUID = collections.defaultdict(list)
-
-        if add_defaults:
-            self.addDefaultProperties()
 
 
     def duplicate(self):
@@ -182,21 +171,6 @@ class Calendar(ComponentBase):
             self.mDescription = temps
 
 
-    def validate(self, doFix=False, doRaise=False):
-        """
-        Validate the data in this component and optionally fix any problems. Return
-        a tuple containing two lists: the first describes problems that were fixed, the
-        second problems that were not fixed. Caller can then decide what to do with unfixed
-        issues.
-        """
-
-        # Optional raise behavior
-        fixed, unfixed = super(Calendar, self).validate(doFix)
-        if doRaise and unfixed:
-            raise ValidationError(";".join(unfixed))
-        return fixed, unfixed
-
-
     def sortedComponentNames(self):
         return (
             definitions.cICalComponent_VTIMEZONE,
@@ -217,121 +191,13 @@ class Calendar(ComponentBase):
         )
 
 
-    @staticmethod
-    def parseText(data):
-
-        cal = Calendar(add_defaults=False)
-        if cal.parse(StringIO(data)):
-            return cal
-        else:
-            return None
-
-
     def parse(self, ins):
 
-        result = False
-
-        self.setProperties({})
-
-        LOOK_FOR_VCALENDAR = 0
-        GET_PROPERTY_OR_COMPONENT = 1
-
-        state = LOOK_FOR_VCALENDAR
-
-        # Get lines looking for start of calendar
-        lines = [None, None]
-        comp = self
-        compend = None
-        componentstack = []
-
-        while readFoldedLine(ins, lines):
-
-            line = lines[0]
-
-            if state == LOOK_FOR_VCALENDAR:
-
-                # Look for start
-                if line == self.getBeginDelimiter():
-                    # Next state
-                    state = GET_PROPERTY_OR_COMPONENT
-
-                    # Indicate success at this point
-                    result = True
-
-                # Handle blank line
-                elif len(line) == 0:
-                    # Raise if requested, otherwise just ignore
-                    if ParserContext.BLANK_LINES_IN_DATA == ParserContext.PARSER_RAISE:
-                        raise InvalidData("iCalendar data has blank lines")
-
-                # Unrecognized data
-                else:
-                    raise InvalidData("iCalendar data not recognized", line)
-
-            elif state == GET_PROPERTY_OR_COMPONENT:
-
-                # Parse property or look for start of component
-                if line.startswith("BEGIN:"):
-
-                    # Push previous details to stack
-                    componentstack.append((comp, compend,))
-
-                    # Start a new component
-                    comp = Component.makeComponent(line[6:], comp)
-                    compend = comp.getEndDelimiter()
-
-                # Look for end of object
-                elif line == self.getEndDelimiter():
-
-                    # Finalise the current calendar
-                    self.finalise()
-
-                    # Change state
-                    state = LOOK_FOR_VCALENDAR
-
-                # Look for end of current component
-                elif line == compend:
-
-                    # Finalise the component (this caches data from the properties)
-                    comp.finalise()
-
-                    # Embed component in parent and reset to use parent
-                    componentstack[-1][0].addComponent(comp)
-                    comp, compend = componentstack.pop()
-
-                # Blank line
-                elif len(line) == 0:
-                    # Raise if requested, otherwise just ignore
-                    if ParserContext.BLANK_LINES_IN_DATA == ParserContext.PARSER_RAISE:
-                        raise InvalidData("iCalendar data has blank lines")
-
-                # Must be a property
-                else:
-
-                    # Parse parameter/value for top-level calendar item
-                    prop = Property()
-                    if prop.parse(line):
-
-                        # Check for valid property
-                        if comp is self:
-                            if not comp.validProperty(prop):
-                                raise InvalidData("Invalid property", str(prop))
-                            elif not comp.ignoreProperty(prop):
-                                comp.addProperty(prop)
-                        else:
-                            comp.addProperty(prop)
-
-        # Check for truncated data
-        if state != LOOK_FOR_VCALENDAR:
-            raise InvalidData("iCalendar data not complete")
+        result = super(Calendar, self).parse(ins)
 
         # We need to store all timezones in the static object so they can be accessed by any date object
         from pycalendar.timezonedb import TimezoneDatabase
         TimezoneDatabase.mergeTimezones(self, self.getComponents(definitions.cICalComponent_VTIMEZONE))
-
-        # Validate some things
-        if result and not self.hasProperty("VERSION"):
-            raise InvalidData("iCalendar missing VERSION")
 
         return result
 
@@ -421,12 +287,11 @@ class Calendar(ComponentBase):
                 else:
 
                     # Parse parameter/value for top-level calendar item
-                    prop = Property()
-                    if prop.parse(lines[0]):
+                    prop = Property.parseText(lines[0])
 
-                        # Check for valid property
-                        if comp is not self:
-                            comp.addProperty(prop)
+                    # Check for valid property
+                    if comp is not self:
+                        comp.addProperty(prop)
 
             # Exit if we have one - ignore all the rest
             if state == GOT_VCALENDAR:
@@ -500,26 +365,19 @@ class Calendar(ComponentBase):
         return root
 
 
-    @staticmethod
-    def parseJSONText(data):
-
-        return Calendar.parseJSON(json.loads(data), None, Calendar(add_defaults=False))
-
-
     def getTextJSON(self, includeTimezones=False):
-        jobject = self.writeJSON(includeTimezones)
-        return json.dumps(jobject, indent=2, separators=(',', ':'))
+        jobject = []
+        self.writeJSON(jobject, includeTimezones)
+        return json.dumps(jobject[0], indent=2, separators=(',', ':'))
 
 
-    def writeJSON(self, includeTimezones=False):
+    def writeJSON(self, jobject, includeTimezones=False):
         # Make sure all required timezones are in this object
         if includeTimezones:
             self.includeTimezones()
 
         # Root node structure
-        vcalendar = []
-        super(Calendar, self).writeJSON(vcalendar)
-        return vcalendar[0]
+        super(Calendar, self).writeJSON(jobject)
 
 
     # Get expanded components
@@ -722,10 +580,6 @@ class Calendar(ComponentBase):
                 return False
 
         return True
-
-
-    def ignoreProperty(self, prop):
-        return False #prop.getName() in (definitions.cICalProperty_VERSION, definitions.cICalProperty_CALSCALE, definitions.cICalProperty_PRODID)
 
 
     def includeTimezones(self):
