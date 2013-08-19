@@ -22,11 +22,7 @@ from pycalendar.vcard.n import N
 
 class NValue(WrapperValue, Value):
 
-    def __init__(self, value=None):
-        self.mValue = value if value is not None else N()
-
-
-    def getType(self):
-        return Value.VALUETYPE_N
+    _wrappedClass = N
+    _wrappedType = Value.VALUETYPE_N
 
 Value.registerType(Value.VALUETYPE_N, NValue, None)

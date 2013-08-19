@@ -50,6 +50,7 @@ class Value(ValueMixin):
 
     _typeMap = {}
     _xmlMap = {}
+    _jsonMap = {}
 
 
     def __hash__(self):
@@ -67,9 +68,10 @@ class Value(ValueMixin):
 
 
     @classmethod
-    def registerType(clz, type, cls, xmlNode):
+    def registerType(clz, type, cls, xmlNode, jsonNode=None):
         clz._typeMap[type] = cls
         clz._xmlMap[type] = xmlNode
+        clz._jsonMap[type] = xmlNode if jsonNode is None else jsonNode
 
 
     @classmethod
@@ -103,6 +105,19 @@ class Value(ValueMixin):
 
 
     def writeXML(self, node, namespace):
+        raise NotImplementedError
+
+
+    def parseJSONValue(self, jobject):
+        raise NotImplementedError
+
+
+    def writeJSON(self, jobject):
+        jobject.append(self._jsonMap[self.getType()])
+        self.writeJSONValue(jobject)
+
+
+    def writeJSONValue(self, jobject):
         raise NotImplementedError
 
 

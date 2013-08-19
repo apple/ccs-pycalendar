@@ -47,13 +47,13 @@ class Property(PropertyBase):
 
         #     2426 Section 3.1
         definitions.Property_FN       : Value.VALUETYPE_TEXT,
-        definitions.Property_N        : Value.VALUETYPE_N,
+        definitions.Property_N        : Value.VALUETYPE_TEXT,
         definitions.Property_NICKNAME : Value.VALUETYPE_TEXT,
         definitions.Property_PHOTO    : Value.VALUETYPE_BINARY,
         definitions.Property_BDAY     : Value.VALUETYPE_DATE,
 
         #     2426 Section 3.2
-        definitions.Property_ADR   : Value.VALUETYPE_ADR,
+        definitions.Property_ADR   : Value.VALUETYPE_TEXT,
         definitions.Property_LABEL : Value.VALUETYPE_TEXT,
 
         #     2426 Section 3.3
@@ -63,14 +63,14 @@ class Property(PropertyBase):
 
         #     2426 Section 3.4
         definitions.Property_TZ  : Value.VALUETYPE_UTC_OFFSET,
-        definitions.Property_GEO : Value.VALUETYPE_GEO,
+        definitions.Property_GEO : Value.VALUETYPE_FLOAT,
 
         #     2426 Section 3.5
         definitions.Property_TITLE : Value.VALUETYPE_TEXT,
         definitions.Property_ROLE  : Value.VALUETYPE_TEXT,
         definitions.Property_LOGO  : Value.VALUETYPE_BINARY,
         definitions.Property_AGENT : Value.VALUETYPE_VCARD,
-        definitions.Property_ORG   : Value.VALUETYPE_ORG,
+        definitions.Property_ORG   : Value.VALUETYPE_TEXT,
 
         #     2426 Section 3.6
         definitions.Property_CATEGORIES  : Value.VALUETYPE_TEXT,
@@ -125,11 +125,12 @@ class Property(PropertyBase):
         definitions.Property_CATEGORIES,
     ))
 
-    sTextVariants = set((
-        definitions.Property_ADR,
-        definitions.Property_N,
-        definitions.Property_ORG,
-    ))
+    sSpecialVariants = {
+        definitions.Property_ADR : Value.VALUETYPE_ADR,
+        definitions.Property_GEO : Value.VALUETYPE_GEO,
+        definitions.Property_N: Value.VALUETYPE_N,
+        definitions.Property_ORG: Value.VALUETYPE_ORG,
+    }
 
     sUsesGroup = True
 

@@ -14,42 +14,48 @@
 #    limitations under the License.
 ##
 
-# vCard ORG value
+# iCalendar float value
 
-from pycalendar import utils
+from pycalendar import xmldefinitions
 from pycalendar.value import Value
 
-class OrgValue(Value):
-    """
-    mValue is a str or tuple of str
-    """
+class FloatValue(Value):
 
     def __init__(self, value=None):
-        self.mValue = value
+        self.mValue = value if value is not None else 0.0
 
 
     def duplicate(self):
-        return OrgValue(self.mValue)
+        return FloatValue(self.mValue)
 
 
     def getType(self):
-        return Value.VALUETYPE_ORG
+        return Value.VALUETYPE_FLOAT
 
 
-    def parse(self, data, variant="vcard"):
-        self.mValue = utils.parseTextList(data, ';')
+    def parse(self, data, variant):
+        self.mValue = float(data)
 
 
+    # os - StringIO object
     def generate(self, os):
-        utils.generateTextList(os, self.mValue, ';')
+        try:
+            os.write(str(self.mValue))
+        except:
+            pass
+
+
+    def writeXML(self, node, namespace):
+        value = self.getXMLNode(node, namespace)
+        value.text = str(self.mValue)
 
 
     def parseJSONValue(self, jobject):
-        self.mValue = tuple(jobject)
+        self.mValue = float(jobject)
 
 
     def writeJSONValue(self, jobject):
-        jobject.append(list(self.mValue))
+        jobject.append(self.mValue)
 
 
     def getValue(self):
@@ -59,4 +65,4 @@ class OrgValue(Value):
     def setValue(self, value):
         self.mValue = value
 
-Value.registerType(Value.VALUETYPE_ORG, OrgValue, None)
+Value.registerType(Value.VALUETYPE_FLOAT, FloatValue, xmldefinitions.value_float)

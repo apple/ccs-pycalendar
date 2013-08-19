@@ -934,6 +934,7 @@ class DateTime(ValueMixin):
             else:
                 return "%04d-%02d-%02dT%02d:%02d:%02d" % (self.mYear, self.mMonth, self.mDay, self.mHours, self.mMinutes, self.mSeconds)
 
+    getJSONText = getXMLText
 
     @classmethod
     def parseText(cls, data, fullISO=False):
@@ -1030,7 +1031,7 @@ class DateTime(ValueMixin):
 
         # iCalendar:
         #   parse format YYYYMMDD[THHMMSS[Z]]
-        # vCard (fullISO)
+        # vCard (fullISO), jCal
         #   parse format YYYY[-]MM[-]DD[THH[:]MM[:]SS[(Z/(+/-)HHMM]]
 
         try:
@@ -1090,6 +1091,14 @@ class DateTime(ValueMixin):
                 xmldefinitions.value_date if self.isDateOnly() else xmldefinitions.value_date_time
         ))
         value.text = self.getXMLText()
+
+
+    def parseJSON(self, jobject):
+        self.parse(str(jobject), True)
+
+
+    def writeJSON(self, jobject):
+        jobject.append(self.getJSONText())
 
 
     def normalise(self):

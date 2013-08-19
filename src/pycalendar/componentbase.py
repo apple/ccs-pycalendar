@@ -20,6 +20,7 @@ from pycalendar.datetimevalue import DateTimeValue
 from pycalendar.periodvalue import PeriodValue
 from pycalendar.value import Value
 import xml.etree.cElementTree as XML
+from pycalendar.exceptions import InvalidComponent, ErrorBase
 
 class ComponentBase(object):
 
@@ -359,6 +360,60 @@ class ComponentBase(object):
         self.writeComponentsFilteredXML(comp, namespace, filter)
 
 
+    @classmethod
+    def parseJSON(cls, jobject, parent, comp=None):
+        """
+        Parse the JSON object which has the form:
+
+        [name, properties, subcomponents]
+
+        @param jobject: a JSON array
+        @type jobject: C{list}
+        """
+        # [name, properties, subcomponents]
+
+        try:
+            if comp is None:
+                comp = cls.sComponentType.makeComponent(jobject[0].upper(), parent)
+            for prop in jobject[1]:
+                comp.addProperty(cls.sPropertyType.parseJSON(prop))
+            for subcomp in jobject[2]:
+                comp.addComponent(cls.sComponentType.parseJSON(subcomp, comp))
+            comp.finalise()
+            return comp
+        except ErrorBase:
+            raise
+        except Exception:
+            raise InvalidComponent("Invalid component", jobject)
+
+
+    def writeJSON(self, jobject):
+
+        # Component element
+        comp = [self.getType().lower(), [], []]
+
+        # Each property
+        self.writePropertiesJSON(comp[1])
+
+        # Each component
+        self.writeComponentsJSON(comp[2])
+
+        jobject.append(comp)
+
+
+    def writeJSONFiltered(self, jobject, filter):
+        # Component element
+        comp = [self.getType().lower(), [], []]
+
+        # Each property
+        self.writePropertiesFilteredJSON(comp[1], filter)
+
+        # Each component
+        self.writeComponentsFilteredJSON(comp[2], filter)
+
+        jobject.append(comp)
+
+
     def sortedComponents(self):
 
         components = self.mComponents[:]
@@ -429,6 +484,27 @@ class ComponentBase(object):
                     subfilter = filter.getSubComponentFilter(subcomp.getType())
                     if subfilter is not None:
                         subcomp.writeXMLFiltered(comps, namespace, subfilter)
+
+
+    def writeComponentsJSON(self, jobject):
+
+        if self.mComponents:
+            # Write out the remainder
+            for component in self.sortedComponents():
+                component.writeJSON(jobject)
+
+
+    def writeComponentsFilteredJSON(self, jobject, filter):
+
+        if self.mComponents:
+            # Shortcut for all sub-components
+            if filter.isAllSubComponents():
+                self.writeJSON(jobject)
+            elif filter.hasSubComponentFilters():
+                for subcomp in self.sortedcomponents():
+                    subfilter = filter.getSubComponentFilter(subcomp.getType())
+                    if subfilter is not None:
+                        subcomp.writeJSONFiltered(jobject, subfilter)
 
 
     def loadValue(self, value_name):
@@ -601,6 +677,32 @@ class ComponentBase(object):
             for key in keys:
                 for prop in self.getProperties(key):
                     prop.writeXMLFiltered(props, namespace, filter)
+
+
+    def writePropertiesJSON(self, jobject):
+
+        # Sort properties by name
+        keys = self.sortedPropertyKeys()
+        for key in keys:
+            props = self.mProperties[key]
+            for prop in props:
+                prop.writeJSON(jobject)
+
+
+    def writePropertiesFilteredJSON(self, jobject, filter):
+
+        # Sort properties by name
+        keys = self.sortedPropertyKeys()
+
+        # Shortcut for all properties
+        if filter.isAllProperties():
+            for key in keys:
+                for prop in self.getProperties(key):
+                    prop.writeJSON(jobject)
+        elif filter.hasPropertyFilters():
+            for key in keys:
+                for prop in self.getProperties(key):
+                    prop.writeJSONFiltered(jobject, filter)
 
 
     def loadPrivateValue(self, value_name):

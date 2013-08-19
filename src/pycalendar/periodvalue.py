@@ -21,11 +21,7 @@ from pycalendar.valueutils import WrapperValue
 
 class PeriodValue(WrapperValue, Value):
 
-    def __init__(self, value=None):
-        self.mValue = value if value is not None else Period()
-
-
-    def getType(self):
-        return Value.VALUETYPE_PERIOD
+    _wrappedClass = Period
+    _wrappedType = Value.VALUETYPE_PERIOD
 
 Value.registerType(Value.VALUETYPE_PERIOD, PeriodValue, xmldefinitions.value_period)

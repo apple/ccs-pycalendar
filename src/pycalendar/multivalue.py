@@ -93,4 +93,16 @@ class MultiValue(Value):
         for iter in self.mValues:
             iter.writeXML(node, namespace)
 
+
+    def parseJSONValue(self, jobject):
+        for jvalue in jobject:
+            value = Value.createFromType(self.mType)
+            value.parseJSONValue(jvalue)
+            self.mValues.append(value)
+
+
+    def writeJSONValue(self, jobject):
+        for iter in self.mValues:
+            iter.writeJSONValue(jobject)
+
 Value.registerType(Value.VALUETYPE_MULTIVALUE, MultiValue, None)

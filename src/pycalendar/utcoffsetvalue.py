@@ -67,29 +67,24 @@ class UTCOffsetValue(Value):
 
 
     # os - StringIO object
-    def generate(self, os):
+    def generate(self, os, fullISO=False):
         try:
             abs_value = self.mValue
-            if self.mValue < 0 :
-                os.write("-")
+            if abs_value < 0 :
+                sign = "-"
                 abs_value = -self.mValue
             else:
-                os.write("+")
+                sign = "+"
 
             secs = abs_value % 60
             mins = (abs_value / 60) % 60
             hours = abs_value / (60 * 60)
 
-            if (hours < 10):
-                os.write("0")
-            os.write(str(hours))
-            if (mins < 10):
-                os.write("0")
-            os.write(str(mins))
+            s = ("%s%02d:%02d" if fullISO else "%s%02d%02d") % (sign, hours, mins,)
             if (secs != 0):
-                if (secs < 10):
-                    os.write("0")
-                os.write(str(secs))
+                s = ("%s:%s" if fullISO else "%s%s") % (secs,)
+
+            os.write(s)
         except:
             pass
 
@@ -103,6 +98,18 @@ class UTCOffsetValue(Value):
 
         value = self.getXMLNode(node, namespace)
         value.text = text
+
+
+    def parseJSONValue(self, jobject):
+        self.parse(str(jobject), variant="vcard")
+
+
+    def writeJSONValue(self, jobject):
+
+        os = StringIO()
+        self.generate(os, fullISO=True)
+        text = os.getvalue()
+        jobject.append(text)
 
 
     def getValue(self):

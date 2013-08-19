@@ -47,6 +47,14 @@ class PlainTextValue(Value):
         value.text = self.mValue
 
 
+    def parseJSONValue(self, jobject):
+        self.mValue = str(jobject)
+
+
+    def writeJSONValue(self, jobject):
+        jobject.append(self.mValue)
+
+
     def getValue(self):
         return self.mValue
 

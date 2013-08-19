@@ -22,11 +22,7 @@ from pycalendar.vcard.adr import Adr
 
 class AdrValue(WrapperValue, Value):
 
-    def __init__(self, value=None):
-        self.mValue = value if value is not None else Adr()
-
-
-    def getType(self):
-        return Value.VALUETYPE_ADR
+    _wrappedClass = Adr
+    _wrappedType = Value.VALUETYPE_ADR
 
 Value.registerType(Value.VALUETYPE_ADR, AdrValue, None)

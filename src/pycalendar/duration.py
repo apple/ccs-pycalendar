@@ -270,3 +270,11 @@ class Duration(ValueMixin):
 
     def writeXML(self, node, namespace):
         node.text = self.getText()
+
+
+    def parseJSON(self, jobject):
+        self.parse(str(jobject))
+
+
+    def writeJSON(self, jobject):
+        jobject.append(self.getText())

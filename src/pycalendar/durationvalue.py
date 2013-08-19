@@ -21,11 +21,7 @@ from pycalendar.valueutils import WrapperValue
 
 class DurationValue(WrapperValue, Value):
 
-    def __init__(self, value=None):
-        self.mValue = value if value is not None else Duration()
-
-
-    def getType(self):
-        return Value.VALUETYPE_DURATION
+    _wrappedClass = Duration
+    _wrappedType = Value.VALUETYPE_DURATION
 
 Value.registerType(Value.VALUETYPE_DURATION, DurationValue, xmldefinitions.value_duration)

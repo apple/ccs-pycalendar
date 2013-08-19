@@ -137,7 +137,6 @@ class TestRecurrence(unittest.TestCase):
                 DateTime(2016, 1, 15, 0, 0, 0),
             ],
         )
-        print items
 
 
     def testClearOnChange(self):

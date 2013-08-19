@@ -40,8 +40,10 @@ class TestProperty(unittest.TestCase):
         "SUMMARY:Some \\ntext",
         "RRULE:FREQ=MONTHLY;COUNT=3;BYDAY=TU,WE,TH;BYSETPOS=-1",
         "REQUEST-STATUS:2.0;Success",
+        "GEO:-2.1;3.2",
         "URI:http://www.example.com",
         "TZOFFSETFROM:-0500",
+        "X-FOO;VALUE=FLOAT:-1.23",
         "X-Test:Some\, text.",
         "X-Test:Some:, text.",
         "X-APPLE-STRUCTURED-LOCATION;VALUE=URI:geo:123.123,123.123",
@@ -130,7 +132,7 @@ class TestProperty(unittest.TestCase):
 
     def testGEOValueRoundtrip(self):
 
-        data = "GEO:123.456,789.101"
+        data = "GEO:123.456;789.101"
         prop = Property()
         prop.parse(data)
         self.assertEqual(str(prop), data + "\r\n")

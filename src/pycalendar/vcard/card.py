@@ -25,6 +25,7 @@ from pycalendar.vcard.definitions import VCARD, Property_VERSION, \
     Property_PRODID, Property_UID
 from pycalendar.vcard.property import Property
 from pycalendar.vcard.validation import VCARD_VALUE_CHECKS
+import json
 
 class Card(ComponentBase):
 
@@ -271,6 +272,20 @@ class Card(ComponentBase):
             raise InvalidData("vCard missing VERSION", "")
 
         return result
+
+
+    @staticmethod
+    def parseJSONText(data):
+
+        try:
+            return Card.parseJSON(json.loads(data), None, Card(add_defaults=False))
+        except Exception:
+            return None
+
+
+    def getTextJSON(self, includeTimezones=False):
+        jobject = self.writeJSON(includeTimezones)
+        return json.dumps(jobject, indent=2, separators=(',', ':'))
 
 
     def addDefaultProperties(self):

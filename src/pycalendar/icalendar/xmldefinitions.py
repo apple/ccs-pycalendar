@@ -46,6 +46,11 @@ recur_bymonth = "bymonth"
 recur_bysetpos = "bysetpos"
 recur_wkst = "wkst"
 
+req_status = "request-status"
 req_status_code = "code"
 req_status_description = "description"
 req_status_data = "data"
+
+geo = "geo"
+geo_longitude = "longitude"
+geo_latitude = "latitude"

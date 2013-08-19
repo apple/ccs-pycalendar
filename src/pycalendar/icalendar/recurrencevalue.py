@@ -21,13 +21,8 @@ from pycalendar.valueutils import WrapperValue
 
 class RecurrenceValue(WrapperValue, Value):
 
-    def __init__(self, value=None):
-        self.mValue = value if value is not None else Recurrence()
-
-
-    def getType(self):
-        return Value.VALUETYPE_RECUR
-
+    _wrappedClass = Recurrence
+    _wrappedType = Value.VALUETYPE_RECUR
 
     def writeXML(self, node, namespace):
         self.mValue.writeXML(node, namespace)

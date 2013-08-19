@@ -78,19 +78,19 @@ class Period(ValueMixin):
         return period
 
 
-    def parse(self, data):
+    def parse(self, data, fullISO=False):
         splits = data.split('/', 1)
         if len(splits) == 2:
             start = splits[0]
             end = splits[1]
 
-            self.mStart.parse(start)
+            self.mStart.parse(start, fullISO)
             if end[0] == 'P':
                 self.mDuration.parse(end)
                 self.mUseDuration = True
                 self.mEnd = self.mStart + self.mDuration
             else:
-                self.mEnd.parse(end)
+                self.mEnd.parse(end, fullISO)
                 self.mUseDuration = False
                 self.mDuration = self.mEnd - self.mStart
         else:
@@ -119,6 +119,26 @@ class Period(ValueMixin):
         else:
             end = XML.SubElement(node, xmlutils.makeTag(namespace, xmldefinitions.period_end))
             end.text = self.mEnd.getXMLText()
+
+
+    def parseJSON(self, jobject):
+        """
+        jCal encodes this as an array of two values. We convert back into a single "/"
+        separated string and parse as normal.
+        """
+        self.parse("%s/%s" % tuple(jobject), True)
+
+
+    def writeJSON(self, jobject):
+        """
+        jCal encodes this value as an array with two components.
+        """
+        value = [self.mStart.getXMLText(), ]
+        if self.mUseDuration:
+            value.append(self.mDuration.getText())
+        else:
+            value.append(self.mEnd.getXMLText())
+        jobject.append(value)
 
 
     def getStart(self):

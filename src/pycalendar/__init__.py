@@ -20,6 +20,8 @@ import binaryvalue
 import caladdressvalue
 import datetimevalue
 import durationvalue
+import floatvalue
+import geovalue
 import icalendar.recurrencevalue
 import icalendar.requeststatusvalue
 import integervalue

@@ -30,6 +30,7 @@ from pycalendar.parser import ParserContext
 from pycalendar.period import Period
 from pycalendar.utils import readFoldedLine
 import collections
+import json
 import xml.etree.cElementTree as XML
 
 class Calendar(ComponentBase):
@@ -497,6 +498,28 @@ class Calendar(ComponentBase):
         root = XML.Element(xmlutils.makeTag(xmldefinitions.iCalendar20_namespace, xmldefinitions.icalendar))
         super(Calendar, self).writeXML(root, xmldefinitions.iCalendar20_namespace)
         return root
+
+
+    @staticmethod
+    def parseJSONText(data):
+
+        return Calendar.parseJSON(json.loads(data), None, Calendar(add_defaults=False))
+
+
+    def getTextJSON(self, includeTimezones=False):
+        jobject = self.writeJSON(includeTimezones)
+        return json.dumps(jobject, indent=2, separators=(',', ':'))
+
+
+    def writeJSON(self, includeTimezones=False):
+        # Make sure all required timezones are in this object
+        if includeTimezones:
+            self.includeTimezones()
+
+        # Root node structure
+        vcalendar = []
+        super(Calendar, self).writeJSON(vcalendar)
+        return vcalendar[0]
 
 
     # Get expanded components

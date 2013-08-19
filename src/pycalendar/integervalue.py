@@ -50,6 +50,14 @@ class IntegerValue(Value):
         value.text = str(self.mValue)
 
 
+    def parseJSONValue(self, jobject):
+        self.mValue = int(jobject)
+
+
+    def writeJSONValue(self, jobject):
+        jobject.append(self.mValue)
+
+
     def getValue(self):
         return self.mValue
 

@@ -46,7 +46,7 @@ class Property(PropertyBase):
         definitions.cICalProperty_CLASS            : Value.VALUETYPE_TEXT,
         definitions.cICalProperty_COMMENT          : Value.VALUETYPE_TEXT,
         definitions.cICalProperty_DESCRIPTION      : Value.VALUETYPE_TEXT,
-        definitions.cICalProperty_GEO              : Value.VALUETYPE_GEO,
+        definitions.cICalProperty_GEO              : Value.VALUETYPE_FLOAT,
         definitions.cICalProperty_LOCATION         : Value.VALUETYPE_TEXT,
         definitions.cICalProperty_PERCENT_COMPLETE : Value.VALUETYPE_INTEGER,
         definitions.cICalProperty_PRIORITY         : Value.VALUETYPE_INTEGER,
@@ -97,7 +97,7 @@ class Property(PropertyBase):
         definitions.cICalProperty_SEQUENCE      : Value.VALUETYPE_INTEGER,
 
         # 5545 Section 3.8.8
-        definitions.cICalProperty_REQUEST_STATUS : Value.VALUETYPE_REQUEST_STATUS,
+        definitions.cICalProperty_REQUEST_STATUS : Value.VALUETYPE_TEXT,
 
         # Extensions: draft-daboo-valarm-extensions-03
         definitions.cICalProperty_ACKNOWLEDGED   : Value.VALUETYPE_DATETIME,
@@ -160,6 +160,11 @@ class Property(PropertyBase):
         definitions.cICalProperty_EXDATE,
         definitions.cICalProperty_RDATE,
     ))
+
+    sSpecialVariants = {
+        definitions.cICalProperty_GEO : Value.VALUETYPE_GEO,
+        definitions.cICalProperty_REQUEST_STATUS: Value.VALUETYPE_REQUEST_STATUS,
+    }
 
     sVariant = "ical"
 

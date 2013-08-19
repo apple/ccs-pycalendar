@@ -82,15 +82,28 @@ class RequestStatusValue(Value):
 
 
     def writeXML(self, node, namespace):
-        code = XML.SubElement(node, xmlutils.makeTag(namespace, xmldefinitions.req_status_code))
+        value = self.getXMLNode(node, namespace)
+
+        code = XML.SubElement(value, xmlutils.makeTag(namespace, xmldefinitions.req_status_code))
         code.text = self.mValue[0]
 
-        description = XML.SubElement(node, xmlutils.makeTag(namespace, xmldefinitions.req_status_description))
+        description = XML.SubElement(value, xmlutils.makeTag(namespace, xmldefinitions.req_status_description))
         description.text = self.mValue[1]
 
         if len(self.mValue) == 3 and self.mValue[2]:
-            data = XML.SubElement(node, xmlutils.makeTag(namespace, xmldefinitions.req_status_data))
-            data.text = self.mValue[1]
+            data = XML.SubElement(value, xmlutils.makeTag(namespace, xmldefinitions.req_status_data))
+            data.text = self.mValue[2]
+
+
+    def parseJSONValue(self, jobject):
+        self.mValue = jobject
+
+
+    def writeJSONValue(self, jobject):
+        value = [self.mValue[0], self.mValue[1]]
+        if len(self.mValue) == 3:
+            value.append(self.mValue[2])
+        jobject.append(value)
 
 
     def getValue(self):

@@ -21,9 +21,8 @@ from pycalendar.valueutils import WrapperValue
 
 class DateTimeValue(WrapperValue, Value):
 
-    def __init__(self, value=None):
-        self.mValue = value if value is not None else DateTime()
-
+    _wrappedClass = DateTime
+    _wrappedType = None # Depends on actual value
 
     def getType(self):
         return  (Value.VALUETYPE_DATETIME, Value.VALUETYPE_DATE)[self.mValue.isDateOnly()]

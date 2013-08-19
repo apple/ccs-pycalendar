@@ -27,6 +27,11 @@ class InvalidData(ErrorBase):
 
 
 
+class InvalidComponent(ErrorBase):
+    pass
+
+
+
 class InvalidProperty(ErrorBase):
     pass
 

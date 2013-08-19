@@ -52,18 +52,33 @@ class ValueMixin(object):
         raise NotImplementedError
 
 
+    def parseJSON(self, jobject):
+        raise NotImplementedError
+
+
+    def writeJSON(self, jobject):
+        raise NotImplementedError
+
+
 
 class WrapperValue(object):
     """
     Mix-in for Value derived classes that wrap a value-specific class.
     """
 
-    def duplicate(self):
-        return self.__class__(self.mValue.duplicate())
+    _wrappedClass = None
+    _wrappedType = None
+
+    def __init__(self, value=None):
+        self.mValue = value if value is not None else self._wrappedClass()
 
 
     def getType(self):
-        raise NotImplementedError
+        return self._wrappedType
+
+
+    def duplicate(self):
+        return self.__class__(self.mValue.duplicate())
 
 
     def parse(self, data, variant):
@@ -77,6 +92,14 @@ class WrapperValue(object):
     def writeXML(self, node, namespace):
         value = self.getXMLNode(node, namespace)
         value.text = self.mValue.writeXML()
+
+
+    def parseJSONValue(self, jobject):
+        self.mValue.parseJSON(jobject)
+
+
+    def writeJSONValue(self, jobject):
+        self.mValue.writeJSON(jobject)
 
 
     def getValue(self):

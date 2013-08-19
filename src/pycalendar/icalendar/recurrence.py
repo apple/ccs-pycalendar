@@ -720,6 +720,77 @@ class Recurrence(ValueMixin):
                 child.text = str(item)
 
 
+    def parseJSON(self, jobject):
+        """
+        jCal splits the value into components. We need to convert that back to the
+        iCalendar string format, then parse it.
+        """
+
+        items = []
+        for name, value in jobject.items():
+            if name in (
+                "bysecond", "byminute", "byhour",
+                "bymonthday", "byyearday", "byweekno",
+                "bymonth", "bysetpos", "byday",
+            ):
+                if not isinstance(value, str) and not isinstance(value, unicode) and not isinstance(value, int):
+                    value = ",".join(map(str, value))
+            items.append("%s=%s" % (name.upper(), value,))
+        self.parse(";".join(items))
+
+
+    def writeJSON(self, jobject):
+        """
+        jCal splits the value into components. We need to convert that back to the
+        iCalendar string format, then parse it.
+        """
+        jdict = {}
+
+        jdict[xmldefinitions.recur_freq] = self.cFreqToXMLMap[self.mFreq]
+
+        if self.mUseCount:
+            jdict[xmldefinitions.recur_count] = self.mCount
+        elif self.mUseUntil:
+            jdict[xmldefinitions.recur_until] = self.mUntil.getXMLText()
+
+        if self.mInterval > 1:
+            jdict[xmldefinitions.recur_interval] = self.mInterval
+
+        if self.mBySeconds:
+            jdict[xmldefinitions.recur_bysecond] = self.mBySeconds
+        if self.mByMinutes:
+            jdict[xmldefinitions.recur_byminute] = self.mByMinutes
+        if self.mByHours:
+            jdict[xmldefinitions.recur_byhour] = self.mByHours
+
+        if self.mByDay is not None and len(self.mByDay) != 0:
+            items = []
+            for iter in self.mByDay:
+                data = ""
+                if iter[0] != 0:
+                    data = str(iter[0])
+                data += self.cWeekdayRecurMap.get(iter[1], "")
+                items.append(data)
+            jdict[xmldefinitions.recur_byday] = items
+
+        if self.mByMonthDay:
+            jdict[xmldefinitions.recur_bymonthday] = self.mByMonthDay
+        if self.mByYearDay:
+            jdict[xmldefinitions.recur_byyearday] = self.mByYearDay
+        if self.mByWeekNo:
+            jdict[xmldefinitions.recur_byweekno] = self.mByWeekNo
+        if self.mByMonth:
+            jdict[xmldefinitions.recur_bymonth] = self.mByMonth
+        if self.mBySetPos:
+            jdict[xmldefinitions.recur_bysetpos] = self.mBySetPos
+
+        # MO is the default so we do not need it
+        if self.mWeekstart != definitions.eRecurrence_WEEKDAY_MO:
+            jdict[xmldefinitions.recur_wkst] = self.cWeekdayRecurMap.get(self.mWeekstart, definitions.cICalValue_RECUR_WEEKDAY_MO)
+
+        jobject.append(jdict)
+
+
     def hasBy(self):
         return (self.mBySeconds is not None) and (len(self.mBySeconds) != 0) \
                 or (self.mByMinutes is not None) and (len(self.mByMinutes) != 0) \

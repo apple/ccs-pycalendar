@@ -40,7 +40,7 @@ class PropertyBase(object):
     sValueTypeMap = {}
     sTypeValueMap = {}
     sMultiValues = set()
-    sTextVariants = set()
+    sSpecialVariants = {}
 
     sUsesGroup = False
 
@@ -390,6 +390,93 @@ class PropertyBase(object):
             self.mValue.writeXML(prop, namespace)
 
 
+    @classmethod
+    def parseJSON(cls, jobject):
+        """
+        Parse a JSON property of the form:
+
+        [name, attrs, type, value1, value2, ...]
+
+        @param jobject: a JSON array
+        @type jobject: C{list}
+        """
+
+        try:
+            prop = cls()
+            prop.mName = jobject[0].upper()
+            if jobject[1]:
+                for name, value in jobject[1].items():
+                    # Now add parameter value
+                    name = name.upper()
+                    attrvalue = Parameter(name=name, value=value)
+                    prop.mParameters.setdefault(name, []).append(attrvalue)
+
+            value_type = cls.sValueTypeMap.get(jobject[2].upper(), Value.VALUETYPE_UNKNOWN)
+
+            # Get default value type from property name and insert a VALUE parameter if current value type is not default
+            default_type = cls.sDefaultValueTypeMap.get(prop.mName.upper(), Value.VALUETYPE_UNKNOWN)
+            if default_type != value_type:
+                attrvalue = Parameter(name=cls.sValue, value=value_type)
+                prop.mParameters.setdefault(cls.sValue, []).append(attrvalue)
+
+            # Check for specials
+            if prop.mName.upper() in cls.sSpecialVariants:
+                # Make sure we have the default value for the special
+                if value_type == cls.sDefaultValueTypeMap.get(prop.mName.upper(), Value.VALUETYPE_UNKNOWN):
+                    value_type = cls.sSpecialVariants[prop.mName.upper()]
+
+            # Check for multivalued
+            values = jobject[3:]
+            if prop.mName.upper() in cls.sMultiValues:
+                prop.mValue = MultiValue(value_type)
+                prop.mValue.parseJSONValue(values)
+            else:
+                # Create the type
+                prop.mValue = Value.createFromType(value_type)
+                prop.mValue.parseJSONValue(values[0])
+
+            # Special post-create for some types
+            prop._postCreateValue(value_type)
+
+            return prop
+
+        except Exception:
+            raise InvalidProperty("Invalid property", jobject)
+
+
+    def writeJSON(self, jobject):
+
+        # Write it out always with value
+        self.generateValueJSON(jobject, False)
+
+
+    def writeJSONFiltered(self, jobject, filter):
+
+        # Check for property in filter and whether value is written out
+        test, novalue = filter.testPropertyValue(self.mName.upper())
+        if test:
+            self.generateValueJSON(jobject, novalue)
+
+
+    def generateValueJSON(self, jobject, novalue):
+
+        prop = [
+            self.getName().lower(),
+            {},
+        ]
+        jobject.append(prop)
+
+        # Write all parameters
+        for key in sorted(self.mParameters.keys()):
+            for attr in self.mParameters[key]:
+                if attr.getName().lower() != "value":
+                    attr.writeJSON(prop[1])
+
+        # Write value
+        if self.mValue and not novalue:
+            self.mValue.writeJSON(prop)
+
+
     def createValue(self, data):
         # Tidy first
         self.mValue = None
@@ -400,8 +487,14 @@ class PropertyBase(object):
         # Check whether custom value is set
         if self.sValue in self.mParameters:
             attr = self.getParameterValue(self.sValue)
-            if attr != self.sText or self.mName.upper() not in self.sTextVariants:
+            if attr != self.sText:
                 value_type = self.sValueTypeMap.get(attr, value_type)
+
+        # Check for specials
+        if self.mName.upper() in self.sSpecialVariants:
+            # Make sure we have the default value for the special
+            if value_type == self.sDefaultValueTypeMap.get(self.mName.upper(), Value.VALUETYPE_UNKNOWN):
+                value_type = self.sSpecialVariants[self.mName.upper()]
 
         # Check for multivalued
         if self.mName.upper() in self.sMultiValues:
@@ -464,7 +557,10 @@ class PropertyBase(object):
         # See if current type is default for this property. If there is no mapping available,
         # then always add VALUE if it is not TEXT.
         default_type = self.sDefaultValueTypeMap.get(self.mName.upper())
-        actual_type = self.mValue.getType()
+        if self.mName.upper() in self.sSpecialVariants:
+            actual_type = default_type
+        else:
+            actual_type = self.mValue.getType()
         if default_type is None or default_type != actual_type:
             actual_value = self.sTypeValueMap.get(actual_type)
             if actual_value is not None and (default_type is not None or actual_type != Value.VALUETYPE_TEXT):
