@@ -43,11 +43,9 @@ import icalendar.vavailability
 import icalendar.vevent
 import icalendar.vfreebusy
 import icalendar.vjournal
+import icalendar.vpoll
 import icalendar.vtimezone
 import icalendar.vtimezonedaylight
 import icalendar.vtimezonestandard
 import icalendar.vtodo
 import icalendar.vunknown
-
-# Import these to force static initialisation
-#import property

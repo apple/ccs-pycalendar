@@ -40,3 +40,10 @@ cICalMIMEComponent_VTODO = "vtodo"
 cICalMIMEComponent_VJOURNAL = "vjournal"
 cICalMIMEComponent_VFREEBUSY = "vfreebusy"
 cICalMIMEComponent_VAVAILABILITY = "vavailability"
+
+# VPOLL extensions draft-york-vpoll-00.txt
+
+#    Section 6.1
+cICalMethod_POLLSTATUS = "POLLSTATUS"
+cICalMIMEMethod_POLLSTATUS = "pollstatus"
+cICalMIMEComponent_VPOLL = "vpoll"

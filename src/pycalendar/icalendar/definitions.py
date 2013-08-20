@@ -320,6 +320,7 @@ cICalComponent_AVAILABLE = "AVAILABLE"
 #     Section 3.2
 cICalProperty_BUSYTYPE = "BUSYTYPE"
 
+
 #     Extensions: draft-daboo-valarm-extensions-03
 
 #     Section 5
@@ -331,6 +332,26 @@ cICalProperty_ACKNOWLEDGED = "ACKNOWLEDGED"
 
 eAction_VAlarm_None = 6
 cICalProperty_ACTION_NONE = "NONE"
+
+
+#    Extensions: draft-york-vpoll-00.txt
+
+#    Section 4.1
+cICalParamater_PUBLIC_COMMENT = "PUBLIC-COMMENT"
+cICalParamater_RESPONSE = "RESPONSE"
+cICalParamater_STAY_INFORMED = "STAY-INFORMED"
+
+#    Section 4.2
+cICalProperty_ACCEPT_RESPONSE = "ACCEPT-RESPONSE"
+cICalProperty_POLL_ITEM_ID = "POLL-ITEM-ID"
+cICalProperty_POLL_MODE = "POLL-MODE"
+cICalProperty_POLL_MODE_BASIC = "BASIC"
+cICalProperty_POLL_PROPERTIES = "POLL-PROPERTIES"
+cICalProperty_VOTER = "VOTER"
+
+#    Section 4.3
+cICalComponent_VPOLL = "VPOLL"
+
 
 #     Mulberry extensions
 cICalProperty_ACTION_X_SPEAKTEXT = "X-MULBERRY-SPEAK-TEXT"
