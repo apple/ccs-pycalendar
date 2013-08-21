@@ -82,7 +82,7 @@ class UTCOffsetValue(Value):
 
             s = ("%s%02d:%02d" if fullISO else "%s%02d%02d") % (sign, hours, mins,)
             if (secs != 0):
-                s = ("%s:%s" if fullISO else "%s%s") % (secs,)
+                s = ("%s:%02d" if fullISO else "%s%02d") % (s, secs,)
 
             os.write(s)
         except:

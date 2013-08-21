@@ -139,12 +139,6 @@ class Property(PropertyBase):
     sValue = definitions.Parameter_VALUE
     sText = definitions.Value_TEXT
 
-    @classmethod
-    def registerDefaultValue(cls, propname, valuetype):
-        if propname not in cls.sDefaultValueTypeMap:
-            cls.sDefaultValueTypeMap[propname] = valuetype
-
-
     def __init__(self, group=None, name=None, value=None, valuetype=None):
 
         self.mGroup = group

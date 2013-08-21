@@ -43,6 +43,7 @@ class TestProperty(unittest.TestCase):
         "GEO:-2.1;3.2",
         "URI:http://www.example.com",
         "TZOFFSETFROM:-0500",
+        "TZOFFSETFROM:-045857",
         "X-FOO;VALUE=FLOAT:-1.23",
         "X-Test:Some\, text.",
         "X-Test:Some:, text.",

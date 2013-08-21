@@ -49,6 +49,12 @@ class PropertyBase(object):
     sValue = None
     sText = None
 
+    @classmethod
+    def registerDefaultValue(cls, propname, valuetype):
+        if propname not in cls.sDefaultValueTypeMap:
+            cls.sDefaultValueTypeMap[propname] = valuetype
+
+
     def __init__(self, name=None, value=None, valuetype=None):
         raise NotImplementedError
 

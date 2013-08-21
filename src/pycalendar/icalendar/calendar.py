@@ -62,7 +62,7 @@ class Calendar(ContainerBase):
     propertyValueChecks = ICALENDAR_VALUE_CHECKS
 
     def __init__(self, parent=None, add_defaults=True):
-        super(Calendar, self).__init__(None)
+        super(Calendar, self).__init__(add_defaults=add_defaults)
 
         self.mName = ""
         self.mDescription = ""

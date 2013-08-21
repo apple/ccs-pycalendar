@@ -171,12 +171,6 @@ class Property(PropertyBase):
     sValue = definitions.cICalParameter_VALUE
     sText = definitions.cICalValue_TEXT
 
-    @classmethod
-    def registerDefaultValue(cls, propname, valuetype):
-        if propname not in cls.sDefaultValueTypeMap:
-            cls.sDefaultValueTypeMap[propname] = valuetype
-
-
     def __init__(self, name=None, value=None, valuetype=None):
 
         self.mName = name if name is not None else ""
