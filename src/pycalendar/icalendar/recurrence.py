@@ -735,6 +735,8 @@ class Recurrence(ValueMixin):
             ):
                 if not isinstance(value, str) and not isinstance(value, unicode) and not isinstance(value, int):
                     value = ",".join(map(str, value))
+            elif name == "until":
+                value = value.replace("-", "").replace(":", "")
             items.append("%s=%s" % (name.upper(), value,))
         self.parse(";".join(items))
 

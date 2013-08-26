@@ -40,7 +40,7 @@ class UTCOffsetValue(Value):
 
         # Must be of specific lengths
         datalen = len(data)
-        if datalen not in ((6, 8,) if fullISO else (5, 7,)):
+        if datalen not in ((6, 9,) if fullISO else (5, 7,)):
             self.mValue = 0
             raise ValueError
 
@@ -59,7 +59,8 @@ class UTCOffsetValue(Value):
         # Get seconds if present
         secs = 0
         if datalen > 6:
-            secs = int(data[index + 2:])
+            index = 7 if fullISO else 5
+            secs = int(data[index:])
 
         self.mValue = ((hours * 60) + mins) * 60 + secs
         if not plus:

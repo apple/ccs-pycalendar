@@ -15,6 +15,7 @@
 ##
 
 from pycalendar.icalendar.calendar import Calendar
+from pycalendar.icalendar.property import Property
 import difflib
 import unittest
 
@@ -410,7 +411,7 @@ END:VCALENDAR
             cal1 = Calendar.parseText(caldata)
             test1 = cal1.getText()
 
-            cal2 = Calendar.parseJSONText(jcaldata)
+            cal2 = Calendar.parseJSONData(jcaldata)
             test2 = cal2.getText()
 
             self.assertEqual(
@@ -461,7 +462,7 @@ END:VCALENDAR
         cal1 = Calendar.parseText(icaldata)
         test1 = cal1.getText()
 
-        cal2 = Calendar.parseJSONText(jcaldata)
+        cal2 = Calendar.parseJSONData(jcaldata)
         test2 = cal2.getText()
 
         self.assertEqual(
@@ -516,8 +517,8 @@ END:VCALENDAR
               }
             ],
             ["tzname", {}, "text", "EST"],
-            ["tzoffsetfrom", {}, "utc-offset", "-04:00"],
-            ["tzoffsetto", {}, "utc-offset", "-05:00"]
+            ["tzoffsetfrom", {}, "utc-offset", "-04:00:00"],
+            ["tzoffsetto", {}, "utc-offset", "-05:00:00"]
           ],
           []
         ]
@@ -619,7 +620,7 @@ END:VCALENDAR
         cal1 = Calendar.parseText(icaldata)
         test1 = cal1.getText()
 
-        cal2 = Calendar.parseJSONText(jcaldata)
+        cal2 = Calendar.parseJSONData(jcaldata)
         test2 = cal2.getText()
 
         self.assertEqual(
@@ -627,3 +628,48 @@ END:VCALENDAR
             test2,
             "\n".join(difflib.unified_diff(str(test1).splitlines(), test2.splitlines()))
         )
+
+
+
+class TestJSONProperty(unittest.TestCase):
+
+    test_data = (
+        # Different value types
+        ["attach", {}, "binary", "VGVzdA=="],
+        ["organizer", {}, "cal-address", "mailto:jdoe@example.com"],
+        ["dtstart", {"tzid": "US/Eastern"}, "date-time", "2006-02-26T12:00:00"],
+        ["dtstart", {}, "date", "2006-02-26"],
+        ["dtstart", {}, "date-time", "2006-02-26T13:00:00Z"],
+        ["x-foo", {}, "text", "BAR"],
+        ["duration", {}, "duration", "PT10M"],
+        ["sequence", {}, "integer", 1],
+        ["rdate", {}, "date-time", "2006-02-26T12:00:00Z", "2006-02-27T12:00:00Z"],
+        ["freebusy", {}, "period", ["2006-02-26T12:00:00Z", "2006-02-27T12:00:00Z"]],
+        ["rrule", {}, "recur", {"freq":"MONTHLY", "count": 3, "byday":["TU", "WE", "TH"], "bysetpos":[-1]}],
+        ["request-status", {}, "text", ["2.0", "Success"]],
+        ["geo", {}, "float", [-2.1, 3.2]],
+        ["uri", {}, "uri", "http://www.example.com"],
+        ["tzoffsetfrom", {}, "utc-offset", "-05:00"],
+        ["tzoffsetfrom", {}, "utc-offset", "-04:58:57"],
+        ["x-foo", {}, "float", -1.23],
+        ["x-test", {}, "text", "Some:, text."],
+        ["x-apple-structured-location", {}, "uri", "geo:123.123,123.123"],
+        ["rrule", {}, "recur", {"freq":"MONTHLY", "until": "2013-01-01T00:00:00Z"}],
+
+        # Various parameters
+        ["dtstart", {"tzid": "Somewhere, else"}, "date-time", "2006-02-26T12:00:00"],
+        ["attendee", {"partstat": "ACCEPTED", "role": "CHAIR"}, "cal-address", "mailto:jdoe@example.com"],
+        ["x-foo", {"x-bar": "Some\\ntext"}, "text", "foobar"],
+
+        # Parameter escaping
+        ["attendee", {"cn": "My 'Test' Name", "role": "CHAIR"}, "cal-address", "mailto:jdoe@example.com"],
+    )
+
+
+    def testParseGenerate(self):
+
+        for data in TestJSONProperty.test_data:
+            prop = Property.parseJSON(data)
+            jobject = []
+            prop.writeJSON(jobject)
+            self.assertEqual(jobject[0], data, "Failed parse/generate: %s to %s" % (data, jobject[0],))

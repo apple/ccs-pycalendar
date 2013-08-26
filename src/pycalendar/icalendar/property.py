@@ -173,9 +173,7 @@ class Property(PropertyBase):
 
     def __init__(self, name=None, value=None, valuetype=None):
 
-        self.mName = name if name is not None else ""
-        self.mParameters = {}
-        self.mValue = None
+        super(Property, self).__init__(name, value, valuetype)
 
         # The None check speeds up .duplicate()
         if value is None:

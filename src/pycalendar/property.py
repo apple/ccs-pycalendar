@@ -56,7 +56,10 @@ class PropertyBase(object):
 
 
     def __init__(self, name=None, value=None, valuetype=None):
-        raise NotImplementedError
+
+        self.mName = name if name is not None else ""
+        self.mParameters = {}
+        self.mValue = None
 
 
     def duplicate(self):
@@ -517,8 +520,7 @@ class PropertyBase(object):
         # Check whether custom value is set
         if self.sValue in self.mParameters:
             attr = self.getParameterValue(self.sValue)
-            if attr != self.sText:
-                value_type = self.sValueTypeMap.get(attr, value_type)
+            value_type = self.sValueTypeMap.get(attr, value_type)
 
         # Check for specials
         if self.mName.upper() in self.sSpecialVariants:

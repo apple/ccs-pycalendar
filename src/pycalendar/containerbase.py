@@ -34,6 +34,9 @@ class ContainerBase(ComponentBase):
     sComponentType = None
     sPropertyType = None
 
+    sFormatText = None
+    sFormatJSON = None
+
     @classmethod
     def setPRODID(cls, prodid):
         cls.sProdID = prodid
@@ -79,10 +82,35 @@ class ContainerBase(ComponentBase):
 
 
     @classmethod
-    def parseText(cls, data):
+    def parseData(cls, data, format=None):
+        """
+        Parse a source of data that can either be a stream (file like object) or a string. Also,
+        it can be in text or json formats.
 
+        @param data: the data to parse
+        @type data: C{str} or C{File-like}
+        @param format: format (MIME media type) of data.
+        @type format: C{str}
+        """
+
+        if format is None or format == cls.sFormatText:
+            return cls.parseTextData(data)
+
+        elif format == cls.sFormatJSON:
+            return cls.parseJSONData(data)
+
+
+    @classmethod
+    def parseText(cls, data):
+        return cls.parseTextData(data)
+
+
+    @classmethod
+    def parseTextData(cls, data):
+        if isinstance(data, str):
+            data = StringIO(data)
         cal = cls(add_defaults=False)
-        if cal.parse(StringIO(data)):
+        if cal.parse(data):
             return cal
         else:
             return None
@@ -193,11 +221,25 @@ class ContainerBase(ComponentBase):
 
 
     @classmethod
-    def parseJSONText(cls, data):
-
+    def parseJSONData(cls, data):
+        if not isinstance(data, str):
+            data = data.read()
         try:
-            return cls.parseJSON(json.loads(data), None, cls(add_defaults=False))
-        except Exception:
+            jobject = json.loads(data)
+        except ValueError, e:
+            raise InvalidData(e, data)
+        return cls.parseJSON(jobject, None, cls(add_defaults=False))
+
+
+    def getText(self, format=None):
+
+        if format is None or format == self.sFormatText:
+            s = StringIO()
+            self.generate(s)
+            return s.getvalue()
+        elif format == self.sFormatJSON:
+            return self.getTextJSON()
+        else:
             return None
 
 

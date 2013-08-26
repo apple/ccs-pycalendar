@@ -141,10 +141,13 @@ class Property(PropertyBase):
 
     def __init__(self, group=None, name=None, value=None, valuetype=None):
 
+        super(Property, self).__init__(name, value, valuetype)
+
         self.mGroup = group
-        self.mName = name if name is not None else ""
-        self.mParameters = {}
-        self.mValue = None
+
+        # The None check speeds up .duplicate()
+        if value is None:
+            pass
 
         if isinstance(value, int):
             self._init_attr_value_int(value)

@@ -343,7 +343,7 @@ END:VCARD
 
         for item, results in data:
 
-            cards = Card.parseMultiple(StringIO.StringIO(item))
+            cards = Card.parseMultipleTextData(StringIO.StringIO(item))
             self.assertEqual(len(cards), len(results))
             for card, result in zip(cards, results):
                 self.assertEqual(str(card), result, "\n".join(difflib.unified_diff(str(card).splitlines(), result.splitlines())))

@@ -14,6 +14,7 @@
 #    limitations under the License.
 ##
 
+from cStringIO import StringIO
 from pycalendar.containerbase import ContainerBase
 from pycalendar.exceptions import InvalidData
 from pycalendar.parser import ParserContext
@@ -23,12 +24,16 @@ from pycalendar.vcard.definitions import VCARD, Property_VERSION, \
     Property_PRODID, Property_UID
 from pycalendar.vcard.property import Property
 from pycalendar.vcard.validation import VCARD_VALUE_CHECKS
+import json
 
 class Card(ContainerBase):
 
     sContainerDescriptor = "vCard"
     sComponentType = None
     sPropertyType = Property
+
+    sFormatText = "text/vcard"
+    sFormatJSON = "application/vcard+json"
 
     propertyCardinality_1 = (
         definitions.Property_VERSION,
@@ -64,12 +69,24 @@ class Card(ContainerBase):
         )
 
 
-    @staticmethod
-    def parseMultiple(ins):
+    @classmethod
+    def parseMultipleData(cls, data, format):
+
+        if format == cls.sFormatText:
+            return cls.parseMultipleTextData(data)
+        elif format == cls.sFormatJSON:
+            return cls.parseMultipleJSONData(data)
+
+
+    @classmethod
+    def parseMultipleTextData(cls, ins):
+
+        if isinstance(ins, str):
+            ins = StringIO(ins)
 
         results = []
 
-        card = Card(add_defaults=False)
+        card = cls(add_defaults=False)
 
         LOOK_FOR_VCARD = 0
         GET_PROPERTY = 1
@@ -139,6 +156,21 @@ class Card(ContainerBase):
         if state != LOOK_FOR_VCARD:
             raise InvalidData("vCard data not complete")
 
+        return results
+
+
+    @classmethod
+    def parseMultipleJSONData(cls, data):
+
+        if not isinstance(data, str):
+            data = data.read()
+        try:
+            jobjects = json.loads(data)
+        except ValueError, e:
+            raise InvalidData(e, data)
+        results = []
+        for jobject in jobjects:
+            results.append(cls.parseJSON(jobject, None, cls(add_defaults=False)))
         return results
 
 

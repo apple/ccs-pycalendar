@@ -49,6 +49,9 @@ class Calendar(ContainerBase):
     sComponentType = Component
     sPropertyType = Property
 
+    sFormatText = "text/calendar"
+    sFormatJSON = "application/calendar+json"
+
     propertyCardinality_1 = (
         definitions.cICalProperty_PRODID,
         definitions.cICalProperty_VERSION,
@@ -221,33 +224,35 @@ class Calendar(ContainerBase):
 
         while readFoldedLine(ins, lines):
 
+            line = lines[0]
+
             if state == LOOK_FOR_VCALENDAR:
 
                 # Look for start
-                if lines[0] == self.getBeginDelimiter():
+                if line == self.getBeginDelimiter():
                     # Next state
                     state = GET_PROPERTY_OR_COMPONENT
 
                 # Handle blank line
-                elif len(lines[0]) == 0:
+                elif len(line) == 0:
                     # Raise if requested, otherwise just ignore
                     if ParserContext.BLANK_LINES_IN_DATA == ParserContext.PARSER_RAISE:
                         raise InvalidData("iCalendar data has blank lines")
 
                 # Unrecognized data
                 else:
-                    raise InvalidData("iCalendar data not recognized", lines[0])
+                    raise InvalidData("iCalendar data not recognized", line)
 
             elif state == GET_PROPERTY_OR_COMPONENT:
 
                 # Parse property or look for start of component
-                if lines[0].startswith("BEGIN:"):
+                if line.startswith("BEGIN:"):
 
                     # Push previous details to stack
                     componentstack.append((comp, compend,))
 
                     # Start a new component
-                    comp = Component.makeComponent(lines[0][6:], comp)
+                    comp = self.sComponentType.makeComponent(line[6:], comp)
                     compend = comp.getEndDelimiter()
 
                     # Cache as result - but only the first one, we ignore the rest
@@ -258,13 +263,13 @@ class Calendar(ContainerBase):
                     if comp.getType() == definitions.cICalComponent_VTIMEZONE:
                         got_timezone = True
 
-                elif lines[0] == self.getEndDelimiter():
+                elif line == self.getEndDelimiter():
 
                     # Change state
                     state = GOT_VCALENDAR
 
                 # Look for end of current component
-                elif lines[0] == compend:
+                elif line == compend:
 
                     # Finalise the component (this caches data from the properties)
                     comp.finalise()
@@ -274,7 +279,7 @@ class Calendar(ContainerBase):
                     comp, compend = componentstack.pop()
 
                 # Blank line
-                elif len(lines[0]) == 0:
+                elif len(line) == 0:
                     # Raise if requested, otherwise just ignore
                     if ParserContext.BLANK_LINES_IN_DATA == ParserContext.PARSER_RAISE:
                         raise InvalidData("iCalendar data has blank lines")
@@ -287,7 +292,7 @@ class Calendar(ContainerBase):
                 else:
 
                     # Parse parameter/value for top-level calendar item
-                    prop = Property.parseText(lines[0])
+                    prop = self.sPropertyType.parseText(line)
 
                     # Check for valid property
                     if comp is not self:
@@ -336,10 +341,14 @@ class Calendar(ContainerBase):
                 del self.mMasterComponentsByTypeAndUID[component.getType()][uid]
 
 
-    def getText(self, includeTimezones=False):
-        s = StringIO()
-        self.generate(s, includeTimezones=includeTimezones)
-        return s.getvalue()
+    def getText(self, includeTimezones=False, format=None):
+
+        if format is None or format == self.sFormatText:
+            s = StringIO()
+            self.generate(s, includeTimezones=includeTimezones)
+            return s.getvalue()
+        elif format == self.sFormatJSON:
+            return self.getTextJSON(includeTimezones)
 
 
     def generate(self, os, includeTimezones=False):

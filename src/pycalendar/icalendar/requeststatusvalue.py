@@ -20,6 +20,7 @@ from pycalendar import utils, xmlutils
 from pycalendar.icalendar import xmldefinitions
 from pycalendar.parser import ParserContext
 from pycalendar.value import Value
+from pycalendar import xmldefinitions as xmldefinitions_top
 import xml.etree.cElementTree as XML
 
 class RequestStatusValue(Value):
@@ -113,4 +114,4 @@ class RequestStatusValue(Value):
     def setValue(self, value):
         self.mValue = value
 
-Value.registerType(Value.VALUETYPE_REQUEST_STATUS, RequestStatusValue, None)
+Value.registerType(Value.VALUETYPE_REQUEST_STATUS, RequestStatusValue, None, xmldefinitions_top.value_text)
