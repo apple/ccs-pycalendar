@@ -300,6 +300,14 @@ class DateTime(ValueMixin):
         self.changed()
 
 
+    def setYYMMDD(self, year, month, days):
+        if (self.mYear != year) or (self.mMonth != month) or (self.mDay != days):
+            self.mYear = year
+            self.mMonth = month
+            self.mDay = days
+            self.changed()
+
+
     def getYear(self):
         return self.mYear
 

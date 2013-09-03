@@ -42,9 +42,6 @@ class Calendar(ContainerBase):
     FIND_EXACT = 0
     FIND_MASTER = 1
 
-    sProdID = "-//mulberrymail.com//Mulberry v4.0//EN"
-    sDomain = "mulberrymail.com"
-
     sContainerDescriptor = "iCalendar"
     sComponentType = Component
     sPropertyType = Property

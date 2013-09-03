@@ -280,9 +280,12 @@ class ComponentRecur(Component):
                 self.mEnd = self.mStart + temp
                 self.mDuration = True
             else:
-                # If no end or duration then use the start
+                # If no end or duration then use the start (bumped by one day for
+                # an all day event)
                 self.mHasEnd = False
                 self.mEnd = self.mStart.duplicate()
+                if self.mEnd.isDateOnly():
+                    self.mEnd.offsetDay(1)
                 self.mDuration = False
         else:
             self.mHasEnd = True

@@ -26,8 +26,8 @@ class ContainerBase(ComponentBase):
     Represents the top-level component (i.e., VCALENDAR or vCARD)
     """
 
-    sProdID = "-//mulberrymail.com//Mulberry v4.0//EN"
-    sDomain = "mulberrymail.com"
+    sProdID = "-//calendarserver.org//PyCalendar v1//EN"
+    sDomain = "calendarserver.org"
 
     # These must be set by derived classes
     sContainerDescriptor = None
