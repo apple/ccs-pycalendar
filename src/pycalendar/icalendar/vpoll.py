@@ -64,4 +64,16 @@ class VPoll(Component):
             definitions.cICalProperty_DTEND,
         )
 
+
+    def sortedComponents(self):
+        """
+        Also take POLL-ID into account
+        """
+
+        components = self.mComponents[:]
+
+        # Write out the remainder sorted by name, sortKey
+        return sorted(components, key=lambda x: (x.getType().upper(), x.loadValueString(definitions.cICalProperty_POLL_ITEM_ID),))
+
+
 Component.registerComponent(definitions.cICalComponent_VPOLL, VPoll)

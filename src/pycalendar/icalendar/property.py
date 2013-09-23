@@ -102,6 +102,15 @@ class Property(PropertyBase):
         # Extensions: draft-daboo-valarm-extensions-03
         definitions.cICalProperty_ACKNOWLEDGED   : Value.VALUETYPE_DATETIME,
 
+        # Extensions: draft-york-vpoll-00.txt
+        # Section 4.2
+        definitions.cICalProperty_ACCEPT_RESPONSE   : Value.VALUETYPE_TEXT,
+        definitions.cICalProperty_POLL_ITEM_ID      : Value.VALUETYPE_TEXT,
+        definitions.cICalProperty_POLL_WINNER       : Value.VALUETYPE_TEXT,
+        definitions.cICalProperty_POLL_MODE         : Value.VALUETYPE_TEXT,
+        definitions.cICalProperty_POLL_PROPERTIES   : Value.VALUETYPE_TEXT,
+        definitions.cICalProperty_VOTER             : Value.VALUETYPE_CALADDRESS,
+
         # Apple Extensions
         definitions.cICalProperty_XWRCALNAME  : Value.VALUETYPE_TEXT,
         definitions.cICalProperty_XWRCALDESC  : Value.VALUETYPE_TEXT,
