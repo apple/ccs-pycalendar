@@ -655,6 +655,7 @@ class TestJSONProperty(unittest.TestCase):
         ["x-test", {}, "text", "Some:, text."],
         ["x-apple-structured-location", {}, "uri", "geo:123.123,123.123"],
         ["rrule", {}, "recur", {"freq":"MONTHLY", "until": "2013-01-01T00:00:00Z"}],
+        ["categories", {}, "text", "A", "B"],
 
         # Various parameters
         ["dtstart", {"tzid": "Somewhere, else"}, "date-time", "2006-02-26T12:00:00"],

@@ -168,6 +168,7 @@ class Property(PropertyBase):
         definitions.cICalProperty_FREEBUSY,
         definitions.cICalProperty_EXDATE,
         definitions.cICalProperty_RDATE,
+        definitions.cICalProperty_POLL_PROPERTIES,
     ))
 
     sSpecialVariants = {
