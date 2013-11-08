@@ -1,5 +1,5 @@
 ##
-#    Copyright (c) 2007-2012 Cyrus Daboo. All rights reserved.
+#    Copyright (c) 2007-2013 Cyrus Daboo. All rights reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -17,27 +17,30 @@
 # iCalendar UTC Offset value
 
 from cStringIO import StringIO
-from pycalendar import xmldefs
-from pycalendar.value import PyCalendarValue
+from pycalendar import xmldefinitions
+from pycalendar.value import Value
 
-class PyCalendarUTCOffsetValue(PyCalendarValue):
+class UTCOffsetValue(Value):
 
     def __init__(self, value=0):
         self.mValue = value
 
 
     def duplicate(self):
-        return PyCalendarUTCOffsetValue(self.mValue)
+        return UTCOffsetValue(self.mValue)
 
 
     def getType(self):
-        return PyCalendarValue.VALUETYPE_UTC_OFFSET
+        return Value.VALUETYPE_UTC_OFFSET
 
 
-    def parse(self, data):
+    def parse(self, data, variant):
+
+        fullISO = (variant == "vcard")
+
         # Must be of specific lengths
         datalen = len(data)
-        if datalen not in (5, 7):
+        if datalen not in ((6, 9,) if fullISO else (5, 7,)):
             self.mValue = 0
             raise ValueError
 
@@ -50,12 +53,14 @@ class PyCalendarUTCOffsetValue(PyCalendarValue):
         hours = int(data[1:3])
 
         # Get minutes
-        mins = int(data[3:5])
+        index = 4 if fullISO else 3
+        mins = int(data[index:index + 2])
 
         # Get seconds if present
         secs = 0
-        if datalen == 7 :
-            secs = int(data[5:])
+        if datalen > 6:
+            index = 7 if fullISO else 5
+            secs = int(data[index:])
 
         self.mValue = ((hours * 60) + mins) * 60 + secs
         if not plus:
@@ -63,42 +68,49 @@ class PyCalendarUTCOffsetValue(PyCalendarValue):
 
 
     # os - StringIO object
-    def generate(self, os):
+    def generate(self, os, fullISO=False):
         try:
             abs_value = self.mValue
-            if self.mValue < 0 :
-                os.write("-")
+            if abs_value < 0 :
+                sign = "-"
                 abs_value = -self.mValue
             else:
-                os.write("+")
+                sign = "+"
 
             secs = abs_value % 60
             mins = (abs_value / 60) % 60
             hours = abs_value / (60 * 60)
 
-            if (hours < 10):
-                os.write("0")
-            os.write(str(hours))
-            if (mins < 10):
-                os.write("0")
-            os.write(str(mins))
+            s = ("%s%02d:%02d" if fullISO else "%s%02d%02d") % (sign, hours, mins,)
             if (secs != 0):
-                if (secs < 10):
-                    os.write("0")
-                os.write(str(secs))
+                s = ("%s:%02d" if fullISO else "%s%02d") % (s, secs,)
+
+            os.write(s)
         except:
             pass
 
 
     def writeXML(self, node, namespace):
 
-        os = StringIO.StringIO()
+        os = StringIO()
         self.generate(os)
         text = os.getvalue()
         text = text[:-2] + ":" + text[-2:]
 
         value = self.getXMLNode(node, namespace)
         value.text = text
+
+
+    def parseJSONValue(self, jobject):
+        self.parse(str(jobject), variant="vcard")
+
+
+    def writeJSONValue(self, jobject):
+
+        os = StringIO()
+        self.generate(os, fullISO=True)
+        text = os.getvalue()
+        jobject.append(text)
 
 
     def getValue(self):
@@ -108,4 +120,4 @@ class PyCalendarUTCOffsetValue(PyCalendarValue):
     def setValue(self, value):
         self.mValue = value
 
-PyCalendarValue.registerType(PyCalendarValue.VALUETYPE_UTC_OFFSET, PyCalendarUTCOffsetValue, xmldefs.value_utc_offset)
+Value.registerType(Value.VALUETYPE_UTC_OFFSET, UTCOffsetValue, xmldefinitions.value_utc_offset)

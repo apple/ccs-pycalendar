@@ -1,5 +1,5 @@
 ##
-#    Copyright (c) 2007-2012 Cyrus Daboo. All rights reserved.
+#    Copyright (c) 2007-2013 Cyrus Daboo. All rights reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
 #    limitations under the License.
 ##
 
-from pycalendar.exceptions import PyCalendarInvalidData
+from pycalendar.exceptions import InvalidData
 from pycalendar.parser import ParserContext
 from pycalendar.vcard.card import Card
 from pycalendar.vcard.property import Property
@@ -343,7 +343,7 @@ END:VCARD
 
         for item, results in data:
 
-            cards = Card.parseMultiple(StringIO.StringIO(item))
+            cards = Card.parseMultipleTextData(StringIO.StringIO(item))
             self.assertEqual(len(cards), len(results))
             for card, result in zip(cards, results):
                 self.assertEqual(str(card), result, "\n".join(difflib.unified_diff(str(card).splitlines(), result.splitlines())))
@@ -383,7 +383,7 @@ PHOTO;ENCODING=B:
 REV:20110323T202004Z
 TEL;type=WORK;type=pref:555-1212
 TEL;type=HOME:532-1234
-X-ABUID:5B77BC10-E9DB-48C4-8BE1-BAB5E38E1E43:ABPerson
+X-ABUID:5B77BC10-E9DB-48C4-8BE1-BAB5E38E1E43\:ABPerson
 END:VCARD
 """.replace("\n", "\r\n")
 
@@ -473,7 +473,7 @@ BOGUS
         )
 
         for item in data:
-            self.assertRaises(PyCalendarInvalidData, Card.parseText, item)
+            self.assertRaises(InvalidData, Card.parseText, item)
 
 
     def testParseBlank(self):
@@ -561,7 +561,7 @@ END:VCARD
         save = ParserContext.BLANK_LINES_IN_DATA
         for item in data:
             ParserContext.BLANK_LINES_IN_DATA = ParserContext.PARSER_RAISE
-            self.assertRaises(PyCalendarInvalidData, Card.parseText, item)
+            self.assertRaises(InvalidData, Card.parseText, item)
 
             ParserContext.BLANK_LINES_IN_DATA = ParserContext.PARSER_IGNORE
             lines = item.split("\r\n")

@@ -1,5 +1,5 @@
 ##
-#    Copyright (c) 2011-2012 Cyrus Daboo. All rights reserved.
+#    Copyright (c) 2011-2013 Cyrus Daboo. All rights reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
 #    limitations under the License.
 ##
 
-from pycalendar.exceptions import PyCalendarValidationError
+from pycalendar.exceptions import ValidationError
 from pycalendar.vcard.card import Card
 import unittest
 
@@ -210,7 +210,7 @@ END:VCARD
         for title, test_old, test_new, test_fixed, test_unfixed, test_raises in data:
             card = Card.parseText(test_old)
             if test_raises:
-                self.assertRaises(PyCalendarValidationError, card.validate, doFix=False, doRaise=True)
+                self.assertRaises(ValidationError, card.validate, doFix=False, doRaise=True)
             else:
                 try:
                     fixed, unfixed = card.validate(doFix=False, doRaise=False)

@@ -1,5 +1,5 @@
 ##
-#    Copyright (c) 2011-2012 Cyrus Daboo. All rights reserved.
+#    Copyright (c) 2011-2013 Cyrus Daboo. All rights reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -14,9 +14,9 @@
 #    limitations under the License.
 ##
 
-from pycalendar.calendar import PyCalendar
-from pycalendar.datetime import PyCalendarDateTime
-from pycalendar.timezone import PyCalendarTimezone
+from pycalendar.datetime import DateTime
+from pycalendar.icalendar.calendar import Calendar
+from pycalendar.timezone import Timezone
 import unittest
 
 class TestDateTime(unittest.TestCase):
@@ -25,16 +25,16 @@ class TestDateTime(unittest.TestCase):
 
         items = (
             (
-                PyCalendarDateTime(2011, 1, 1, 0, 0, 0, tzid=PyCalendarTimezone(utc=True)),
-                PyCalendarDateTime(2011, 1, 1, 0, 0, 0, tzid=PyCalendarTimezone(utc=True)),
+                DateTime(2011, 1, 1, 0, 0, 0, tzid=Timezone(utc=True)),
+                DateTime(2011, 1, 1, 0, 0, 0, tzid=Timezone(utc=True)),
             ),
             (
-                PyCalendarDateTime(2011, 1, 1, 0, 0, 0),
-                PyCalendarDateTime(2011, 1, 1, 0, 0, 0),
+                DateTime(2011, 1, 1, 0, 0, 0),
+                DateTime(2011, 1, 1, 0, 0, 0),
             ),
             (
-                PyCalendarDateTime(2011, 1, 1),
-                PyCalendarDateTime(2011, 1, 1),
+                DateTime(2011, 1, 1),
+                DateTime(2011, 1, 1),
             )
         )
 
@@ -47,13 +47,13 @@ class TestDateTime(unittest.TestCase):
 
         s = set(
             (
-                PyCalendarDateTime(2011, 1, 1, 0, 0, 0, tzid=PyCalendarTimezone(utc=True)),
-                PyCalendarDateTime(2011, 1, 2, 0, 0, 0, tzid=PyCalendarTimezone(utc=True)),
+                DateTime(2011, 1, 1, 0, 0, 0, tzid=Timezone(utc=True)),
+                DateTime(2011, 1, 2, 0, 0, 0, tzid=Timezone(utc=True)),
             )
         )
 
-        self.assertTrue(PyCalendarDateTime(2011, 1, 1, 0, 0, 0, tzid=PyCalendarTimezone(utc=True)) in s)
-        self.assertFalse(PyCalendarDateTime(2011, 1, 3, 0, 0, 0, tzid=PyCalendarTimezone(utc=True)) in s)
+        self.assertTrue(DateTime(2011, 1, 1, 0, 0, 0, tzid=Timezone(utc=True)) in s)
+        self.assertFalse(DateTime(2011, 1, 3, 0, 0, 0, tzid=Timezone(utc=True)) in s)
 
 
     def testRoundtrip(self):
@@ -85,11 +85,11 @@ class TestDateTime(unittest.TestCase):
         )
 
         for item in data1:
-            dt = PyCalendarDateTime.parseText(item, False)
+            dt = DateTime.parseText(item, False)
             self.assertEqual(dt.getText(), item, "Failed on: %s" % (item,))
 
         for item, result in data2:
-            dt = PyCalendarDateTime.parseText(item, True)
+            dt = DateTime.parseText(item, True)
             self.assertEqual(dt.getText(), result, "Failed on: %s" % (item,))
 
 
@@ -122,16 +122,16 @@ class TestDateTime(unittest.TestCase):
         )
 
         for item in data1:
-            self.assertRaises(ValueError, PyCalendarDateTime.parseText, item, False)
+            self.assertRaises(ValueError, DateTime.parseText, item, False)
 
         for item in data2:
-            self.assertRaises(ValueError, PyCalendarDateTime.parseText, item, False)
+            self.assertRaises(ValueError, DateTime.parseText, item, False)
 
 
     def testCachePreserveOnAdjustment(self):
 
         # UTC first
-        dt = PyCalendarDateTime(2012, 6, 7, 12, 0, 0, PyCalendarTimezone(tzid="utc"))
+        dt = DateTime(2012, 6, 7, 12, 0, 0, Timezone(tzid="utc"))
         dt.getPosixTime()
 
         # check existing cache is complete
@@ -301,9 +301,9 @@ END:VTIMEZONE
 END:VCALENDAR
 """.replace("\n", "\r\n")
 
-        PyCalendar.parseText(tzdata)
+        Calendar.parseText(tzdata)
 
-        dt = PyCalendarDateTime(2012, 6, 7, 12, 0, 0, PyCalendarTimezone(tzid="America/Pittsburgh"))
+        dt = DateTime(2012, 6, 7, 12, 0, 0, Timezone(tzid="America/Pittsburgh"))
         dt.getPosixTime()
 
         # check existing cache is complete
@@ -326,47 +326,47 @@ END:VCALENDAR
 
     def testSetWeekNo(self):
 
-        dt = PyCalendarDateTime(2013, 1, 1, 0, 0, 0, tzid=PyCalendarTimezone(utc=True))
+        dt = DateTime(2013, 1, 1, 0, 0, 0, tzid=Timezone(utc=True))
         self.assertEqual(dt.getWeekNo(), 1)
         dt.setWeekNo(1)
-        self.assertEqual(dt, PyCalendarDateTime(2013, 1, 1, 0, 0, 0, tzid=PyCalendarTimezone(utc=True)))
+        self.assertEqual(dt, DateTime(2013, 1, 1, 0, 0, 0, tzid=Timezone(utc=True)))
         self.assertEqual(dt.getWeekNo(), 1)
 
-        dt = PyCalendarDateTime(2013, 1, 1, 0, 0, 0, tzid=PyCalendarTimezone(utc=True))
+        dt = DateTime(2013, 1, 1, 0, 0, 0, tzid=Timezone(utc=True))
         self.assertEqual(dt.getWeekNo(), 1)
         dt.setWeekNo(2)
-        self.assertEqual(dt, PyCalendarDateTime(2013, 1, 8, 0, 0, 0, tzid=PyCalendarTimezone(utc=True)))
+        self.assertEqual(dt, DateTime(2013, 1, 8, 0, 0, 0, tzid=Timezone(utc=True)))
         self.assertEqual(dt.getWeekNo(), 2)
 
-        dt = PyCalendarDateTime(2013, 1, 8, 0, 0, 0, tzid=PyCalendarTimezone(utc=True))
+        dt = DateTime(2013, 1, 8, 0, 0, 0, tzid=Timezone(utc=True))
         self.assertEqual(dt.getWeekNo(), 2)
         dt.setWeekNo(1)
-        self.assertEqual(dt, PyCalendarDateTime(2013, 1, 1, 0, 0, 0, tzid=PyCalendarTimezone(utc=True)))
+        self.assertEqual(dt, DateTime(2013, 1, 1, 0, 0, 0, tzid=Timezone(utc=True)))
         self.assertEqual(dt.getWeekNo(), 1)
 
-        dt = PyCalendarDateTime(2014, 1, 7, 0, 0, 0, tzid=PyCalendarTimezone(utc=True))
+        dt = DateTime(2014, 1, 7, 0, 0, 0, tzid=Timezone(utc=True))
         self.assertEqual(dt.getWeekNo(), 2)
         dt.setWeekNo(1)
-        self.assertEqual(dt, PyCalendarDateTime(2013, 12, 31, 0, 0, 0, tzid=PyCalendarTimezone(utc=True)))
+        self.assertEqual(dt, DateTime(2013, 12, 31, 0, 0, 0, tzid=Timezone(utc=True)))
         self.assertEqual(dt.getWeekNo(), 1)
 
-        dt = PyCalendarDateTime(2012, 12, 31, 0, 0, 0, tzid=PyCalendarTimezone(utc=True))
+        dt = DateTime(2012, 12, 31, 0, 0, 0, tzid=Timezone(utc=True))
         self.assertEqual(dt.getWeekNo(), 1)
         dt.setWeekNo(1)
-        self.assertEqual(dt, PyCalendarDateTime(2012, 12, 31, 0, 0, 0, tzid=PyCalendarTimezone(utc=True)))
+        self.assertEqual(dt, DateTime(2012, 12, 31, 0, 0, 0, tzid=Timezone(utc=True)))
         self.assertEqual(dt.getWeekNo(), 1)
 
-        dt = PyCalendarDateTime(2016, 1, 1, 0, 0, 0, tzid=PyCalendarTimezone(utc=True))
+        dt = DateTime(2016, 1, 1, 0, 0, 0, tzid=Timezone(utc=True))
         self.assertEqual(dt.getWeekNo(), 53)
         dt.setWeekNo(1)
-        self.assertEqual(dt, PyCalendarDateTime(2016, 1, 8, 0, 0, 0, tzid=PyCalendarTimezone(utc=True)))
+        self.assertEqual(dt, DateTime(2016, 1, 8, 0, 0, 0, tzid=Timezone(utc=True)))
         self.assertEqual(dt.getWeekNo(), 1)
         dt.setWeekNo(2)
-        self.assertEqual(dt, PyCalendarDateTime(2016, 1, 15, 0, 0, 0, tzid=PyCalendarTimezone(utc=True)))
+        self.assertEqual(dt, DateTime(2016, 1, 15, 0, 0, 0, tzid=Timezone(utc=True)))
         self.assertEqual(dt.getWeekNo(), 2)
 
-        dt = PyCalendarDateTime(2016, 1, 8, 0, 0, 0, tzid=PyCalendarTimezone(utc=True))
+        dt = DateTime(2016, 1, 8, 0, 0, 0, tzid=Timezone(utc=True))
         self.assertEqual(dt.getWeekNo(), 1)
         dt.setWeekNo(1)
-        self.assertEqual(dt, PyCalendarDateTime(2016, 1, 8, 0, 0, 0, tzid=PyCalendarTimezone(utc=True)))
+        self.assertEqual(dt, DateTime(2016, 1, 8, 0, 0, 0, tzid=Timezone(utc=True)))
         self.assertEqual(dt.getWeekNo(), 1)

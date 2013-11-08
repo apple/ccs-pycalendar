@@ -1,5 +1,5 @@
 ##
-#    Copyright (c) 2007-2012 Cyrus Daboo. All rights reserved.
+#    Copyright (c) 2007-2013 Cyrus Daboo. All rights reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -14,18 +14,17 @@
 #    limitations under the License.
 ##
 
-from pycalendar import definitions
-from pycalendar import locale
+from pycalendar import locale, xmldefinitions, xmlutils
 from pycalendar import utils
-from pycalendar import xmldefs
-from pycalendar.duration import PyCalendarDuration
-from pycalendar.timezone import PyCalendarTimezone
+from pycalendar.duration import Duration
+from pycalendar.icalendar import definitions
+from pycalendar.timezone import Timezone
 from pycalendar.valueutils import ValueMixin
 import cStringIO as StringIO
 import time
 import xml.etree.cElementTree as XML
 
-class PyCalendarDateTime(ValueMixin):
+class DateTime(ValueMixin):
 
     SUNDAY = 0
     MONDAY = 1
@@ -83,7 +82,7 @@ class PyCalendarDateTime(ValueMixin):
 
 
     def duplicate(self):
-        other = PyCalendarDateTime(self.mYear, self.mMonth, self.mDay, self.mHours, self.mMinutes, self.mSeconds)
+        other = DateTime(self.mYear, self.mMonth, self.mDay, self.mHours, self.mMinutes, self.mSeconds)
 
         other.mDateOnly = self.mDateOnly
 
@@ -104,7 +103,7 @@ class PyCalendarDateTime(ValueMixin):
 
 
     def __repr__(self):
-        return "PyCalendarDateTime: %s" % (self.getText(),)
+        return "DateTime: %s" % (self.getText(),)
 
 
     def __hash__(self):
@@ -122,7 +121,7 @@ class PyCalendarDateTime(ValueMixin):
 
     def __sub__(self, dateorduration):
 
-        if isinstance(dateorduration, PyCalendarDateTime):
+        if isinstance(dateorduration, DateTime):
 
             date = dateorduration
 
@@ -151,9 +150,9 @@ class PyCalendarDateTime(ValueMixin):
             else:
                 # Do diff of date-time in seconds
                 diff = self.getPosixTime() - date.getPosixTime()
-                return PyCalendarDuration(duration=diff)
+                return Duration(duration=diff)
 
-        elif isinstance(dateorduration, PyCalendarDuration):
+        elif isinstance(dateorduration, Duration):
 
             duration = dateorduration
             result = self.duplicate()
@@ -216,7 +215,7 @@ class PyCalendarDateTime(ValueMixin):
 
         # If they have the same timezone do simple compare - no posix calc
         # needed
-        elif (PyCalendarTimezone.same(self.mTZUTC, self.mTZID, comp.mTZUTC, comp.mTZID)):
+        elif (Timezone.same(self.mTZUTC, self.mTZID, comp.mTZUTC, comp.mTZID)):
             if self.mYear == comp.mYear:
                 if self.mMonth == comp.mMonth:
                     if self.mDay == comp.mDay:
@@ -299,6 +298,14 @@ class PyCalendarDateTime(ValueMixin):
     def setDateOnly(self, date_only):
         self.mDateOnly = date_only
         self.changed()
+
+
+    def setYYMMDD(self, year, month, days):
+        if (self.mYear != year) or (self.mMonth != month) or (self.mDay != days):
+            self.mYear = year
+            self.mMonth = month
+            self.mDay = days
+            self.changed()
 
 
     def getYear(self):
@@ -426,14 +433,14 @@ class PyCalendarDateTime(ValueMixin):
             return
 
         # What day does the current year start on, and diff that with the current day
-        temp = PyCalendarDateTime(year=self.mYear, month=1, day=1)
+        temp = DateTime(year=self.mYear, month=1, day=1)
         first_day = temp.getDayOfWeek()
         current_day = self.getDayOfWeek()
 
         # Calculate and set yearday for start of week. The first week is the one that contains at least
         # four days (with week start defaulting to MONDAY), so that means the 1st of January would fall
         # on MO, TU, WE, TH.
-        if first_day in (PyCalendarDateTime.MONDAY, PyCalendarDateTime.TUESDAY, PyCalendarDateTime.WEDNESDAY, PyCalendarDateTime.THURSDAY):
+        if first_day in (DateTime.MONDAY, DateTime.TUESDAY, DateTime.WEDNESDAY, DateTime.THURSDAY):
             year_day = (weekno - 1) * 7 + current_day - first_day
         else:
             year_day = weekno * 7 + current_day - first_day
@@ -453,7 +460,7 @@ class PyCalendarDateTime(ValueMixin):
         """
 
         # What day does the current year start on
-        temp = PyCalendarDateTime(year=self.mYear, month=1, day=1)
+        temp = DateTime(year=self.mYear, month=1, day=1)
         first_day = temp.getDayOfWeek()
         if first_day == 0:
             first_day = 7
@@ -467,13 +474,13 @@ class PyCalendarDateTime(ValueMixin):
         # Might need to adjust forward/backwards based on year boundaries
         if week_no == 0:
             # Last week of previous year
-            temp = PyCalendarDateTime(year=self.mYear - 1, month=12, day=31)
+            temp = DateTime(year=self.mYear - 1, month=12, day=31)
             week_no = temp.getWeekNo()
         elif week_no == 53:
             # Might be first week of next year
-            temp = PyCalendarDateTime(year=self.mYear + 1, month=1, day=1)
+            temp = DateTime(year=self.mYear + 1, month=1, day=1)
             first_day = temp.getDayOfWeek()
-            if first_day in (PyCalendarDateTime.MONDAY, PyCalendarDateTime.TUESDAY, PyCalendarDateTime.WEDNESDAY, PyCalendarDateTime.THURSDAY):
+            if first_day in (DateTime.MONDAY, DateTime.TUESDAY, DateTime.WEDNESDAY, DateTime.THURSDAY):
                 week_no = 1
 
         return week_no
@@ -579,7 +586,7 @@ class PyCalendarDateTime(ValueMixin):
 
     def getDayOfWeek(self):
         # Count days since 01-Jan-1970 which was a Thursday
-        result = PyCalendarDateTime.THURSDAY + self.daysSince1970()
+        result = DateTime.THURSDAY + self.daysSince1970()
         result %= 7
         if result < 0:
             result += 7
@@ -686,7 +693,7 @@ class PyCalendarDateTime(ValueMixin):
 
 
     def getTimezone(self):
-        return PyCalendarTimezone(utc=self.mTZUTC, tzid=self.mTZID)
+        return Timezone(utc=self.mTZUTC, tzid=self.mTZID)
 
 
     def setTimezone(self, tzid):
@@ -711,7 +718,7 @@ class PyCalendarDateTime(ValueMixin):
             # Cache and restore and adjust the posix value to avoid a recalc since it won't change during this adjust
             tempPosix = self.mPosixTime if self.mPosixTimeCached else None
 
-            utc = PyCalendarTimezone(utc=True)
+            utc = Timezone(utc=True)
 
             offset_from = self.timeZoneSecondsOffset()
             self.setTimezone(utc)
@@ -735,7 +742,7 @@ class PyCalendarDateTime(ValueMixin):
 
 
     def setToday(self):
-        tz = PyCalendarTimezone(utc=self.mTZUTC, tzid=self.mTZID)
+        tz = Timezone(utc=self.mTZUTC, tzid=self.mTZID)
         self.copy_ICalendarDateTime(self.getToday(tz))
 
 
@@ -745,24 +752,24 @@ class PyCalendarDateTime(ValueMixin):
         now = time.time()
         now_tm = time.localtime(now)
 
-        temp = PyCalendarDateTime(year=now_tm.tm_year, month=now_tm.tm_mon, day=now_tm.tm_mday, tzid=tzid)
+        temp = DateTime(year=now_tm.tm_year, month=now_tm.tm_mon, day=now_tm.tm_mday, tzid=tzid)
         return temp
 
 
     def setNow(self):
-        tz = PyCalendarTimezone(utc=self.mTZUTC, tzid=self.mTZID)
+        tz = Timezone(utc=self.mTZUTC, tzid=self.mTZID)
         self.copy_ICalendarDateTime(self.getNow(tz))
 
 
     @staticmethod
     def getNow(tzid):
-        utc = PyCalendarDateTime.getNowUTC()
-        utc.adjustTimezone(tzid if tzid is not None else PyCalendarTimezone())
+        utc = DateTime.getNowUTC()
+        utc.adjustTimezone(tzid if tzid is not None else Timezone())
         return utc
 
 
     def setNowUTC(self):
-        self.copy_PyCalendarDateTime(self.getNowUTC())
+        self.copy_DateTime(self.getNowUTC())
 
 
     @staticmethod
@@ -770,9 +777,9 @@ class PyCalendarDateTime(ValueMixin):
         # Get from posix time
         now = time.time()
         now_tm = time.gmtime(now)
-        tzid = PyCalendarTimezone(utc=True)
+        tzid = Timezone(utc=True)
 
-        return PyCalendarDateTime(year=now_tm.tm_year, month=now_tm.tm_mon, day=now_tm.tm_mday, hours=now_tm.tm_hour, minutes=now_tm.tm_min, seconds=now_tm.tm_sec, tzid=tzid)
+        return DateTime(year=now_tm.tm_year, month=now_tm.tm_mon, day=now_tm.tm_mday, hours=now_tm.tm_hour, minutes=now_tm.tm_min, seconds=now_tm.tm_sec, tzid=tzid)
 
 
     def recur(self, freq, interval):
@@ -809,7 +816,7 @@ class PyCalendarDateTime(ValueMixin):
 
         buf = StringIO.StringIO()
 
-        if locale == PyCalendarDateTime.FULLDATE:
+        if locale == DateTime.FULLDATE:
             buf.write(locale.getDay(self.getDayOfWeek(), locale.LONG))
             buf.write(", ")
             buf.write(locale.getMonth(self.mMonth, locale.LONG))
@@ -817,7 +824,7 @@ class PyCalendarDateTime(ValueMixin):
             buf.write(str(self.mDay))
             buf.write(", ")
             buf.write(str(self.mYear))
-        elif locale == PyCalendarDateTime.ABBREVDATE:
+        elif locale == DateTime.ABBREVDATE:
             buf.write(locale.getDay(self.getDayOfWeek(), locale.SHORT))
             buf.write(", ")
             buf.write(locale.getMonth(self.mMonth, locale.SHORT))
@@ -825,25 +832,25 @@ class PyCalendarDateTime(ValueMixin):
             buf.write(str(self.mDay))
             buf.write(", ")
             buf.write(str(self.mYear))
-        elif locale == PyCalendarDateTime.NUMERICDATE:
+        elif locale == DateTime.NUMERICDATE:
             buf.write(str(self.mMonth))
             buf.write("/")
             buf.write(str(self.mDay))
             buf.write("/")
             buf.write(str(self.mYear))
-        elif locale == PyCalendarDateTime.FULLDATENOYEAR:
+        elif locale == DateTime.FULLDATENOYEAR:
             buf.write(locale.getDay(self.getDayOfWeek(), locale.LONG))
             buf.write(", ")
             buf.write(locale.getMonth(self.mMonth, locale.LONG))
             buf.write(" ")
             buf.write(str(self.mDay))
-        elif locale == PyCalendarDateTime.ABBREVDATENOYEAR:
+        elif locale == DateTime.ABBREVDATENOYEAR:
             buf.write(locale.getDay(self. getDayOfWeek(), locale.SHORT))
             buf.write(", ")
             buf.write(locale.getMonth(self.mMonth, locale.SHORT))
             buf.write(" ")
             buf.write(str(self.mDay))
-        elif locale == PyCalendarDateTime.NUMERICDATENOYEAR:
+        elif locale == DateTime.NUMERICDATENOYEAR:
             buf.write(str(self.mMonth))
             buf.write("/")
             buf.write(str(self.mDay))
@@ -935,6 +942,7 @@ class PyCalendarDateTime(ValueMixin):
             else:
                 return "%04d-%02d-%02dT%02d:%02d:%02d" % (self.mYear, self.mMonth, self.mDay, self.mHours, self.mMinutes, self.mSeconds)
 
+    getJSONText = getXMLText
 
     @classmethod
     def parseText(cls, data, fullISO=False):
@@ -1031,7 +1039,7 @@ class PyCalendarDateTime(ValueMixin):
 
         # iCalendar:
         #   parse format YYYYMMDD[THHMMSS[Z]]
-        # vCard (fullISO)
+        # vCard (fullISO), jCal
         #   parse format YYYY[-]MM[-]DD[THH[:]MM[:]SS[(Z/(+/-)HHMM]]
 
         try:
@@ -1086,11 +1094,19 @@ class PyCalendarDateTime(ValueMixin):
     def writeXML(self, node, namespace):
         value = XML.SubElement(
             node,
-            xmldefs.makeTag(
+            xmlutils.makeTag(
                 namespace,
-                xmldefs.value_date if self.isDateOnly() else xmldefs.value_date_time
+                xmldefinitions.value_date if self.isDateOnly() else xmldefinitions.value_date_time
         ))
         value.text = self.getXMLText()
+
+
+    def parseJSON(self, jobject):
+        self.parse(str(jobject), True)
+
+
+    def writeJSON(self, jobject):
+        jobject.append(self.getJSONText())
 
 
     def normalise(self):
@@ -1160,13 +1176,13 @@ class PyCalendarDateTime(ValueMixin):
         if self.mTZUTC:
             return 0
         if self.mTZOffset is None:
-            tz = PyCalendarTimezone(utc=self.mTZUTC, tzid=self.mTZID)
+            tz = Timezone(utc=self.mTZUTC, tzid=self.mTZID)
             self.mTZOffset = tz.timeZoneSecondsOffset(self)
         return self.mTZOffset
 
 
     def timeZoneDescriptor(self):
-        tz = PyCalendarTimezone(utc=self.mTZUTC, tzid=self.mTZID)
+        tz = Timezone(utc=self.mTZUTC, tzid=self.mTZID)
         return tz.timeZoneDescriptor(self)
 
 

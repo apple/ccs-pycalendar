@@ -1,5 +1,5 @@
 ##
-#    Copyright (c) 2011-2012 Cyrus Daboo. All rights reserved.
+#    Copyright (c) 2011-2013 Cyrus Daboo. All rights reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
 #    limitations under the License.
 ##
 
-from pycalendar import definitions
+from pycalendar.icalendar import definitions
 from pycalendar.validation import partial, PropertyValueChecks
 
 ICALENDAR_VALUE_CHECKS = {

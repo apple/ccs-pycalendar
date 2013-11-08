@@ -1,5 +1,5 @@
 ##
-#    Copyright (c) 2007-2012 Cyrus Daboo. All rights reserved.
+#    Copyright (c) 2007-2013 Cyrus Daboo. All rights reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -14,14 +14,14 @@
 #    limitations under the License.
 ##
 
-from pycalendar import definitions
-from pycalendar.datetime import PyCalendarDateTime
+from pycalendar.datetime import DateTime
+from pycalendar.icalendar import definitions
+from pycalendar.icalendar.property import Property
+from pycalendar.icalendar.recurrence import Recurrence
+from pycalendar.icalendar.vtimezonedaylight import Daylight
+from pycalendar.icalendar.vtimezonestandard import Standard
+from pycalendar.utcoffsetvalue import UTCOffsetValue
 from pycalendar.utils import daysInMonth
-from pycalendar.vtimezonestandard import PyCalendarVTimezoneStandard
-from pycalendar.utcoffsetvalue import PyCalendarUTCOffsetValue
-from pycalendar.vtimezonedaylight import PyCalendarVTimezoneDaylight
-from pycalendar.property import PyCalendarProperty
-from pycalendar.recurrence import PyCalendarRecurrence
 import utils
 
 """
@@ -114,23 +114,23 @@ class Rule(object):
     # Some useful mapping tables
 
     LASTDAY_NAME_TO_DAY = {
-        "lastSun": PyCalendarDateTime.SUNDAY,
-        "lastMon": PyCalendarDateTime.MONDAY,
-        "lastTue": PyCalendarDateTime.TUESDAY,
-        "lastWed": PyCalendarDateTime.WEDNESDAY,
-        "lastThu": PyCalendarDateTime.THURSDAY,
-        "lastFri": PyCalendarDateTime.FRIDAY,
-        "lastSat": PyCalendarDateTime.SATURDAY,
+        "lastSun": DateTime.SUNDAY,
+        "lastMon": DateTime.MONDAY,
+        "lastTue": DateTime.TUESDAY,
+        "lastWed": DateTime.WEDNESDAY,
+        "lastThu": DateTime.THURSDAY,
+        "lastFri": DateTime.FRIDAY,
+        "lastSat": DateTime.SATURDAY,
     }
 
     DAY_NAME_TO_DAY = {
-        "Sun": PyCalendarDateTime.SUNDAY,
-        "Mon": PyCalendarDateTime.MONDAY,
-        "Tue": PyCalendarDateTime.TUESDAY,
-        "Wed": PyCalendarDateTime.WEDNESDAY,
-        "Thu": PyCalendarDateTime.THURSDAY,
-        "Fri": PyCalendarDateTime.FRIDAY,
-        "Sat": PyCalendarDateTime.SATURDAY,
+        "Sun": DateTime.SUNDAY,
+        "Mon": DateTime.MONDAY,
+        "Tue": DateTime.TUESDAY,
+        "Wed": DateTime.WEDNESDAY,
+        "Thu": DateTime.THURSDAY,
+        "Fri": DateTime.FRIDAY,
+        "Sat": DateTime.SATURDAY,
     }
 
     LASTDAY_NAME_TO_RDAY = {
@@ -144,13 +144,13 @@ class Rule(object):
     }
 
     DAY_NAME_TO_RDAY = {
-        PyCalendarDateTime.SUNDAY: definitions.eRecurrence_WEEKDAY_SU,
-        PyCalendarDateTime.MONDAY: definitions.eRecurrence_WEEKDAY_MO,
-        PyCalendarDateTime.TUESDAY: definitions.eRecurrence_WEEKDAY_TU,
-        PyCalendarDateTime.WEDNESDAY: definitions.eRecurrence_WEEKDAY_WE,
-        PyCalendarDateTime.THURSDAY: definitions.eRecurrence_WEEKDAY_TH,
-        PyCalendarDateTime.FRIDAY: definitions.eRecurrence_WEEKDAY_FR,
-        PyCalendarDateTime.SATURDAY: definitions.eRecurrence_WEEKDAY_SA,
+        DateTime.SUNDAY: definitions.eRecurrence_WEEKDAY_SU,
+        DateTime.MONDAY: definitions.eRecurrence_WEEKDAY_MO,
+        DateTime.TUESDAY: definitions.eRecurrence_WEEKDAY_TU,
+        DateTime.WEDNESDAY: definitions.eRecurrence_WEEKDAY_WE,
+        DateTime.THURSDAY: definitions.eRecurrence_WEEKDAY_TH,
+        DateTime.FRIDAY: definitions.eRecurrence_WEEKDAY_FR,
+        DateTime.SATURDAY: definitions.eRecurrence_WEEKDAY_SA,
     }
 
     MONTH_NAME_TO_POS = {
@@ -288,11 +288,11 @@ class Rule(object):
         @param year:  the year to determine the transition for
         @type year: C{int}
 
-        @return: C{tuple} of L{PyCalendarDateTime} and C{str} (which is the special
+        @return: C{tuple} of L{DateTime} and C{str} (which is the special
             tzdata mode character
         """
         # Create a floating date-time
-        dt = PyCalendarDateTime()
+        dt = DateTime()
 
         # Setup base year/month/day
         dt.setYear(year)
@@ -342,7 +342,7 @@ class Rule(object):
         Get RRULE BYxxx part items from the Rule data.
 
         @param start: start date-time for the recurrence set
-        @type start: L{PyCalendarDateTime}
+        @type start: L{DateTime}
         @param indicatedDay: the day that the Rule indicates for recurrence
         @type indicatedDay: C{int}
         @param indicatedOffset: the offset that the Rule indicates for recurrence
@@ -449,13 +449,13 @@ class Rule(object):
         Generate a VTIMEZONE sub-component for this Rule.
 
         @param vtz: VTIMEZONE to add to
-        @type vtz: L{PyCalendarVTimezone}
+        @type vtz: L{VTimezone}
         @param zonerule: the Zone rule line being used
         @type zonerule: L{ZoneRule}
         @param start: the start time for the first instance
-        @type start: L{PyCalendarDateTime}
+        @type start: L{DateTime}
         @param end: the start time for the last instance
-        @type end: L{PyCalendarDateTime}
+        @type end: L{DateTime}
         @param offsetfrom: the UTC offset-from
         @type offsetfrom: C{int}
         @param offsetto: the UTC offset-to
@@ -467,31 +467,31 @@ class Rule(object):
         # Determine type of component based on offset
         dstoffset = self.getOffset()
         if dstoffset == 0:
-            comp = PyCalendarVTimezoneStandard(parent=vtz)
+            comp = Standard(parent=vtz)
         else:
-            comp = PyCalendarVTimezoneDaylight(parent=vtz)
+            comp = Daylight(parent=vtz)
 
         # Do offsets
-        tzoffsetfrom = PyCalendarUTCOffsetValue(offsetfrom)
-        tzoffsetto = PyCalendarUTCOffsetValue(offsetto)
+        tzoffsetfrom = UTCOffsetValue(offsetfrom)
+        tzoffsetto = UTCOffsetValue(offsetto)
 
-        comp.addProperty(PyCalendarProperty(definitions.cICalProperty_TZOFFSETFROM, tzoffsetfrom))
-        comp.addProperty(PyCalendarProperty(definitions.cICalProperty_TZOFFSETTO, tzoffsetto))
+        comp.addProperty(Property(definitions.cICalProperty_TZOFFSETFROM, tzoffsetfrom))
+        comp.addProperty(Property(definitions.cICalProperty_TZOFFSETTO, tzoffsetto))
 
         # Do TZNAME
         if zonerule.format.find("%") != -1:
             tzname = zonerule.format % (self.letter if self.letter != "-" else "",)
         else:
             tzname = zonerule.format
-        comp.addProperty(PyCalendarProperty(definitions.cICalProperty_TZNAME, tzname))
+        comp.addProperty(Property(definitions.cICalProperty_TZNAME, tzname))
 
         # Do DTSTART
-        comp.addProperty(PyCalendarProperty(definitions.cICalProperty_DTSTART, start))
+        comp.addProperty(Property(definitions.cICalProperty_DTSTART, start))
 
         # Now determine the recurrences (use RDATE if only one year or
         # number of instances is one)
         if self.toYear != "only" and instanceCount != 1:
-            rrule = PyCalendarRecurrence()
+            rrule = Recurrence()
             rrule.setFreq(definitions.eRecurrence_YEARLY)
             rrule.setByMonth((Rule.MONTH_NAME_TO_POS[self.inMonth],))
             if self.onDay in Rule.LASTDAY_NAME_TO_RDAY:
@@ -566,9 +566,9 @@ class Rule(object):
                 rrule.setUseUntil(True)
                 rrule.setUntil(until)
 
-            comp.addProperty(PyCalendarProperty(definitions.cICalProperty_RRULE, rrule))
+            comp.addProperty(Property(definitions.cICalProperty_RRULE, rrule))
         else:
-            comp.addProperty(PyCalendarProperty(definitions.cICalProperty_RDATE, start))
+            comp.addProperty(Property(definitions.cICalProperty_RDATE, start))
 
         comp.finalise()
         vtz.addComponent(comp)

@@ -1,5 +1,5 @@
 ##
-#    Copyright (c) 2007-2012 Cyrus Daboo. All rights reserved.
+#    Copyright (c) 2007-2013 Cyrus Daboo. All rights reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ from pycalendar.parser import ParserContext
 from pycalendar.stringutils import strtoul
 from pycalendar.valueutils import ValueMixin
 
-class PyCalendarDuration(ValueMixin):
+class Duration(ValueMixin):
 
     def __init__(self, duration=None, weeks=0, days=0, hours=0, minutes=0, seconds=0):
         self.mForward = True
@@ -36,7 +36,7 @@ class PyCalendarDuration(ValueMixin):
 
 
     def duplicate(self):
-        other = PyCalendarDuration(None)
+        other = Duration(None)
         other.mForward = self.mForward
 
         other.mWeeks = self.mWeeks
@@ -270,3 +270,11 @@ class PyCalendarDuration(ValueMixin):
 
     def writeXML(self, node, namespace):
         node.text = self.getText()
+
+
+    def parseJSON(self, jobject):
+        self.parse(str(jobject))
+
+
+    def writeJSON(self, jobject):
+        jobject.append(self.getText())

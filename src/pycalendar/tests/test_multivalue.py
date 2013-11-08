@@ -1,5 +1,5 @@
 ##
-#    Copyright (c) 2011-2012 Cyrus Daboo. All rights reserved.
+#    Copyright (c) 2011-2013 Cyrus Daboo. All rights reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -15,8 +15,8 @@
 ##
 
 import unittest
-from pycalendar.multivalue import PyCalendarMultiValue
-from pycalendar.value import PyCalendarValue
+from pycalendar.multivalue import MultiValue
+from pycalendar.value import Value
 
 class TestMultiValue(unittest.TestCase):
 
@@ -29,8 +29,8 @@ class TestMultiValue(unittest.TestCase):
         )
 
         for item, result, count in items:
-            req = PyCalendarMultiValue(PyCalendarValue.VALUETYPE_TEXT)
-            req.parse(item)
+            req = MultiValue(Value.VALUETYPE_TEXT)
+            req.parse(item, "icalendar")
             test = req.getText()
             self.assertEqual(test, result, "Failed to parse and re-generate '%s'" % (item,))
             self.assertEqual(len(req.mValues), count, "Failed to parse and re-generate '%s'" % (item,))
@@ -38,8 +38,8 @@ class TestMultiValue(unittest.TestCase):
 
     def testSetValue(self):
 
-        req = PyCalendarMultiValue(PyCalendarValue.VALUETYPE_TEXT)
-        req.parse("Example1, Example2")
+        req = MultiValue(Value.VALUETYPE_TEXT)
+        req.parse("Example1, Example2", "icalendar")
         req.setValue(("Example3", "Example4",))
         test = req.getText()
         self.assertEqual(test, "Example3,Example4")

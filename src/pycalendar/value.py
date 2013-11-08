@@ -1,5 +1,5 @@
 ##
-#    Copyright (c) 2007-2012 Cyrus Daboo. All rights reserved.
+#    Copyright (c) 2007-2013 Cyrus Daboo. All rights reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -16,11 +16,11 @@
 
 # ICalendar Value class
 
+from pycalendar import xmlutils
 from pycalendar.valueutils import ValueMixin
-from pycalendar import xmldefs
 import xml.etree.cElementTree as XML
 
-class PyCalendarValue(ValueMixin):
+class Value(ValueMixin):
 
     (
         VALUETYPE_ADR,
@@ -50,6 +50,7 @@ class PyCalendarValue(ValueMixin):
 
     _typeMap = {}
     _xmlMap = {}
+    _jsonMap = {}
 
 
     def __hash__(self):
@@ -61,25 +62,26 @@ class PyCalendarValue(ValueMixin):
 
 
     def __eq__(self, other):
-        if not isinstance(other, PyCalendarValue):
+        if not isinstance(other, Value):
             return False
         return self.getType() == other.getType() and self.getValue() == other.getValue()
 
 
     @classmethod
-    def registerType(clz, type, cls, xmlNode):
+    def registerType(clz, type, cls, xmlNode, jsonNode=None):
         clz._typeMap[type] = cls
         clz._xmlMap[type] = xmlNode
+        clz._jsonMap[type] = xmlNode if jsonNode is None else jsonNode
 
 
     @classmethod
-    def createFromType(clz, type):
-        # Create the type
-        created = clz._typeMap.get(type, None)
+    def createFromType(clz, value_type):
+        # Create the value type
+        created = clz._typeMap.get(value_type, None)
         if created:
             return created()
         else:
-            return clz._typeMap.get(PyCalendarValue.VALUETYPE_UNKNOWN)(type)
+            return clz._typeMap.get(Value.VALUETYPE_UNKNOWN)(value_type)
 
 
     def getType(self):
@@ -98,9 +100,26 @@ class PyCalendarValue(ValueMixin):
         raise NotImplementedError
 
 
+    def parse(self, data, variant):
+        raise NotImplementedError
+
+
     def writeXML(self, node, namespace):
         raise NotImplementedError
 
 
+    def parseJSONValue(self, jobject):
+        raise NotImplementedError
+
+
+    def writeJSON(self, jobject):
+        jobject.append(self._jsonMap[self.getType()])
+        self.writeJSONValue(jobject)
+
+
+    def writeJSONValue(self, jobject):
+        raise NotImplementedError
+
+
     def getXMLNode(self, node, namespace):
-        return XML.SubElement(node, xmldefs.makeTag(namespace, self._xmlMap[self.getType()]))
+        return XML.SubElement(node, xmlutils.makeTag(namespace, self._xmlMap[self.getType()]))

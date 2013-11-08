@@ -1,5 +1,5 @@
 ##
-#    Copyright (c) 2007-2012 Cyrus Daboo. All rights reserved.
+#    Copyright (c) 2007-2013 Cyrus Daboo. All rights reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -16,24 +16,24 @@
 
 # iCalendar UTC Offset value
 
-from pycalendar import xmldefs
-from pycalendar.value import PyCalendarValue
+from pycalendar import xmldefinitions
+from pycalendar.value import Value
 
-class PyCalendarIntegerValue(PyCalendarValue):
+class IntegerValue(Value):
 
     def __init__(self, value=None):
         self.mValue = value if value is not None else 0
 
 
     def duplicate(self):
-        return PyCalendarIntegerValue(self.mValue)
+        return IntegerValue(self.mValue)
 
 
     def getType(self):
-        return PyCalendarValue.VALUETYPE_INTEGER
+        return Value.VALUETYPE_INTEGER
 
 
-    def parse(self, data):
+    def parse(self, data, variant):
         self.mValue = int(data)
 
 
@@ -50,6 +50,14 @@ class PyCalendarIntegerValue(PyCalendarValue):
         value.text = str(self.mValue)
 
 
+    def parseJSONValue(self, jobject):
+        self.mValue = int(jobject)
+
+
+    def writeJSONValue(self, jobject):
+        jobject.append(self.mValue)
+
+
     def getValue(self):
         return self.mValue
 
@@ -57,4 +65,4 @@ class PyCalendarIntegerValue(PyCalendarValue):
     def setValue(self, value):
         self.mValue = value
 
-PyCalendarValue.registerType(PyCalendarValue.VALUETYPE_INTEGER, PyCalendarIntegerValue, xmldefs.value_integer)
+Value.registerType(Value.VALUETYPE_INTEGER, IntegerValue, xmldefinitions.value_integer)

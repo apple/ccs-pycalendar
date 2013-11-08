@@ -1,5 +1,5 @@
 ##
-#    Copyright (c) 2007-2012 Cyrus Daboo. All rights reserved.
+#    Copyright (c) 2007-2013 Cyrus Daboo. All rights reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -16,17 +16,17 @@
 
 # iCalendar UTC Offset value
 
-from pycalendar import utils, xmldefs
-from pycalendar.plaintextvalue import PyCalendarPlainTextValue
-from pycalendar.value import PyCalendarValue
+from pycalendar import utils, xmldefinitions
+from pycalendar.plaintextvalue import PlainTextValue
+from pycalendar.value import Value
 
-class PyCalendarTextValue(PyCalendarPlainTextValue):
+class TextValue(PlainTextValue):
 
     def getType(self):
-        return PyCalendarValue.VALUETYPE_TEXT
+        return Value.VALUETYPE_TEXT
 
 
-    def parse(self, data):
+    def parse(self, data, variant):
         # Decoding required
         self.mValue = utils.decodeTextValue(data)
 
@@ -39,4 +39,4 @@ class PyCalendarTextValue(PyCalendarPlainTextValue):
         except:
             pass
 
-PyCalendarValue.registerType(PyCalendarValue.VALUETYPE_TEXT, PyCalendarTextValue, xmldefs.value_text)
+Value.registerType(Value.VALUETYPE_TEXT, TextValue, xmldefinitions.value_text)

@@ -1,5 +1,5 @@
 ##
-#    Copyright (c) 2011-2012 Cyrus Daboo. All rights reserved.
+#    Copyright (c) 2011-2013 Cyrus Daboo. All rights reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
 #    limitations under the License.
 ##
 
-from pycalendar.plaintextvalue import PyCalendarPlainTextValue
+from pycalendar.plaintextvalue import PlainTextValue
 
 # Grabbed from http://docs.python.org/library/functools.html since we need to support Python 2.5
 def partial(func, *args, **keywords):
@@ -35,7 +35,7 @@ class PropertyValueChecks(object):
     def stringValue(text, property):
 
         value = property.getValue()
-        if value and isinstance(value, PyCalendarPlainTextValue):
+        if value and isinstance(value, PlainTextValue):
             value = value.getValue()
             return value.lower() == text.lower()
 

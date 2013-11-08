@@ -1,5 +1,5 @@
 ##
-#    Copyright (c) 2007-2012 Cyrus Daboo. All rights reserved.
+#    Copyright (c) 2007-2013 Cyrus Daboo. All rights reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 import unittest
 from zonal.zone import Zone
 from zonal.rule import RuleSet
-from pycalendar.calendar import PyCalendar
+from pycalendar.icalendar.calendar import Calendar
 
 class TestZone(unittest.TestCase):
 
@@ -92,7 +92,7 @@ END:VTIMEZONE
         ruleset.parse(rules)
         rules = {ruleset.name: ruleset}
 
-        cal = PyCalendar()
+        cal = Calendar()
         vtz = zone.vtimezone(cal, rules, 2006, 2011)
 
         self.assertEqual(str(vtz), result)

@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 ##
-#    Copyright (c) 2012 Cyrus Daboo. All rights reserved.
+#    Copyright (c) 2012-2013 Cyrus Daboo. All rights reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -15,8 +15,8 @@
 #    limitations under the License.
 ##
 
-from pycalendar.calendar import PyCalendar
-from pycalendar.exceptions import PyCalendarError
+from pycalendar.icalendar.calendar import Calendar
+from pycalendar.exceptions import ErrorBase
 from pycalendar.parser import ParserContext
 from pycalendar.vcard.card import Card
 import os
@@ -33,14 +33,14 @@ def validate(fname):
 
     if data.find("BEGIN:VCALENDAR") != -1:
         try:
-            cal = PyCalendar.parseText(data)
-        except PyCalendarError, e:
+            cal = Calendar.parseText(data)
+        except ErrorBase, e:
             print "Failed to parse iCalendar: %r" % (e,)
             sys.exit(1)
     elif data.find("BEGIN:VCARD") != -1:
         try:
             cal = Card.parseText(data)
-        except PyCalendarError, e:
+        except ErrorBase, e:
             print "Failed to parse vCard: %r" % (e,)
             sys.exit(1)
     else:

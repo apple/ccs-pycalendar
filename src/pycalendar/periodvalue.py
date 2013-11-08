@@ -1,5 +1,5 @@
 ##
-#    Copyright (c) 2007-2012 Cyrus Daboo. All rights reserved.
+#    Copyright (c) 2007-2013 Cyrus Daboo. All rights reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -14,42 +14,14 @@
 #    limitations under the License.
 ##
 
-from pycalendar import xmldefs
-from pycalendar.period import PyCalendarPeriod
-from pycalendar.value import PyCalendarValue
+from pycalendar import xmldefinitions
+from pycalendar.period import Period
+from pycalendar.value import Value
+from pycalendar.valueutils import WrapperValue
 
-class PyCalendarPeriodValue(PyCalendarValue):
+class PeriodValue(WrapperValue, Value):
 
-    def __init__(self, value=None):
-        self.mValue = value if value is not None else PyCalendarPeriod()
+    _wrappedClass = Period
+    _wrappedType = Value.VALUETYPE_PERIOD
 
-
-    def duplicate(self):
-        return PyCalendarPeriodValue(self.mValue.duplicate())
-
-
-    def getType(self):
-        return PyCalendarValue.VALUETYPE_PERIOD
-
-
-    def parse(self, data):
-        self.mValue.parse(data)
-
-
-    def generate(self, os):
-        self.mValue.generate(os)
-
-
-    def writeXML(self, node, namespace):
-        value = self.getXMLNode(node, namespace)
-        value.text = self.mValue.writeXML()
-
-
-    def getValue(self):
-        return self.mValue
-
-
-    def setValue(self, value):
-        self.mValue = value
-
-PyCalendarValue.registerType(PyCalendarValue.VALUETYPE_PERIOD, PyCalendarPeriodValue, xmldefs.value_period)
+Value.registerType(Value.VALUETYPE_PERIOD, PeriodValue, xmldefinitions.value_period)
