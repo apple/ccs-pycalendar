@@ -119,6 +119,10 @@ class PropertyBase(object):
         return self.mParameters[attr.upper()][0].getFirstValue()
 
 
+    def getParameterValues(self, attr):
+        return self.mParameters[attr.upper()][0].getValues()
+
+
     def addParameter(self, attr):
         self.mParameters.setdefault(attr.getName().upper(), []).append(attr)
 
