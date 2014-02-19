@@ -16,10 +16,19 @@
 
 from pycalendar.calendar import PyCalendar
 from pycalendar.datetime import PyCalendarDateTime
+from pycalendar.parser import ParserContext
 from pycalendar.timezone import PyCalendarTimezone
 import unittest
 
 class TestDateTime(unittest.TestCase):
+
+    def _patch(self, obj, attr, value):
+        oldvalue = getattr(obj, attr)
+        setattr(obj, attr, value)
+        def _restore():
+            setattr(obj, attr, oldvalue)
+        self.addCleanup(_restore)
+
 
     def testDuplicateASUTC(self):
 
@@ -95,6 +104,8 @@ class TestDateTime(unittest.TestCase):
 
     def testBadParse(self):
 
+        self._patch(ParserContext, "INVALID_DATETIME_LEADINGSPACE", ParserContext.PARSER_RAISE)
+
         data1 = (
             "2011",
             "201101023",
@@ -126,6 +137,24 @@ class TestDateTime(unittest.TestCase):
 
         for item in data2:
             self.assertRaises(ValueError, PyCalendarDateTime.parseText, item, False)
+
+
+    def testBadParseFixed(self):
+
+        self._patch(ParserContext, "INVALID_DATETIME_LEADINGSPACE", ParserContext.PARSER_ALLOW)
+
+        data = (
+            ("   10102", "00010102"),
+            ("2001 102", "20010102"),
+            ("200101 2", "20010102"),
+            ("   10102T010101", "00010102T010101"),
+            ("2001 102T010101", "20010102T010101"),
+            ("200101 2T010101", "20010102T010101"),
+        )
+
+        for item, result in data:
+            dt = PyCalendarDateTime.parseText(item)
+            self.assertEqual(str(dt), result)
 
 
     def testCachePreserveOnAdjustment(self):

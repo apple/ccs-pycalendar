@@ -46,6 +46,9 @@ class ParserContext(object):
     # Allow DATE values when DATETIME specified (and vice versa)
     INVALID_DATETIME_VALUE = PARSER_FIX
 
+    # Allow leading space instead of leading zeros for year in DATE or DATE-TIME values
+    INVALID_DATETIME_LEADINGSPACE = PARSER_ALLOW
+
     # Allow slightly invalid DURATION values
     INVALID_DURATION_VALUE = PARSER_FIX
 

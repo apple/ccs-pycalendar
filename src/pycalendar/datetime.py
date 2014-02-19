@@ -19,6 +19,7 @@ from pycalendar import locale
 from pycalendar import utils
 from pycalendar import xmldefs
 from pycalendar.duration import PyCalendarDuration
+from pycalendar.parser import ParserContext
 from pycalendar.timezone import PyCalendarTimezone
 from pycalendar.valueutils import ValueMixin
 import cStringIO as StringIO
@@ -960,7 +961,7 @@ class PyCalendarDateTime(ValueMixin):
         self.mDay = int(data[index:index + 2])
         index += 2
 
-        if ' ' in data[:index]:
+        if ' ' in data[:index] and ParserContext.INVALID_DATETIME_LEADINGSPACE == ParserContext.PARSER_RAISE:
             raise ValueError
         if self.mYear < 0 or self.mMonth < 0 or self.mDay < 0:
             raise ValueError
