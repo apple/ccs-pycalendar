@@ -665,10 +665,10 @@ class PyCalendar(PyCalendarComponentBase):
         PyCalendarFreeBusy.resolveOverlaps(fb)
 
 
-    def getTimezoneOffsetSeconds(self, tzid, dt):
+    def getTimezoneOffsetSeconds(self, tzid, dt, relative_to_utc=False):
         # Find timezone that matches the name (which is the same as the map key)
         timezone = self.getTimezone(tzid)
-        return timezone.getTimezoneOffsetSeconds(dt) if timezone else 0
+        return timezone.getTimezoneOffsetSeconds(dt, relative_to_utc) if timezone else 0
 
 
     def getTimezoneDescriptor(self, tzid, dt):
