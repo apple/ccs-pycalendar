@@ -94,11 +94,11 @@ class TimezoneDatabase(object):
 
 
     @staticmethod
-    def getTimezoneOffsetSeconds(tzid, dt):
+    def getTimezoneOffsetSeconds(tzid, dt, relative_to_utc=False):
         # Cache it first
         tz = TimezoneDatabase.getTimezone(tzid)
         if tz is not None:
-            return tz.getTimezoneOffsetSeconds(dt)
+            return tz.getTimezoneOffsetSeconds(dt, relative_to_utc)
         else:
             return 0
 

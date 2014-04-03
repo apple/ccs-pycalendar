@@ -135,10 +135,21 @@ class VTimezone(Component):
         return self.mUTCOffsetSortKey
 
 
-    def getTimezoneOffsetSeconds(self, dt):
+    def getTimezoneOffsetSeconds(self, dt, relative_to_utc=False):
         """
         Caching implementation of expansion. We cache the entire set of transitions up to one year ahead
         of the requested time.
+
+        We need to handle calculating the offset based on both a local time and a UTC time. The later
+        is needed when converting from one timezone offset to another which is best done by determining
+        the UTC time as an intermediate value.
+
+        @param dt: a date-time to determine the offset for
+        @type dt: L{DateTime}
+        @param relative_to_utc: if L{False}, then the L{dt} value is the local time for which an
+            offset is desired, if L{True}, then the L{dt} value is a UTC time for which an
+            offset is desired.
+        @type relative_to_utc: L{bool}
         """
 
         # Need to make the incoming date-time relative to the DTSTART in the
@@ -161,15 +172,15 @@ class VTimezone(Component):
 
         # Now search for the transition just below the time we want
         if len(self.mCachedExpandAll):
-            cacheKey = (temp.mYear, temp.mMonth, temp.mDay, temp.mHours, temp.mMinutes,)
+            cacheKey = (temp.mYear, temp.mMonth, temp.mDay, temp.mHours, temp.mMinutes, relative_to_utc)
             i = self.mCachedOffsets.get(cacheKey)
             if i is None:
-                i = VTimezone.tuple_bisect_right(self.mCachedExpandAll, temp)
+                i = VTimezone.tuple_bisect_right(self.mCachedExpandAll, temp, relative_to_utc)
                 if len(self.mCachedOffsets) >= self.UTCOFFSET_CACHE_MAX_ENTRIES:
                     self.mCachedOffsets = {}
                 self.mCachedOffsets[cacheKey] = i
             if i != 0:
-                return self.mCachedExpandAll[i - 1][2]
+                return self.mCachedExpandAll[i - 1][3]
 
         return 0
 
@@ -210,7 +221,7 @@ class VTimezone(Component):
 
 
     @staticmethod
-    def tuple_bisect_right(a, x):
+    def tuple_bisect_right(a, x, relative_to_utc=False):
         """
         Same as bisect_right except that the values being compared are the first elements
         of a tuple.
@@ -220,7 +231,7 @@ class VTimezone(Component):
         hi = len(a)
         while lo < hi:
             mid = (lo + hi) // 2
-            if x < a[mid][0]:
+            if x < a[mid][1 if relative_to_utc else 0]:
                 hi = mid
             else:
                 lo = mid + 1
@@ -262,9 +273,16 @@ class VTimezone(Component):
         results = []
         for item in self.mComponents:
             results.extend(item.expandAll(start, end, with_name))
-        results = [x for x in set(results)]
-        results.sort(key=lambda x: x[0].getPosixTime())
-        return results
+
+        utc_results = []
+        for items in set(results):
+            items = list(items)
+            utcdt = items[0].duplicate()
+            utcdt.offsetSeconds(-items[1])
+            items.insert(1, utcdt)
+            utc_results.append(tuple(items))
+        utc_results.sort(key=lambda x: x[0].getPosixTime())
+        return utc_results
 
 
     def sortedPropertyKeyOrder(self):

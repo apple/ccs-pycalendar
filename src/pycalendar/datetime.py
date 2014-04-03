@@ -707,10 +707,11 @@ class DateTime(ValueMixin):
         # Only if different
         s1 = tzid.getTimezoneID()
         if (tzid.getUTC() != self.mTZUTC) or (s1 != self.mTZID):
-            offset_from = self.timeZoneSecondsOffset()
+            if not self.mTZUTC:
+                self.adjustToUTC()
             self.setTimezone(tzid)
-            offset_to = self.timeZoneSecondsOffset()
-            self.offsetSeconds(offset_to - offset_from)
+            offset_to = self.timeZoneSecondsOffset(relative_to_utc=True)
+            self.offsetSeconds(offset_to)
         return self
 
 
@@ -1173,12 +1174,12 @@ class DateTime(ValueMixin):
         self.changed()
 
 
-    def timeZoneSecondsOffset(self):
+    def timeZoneSecondsOffset(self, relative_to_utc=False):
         if self.mTZUTC:
             return 0
         if self.mTZOffset is None:
             tz = Timezone(utc=self.mTZUTC, tzid=self.mTZID)
-            self.mTZOffset = tz.timeZoneSecondsOffset(self)
+            self.mTZOffset = tz.timeZoneSecondsOffset(self, relative_to_utc)
         return self.mTZOffset
 
 

@@ -100,16 +100,16 @@ class Timezone(object):
         return not self.mUTC and self.mTimezone is not None
 
 
-    def timeZoneSecondsOffset(self, dt):
+    def timeZoneSecondsOffset(self, dt, relative_to_utc=False):
         if self.mUTC:
             return 0
         elif self.mTimezone is None:
-            return TimezoneDatabase.getTimezoneOffsetSeconds(Timezone.sDefaultTimezone.getTimezoneID(), dt)
+            return TimezoneDatabase.getTimezoneOffsetSeconds(Timezone.sDefaultTimezone.getTimezoneID(), dt, relative_to_utc)
         elif isinstance(self.mTimezone, int):
             return self.mTimezone
         else:
             # Look up timezone and resolve date using default timezones
-            return TimezoneDatabase.getTimezoneOffsetSeconds(self.mTimezone, dt)
+            return TimezoneDatabase.getTimezoneOffsetSeconds(self.mTimezone, dt, relative_to_utc)
 
 
     def timeZoneDescriptor(self, dt):
