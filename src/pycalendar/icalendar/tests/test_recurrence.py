@@ -18,6 +18,7 @@ from pycalendar.datetime import DateTime
 from pycalendar.period import Period
 from pycalendar.icalendar.recurrence import Recurrence
 import unittest
+from pycalendar.timezone import Timezone
 
 class TestRecurrence(unittest.TestCase):
 
@@ -135,6 +136,214 @@ class TestRecurrence(unittest.TestCase):
                 DateTime(2015, 1, 8, 0, 0, 0),
                 DateTime(2016, 1, 8, 0, 0, 0),
                 DateTime(2016, 1, 15, 0, 0, 0),
+            ],
+        )
+
+
+    def testMonthlyInvalidStart(self):
+
+        recur = Recurrence()
+        recur.parse("FREQ=MONTHLY")
+        start = DateTime(2014, 1, 40, 12, 0, 0)
+        end = DateTime(2015, 1, 1, 0, 0, 0)
+        items = []
+        range = Period(start, end)
+        recur.expand(start, range, items)
+        self.assertEqual(
+            items,
+            [
+                DateTime(2014, 2, 9, 12, 0, 0),
+                DateTime(2014, 3, 9, 12, 0, 0),
+                DateTime(2014, 4, 9, 12, 0, 0),
+                DateTime(2014, 5, 9, 12, 0, 0),
+                DateTime(2014, 6, 9, 12, 0, 0),
+                DateTime(2014, 7, 9, 12, 0, 0),
+                DateTime(2014, 8, 9, 12, 0, 0),
+                DateTime(2014, 9, 9, 12, 0, 0),
+                DateTime(2014, 10, 9, 12, 0, 0),
+                DateTime(2014, 11, 9, 12, 0, 0),
+                DateTime(2014, 12, 9, 12, 0, 0),
+            ],
+        )
+
+
+    def testMonthlyInUTC(self):
+
+        recur = Recurrence()
+        recur.parse("FREQ=MONTHLY")
+        start = DateTime(2014, 1, 1, 12, 0, 0, tzid=Timezone(utc=True))
+        end = DateTime(2015, 1, 1, 0, 0, 0, tzid=Timezone(utc=True))
+        items = []
+        range = Period(start, end)
+        recur.expand(DateTime(2014, 1, 1, 12, 0, 0, tzid=Timezone(tzid="America/New_York")), range, items)
+        self.assertEqual(
+            items,
+            [
+                DateTime(2014, 1, 1, 12, 0, 0, tzid=Timezone(tzid="America/New_York")),
+                DateTime(2014, 2, 1, 12, 0, 0, tzid=Timezone(tzid="America/New_York")),
+                DateTime(2014, 3, 1, 12, 0, 0, tzid=Timezone(tzid="America/New_York")),
+                DateTime(2014, 4, 1, 12, 0, 0, tzid=Timezone(tzid="America/New_York")),
+                DateTime(2014, 5, 1, 12, 0, 0, tzid=Timezone(tzid="America/New_York")),
+                DateTime(2014, 6, 1, 12, 0, 0, tzid=Timezone(tzid="America/New_York")),
+                DateTime(2014, 7, 1, 12, 0, 0, tzid=Timezone(tzid="America/New_York")),
+                DateTime(2014, 8, 1, 12, 0, 0, tzid=Timezone(tzid="America/New_York")),
+                DateTime(2014, 9, 1, 12, 0, 0, tzid=Timezone(tzid="America/New_York")),
+                DateTime(2014, 10, 1, 12, 0, 0),
+                DateTime(2014, 11, 1, 12, 0, 0),
+                DateTime(2014, 12, 1, 12, 0, 0),
+            ],
+        )
+
+
+    def testMonthlyStart31st(self):
+
+        recur = Recurrence()
+        recur.parse("FREQ=MONTHLY")
+        start = DateTime(2014, 1, 31, 12, 0, 0)
+        end = DateTime(2015, 1, 1, 0, 0, 0)
+        items = []
+        range = Period(start, end)
+        recur.expand(start, range, items)
+        self.assertEqual(
+            items,
+            [
+                DateTime(2014, 1, 31, 12, 0, 0),
+                DateTime(2014, 3, 31, 12, 0, 0),
+                DateTime(2014, 5, 31, 12, 0, 0),
+                DateTime(2014, 7, 31, 12, 0, 0),
+                DateTime(2014, 8, 31, 12, 0, 0),
+                DateTime(2014, 10, 31, 12, 0, 0),
+                DateTime(2014, 12, 31, 12, 0, 0),
+            ],
+        )
+
+
+    def testMonthlyByMonthDay31(self):
+
+        recur = Recurrence()
+        recur.parse("FREQ=MONTHLY;BYMONTHDAY=31")
+        start = DateTime(2014, 1, 31, 12, 0, 0)
+        end = DateTime(2015, 1, 1, 0, 0, 0)
+        items = []
+        range = Period(start, end)
+        recur.expand(start, range, items)
+        self.assertEqual(
+            items,
+            [
+                DateTime(2014, 1, 31, 12, 0, 0),
+                DateTime(2014, 3, 31, 12, 0, 0),
+                DateTime(2014, 5, 31, 12, 0, 0),
+                DateTime(2014, 7, 31, 12, 0, 0),
+                DateTime(2014, 8, 31, 12, 0, 0),
+                DateTime(2014, 10, 31, 12, 0, 0),
+                DateTime(2014, 12, 31, 12, 0, 0),
+            ],
+        )
+
+
+    def testMonthlyByMonthDayMinus31(self):
+
+        recur = Recurrence()
+        recur.parse("FREQ=MONTHLY;BYMONTHDAY=-31")
+        start = DateTime(2014, 1, 1, 12, 0, 0)
+        end = DateTime(2015, 1, 1, 0, 0, 0)
+        items = []
+        range = Period(start, end)
+        recur.expand(start, range, items)
+        self.assertEqual(
+            items,
+            [
+                DateTime(2014, 1, 1, 12, 0, 0),
+                DateTime(2014, 3, 1, 12, 0, 0),
+                DateTime(2014, 5, 1, 12, 0, 0),
+                DateTime(2014, 7, 1, 12, 0, 0),
+                DateTime(2014, 8, 1, 12, 0, 0),
+                DateTime(2014, 10, 1, 12, 0, 0),
+                DateTime(2014, 12, 1, 12, 0, 0),
+            ],
+        )
+
+
+    def testMonthlyByLastFridayExpand(self):
+
+        recur = Recurrence()
+        recur.parse("FREQ=MONTHLY;BYDAY=-1FR")
+        start = DateTime(2014, 1, 31, 12, 0, 0)
+        end = DateTime(2015, 1, 1, 0, 0, 0)
+        items = []
+        range = Period(start, end)
+        recur.expand(start, range, items)
+        self.assertEqual(
+            items,
+            [
+                DateTime(2014, 1, 31, 12, 0, 0),
+                DateTime(2014, 2, 28, 12, 0, 0),
+                DateTime(2014, 3, 28, 12, 0, 0),
+                DateTime(2014, 4, 25, 12, 0, 0),
+                DateTime(2014, 5, 30, 12, 0, 0),
+                DateTime(2014, 6, 27, 12, 0, 0),
+                DateTime(2014, 7, 25, 12, 0, 0),
+                DateTime(2014, 8, 29, 12, 0, 0),
+                DateTime(2014, 9, 26, 12, 0, 0),
+                DateTime(2014, 10, 31, 12, 0, 0),
+                DateTime(2014, 11, 28, 12, 0, 0),
+                DateTime(2014, 12, 26, 12, 0, 0),
+            ],
+        )
+
+
+    def testMonthlyByFifthFridayExpand(self):
+
+        recur = Recurrence()
+        recur.parse("FREQ=MONTHLY;BYDAY=5FR")
+        start = DateTime(2014, 1, 31, 12, 0, 0)
+        end = DateTime(2015, 1, 1, 0, 0, 0)
+        items = []
+        range = Period(start, end)
+        recur.expand(start, range, items)
+        self.assertEqual(
+            items,
+            [
+                DateTime(2014, 1, 31, 12, 0, 0),
+                DateTime(2014, 5, 30, 12, 0, 0),
+                DateTime(2014, 8, 29, 12, 0, 0),
+                DateTime(2014, 10, 31, 12, 0, 0),
+            ],
+        )
+
+
+    def testYearlyLeapDay(self):
+
+        recur = Recurrence()
+        recur.parse("FREQ=YEARLY")
+        start = DateTime(2012, 2, 29, 12, 0, 0)
+        end = DateTime(2020, 1, 1, 0, 0, 0)
+        items = []
+        range = Period(start, end)
+        recur.expand(start, range, items)
+        self.assertEqual(
+            items,
+            [
+                DateTime(2012, 2, 29, 12, 0, 0),
+                DateTime(2016, 2, 29, 12, 0, 0),
+            ],
+        )
+
+
+    def testYearlyYearDay(self):
+
+        recur = Recurrence()
+        recur.parse("FREQ=YEARLY;BYYEARDAY=366")
+        start = DateTime(2012, 12, 31, 12, 0, 0)
+        end = DateTime(2020, 1, 1, 0, 0, 0)
+        items = []
+        range = Period(start, end)
+        recur.expand(start, range, items)
+        self.assertEqual(
+            items,
+            [
+                DateTime(2012, 12, 31, 12, 0, 0),
+                DateTime(2016, 12, 31, 12, 0, 0),
             ],
         )
 

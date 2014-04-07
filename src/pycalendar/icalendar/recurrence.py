@@ -876,6 +876,10 @@ class Recurrence(ValueMixin):
 
     def expand(self, start, range, items, float_offset=0):
 
+        # Have to normalize this to be very sure we are starting with a valid date, as otherwise
+        # we could end up looping forever when doing recurrence.
+        start.normalise()
+
         # Must have recurrence list at this point
         if self.mRecurrences is None:
             self.mRecurrences = []
@@ -937,7 +941,9 @@ class Recurrence(ValueMixin):
             items.append(start_iter.duplicate())
 
             # Get next item
-            start_iter.recur(self.mFreq, self.mInterval)
+            start_iter.recur(self.mFreq, self.mInterval, allow_invalid=True)
+            while start_iter.invalid():
+                start_iter.recur(self.mFreq, self.mInterval, allow_invalid=True)
 
             # Check limits
             if self.mUseCount:
@@ -995,6 +1001,9 @@ class Recurrence(ValueMixin):
             elif self.mFreq == definitions.eRecurrence_YEARLY:
                 self.generateYearlySet(start_iter, set_items)
 
+            # Ignore if it is invalid
+            set_items = filter(lambda x: not x.invalid(), set_items)
+
             # Always sort the set as BYxxx rules may not be sorted
             #set_items.sort(cmp=DateTime.sort)
             set_items.sort(key=lambda x: x.getPosixTime())
@@ -1040,7 +1049,7 @@ class Recurrence(ValueMixin):
                 return False
 
             # Get next item
-            start_iter.recur(self.mFreq, self.mInterval)
+            start_iter.recur(self.mFreq, self.mInterval, allow_invalid=True)
 
 
     def clear(self):
@@ -1428,7 +1437,7 @@ class Recurrence(ValueMixin):
             # and insert into output
             for iter2 in self.mByYearDay:
                 temp = iter1.duplicate()
-                temp.setYearDay(iter2)
+                temp.setYearDay(iter2, allow_invalid=True)
                 output.append(temp)
 
         return output
@@ -1442,7 +1451,7 @@ class Recurrence(ValueMixin):
             # and insert into output
             for iter2 in self.mByMonthDay:
                 temp = iter1.duplicate()
-                temp.setMonthDay(iter2)
+                temp.setMonthDay(iter2, allow_invalid=True)
                 output.append(temp)
 
         return output
@@ -1481,13 +1490,13 @@ class Recurrence(ValueMixin):
                 # Numeric value means specific instance
                 if iter2[0] != 0:
                     temp = iter1.duplicate()
-                    temp.setDayOfWeekInMonth(iter2[0], iter2[1])
+                    temp.setDayOfWeekInMonth(iter2[0], iter2[1], allow_invalid=True)
                     output.append(temp)
                 else:
                     # Every matching day in the month
                     for i in range(1, 7):
                         temp = iter1.duplicate()
-                        temp.setDayOfWeekInMonth(i, iter2[1])
+                        temp.setDayOfWeekInMonth(i, iter2[1], allow_invalid=True)
                         if temp.getMonth() == iter1.getMonth():
                             output.append(temp)
 
