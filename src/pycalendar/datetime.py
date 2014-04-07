@@ -347,11 +347,19 @@ class PyCalendarDateTime(ValueMixin):
         self.normalise()
 
 
-    def setYearDay(self, day):
+    def setYearDay(self, day, allow_invalid=False):
         # 1 .. 366 offset from start, or
         # -1 .. -366 offset from end
 
-        if day > 0:
+        if day == 366:
+            self.mMonth = 12
+            self.mDay = 31 if utils.isLeapYear(self.mYear) else 32
+
+        elif day == -366:
+            self.mMonth = 1 if utils.isLeapYear(self.mYear) else 1
+            self.mDay = 1 if utils.isLeapYear(self.mYear) else 0
+
+        elif day > 0:
             # Offset current date to 1st January of current year
             self.mMonth = 1
             self.mDay = 1
@@ -359,26 +367,26 @@ class PyCalendarDateTime(ValueMixin):
             # Increment day
             self.mDay += day - 1
 
-            # Normalise to get proper month/day values
-            self.normalise()
         elif day < 0:
             # Offset current date to 1st January of next year
-            self.mYear += 1
-            self.mMonth = 1
-            self.mDay = 1
+            self.mMonth = 12
+            self.mDay = 31
 
             # Decrement day
-            self.mDay += day
+            self.mDay += day + 1
 
+        if not allow_invalid:
             # Normalise to get proper year/month/day values
             self.normalise()
+        else:
+            self.changed()
 
 
     def getYearDay(self):
         return self.mDay + utils.daysUptoMonth(self.mMonth, self.mYear)
 
 
-    def setMonthDay(self, day):
+    def setMonthDay(self, day, allow_invalid=False):
         # 1 .. 31 offset from start, or
         # -1 .. -31 offset from end
 
@@ -389,18 +397,18 @@ class PyCalendarDateTime(ValueMixin):
             # Increment day
             self.mDay += day - 1
 
-            # Normalise to get proper month/day values
-            self.normalise()
         elif day < 0:
-            # Offset current date to 1st of next month
-            self.mMonth += 1
-            self.mDay = 1
+            # Offset current date to last of month
+            self.mDay = utils.daysInMonth(self.mMonth, self.mYear)
 
             # Decrement day
-            self.mDay += day
+            self.mDay += day + 1
 
+        if not allow_invalid:
             # Normalise to get proper year/month/day values
             self.normalise()
+        else:
+            self.changed()
 
 
     def isMonthDay(self, day):
@@ -518,7 +526,7 @@ class PyCalendarDateTime(ValueMixin):
         self.normalise()
 
 
-    def setDayOfWeekInMonth(self, offset, day):
+    def setDayOfWeekInMonth(self, offset, day, allow_invalid=False):
         # Set to first day in month
         self.mDay = 1
 
@@ -542,7 +550,10 @@ class PyCalendarDateTime(ValueMixin):
                 cycle += 7
             self.mDay = days_in_month - cycle
 
-        self.normalise()
+        if not allow_invalid:
+            self.normalise()
+        else:
+            self.changed()
 
 
     def setNextDayOfWeek(self, start, day):
@@ -777,8 +788,9 @@ class PyCalendarDateTime(ValueMixin):
         return PyCalendarDateTime(year=now_tm.tm_year, month=now_tm.tm_mon, day=now_tm.tm_mday, hours=now_tm.tm_hour, minutes=now_tm.tm_min, seconds=now_tm.tm_sec, tzid=tzid)
 
 
-    def recur(self, freq, interval):
+    def recur(self, freq, interval, allow_invalid=False):
         # Add appropriate interval
+        normalize = True
         if freq == definitions.eRecurrence_SECONDLY:
             self.mSeconds += interval
         elif freq == definitions.eRecurrence_MINUTELY:
@@ -796,15 +808,32 @@ class PyCalendarDateTime(ValueMixin):
             # or 1/2 May, or 31 March or what? We choose to find the next month with
             # the same day number as the current one.
             self.mMonth += interval
-            self.normalise()
-            while self.mDay > utils.daysInMonth(self.mMonth, self.mYear):
-                self.mMonth += interval
+
+            # Normalise month
+            normalised_month = ((self.mMonth - 1) % 12) + 1
+            adjustment_year = (self.mMonth - 1) / 12
+            if (normalised_month - 1) < 0:
+                normalised_month += 12
+                adjustment_year -= 1
+            self.mMonth = normalised_month
+            self.mYear += adjustment_year
+
+            if not allow_invalid:
                 self.normalise()
+                while self.mDay > utils.daysInMonth(self.mMonth, self.mYear):
+                    self.mMonth += interval
+                    self.normalise()
+            normalize = False
         elif freq == definitions.eRecurrence_YEARLY:
             self.mYear += interval
+            if allow_invalid:
+                normalize = False
 
-        # Normalise to standard date-time ranges
-        self.normalise()
+        if normalize:
+            # Normalise to standard date-time ranges
+            self.normalise()
+        else:
+            self.changed()
 
 
     def getLocaleDate(self, locale):
@@ -1093,6 +1122,20 @@ class PyCalendarDateTime(ValueMixin):
                 xmldefs.value_date if self.isDateOnly() else xmldefs.value_date_time
         ))
         value.text = self.getXMLText()
+
+
+    def invalid(self):
+        """
+        Are any of the current fields invalid.
+        """
+
+        # Right now we only care about invalid days of the month (e.g. February 30th). In the
+        # future we may also want to look for invalid times during a DST transition.
+
+        if self.mDay <= 0 or self.mDay > utils.daysInMonth(self.mMonth, self.mYear):
+            return True
+
+        return False
 
 
     def normalise(self):
