@@ -36,10 +36,24 @@ import xml.etree.cElementTree as XML
 class PropertyBase(object):
 
     # Mappings between various tokens and internal definitions
+
+    # Map a property name to its default value type
     sDefaultValueTypeMap = {}
+
+    # Properties whose value parameter is always written out
+    # even if equal to the default
+    sAlwaysValueTypes = set()
+
+    # Map a value name to a value type constant
     sValueTypeMap = {}
+
+    # Map a value type constant to a value name
     sTypeValueMap = {}
+
+    # Properties that are multi-valued
     sMultiValues = set()
+
+    # Properties whose value needs special handling
     sSpecialVariants = {}
 
     sUsesGroup = False
@@ -50,9 +64,22 @@ class PropertyBase(object):
     sText = None
 
     @classmethod
-    def registerDefaultValue(cls, propname, valuetype):
+    def registerDefaultValue(cls, propname, valuetype, always_write_value=False):
+        """
+        Allow custom properties to be used by defining their name/value mappings.
+
+        @param propname: name of the new property
+        @type propname: L{str}
+        @param valuetype: the L{Value} type used as the default value
+        @type valuetype: L{int}
+        @param always_write_value: if L{True} always write a VALUE= parameter even
+            when the default value is used
+        @type always_write_value: L{bool}
+        """
         if propname not in cls.sDefaultValueTypeMap:
             cls.sDefaultValueTypeMap[propname] = valuetype
+        if always_write_value:
+            cls.sAlwaysValueTypes.add(propname)
 
 
     def __init__(self, name=None, value=None, valuetype=None):
@@ -601,13 +628,14 @@ class PropertyBase(object):
             return
 
         # See if current type is default for this property. If there is no mapping available,
-        # then always add VALUE if it is not TEXT.
+        # then always add VALUE if it is not TEXT. Always add the value if listed in the
+        # C{sAlwaysValueTypes} attribute.
         default_type = self.sDefaultValueTypeMap.get(self.mName.upper())
         if self.mName.upper() in self.sSpecialVariants:
             actual_type = default_type
         else:
             actual_type = self.mValue.getType()
-        if default_type is None or default_type != actual_type:
+        if default_type is None or default_type != actual_type or self.mName.upper() in self.sAlwaysValueTypes:
             actual_value = self.sTypeValueMap.get(actual_type)
             if actual_value is not None and (default_type is not None or actual_type != Value.VALUETYPE_TEXT):
                 self.mParameters.setdefault(self.sValue, []).append(Parameter(name=self.sValue, value=actual_value))
