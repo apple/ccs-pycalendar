@@ -94,7 +94,7 @@ class Parameter(object):
                 os.write("=")
 
                 first = True
-                for s in self.mValues:
+                for s in sorted(self.mValues):
                     if first:
                         first = False
                     else:
