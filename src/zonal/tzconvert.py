@@ -88,7 +88,7 @@ class tzconvert(object):
         last_line = None
         for nextline in f:
             nextline = nextline[:-1]
-            if nextline.startswith("\t"):
+            if nextline.startswith("\t"): # or nextline.startswith(" "):
                 os.write("\n")
                 os.write(nextline)
             elif nextline.startswith("#") or len(nextline) == 0:

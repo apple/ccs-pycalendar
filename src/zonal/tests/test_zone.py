@@ -27,11 +27,17 @@ class TestZone(unittest.TestCase):
 \t\t\t-5:00\tNYC\tE%sT\t1942
 \t\t\t-5:00\tUS\tE%sT\t1946
 \t\t\t-5:00\tNYC\tE%sT\t1967
+  \t\t-5:00\tUS\tE%sT"""
+        zonedef_result = """Zone America/New_York\t-4:56:02\t-\tLMT\t1883 Nov 18 12:03:58
+\t\t\t-5:00\tUS\tE%sT\t1920
+\t\t\t-5:00\tNYC\tE%sT\t1942
+\t\t\t-5:00\tUS\tE%sT\t1946
+\t\t\t-5:00\tNYC\tE%sT\t1967
 \t\t\t-5:00\tUS\tE%sT"""
         zone = Zone()
         zone.parse(zonedef)
 
-        self.assertEqual(str(zone), zonedef)
+        self.assertEqual(str(zone), zonedef_result)
 
 
     def test_vtimezone(self):
