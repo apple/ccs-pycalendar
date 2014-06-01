@@ -46,14 +46,16 @@ def getExpandedDates(cal, start, end):
 
 
 
+def sortedList(setdata):
+    l = list(setdata)
+    l.sort(cmp=lambda x, y: DateTime.sort(x[0], y[0]))
+    return l
+
+
+
 def formattedExpandedDates(expanded):
-    items = []
-    for item in expanded:
-        utc = item[0].duplicate()
-        utc.setTimezoneUTC(True)
-        utc.offsetSeconds(-item[1])
-        items.append((item[0], utc, secondsToTime(item[1]), secondsToTime(item[2]),))
-    return "\n".join(["(%s, %s, %s, %s)" % item for item in items])
+    items = sortedList([(item[0], item[1], secondsToTime(item[2]), secondsToTime(item[3]),) for item in expanded])
+    return ", ".join(["(%s, %s, %s, %s)" % item for item in items])
 
 
 

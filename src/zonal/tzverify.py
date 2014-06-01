@@ -22,8 +22,9 @@ from tzconvert import tzconvert
 import getopt
 import os
 import sys
+from pycalendar.icalendar import definitions
 
-def loadCalendarFromZoneinfo(zoneinfopath, skips=(), verbose=False, quiet=False):
+def loadCalendarFromZoneinfo(zoneinfopath, skips=(), only=(), verbose=False, quiet=False):
 
     if not quiet:
         print "Scanning for calendar data in: %s" % (zoneinfopath,)
@@ -34,13 +35,20 @@ def loadCalendarFromZoneinfo(zoneinfopath, skips=(), verbose=False, quiet=False)
             if os.path.isdir(fpath):
                 scanForICS(fpath)
             elif fname.endswith(".ics"):
-                for skip in skips:
-                    if skip in fpath:
-                        break
+                if only:
+                    for item in only:
+                        if item in fpath:
+                            if verbose:
+                                print "Found calendar data: %s" % (fpath,)
+                            paths.append(fpath)
                 else:
-                    if verbose:
-                        print "Found calendar data: %s" % (fpath,)
-                    paths.append(fpath)
+                    for skip in skips:
+                        if skip in fpath:
+                            break
+                    else:
+                        if verbose:
+                            print "Found calendar data: %s" % (fpath,)
+                        paths.append(fpath)
     scanForICS(zoneinfopath)
 
     if not quiet:
@@ -109,9 +117,9 @@ def compareCalendars(calendar1, calendar2, start, end, filterTzids=(), verbose=F
     missing = tzids1.difference(tzids2)
     if missing:
         print """TZIDs in calendar 1 not in calendar 2 files: %s
-These cannot be checked.""" % (", ".join(missing),)
+These cannot be checked.""" % (", ".join(sorted(missing)),)
 
-    for tzid in tzids1.intersection(tzids2):
+    for tzid in sorted(tzids1.intersection(tzids2)):
         if filterTzids and tzid not in filterTzids:
             continue
         if not quiet:
@@ -128,11 +136,11 @@ These cannot be checked.""" % (", ".join(missing),)
             if i[0] == start:
                 d1.discard(i)
                 break
-            if i[1] == i[2]:
+            if i[2] == i[3]:
                 d1.discard(i)
         d2 = set2.difference(set1)
         for i in set(d2):
-            if i[1] == i[2]:
+            if i[2] == i[3]:
                 d2.discard(i)
         if d1:
             print "In calendar 1 but not in calendar 2 tzid=%s: %s" % (tzid, formattedExpandedDates(d1),)
@@ -146,8 +154,7 @@ These cannot be checked.""" % (", ".join(missing),)
 def getTZIDs(cal):
     results = set()
 
-    db = cal.getVTimezoneDB()
-    for vtz in db:
+    for vtz in cal.getComponents(definitions.cICalComponent_VTIMEZONE):
         tzid = vtz.getID()
         results.add(tzid)
 
@@ -157,8 +164,7 @@ def getTZIDs(cal):
 
 def getExpandedDates(cal, tzid, start, end):
 
-    db = cal.getVTimezoneDB()
-    return db[tzid].expandAll(start, end)
+    return cal.getTimezone(tzid).expandAll(start, end)
 
 
 
@@ -170,8 +176,8 @@ def sortedList(setdata):
 
 
 def formattedExpandedDates(expanded):
-    items = sortedList([(item[0], secondsToTime(item[1]), secondsToTime(item[2]),) for item in expanded])
-    return ", ".join(["(%s, %s, %s)" % item for item in items])
+    items = sortedList([(item[0], item[1], secondsToTime(item[2]), secondsToTime(item[3]),) for item in expanded])
+    return ", ".join(["(%s, %s, %s, %s)" % item for item in items])
 
 
 
@@ -267,8 +273,12 @@ if __name__ == '__main__':
         #"Africa/Cairo",
     )
 
-    checkcalendar1 = loadCalendarFromZoneinfo(zonedir1, skips, verbose, quiet)
-    checkcalendar2 = loadCalendarFromZoneinfo(zonedir2, skips, verbose, quiet)
+    only = (
+        #"Europe/Lisbon",
+    )
+
+    checkcalendar1 = loadCalendarFromZoneinfo(zonedir1, skips, only, verbose, quiet)
+    checkcalendar2 = loadCalendarFromZoneinfo(zonedir2, skips, only, verbose, quiet)
 
     compareCalendars(
         checkcalendar1,
