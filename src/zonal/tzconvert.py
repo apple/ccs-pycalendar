@@ -16,14 +16,18 @@
 ##
 
 from __future__ import with_statement
+from __future__ import print_function
 
-from difflib import unified_diff
 from pycalendar.icalendar.calendar import Calendar
+from xml.etree.cElementTree import ParseError as XMLParseError
 import cStringIO as StringIO
 import getopt
 import os
 import rule
 import sys
+import tarfile
+import urllib
+import xml.etree.cElementTree as XML
 import zone
 
 """
@@ -72,7 +76,7 @@ class tzconvert(object):
                     else:
                         break
         except:
-            print "Failed to parse file %s" % (file,)
+            print("Failed to parse file %s" % (file,))
             raise
 
 
@@ -112,6 +116,26 @@ class tzconvert(object):
         self.links[linkTo] = linkFrom
 
 
+    def parseWindowsAliases(self, aliases):
+
+        try:
+            xmlfile = open(aliases)
+            xmlroot = XML.ElementTree(file=xmlfile).getroot()
+        except (IOError, XMLParseError):
+            raise ValueError("Unable to open or read windows alias file: {}".format(aliases))
+
+        # Extract the mappings
+        try:
+            for elem in xmlroot.findall("./windowsZones/mapTimezones/mapZone"):
+                if elem.get("territory", "") == "001":
+                    if elem.get("other") not in self.links:
+                        self.links[elem.get("other")] = elem.get("type")
+                    else:
+                        print("Ignoring duplicate Windows alias: {}".format(elem.get("other")))
+        except (ValueError, KeyError):
+            raise ValueError("Unable to parse windows alias file: {}".format(aliases))
+
+
     def expandZone(self, zonename, minYear, maxYear=2018):
         """
         Expand a zones transition dates up to the specified year.
@@ -136,7 +160,7 @@ class tzconvert(object):
         return cal.getText()
 
 
-    def generateZoneinfoFiles(self, outputdir, minYear, maxYear=2018, links=True, filterzones=None):
+    def generateZoneinfoFiles(self, outputdir, minYear, maxYear=2018, links=True, windowsAliases=None, filterzones=None):
 
         # Empty current directory
         try:
@@ -162,16 +186,19 @@ class tzconvert(object):
             with open(fpath, "w") as f:
                 f.write(icsdata)
             if self.verbose:
-                print "Write path: %s" % (fpath,)
+                print("Write path: %s" % (fpath,))
 
         if links:
+            if windowsAliases is not None:
+                self.parseWindowsAliases(windowsAliases)
+
             link_list = []
-            for linkTo, linkFrom in self.links.iteritems():
+            for linkTo, linkFrom in sorted(self.links.iteritems(), key=lambda x: x[0]):
 
                 # Check for existing output file
                 fromPath = os.path.join(outputdir, linkFrom + ".ics")
                 if not os.path.exists(fromPath):
-                    print "Missing link from: %s to %s" % (linkFrom, linkTo,)
+                    print("Missing link from: %s to %s" % (linkFrom, linkTo,))
                     continue
 
                 with open(fromPath) as f:
@@ -184,7 +211,7 @@ class tzconvert(object):
                 with open(toPath, "w") as f:
                     f.write(icsdata)
                 if self.verbose:
-                    print "Write link: %s" % (linkTo,)
+                    print("Write link: %s" % (linkTo,))
 
                 link_list.append("%s\t%s" % (linkTo, linkFrom,))
 
@@ -196,9 +223,9 @@ class tzconvert(object):
 
 def usage(error_msg=None):
     if error_msg:
-        print error_msg
+        print(error_msg)
 
-    print """Usage: tzconvert [options] [DIR]
+    print("""Usage: tzconvert [options] [DIR]
 Options:
     -h            Print this help and exit
     --prodid      PROD-ID string to use
@@ -213,7 +240,7 @@ Description:
     This utility convert Olson-style timezone data in iCalendar.
     VTIMEZONE objects, one .ics file per-timezone.
 
-"""
+""")
 
     if error_msg:
         raise ValueError(error_msg)
@@ -225,11 +252,12 @@ if __name__ == '__main__':
 
     # Set the PRODID value used in generated iCalendar data
     prodid = "-//mulberrymail.com//Zonal//EN"
-    rootdir = "../../stuff/temp"
+    rootdir = "../../temp"
     startYear = 1800
     endYear = 2018
+    windowsAliases = None
 
-    options, args = getopt.getopt(sys.argv[1:], "h", ["prodid=", "root=", "start=", "end=", ])
+    options, args = getopt.getopt(sys.argv[1:], "h", ["prodid=", "root=", "start=", "end=", "windows="])
 
     for option, value in options:
         if option == "-h":
@@ -237,19 +265,34 @@ if __name__ == '__main__':
         elif option == "--prodid":
             prodid = value
         elif option == "--root":
-            rootdir = value
+            rootdir = os.path.expanduser(value)
         elif option == "--start":
             startYear = int(value)
         elif option == "--end":
             endYear = int(value)
+        elif option == "--windows":
+            windowsAliases = os.path.expanduser(value)
         else:
             usage("Unrecognized option: %s" % (option,))
 
-    # Process arguments
-    if len(args) > 1:
-        usage("Must have only one argument")
-    if len(args) == 1:
-        rootdir = os.path.expanduser(args[0])
+    if not os.path.exists(rootdir):
+        os.makedirs(rootdir)
+    zonedir = os.path.join(rootdir, "tzdata")
+    if not os.path.exists(zonedir):
+        print("Downloading and extracting IANA timezone database")
+        os.mkdir(zonedir)
+        iana = "https://www.iana.org/time-zones/repository/tzdata-latest.tar.gz"
+        data = urllib.urlretrieve(iana)
+        print("Extract data at: %s" % (data[0]))
+        with tarfile.open(data[0], "r:gz") as t:
+            t.extractall(zonedir)
+
+    if windowsAliases is None:
+        windowsAliases = os.path.join(rootdir, "windowsZones.xml")
+    if not os.path.exists(windowsAliases):
+        print("Downloading Unicode database")
+        unicode = "http://unicode.org/repos/cldr/tags/latest/common/supplemental/windowsZones.xml"
+        data = urllib.urlretrieve(unicode, windowsAliases)
 
     Calendar.sProdID = prodid
 
@@ -270,41 +313,13 @@ if __name__ == '__main__':
     for file in zonefiles:
         parser.parse(os.path.join(zonedir, file))
 
-    if 1:
-        parser.generateZoneinfoFiles(os.path.join(rootdir, "zoneinfo"), startYear, endYear, filterzones=(
-            #"America/Montevideo",
-            #"Europe/Paris",
-            #"Africa/Cairo",
-        ))
-
-    if 0:
-        checkName = "EST"
-        parsed = parser.vtimezones(1800, 2018, filterzones=(
-            checkName,
-        ))
-
-        icsdir = "../2008i/zoneinfo"
-        cal = Calendar()
-        for file in (checkName,):
-            fin = open(os.path.join(icsdir, file + ".ics"), "r")
-            cal.parse(fin)
-
-        for vtz in cal.getVTimezoneDB():
-            #from pycalendar.vtimezoneelement import VTimezoneElement
-            #vtz.mEmbedded.sort(VTimezoneElement.sort_dtstart)
-            for embedded in vtz.mEmbedded:
-                embedded.finalise()
-            vtz.finalise()
-
-        os = StringIO.StringIO()
-        cal.generate(os, False)
-        actual = os.getvalue()
-
-        print "-- ACTUAL --"
-        print actual
-        print
-        print "-- PARSED --"
-        print parsed
-        print
-        print "-- DIFF --"
-        print "\n".join([line for line in unified_diff(actual.split("\n"), parsed.split("\n"))])
+    parser.generateZoneinfoFiles(
+        os.path.join(rootdir, "zoneinfo"),
+        startYear,
+        endYear,
+        windowsAliases=windowsAliases,
+        filterzones=(
+        #"America/Montevideo",
+        #"Europe/Paris",
+        #"Africa/Cairo",
+    ))
