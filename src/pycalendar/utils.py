@@ -201,27 +201,34 @@ def encodeParameterValue(value):
     RFC6868 parameter encoding.
     """
 
-    encoded = []
-    last = ''
-    for c in value:
-        if c == '\r':
-            encoded.append('^')
-            encoded.append('n')
-        elif c == '\n':
-            if last != '\r':
-                encoded.append('^')
-                encoded.append('n')
-        elif c == '"':
-            encoded.append('^')
-            encoded.append('\'')
-        elif c == '^':
-            encoded.append('^')
-            encoded.append('^')
-        else:
-            encoded.append(c)
-        last = c
+    # Test for encoded characters first as encoding is expensive and it is better to
+    # avoid doing it if it is not required (which is the common case)
+    encode = False
+    for c in "\r\n\"^":
+        if c in value:
+            encode = True
 
-    return "".join(encoded)
+    if encode:
+        encoded = []
+        last = ''
+        for c in value:
+            if c in "\r\n\"^":
+                if c == '\r':
+                    encoded.append("^n")
+                elif c == '\n':
+                    if last != '\r':
+                        encoded.append("^n")
+                elif c == '"':
+                    encoded.append("^'")
+                elif c == '^':
+                    encoded.append("^^")
+            else:
+                encoded.append(c)
+            last = c
+
+        return "".join(encoded)
+    else:
+        return value
 
 
 
@@ -230,28 +237,31 @@ def decodeParameterValue(value):
     RFC6868 parameter decoding.
     """
 
-    if value is None:
-        return None
-    decoded = []
-    last = ''
-    for c in value:
-        if last == '^':
-            if c == 'n':
-                decoded.append('\n')
-            elif c == '\'':
-                decoded.append('"')
-            elif c == '^':
-                decoded.append('^')
-                c = ''
-            else:
-                decoded.append('^')
+    # Test for encoded characters first as decoding is expensive and it is better to
+    # avoid doing it if it is not required (which is the common case)
+    if value is not None and "^" in value:
+        decoded = []
+        last = ''
+        for c in value:
+            if last == '^':
+                if c == 'n':
+                    decoded.append('\n')
+                elif c == '\'':
+                    decoded.append('"')
+                elif c == '^':
+                    decoded.append('^')
+                    c = ''
+                else:
+                    decoded.append('^')
+                    decoded.append(c)
+            elif c != '^':
                 decoded.append(c)
-        elif c != '^':
-            decoded.append(c)
-        last = c
-    if last == '^':
-        decoded.append('^')
-    return "".join(decoded)
+            last = c
+        if last == '^':
+            decoded.append('^')
+        return "".join(decoded)
+    else:
+        return value
 
 
 

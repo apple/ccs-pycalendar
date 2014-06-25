@@ -18,51 +18,31 @@ from hashlib import md5
 
 def strduptokenstr(txt, tokens):
 
-    result = None
-    start = 0
-
-    # First punt over any leading space
-    for s in txt:
-        if s == " ":
-            start += 1
-        else:
-            break
-    else:
-        return None, ""
+    # First punt over any leading space - this is not common so test the
+    # first character before trying the more expensive strip
+    if txt[0] == " ":
+        txt = txt.lstrip()
+        if not txt:
+            return None, ""
 
     # Handle quoted string
-    if txt[start] == '\"':
-
-        maxlen = len(txt)
-        # Punt leading quote
-        start += 1
-        end = start
-
-        done = False
-        while not done:
-            if end == maxlen:
-                return None, txt
-
-            if txt[end] == '\"':
-                done = True
-            elif txt[end] == '\\':
-                # Punt past quote
-                end += 2
+    if txt[0] == '\"':
+        skip = False
+        for end, s in enumerate(txt[1:]):
+            if skip:
+                skip = False
+                continue
+            elif s == '\"':
+                return txt[1:end + 1], txt[end + 2:]
             else:
-                end += 1
-            if end >= maxlen:
-                return None, txt
-
-        return txt[start:end], txt[end + 1:]
+                skip = (s == '\\')
+        else:
+            return None, txt
     else:
-        for relend, s in enumerate(txt[start:]):
+        for end, s in enumerate(txt):
             if s in tokens:
-                if relend:
-                    result = txt[start:start + relend]
-                else:
-                    result = ""
-                return result, txt[start + relend:]
-        return txt[start:], ""
+                return txt[0:end], txt[end:]
+        return txt, ""
 
 
 
