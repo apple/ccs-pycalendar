@@ -42,6 +42,11 @@ class Calendar(ContainerBase):
     FIND_EXACT = 0
     FIND_MASTER = 1
 
+    # Enums for includeTimezone parameter
+    ALL_TIMEZONES = 0       # Always include referenced timezones
+    NONSTD_TIMEZONES = 1    # Only include non-standard referenced timezones
+    NO_TIMEZONES = 2        # Never include timezones other than those already present
+
     sContainerDescriptor = "iCalendar"
     sComponentType = Component
     sPropertyType = Property
@@ -68,6 +73,14 @@ class Calendar(ContainerBase):
         self.mDescription = ""
         self.mMasterComponentsByTypeAndUID = collections.defaultdict(lambda: collections.defaultdict(list))
         self.mOverriddenComponentsByUID = collections.defaultdict(list)
+
+
+    def __str__(self):
+        """
+        Override this to generate text without adding timezones - i.e., this will not change the
+        underlying object in any way.
+        """
+        return self.getText(includeTimezones=Calendar.NO_TIMEZONES)
 
 
     def duplicate(self):
@@ -338,32 +351,30 @@ class Calendar(ContainerBase):
                 del self.mMasterComponentsByTypeAndUID[component.getType()][uid]
 
 
-    def getText(self, includeTimezones=False, format=None):
+    def getText(self, includeTimezones=None, format=None):
 
         if format is None or format == self.sFormatText:
             s = StringIO()
             self.generate(s, includeTimezones=includeTimezones)
             return s.getvalue()
         elif format == self.sFormatJSON:
-            return self.getTextJSON(includeTimezones)
+            return self.getTextJSON(includeTimezones=includeTimezones)
 
 
-    def generate(self, os, includeTimezones=False):
+    def generate(self, os, includeTimezones=None):
         # Make sure all required timezones are in this object
-        if includeTimezones:
-            self.includeTimezones()
+        self.includeMissingTimezones(includeTimezones=includeTimezones)
         super(Calendar, self).generate(os)
 
 
-    def getTextXML(self, includeTimezones=False):
+    def getTextXML(self, includeTimezones=None):
         node = self.writeXML(includeTimezones)
         return xmlutils.toString(node)
 
 
-    def writeXML(self, includeTimezones=False):
+    def writeXML(self, includeTimezones=None):
         # Make sure all required timezones are in this object
-        if includeTimezones:
-            self.includeTimezones()
+        self.includeMissingTimezones(includeTimezones=includeTimezones)
 
         # Root node structure
         root = XML.Element(xmlutils.makeTag(xmldefinitions.iCalendar20_namespace, xmldefinitions.icalendar))
@@ -371,16 +382,15 @@ class Calendar(ContainerBase):
         return root
 
 
-    def getTextJSON(self, includeTimezones=False):
+    def getTextJSON(self, includeTimezones=None):
         jobject = []
         self.writeJSON(jobject, includeTimezones)
         return json.dumps(jobject[0], indent=2, separators=(',', ':'))
 
 
-    def writeJSON(self, jobject, includeTimezones=False):
+    def writeJSON(self, jobject, includeTimezones=None):
         # Make sure all required timezones are in this object
-        if includeTimezones:
-            self.includeTimezones()
+        self.includeMissingTimezones(includeTimezones=includeTimezones)
 
         # Root node structure
         super(Calendar, self).writeJSON(jobject)
@@ -588,7 +598,23 @@ class Calendar(ContainerBase):
         return True
 
 
-    def includeTimezones(self):
+    def includeMissingTimezones(self, includeTimezones=None):
+        """
+        For each timezone referenced in this L{Calendar}, if the corresponding VTIMEZONE component
+        is not present, then add the matching component from the timezone database. If
+        L{includeTimezones} is L{False}, then only add VTIMEZONEs that are not part of the standard
+        timezone database.
+        
+        @param includeTimezones: indicated whether all or only non-standard timezones are included
+        @type includeTimezones: L{bool}
+        """
+
+        # Don't add anything in this case
+        if includeTimezones == Calendar.NO_TIMEZONES:
+            return
+        if includeTimezones is None:
+            includeTimezones = Calendar.NONSTD_TIMEZONES
+
         # Get timezone names from each component
         tzids = set()
         for component in self.mComponents:
@@ -598,6 +624,9 @@ class Calendar(ContainerBase):
         # Make sure each timezone is in current calendar
         from pycalendar.timezonedb import TimezoneDatabase
         for tzid in tzids:
+            # Skip standard timezones if requested
+            if includeTimezones == Calendar.NONSTD_TIMEZONES and TimezoneDatabase.isStandardTimezone(tzid):
+                continue
             tz = self.getTimezone(tzid)
             if tz is None:
                 # Find it in the static object
@@ -605,3 +634,22 @@ class Calendar(ContainerBase):
                 if tz is not None:
                     dup = tz.duplicate()
                     self.addComponent(dup)
+
+
+    def stripStandardTimezones(self):
+        """
+        Remove VTIMEZONE components from this L{Calendar} if the corresponding TZIDs are
+        in the timezone database.
+        
+        @return: L{True} if changes were made, L{False} otherwise
+        @rtype: L{bool}
+        """
+        from pycalendar.timezonedb import TimezoneDatabase
+        changed = False
+        for component in self.getComponents(definitions.cICalComponent_VTIMEZONE):
+            tz = TimezoneDatabase.getTimezone(component.getID())
+            if tz is not None and TimezoneDatabase.isStandardTimezone(component.getID()):
+                self.removeComponent(component)
+                changed = True
+
+        return changed

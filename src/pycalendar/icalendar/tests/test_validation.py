@@ -16,9 +16,9 @@
 
 from pycalendar.exceptions import ValidationError
 from pycalendar.icalendar.calendar import Calendar
-import unittest
+from pycalendar.tests.utils import TestPyCalendar
 
-class TestValidation(unittest.TestCase):
+class TestValidation(TestPyCalendar):
 
     def test_basic(self):
 
@@ -1682,7 +1682,7 @@ END:VCALENDAR
         for title, test_old, test_new, test_fixed, test_unfixed in data:
             cal = Calendar.parseText(test_old)
             fixed, unfixed = cal.validate(doFix=True)
-            self.assertEqual(str(cal), test_new, msg="Failed test: %s" % (title,))
+            self.assertEqual(str(cal), test_new, msg="Failed test: %s" % (str(cal),))
             self.assertEqual(set(fixed), test_fixed, msg="Failed test: %s" % (title,))
             self.assertEqual(set(unfixed), test_unfixed, msg="Failed test: %s" % (title,))
 

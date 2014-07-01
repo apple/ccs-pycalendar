@@ -43,6 +43,8 @@ class TimezoneDatabase(object):
         from pycalendar.icalendar.calendar import Calendar
         self.dbpath = None
         self.calendar = Calendar()
+        self.tzcache = {}
+        self.stdtzcache = set()
 
 
     def setPath(self, dbpath):
@@ -52,6 +54,8 @@ class TimezoneDatabase(object):
     def clear(self):
         from pycalendar.icalendar.calendar import Calendar
         self.calendar = Calendar()
+        self.tzcache.clear()
+        self.stdtzcache.clear()
 
 
     @staticmethod
@@ -63,18 +67,7 @@ class TimezoneDatabase(object):
 
     @staticmethod
     def getTimezone(tzid):
-
-        # Check whether current cached
-        tzdb = TimezoneDatabase.getTimezoneDatabase()
-        tz = tzdb.calendar.getTimezone(tzid)
-        if tz is None:
-            try:
-                tzdb.cacheTimezone(tzid)
-            except NoTimezoneInDatabase:
-                pass
-            tz = tzdb.calendar.getTimezone(tzid)
-
-        return tz
+        return TimezoneDatabase.getTimezoneDatabase()._getTimezone(tzid)
 
 
     @staticmethod
@@ -113,7 +106,19 @@ class TimezoneDatabase(object):
             return ""
 
 
+    @staticmethod
+    def isStandardTimezone(tzid):
+        return TimezoneDatabase.getTimezoneDatabase()._isStandardTimezone(tzid)
+
+
     def cacheTimezone(self, tzid):
+        """
+        Load the specified timezone identifier's timezone data from a file and parse it
+        into the L{Calendar} used to store timezones used by this object.
+
+        @param tzid: the timezone identifier to load
+        @type tzid: L{str}
+        """
 
         if self.dbpath is None:
             return
@@ -130,8 +135,65 @@ class TimezoneDatabase(object):
 
 
     def addTimezone(self, tz):
+        """
+        Add the specified VTIMEZONE component to this object's L{Calendar} cache. This component
+        is assumed to be a non-standard timezone - i.e., not loaded from the timezone database.
+
+        @param tz: the VTIMEZONE component to add
+        @type tz: L{Component}
+        """
         copy = tz.duplicate(self.calendar)
         self.calendar.addComponent(copy)
+        self.tzcache[copy.getID()] = copy
+
+
+    def _addStandardTimezone(self, tz):
+        """
+        Same as L{addTimezone} except that the timezone is marked as a standard timezone. This
+        is only meant to be used for testing which happens int he absence of a real standard
+        timezone database.
+
+        @param tz: the VTIMEZONE component to add
+        @type tz: L{Component}
+        """
+        if tz.getID() not in self.tzcache:
+            self.addTimezone(tz)
+        self.stdtzcache.add(tz.getID())
+
+
+    def _isStandardTimezone(self, tzid):
+        """
+        Add the specified VTIMEZONE component to this object's L{Calendar} cache. This component
+        is assumed to be a non-standard timezone - i.e., not loaded from the timezone database.
+
+        @param tzid: the timezone identifier to lookup
+        @type tzid: L{str}
+        """
+        return tzid in self.stdtzcache
+
+
+    def _getTimezone(self, tzid):
+        """
+        Get a timezone matching the specified timezone identifier. Use this object's
+        cache - if not in the cache try to load it from a tz database file and store in
+        this object's calendar.
+
+        @param tzid: the timezone identifier to lookup
+        @type tzid: L{str}
+        """
+        if tzid not in self.tzcache:
+            tz = self.calendar.getTimezone(tzid)
+            if tz is None:
+                try:
+                    self.cacheTimezone(tzid)
+                except NoTimezoneInDatabase:
+                    pass
+                tz = self.calendar.getTimezone(tzid)
+            self.tzcache[tzid] = tz
+            if tz is not None and tzid is not None:
+                self.stdtzcache.add(tzid)
+
+        return self.tzcache[tzid]
 
 
     @staticmethod
@@ -156,5 +218,5 @@ class TimezoneDatabase(object):
         If the supplied VTIMEZONE is not in our cache then store it in memory.
         """
 
-        if self.getTimezone(tz.getID()) is None:
+        if self._getTimezone(tz.getID()) is None:
             self.addTimezone(tz)

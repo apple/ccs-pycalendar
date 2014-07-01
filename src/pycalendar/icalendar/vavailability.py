@@ -106,4 +106,18 @@ class VAvailability(Component):
             definitions.cICalProperty_DTEND,
         )
 
+
+    def getTimezones(self, tzids):
+        """
+        In addition to looking in the VAVAILABILITY component, we must also return any TZIDs used
+        in AVAILABLE child components.
+
+        @param tzids: result to report back
+        @type tzids: L{set}
+        """
+
+        super(VAvailability, self).getTimezones(tzids)
+        for available in self.getComponents(definitions.cICalComponent_AVAILABLE):
+            available.getTimezones(tzids)
+
 Component.registerComponent(definitions.cICalComponent_VAVAILABILITY, VAvailability)
