@@ -601,12 +601,13 @@ class Calendar(ContainerBase):
     def includeMissingTimezones(self, includeTimezones=None):
         """
         For each timezone referenced in this L{Calendar}, if the corresponding VTIMEZONE component
-        is not present, then add the matching component from the timezone database. If
-        L{includeTimezones} is L{False}, then only add VTIMEZONEs that are not part of the standard
-        timezone database.
+        is not present, then add the matching component from the timezone database. L{includeTimezones}
+        indicates what set of timezones should be automatically included. If set to L{None} the default
+        is L{Calendar.NO_TIMEZONES}. Otherwise, one of L{Calendar.ALL_TIMEZONES}, L{Calendar.NONSTD_TIMEZONES},
+        or L{Calendar.NO_TIMEZONES} must be used.
         
-        @param includeTimezones: indicated whether all or only non-standard timezones are included
-        @type includeTimezones: L{bool}
+        @param includeTimezones: indicated whether all, only non-standard or no timezones are included
+        @type includeTimezones: L{int} or L{None}
         """
 
         # Don't add anything in this case
