@@ -167,6 +167,48 @@ class TestRecurrence(unittest.TestCase):
         )
 
 
+    def testWeeklyTwice(self):
+
+        recur = Recurrence()
+        recur.parse("FREQ=WEEKLY")
+        start = DateTime(2014, 1, 1, 12, 0, 0, tzid=Timezone(utc=True))
+        end = DateTime(2014, 2, 1, 0, 0, 0, tzid=Timezone(utc=True))
+        items = []
+        range = Period(start, end)
+        recur.expand(DateTime(2014, 1, 1, 12, 0, 0, tzid=Timezone(tzid="America/New_York")), range, items)
+        self.assertEqual(
+            items,
+            [
+                DateTime(2014, 1, 1, 12, 0, 0, tzid=Timezone(tzid="America/New_York")),
+                DateTime(2014, 1, 8, 12, 0, 0, tzid=Timezone(tzid="America/New_York")),
+                DateTime(2014, 1, 15, 12, 0, 0, tzid=Timezone(tzid="America/New_York")),
+                DateTime(2014, 1, 22, 12, 0, 0, tzid=Timezone(tzid="America/New_York")),
+                DateTime(2014, 1, 29, 12, 0, 0, tzid=Timezone(tzid="America/New_York")),
+
+            ],
+        )
+
+        start = DateTime(2014, 1, 1, 12, 0, 0, tzid=Timezone(utc=True))
+        end = DateTime(2014, 3, 1, 0, 0, 0, tzid=Timezone(utc=True))
+        items = []
+        range = Period(start, end)
+        recur.expand(DateTime(2014, 1, 1, 12, 0, 0, tzid=Timezone(tzid="America/New_York")), range, items)
+        self.assertEqual(
+            items,
+            [
+                DateTime(2014, 1, 1, 12, 0, 0, tzid=Timezone(tzid="America/New_York")),
+                DateTime(2014, 1, 8, 12, 0, 0, tzid=Timezone(tzid="America/New_York")),
+                DateTime(2014, 1, 15, 12, 0, 0, tzid=Timezone(tzid="America/New_York")),
+                DateTime(2014, 1, 22, 12, 0, 0, tzid=Timezone(tzid="America/New_York")),
+                DateTime(2014, 1, 29, 12, 0, 0, tzid=Timezone(tzid="America/New_York")),
+                DateTime(2014, 2, 5, 12, 0, 0, tzid=Timezone(tzid="America/New_York")),
+                DateTime(2014, 2, 12, 12, 0, 0, tzid=Timezone(tzid="America/New_York")),
+                DateTime(2014, 2, 19, 12, 0, 0, tzid=Timezone(tzid="America/New_York")),
+                DateTime(2014, 2, 26, 12, 0, 0, tzid=Timezone(tzid="America/New_York")),
+            ],
+        )
+
+
     def testMonthlyInUTC(self):
 
         recur = Recurrence()

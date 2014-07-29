@@ -894,24 +894,21 @@ class Recurrence(ValueMixin):
         if self.mCached and (start != self.mCacheStart):
             self.mCached = False
             self.mFullyCached = False
-            self.mRecurrences = []
 
         # Is the current cache complete or does it extend past the requested
         # range end
         if not self.mCached or not self.mFullyCached \
                 and (self.mCacheUpto is None or self.mCacheUpto < range.getEnd()):
-            cache_range = range.duplicate()
 
-            # If partially cached just cache from previous cache end up to new
-            # end
-            if self.mCached:
-                cache_range = Period(self.mCacheUpto, range.getEnd())
+            # Always wipe the existing cached items as we always start from the very first instance
+            # so we can properly track the count limit
+            self.mRecurrences = []
 
             # Simple expansion is one where there is no BYXXX rule part
             if not self.hasBy():
-                self.mFullyCached = self.simpleExpand(start, cache_range, self.mRecurrences, float_offset)
+                self.mFullyCached = self.simpleExpand(start, range, self.mRecurrences, float_offset)
             else:
-                self.mFullyCached = self.complexExpand(start, cache_range, self.mRecurrences, float_offset)
+                self.mFullyCached = self.complexExpand(start, range, self.mRecurrences, float_offset)
 
             # Set cache values
             self.mCached = True
