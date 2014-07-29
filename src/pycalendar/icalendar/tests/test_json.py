@@ -22,8 +22,8 @@ import unittest
 class TestJSON(unittest.TestCase):
 
     data = (
-                (
-"""BEGIN:VCALENDAR
+        (
+            """BEGIN:VCALENDAR
 CALSCALE:GREGORIAN
 PRODID:-//Example Inc.//Example Calendar//EN
 VERSION:2.0
@@ -36,7 +36,7 @@ END:VEVENT
 END:VCALENDAR
 """.replace("\n", "\r\n"),
 
-"""[
+            """[
   "vcalendar",
   [
     [
@@ -91,9 +91,9 @@ END:VCALENDAR
     ]
   ]
 ]""",
-                ),
-                (
-"""BEGIN:VCALENDAR
+        ),
+        (
+            """BEGIN:VCALENDAR
 VERSION:2.0
 PRODID:-//Example Corp.//Example Client//EN
 BEGIN:VTIMEZONE
@@ -139,7 +139,7 @@ END:VEVENT
 END:VCALENDAR
 """.replace("\n", "\r\n"),
 
-"""[
+            """[
   "vcalendar",
   [
     [
@@ -384,8 +384,8 @@ END:VCALENDAR
     ]
   ]
 ]""",
-            ),
-        )
+        ),
+    )
 
     def testGenerateJSON(self):
 
@@ -645,7 +645,7 @@ class TestJSONProperty(unittest.TestCase):
         ["sequence", {}, "integer", 1],
         ["rdate", {}, "date-time", "2006-02-26T12:00:00Z", "2006-02-27T12:00:00Z"],
         ["freebusy", {}, "period", ["2006-02-26T12:00:00Z", "2006-02-27T12:00:00Z"]],
-        ["rrule", {}, "recur", {"freq":"MONTHLY", "count": 3, "byday":["TU", "WE", "TH"], "bysetpos":[-1]}],
+        ["rrule", {}, "recur", {"freq": "MONTHLY", "count": 3, "byday": ["TU", "WE", "TH"], "bysetpos": [-1]}],
         ["request-status", {}, "text", ["2.0", "Success"]],
         ["geo", {}, "float", [-2.1, 3.2]],
         ["uri", {}, "uri", "http://www.example.com"],
@@ -654,7 +654,7 @@ class TestJSONProperty(unittest.TestCase):
         ["x-foo", {}, "float", -1.23],
         ["x-test", {}, "text", "Some:, text."],
         ["x-apple-structured-location", {}, "uri", "geo:123.123,123.123"],
-        ["rrule", {}, "recur", {"freq":"MONTHLY", "until": "2013-01-01T00:00:00Z"}],
+        ["rrule", {}, "recur", {"freq": "MONTHLY", "until": "2013-01-01T00:00:00Z"}],
         ["categories", {}, "text", "A", "B"],
 
         # Various parameters

@@ -297,7 +297,7 @@ class Property(PropertyBase):
             if definitions.cICalParameter_TZID in self.mParameters:
                 del self.mParameters[definitions.cICalParameter_TZID]
             self.mParameters.setdefault(definitions.cICalParameter_TZID, []).append(
-                    Parameter(name=definitions.cICalParameter_TZID, value=dt.getTimezoneID()))
+                Parameter(name=definitions.cICalParameter_TZID, value=dt.getTimezoneID()))
 
 
     def _init_attr_value_datetimelist(self, dtl):
@@ -321,7 +321,7 @@ class Property(PropertyBase):
             if definitions.cICalParameter_TZID in self.mParameters:
                 del self.mParameters[definitions.cICalParameter_TZID]
             self.mParameters.setdefault(definitions.cICalParameter_TZID, []).append(
-                    Parameter(name=definitions.cICalParameter_TZID, value=dtl[0].getTimezoneID()))
+                Parameter(name=definitions.cICalParameter_TZID, value=dtl[0].getTimezoneID()))
 
 
     def _init_attr_value_periodlist(self, periodlist):

@@ -25,7 +25,7 @@ class DateTimeValue(WrapperValue, Value):
     _wrappedType = None # Depends on actual value
 
     def getType(self):
-        return  (Value.VALUETYPE_DATETIME, Value.VALUETYPE_DATE)[self.mValue.isDateOnly()]
+        return (Value.VALUETYPE_DATETIME, Value.VALUETYPE_DATE)[self.mValue.isDateOnly()]
 
 
     def parse(self, data, variant):

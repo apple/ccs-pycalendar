@@ -26,7 +26,7 @@ class TestCard(unittest.TestCase):
 
     data = (
         (
-"""BEGIN:VCARD
+            """BEGIN:VCARD
 VERSION:3.0
 N:Thompson;Default;;;
 FN:Default Thompson
@@ -38,7 +38,7 @@ item1.X-ABADR:us
 UID:ED7A5AEC-AB19-4CE0-AD6A-2923A3E5C4E1:ABPerson
 END:VCARD
 """.replace("\n", "\r\n"),
-"""BEGIN:VCARD
+            """BEGIN:VCARD
 VERSION:3.0
 UID:ED7A5AEC-AB19-4CE0-AD6A-2923A3E5C4E1:ABPerson
 item1.ADR;type=WORK;type=pref:;;1245 Test;Sesame Street;California;11111;U
@@ -53,7 +53,7 @@ END:VCARD
 """.replace("\n", "\r\n"),
         ),
         (
-"""BEGIN:VCARD
+            """BEGIN:VCARD
 VERSION:3.0
 N:Thompson;Default;;;
 FN:Default Thompson
@@ -67,7 +67,7 @@ REV:2011-01-02T12:34:56-0500
 UID:ED7A5AEC-AB19-4CE0-AD6A-2923A3E5C4E1:ABPerson
 END:VCARD
 """.replace("\n", "\r\n"),
-"""BEGIN:VCARD
+            """BEGIN:VCARD
 VERSION:3.0
 UID:ED7A5AEC-AB19-4CE0-AD6A-2923A3E5C4E1:ABPerson
 item1.ADR;type=WORK;type=pref:;;1245 Test;Sesame Street;California;11111;U
@@ -84,7 +84,7 @@ END:VCARD
 """.replace("\n", "\r\n"),
         ),
         (
-"""BEGIN:VCARD
+            """BEGIN:VCARD
 VERSION:3.0
 N:Thompson;Default;;;
 FN:Default Thompson
@@ -98,7 +98,7 @@ REV:2011-01-02T12:34:56-0500
 UID:ED7A5AEC-AB19-4CE0-AD6A-2923A3E5C4E1:ABPerson
 END:VCARD
 """.replace("\n", "\r\n"),
-"""BEGIN:VCARD
+            """BEGIN:VCARD
 VERSION:3.0
 UID:ED7A5AEC-AB19-4CE0-AD6A-2923A3E5C4E1:ABPerson
 item1.ADR;type=WORK;type=pref:;;1245 Test;Sesame Street;California;11111;U
@@ -115,7 +115,7 @@ END:VCARD
 """.replace("\n", "\r\n"),
         ),
         (
-"""BEGIN:VCARD
+            """BEGIN:VCARD
 VERSION:3.0
 N:Picture;With;;;
 FN:With Picture
@@ -134,7 +134,7 @@ PHOTO;Encoding=b:QkVHSU46VkNBUkQKVkVSU0lPTjozLjAKTjpQaWN0dXJlO1dpdGg7Ozs
 UID:934731C6-1C95-4C40-BE1F-FA4215B2307B:ABPerson
 END:VCARD
 """.replace("\n", "\r\n"),
-"""BEGIN:VCARD
+            """BEGIN:VCARD
 VERSION:3.0
 UID:934731C6-1C95-4C40-BE1F-FA4215B2307B:ABPerson
 item1.ADR;type=WORK;type=pref:;;1234 Golly Street;Sunnyside;CA;99999;USA
@@ -156,7 +156,7 @@ END:VCARD
 """.replace("\n", "\r\n"),
         ),
         (
-"""BEGIN:VCARD
+            """BEGIN:VCARD
 VERSION:3.0
 N:Thompson;Default;;;
 FN:Default Thompson
@@ -170,7 +170,7 @@ X-APPLE-STRUCTURED-LOCATION;VALUE=URI:geo:123.123,123.123
 X-Test:Some\, text.
 END:VCARD
 """.replace("\n", "\r\n"),
-"""BEGIN:VCARD
+            """BEGIN:VCARD
 VERSION:3.0
 UID:ED7A5AEC-AB19-4CE0-AD6A-2923A3E5C4E1:ABPerson
 item1.ADR;type=WORK;type=pref:;;1245 Test;Sesame Street;California;11111;U
@@ -261,7 +261,7 @@ END:VCARD
 
         data = (
             (
-"""BEGIN:VCARD
+                """BEGIN:VCARD
 VERSION:3.0
 N:Thompson;Default;;;
 FN:Default Thompson
@@ -272,8 +272,9 @@ item1.ADR;type=WORK;type=pref:;;1245 Test;Sesame Street;California;11111;USA
 item1.X-ABADR:us
 UID:ED7A5AEC-AB19-4CE0-AD6A-2923A3E5C4E1:ABPerson
 END:VCARD
-""".replace("\n", "\r\n"), (
-"""BEGIN:VCARD
+""".replace("\n", "\r\n"),
+                (
+                    """BEGIN:VCARD
 VERSION:3.0
 UID:ED7A5AEC-AB19-4CE0-AD6A-2923A3E5C4E1:ABPerson
 item1.ADR;type=WORK;type=pref:;;1245 Test;Sesame Street;California;11111;U
@@ -286,9 +287,10 @@ TEL;type=CELL:1-444-444-4444
 item1.X-ABADR:us
 END:VCARD
 """.replace("\n", "\r\n"),
-            )),
+                )
+            ),
             (
-"""BEGIN:VCARD
+                """BEGIN:VCARD
 VERSION:3.0
 N:Thompson;Default;;;
 FN:Default Thompson
@@ -311,8 +313,9 @@ TEL;type=WORK;type=pref:1-555-555-5556
 TEL;type=CELL:1-444-444-4445
 item1.X-ABADR:us
 END:VCARD
-""".replace("\n", "\r\n"), (
-"""BEGIN:VCARD
+""".replace("\n", "\r\n"),
+                (
+                    """BEGIN:VCARD
 VERSION:3.0
 UID:ED7A5AEC-AB19-4CE0-AD6A-2923A3E5C4E1:ABPerson
 item1.ADR;type=WORK;type=pref:;;1245 Test;Sesame Street;California;11111;U
@@ -325,7 +328,7 @@ TEL;type=CELL:1-444-444-4444
 item1.X-ABADR:us
 END:VCARD
 """.replace("\n", "\r\n"),
-"""BEGIN:VCARD
+                    """BEGIN:VCARD
 VERSION:3.0
 UID:ED7A5AEC-AB19-4CE0-AD6A-2923A3E5C4E2:ABPerson
 item1.ADR;type=WORK;type=pref:;;1245 Test;Sesame Street;California;11111;U
@@ -338,7 +341,8 @@ TEL;type=CELL:1-444-444-4445
 item1.X-ABADR:us
 END:VCARD
 """.replace("\n", "\r\n"),
-            )),
+                )
+            ),
         )
 
         for item, results in data:
@@ -394,7 +398,7 @@ END:VCARD
     def testParseFail(self):
 
         data = (
-"""BEGIN:VCARD
+            """BEGIN:VCARD
 VERSION:3.0
 N:Thompson;Default;;;
 FN:Default Thompson
@@ -406,13 +410,13 @@ item1.X-ABADR:us
 UID:ED7A5AEC-AB19-4CE0-AD6A-2923A3E5C4E1:ABPerson
 """.replace("\n", "\r\n"),
 
-"""BEGIN:VCALENDAR
+            """BEGIN:VCALENDAR
 PRODID:-//mulberrymail.com//Mulberry v4.0//EN
 VERSION:2.0
 END:VCALENDAR
 """.replace("\n", "\r\n"),
 
-"""BOGUS
+            """BOGUS
 BEGIN:VCARD
 VERSION:3.0
 N:Thompson;Default;;;
@@ -426,7 +430,7 @@ UID:ED7A5AEC-AB19-4CE0-AD6A-2923A3E5C4E1:ABPerson
 END:VCARD
 """.replace("\n", "\r\n"),
 
-"""BOGUS
+            """BOGUS
 
 BEGIN:VCARD
 VERSION:3.0
@@ -441,7 +445,7 @@ UID:ED7A5AEC-AB19-4CE0-AD6A-2923A3E5C4E1:ABPerson
 END:VCARD
 """.replace("\n", "\r\n"),
 
-"""BEGIN:VCARD
+            """BEGIN:VCARD
 VERSION:3.0
 N:Thompson;Default;;;
 FN:Default Thompson
@@ -455,7 +459,7 @@ END:VCARD
 BOGUS
 """.replace("\n", "\r\n"),
 
-"""BEGIN:VCARD
+            """BEGIN:VCARD
 VERSION:3.0
 N:Thompson;Default;;;
 FN:Default Thompson
@@ -479,7 +483,7 @@ BOGUS
     def testParseBlank(self):
 
         data = (
-"""
+            """
 BEGIN:VCARD
 VERSION:3.0
 UID:ED7A5AEC-AB19-4CE0-AD6A-2923A3E5C4E1:ABPerson
@@ -494,7 +498,7 @@ item1.X-ABADR:us
 END:VCARD
 """.replace("\n", "\r\n"),
 
-"""
+            """
 
 BEGIN:VCARD
 VERSION:3.0
@@ -510,7 +514,7 @@ item1.X-ABADR:us
 END:VCARD
 """.replace("\n", "\r\n"),
 
-"""BEGIN:VCARD
+            """BEGIN:VCARD
 VERSION:3.0
 UID:ED7A5AEC-AB19-4CE0-AD6A-2923A3E5C4E1:ABPerson
 item1.ADR;type=WORK;type=pref:;;1245 Test;Sesame Street;California;11111;U
@@ -526,7 +530,7 @@ END:VCARD
 
 """.replace("\n", "\r\n"),
 
-"""BEGIN:VCARD
+            """BEGIN:VCARD
 VERSION:3.0
 UID:ED7A5AEC-AB19-4CE0-AD6A-2923A3E5C4E1:ABPerson
 item1.ADR;type=WORK;type=pref:;;1245 Test;Sesame Street;California;11111;U
@@ -541,7 +545,7 @@ item1.X-ABADR:us
 END:VCARD
 """.replace("\n", "\r\n"),
 
-"""BEGIN:VCARD
+            """BEGIN:VCARD
 VERSION:3.0
 UID:ED7A5AEC-AB19-4CE0-AD6A-2923A3E5C4E1:ABPerson
 item1.ADR;type=WORK;type=pref:;;1245 Test;Sesame Street;California;11111;U

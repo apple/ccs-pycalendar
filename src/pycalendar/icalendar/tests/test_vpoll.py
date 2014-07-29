@@ -22,7 +22,7 @@ import unittest
 class TestCalendar(unittest.TestCase):
 
     data = (
-"""BEGIN:VCALENDAR
+        """BEGIN:VCALENDAR
 VERSION:2.0
 CALSCALE:GREGORIAN
 PRODID:-//mulberrymail.com//Mulberry v4.0//EN
@@ -54,7 +54,7 @@ END:VPOLL
 END:VCALENDAR
 """,
 
-"""BEGIN:VCALENDAR
+        """BEGIN:VCALENDAR
 VERSION:2.0
 CALSCALE:GREGORIAN
 METHOD:REPLY
@@ -72,7 +72,7 @@ END:VPOLL
 END:VCALENDAR
 """,
 
-)
+    )
 
 
     def testRoundtrip(self):

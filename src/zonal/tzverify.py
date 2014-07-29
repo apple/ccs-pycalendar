@@ -269,12 +269,12 @@ if __name__ == '__main__':
     )
 
     skips = (
-        #"Europe/Sofia",
-        #"Africa/Cairo",
+        # "Europe/Sofia",
+        # "Africa/Cairo",
     )
 
     only = (
-        #"Europe/Lisbon",
+        # "Europe/Lisbon",
     )
 
     checkcalendar1 = loadCalendarFromZoneinfo(zonedir1, skips, only, verbose, quiet)
@@ -286,7 +286,7 @@ if __name__ == '__main__':
         start,
         end,
         filterTzids=(
-            #"America/Goose_Bay",
+            # "America/Goose_Bay",
         ),
         verbose=verbose,
         quiet=quiet,

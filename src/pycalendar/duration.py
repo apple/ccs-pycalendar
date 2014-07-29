@@ -67,7 +67,7 @@ class Duration(ValueMixin):
 
     def getTotalSeconds(self):
         return [1, -1][not self.mForward] \
-                * (self.mSeconds + (self.mMinutes + (self.mHours + (self.mDays + (self.mWeeks * 7)) * 24) * 60) * 60)
+            * (self.mSeconds + (self.mMinutes + (self.mHours + (self.mDays + (self.mWeeks * 7)) * 24) * 60) * 60)
 
 
     def setDuration(self, seconds):

@@ -25,7 +25,7 @@ class TestCalendar(unittest.TestCase):
     def testAddCN(self):
 
         data = (
-"""BEGIN:VCALENDAR
+            """BEGIN:VCALENDAR
 VERSION:2.0
 CALSCALE:GREGORIAN
 PRODID:-//mulberrymail.com//Mulberry v4.0//EN
@@ -41,9 +41,9 @@ END:VEVENT
 END:VCALENDAR
 """.replace("\n", "\r\n"),
 
-    "まだ",
+            "まだ",
 
-"""BEGIN:VCALENDAR
+            """BEGIN:VCALENDAR
 VERSION:2.0
 CALSCALE:GREGORIAN
 PRODID:-//mulberrymail.com//Mulberry v4.0//EN

@@ -27,7 +27,7 @@ import unittest
 class TestCalendar(unittest.TestCase):
 
     data = (
-"""BEGIN:VCALENDAR
+        """BEGIN:VCALENDAR
 VERSION:2.0
 CALSCALE:GREGORIAN
 PRODID:-//mulberrymail.com//Mulberry v4.0//EN
@@ -42,7 +42,7 @@ END:VEVENT
 END:VCALENDAR
 """.replace("\n", "\r\n"),
 
-"""BEGIN:VCALENDAR
+        """BEGIN:VCALENDAR
 VERSION:2.0
 CALSCALE:GREGORIAN
 PRODID:-//mulberrymail.com//Mulberry v4.0//EN
@@ -80,7 +80,7 @@ END:VEVENT
 END:VCALENDAR
 """.replace("\n", "\r\n"),
 
-"""BEGIN:VCALENDAR
+        """BEGIN:VCALENDAR
 VERSION:2.0
 PRODID:-//mulberrymail.com//Mulberry v4.0//EN
 BEGIN:VEVENT
@@ -94,7 +94,7 @@ END:VEVENT
 END:VCALENDAR
 """.replace("\n", "\r\n"),
 
-"""BEGIN:VCALENDAR
+        """BEGIN:VCALENDAR
 VERSION:2.0
 CALSCALE:GREGORIAN
 PRODID:-//mulberrymail.com//Mulberry v4.0//EN
@@ -109,7 +109,7 @@ END:VEVENT
 END:VCALENDAR
 """.replace("\n", "\r\n"),
 
-"""BEGIN:VCALENDAR
+        """BEGIN:VCALENDAR
 VERSION:2.0
 CALSCALE:GREGORIAN
 PRODID:-//mulberrymail.com//Mulberry v4.0//EN
@@ -124,7 +124,7 @@ END:VEVENT
 END:VCALENDAR
 """.replace("\n", "\r\n"),
 
-"""BEGIN:VCALENDAR
+        """BEGIN:VCALENDAR
 VERSION:2.0
 CALSCALE:GREGORIAN
 PRODID:-//Example Inc.//Example Calendar//EN
@@ -172,7 +172,7 @@ END:VAVAILABILITY
 END:VCALENDAR
 """.replace("\n", "\r\n"),
 
-"""BEGIN:VCALENDAR
+        """BEGIN:VCALENDAR
 VERSION:2.0
 CALSCALE:GREGORIAN
 PRODID:-//Example Inc.//Example Calendar//EN
@@ -185,7 +185,7 @@ END:VTODO
 END:VCALENDAR
 """.replace("\n", "\r\n"),
 
-"""BEGIN:VCALENDAR
+        """BEGIN:VCALENDAR
 VERSION:2.0
 CALSCALE:GREGORIAN
 PRODID:-//mulberrymail.com//Mulberry v4.0//EN
@@ -203,7 +203,7 @@ END:X-COMPONENT
 END:VCALENDAR
 """.replace("\n", "\r\n"),
 
-"""BEGIN:VCALENDAR
+        """BEGIN:VCALENDAR
 VERSION:2.0
 CALSCALE:GREGORIAN
 PRODID:-//Apple Inc.//iCal 4.0.1//EN
@@ -243,7 +243,7 @@ END:VEVENT
 END:VCALENDAR
 """.replace("\n", "\r\n"),
 
-"""BEGIN:VCALENDAR
+        """BEGIN:VCALENDAR
 VERSION:2.0
 CALSCALE:GREGORIAN
 PRODID:-//mulberrymail.com//Mulberry v4.0//EN
@@ -260,7 +260,7 @@ END:VEVENT
 END:VCALENDAR
 """.replace("\n", "\r\n"),
 
-"""BEGIN:VCALENDAR
+        """BEGIN:VCALENDAR
 VERSION:2.0
 CALSCALE:GREGORIAN
 PRODID:-//mulberrymail.com//Mulberry v4.0//EN
@@ -277,10 +277,10 @@ END:VEVENT
 END:VCALENDAR
 """.replace("\n", "\r\n"),
 
-)
+    )
     data2 = (
-                (
-"""BEGIN:VCALENDAR
+        (
+            """BEGIN:VCALENDAR
 VERSION:2.0
 PRODID:-//mulberrymail.com//Mulberry v4.0//EN
 BEGIN:VEVENT
@@ -295,7 +295,7 @@ X-TEST:Testing
 END:VCALENDAR
 """.replace("\n", "\r\n"),
 
-"""BEGIN:VCALENDAR
+            """BEGIN:VCALENDAR
 VERSION:2.0
 PRODID:-//mulberrymail.com//Mulberry v4.0//EN
 X-TEST:Testing
@@ -309,8 +309,8 @@ RRULE:FREQ=YEARLY
 END:VEVENT
 END:VCALENDAR
 """.replace("\n", "\r\n"),
-                ),
-)
+        ),
+    )
 
 
     def testRoundtrip(self):
@@ -467,7 +467,7 @@ END:VCALENDAR
     def testParseFail(self):
 
         data = (
-"""BEGIN:VCALENDAR
+            """BEGIN:VCALENDAR
 VERSION:2.0
 CALSCALE:GREGORIAN
 PRODID:-//mulberrymail.com//Mulberry v4.0//EN
@@ -481,13 +481,13 @@ SUMMARY:New Year's Day
 END:VEVENT
 """.replace("\n", "\r\n"),
 
-"""BEGIN:VCARD
+            """BEGIN:VCARD
 PRODID:-//mulberrymail.com//Mulberry v4.0//EN
 VERSION:2.0
 END:VCARD
 """.replace("\n", "\r\n"),
 
-"""BOGUS
+            """BOGUS
 BEGIN:VCALENDAR
 VERSION:2.0
 CALSCALE:GREGORIAN
@@ -503,7 +503,7 @@ END:VEVENT
 END:VCALENDAR
 """.replace("\n", "\r\n"),
 
-"""BOGUS
+            """BOGUS
 
 BEGIN:VCALENDAR
 VERSION:2.0
@@ -520,7 +520,7 @@ END:VEVENT
 END:VCALENDAR
 """.replace("\n", "\r\n"),
 
-"""BEGIN:VCALENDAR
+            """BEGIN:VCALENDAR
 VERSION:2.0
 CALSCALE:GREGORIAN
 PRODID:-//mulberrymail.com//Mulberry v4.0//EN
@@ -536,7 +536,7 @@ END:VCALENDAR
 BOGUS
 """.replace("\n", "\r\n"),
 
-"""BEGIN:VCALENDAR
+            """BEGIN:VCALENDAR
 VERSION:2.0
 CALSCALE:GREGORIAN
 PRODID:-//mulberrymail.com//Mulberry v4.0//EN
@@ -562,7 +562,7 @@ BOGUS
     def testParseBlank(self):
 
         data = (
-"""
+            """
 BEGIN:VCALENDAR
 VERSION:2.0
 CALSCALE:GREGORIAN
@@ -578,7 +578,7 @@ END:VEVENT
 END:VCALENDAR
 """.replace("\n", "\r\n"),
 
-"""
+            """
 
 BEGIN:VCALENDAR
 VERSION:2.0
@@ -595,7 +595,7 @@ END:VEVENT
 END:VCALENDAR
 """.replace("\n", "\r\n"),
 
-"""BEGIN:VCALENDAR
+            """BEGIN:VCALENDAR
 VERSION:2.0
 CALSCALE:GREGORIAN
 PRODID:-//mulberrymail.com//Mulberry v4.0//EN
@@ -612,7 +612,7 @@ END:VCALENDAR
 
 """.replace("\n", "\r\n"),
 
-"""BEGIN:VCALENDAR
+            """BEGIN:VCALENDAR
 VERSION:2.0
 CALSCALE:GREGORIAN
 PRODID:-//mulberrymail.com//Mulberry v4.0//EN
@@ -628,7 +628,7 @@ END:VEVENT
 END:VCALENDAR
 """.replace("\n", "\r\n"),
 
-"""BEGIN:VCALENDAR
+            """BEGIN:VCALENDAR
 VERSION:2.0
 CALSCALE:GREGORIAN
 PRODID:-//mulberrymail.com//Mulberry v4.0//EN

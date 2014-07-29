@@ -611,8 +611,10 @@ class DateTime(ValueMixin):
         if (self.mMonth < 1) or (self.mMonth > 12):
             return ""
         else:
-            return locale.getMonth(self.mMonth,
-                    [locale.SHORT, locale.LONG][not short_txt])
+            return locale.getMonth(
+                self.mMonth,
+                [locale.SHORT, locale.LONG][not short_txt]
+            )
 
 
     def getDayOfWeekText(self, day):
@@ -1128,7 +1130,8 @@ class DateTime(ValueMixin):
             xmlutils.makeTag(
                 namespace,
                 xmldefinitions.value_date if self.isDateOnly() else xmldefinitions.value_date_time
-        ))
+            )
+        )
         value.text = self.getXMLText()
 
 

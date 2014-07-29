@@ -24,7 +24,8 @@ class TestCalendar(unittest.TestCase):
     def testOffsets(self):
 
         data = (
-                    ("""BEGIN:VCALENDAR
+            (
+                """BEGIN:VCALENDAR
 VERSION:2.0
 CALSCALE:GREGORIAN
 PRODID:-//calendarserver.org//Zonal//EN
@@ -204,7 +205,8 @@ END:VCALENDAR
                     (DateTime(2014, 11, 2, 8, 0, 0), True, -5),
                 )
             ),
-                    ("""BEGIN:VCALENDAR
+            (
+                """BEGIN:VCALENDAR
 CALSCALE:GREGORIAN
 PRODID:-//calendarserver.org//Zonal//EN
 VERSION:2.0

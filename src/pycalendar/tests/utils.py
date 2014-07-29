@@ -25,5 +25,6 @@ class TestPyCalendar(unittest.TestCase):
     def setUp(self):
         TimezoneDatabase.createTimezoneDatabase(None)
 
+
     def tearDown(self):
         TimezoneDatabase.clearTimezoneDatabase()

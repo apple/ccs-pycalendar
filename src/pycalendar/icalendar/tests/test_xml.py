@@ -22,8 +22,8 @@ import unittest
 class TestXML(unittest.TestCase):
 
     data = (
-                (
-"""BEGIN:VCALENDAR
+        (
+            """BEGIN:VCALENDAR
 VERSION:2.0
 PRODID:-//mulberrymail.com//Mulberry v4.0//EN
 BEGIN:VEVENT
@@ -38,7 +38,7 @@ X-TEST:Testing
 END:VCALENDAR
 """.replace("\n", "\r\n"),
 
-"""<?xml version="1.0" encoding="utf-8"?>
+            """<?xml version="1.0" encoding="utf-8"?>
 <ns0:icalendar xmlns:ns0="urn:ietf:params:xml:ns:icalendar-2.0">
   <ns0:vcalendar>
     <ns0:properties>
@@ -81,8 +81,8 @@ END:VCALENDAR
   </ns0:vcalendar>
 </ns0:icalendar>
 """,
-                ),
-)
+        ),
+    )
 
     def testGenerateXML(self):
 

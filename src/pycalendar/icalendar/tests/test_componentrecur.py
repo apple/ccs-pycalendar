@@ -22,7 +22,7 @@ class TestCalendar(unittest.TestCase):
     def testDuplicateWithRecurrenceChange(self):
 
         data = (
-"""BEGIN:VCALENDAR
+            """BEGIN:VCALENDAR
 VERSION:2.0
 CALSCALE:GREGORIAN
 PRODID:-//mulberrymail.com//Mulberry v4.0//EN
@@ -36,7 +36,7 @@ SUMMARY:New Year's Day
 END:VEVENT
 END:VCALENDAR
 """.replace("\n", "\r\n"),
-"""BEGIN:VCALENDAR
+            """BEGIN:VCALENDAR
 VERSION:2.0
 CALSCALE:GREGORIAN
 PRODID:-//mulberrymail.com//Mulberry v4.0//EN
@@ -50,7 +50,7 @@ SUMMARY:New Year's Day
 END:VEVENT
 END:VCALENDAR
 """.replace("\n", "\r\n"),
-)
+        )
 
         cal1 = Calendar()
         cal1.parse(StringIO.StringIO(data[0]))

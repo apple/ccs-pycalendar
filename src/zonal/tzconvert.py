@@ -319,7 +319,8 @@ if __name__ == '__main__':
         endYear,
         windowsAliases=windowsAliases,
         filterzones=(
-        #"America/Montevideo",
-        #"Europe/Paris",
-        #"Africa/Cairo",
-    ))
+            # "America/Montevideo",
+            # "Europe/Paris",
+            # "Africa/Cairo",
+        )
+    )

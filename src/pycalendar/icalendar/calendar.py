@@ -424,8 +424,10 @@ class Calendar(ContainerBase):
             if only_due:
                 if vtodo.getStatus() == definitions.eStatus_VToDo_Cancelled:
                     continue
-                elif ((vtodo.getStatus() == definitions.eStatus_VToDo_Completed) and
-                            (not vtodo.hasCompleted() or (vtodo.getCompleted() < minusoneday))):
+                elif (
+                    (vtodo.getStatus() == definitions.eStatus_VToDo_Completed) and
+                    (not vtodo.hasCompleted() or (vtodo.getCompleted() < minusoneday))
+                ):
                     continue
 
             # Filter out those with end after chosen date if required
@@ -436,7 +438,7 @@ class Calendar(ContainerBase):
                     continue
 
             # TODO: fix this
-            #list.append(ComponentExpandedShared(ComponentExpanded(vtodo, None)))
+            # list.append(ComponentExpandedShared(ComponentExpanded(vtodo, None)))
 
 
     def getRecurrenceInstancesItems(self, type, uid, items):
@@ -459,7 +461,7 @@ class Calendar(ContainerBase):
     def getVFreeBusyFB(self, period, fb):
         # First create expanded set
         # TODO: fix this
-        #list = ExpandedComponents()
+        # list = ExpandedComponents()
         self.getVEvents(period, list)
         if len(list) == 0:
             return
@@ -605,7 +607,7 @@ class Calendar(ContainerBase):
         indicates what set of timezones should be automatically included. If set to L{None} the default
         is L{Calendar.NO_TIMEZONES}. Otherwise, one of L{Calendar.ALL_TIMEZONES}, L{Calendar.NONSTD_TIMEZONES},
         or L{Calendar.NO_TIMEZONES} must be used.
-        
+
         @param includeTimezones: indicated whether all, only non-standard or no timezones are included
         @type includeTimezones: L{int} or L{None}
         """
@@ -641,7 +643,7 @@ class Calendar(ContainerBase):
         """
         Remove VTIMEZONE components from this L{Calendar} if the corresponding TZIDs are
         in the timezone database.
-        
+
         @return: L{True} if changes were made, L{False} otherwise
         @rtype: L{bool}
         """

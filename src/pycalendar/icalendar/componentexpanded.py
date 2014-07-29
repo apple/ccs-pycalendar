@@ -41,8 +41,10 @@ class ComponentExpanded(object):
     @staticmethod
     def sort_by_dtstart(e1, e2):
         if e1.mInstanceStart == e2.mInstanceStart:
-            if (e1.mInstanceStart.isDateOnly() and not e2.mInstanceStart.isDateOnly() or
-                not e1.mInstanceStart.isDateOnly() and e2.mInstanceStart.isDateOnly()):
+            if (
+                e1.mInstanceStart.isDateOnly() and not e2.mInstanceStart.isDateOnly() or
+                not e1.mInstanceStart.isDateOnly() and e2.mInstanceStart.isDateOnly()
+            ):
                 return e1.mInstanceStart.isDateOnly()
             else:
                 return False

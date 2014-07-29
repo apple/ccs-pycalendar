@@ -39,9 +39,11 @@ class RecurrenceSet(object):
 
 
     def hasRecurrence(self):
-        return ((len(self.mRrules) != 0) or (len(self.mRdates) != 0) or (len(self.mRperiods) != 0)
-                    or (len(self.mExrules) != 0) or (len(self.mExdates) != 0)
-                    or (len(self.mExperiods) != 0))
+        return (
+            (len(self.mRrules) != 0) or (len(self.mRdates) != 0) or (len(self.mRperiods) != 0)
+            or (len(self.mExrules) != 0) or (len(self.mExdates) != 0)
+            or (len(self.mExperiods) != 0)
+        )
 
 
     def equals(self, comp):

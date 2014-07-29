@@ -204,20 +204,22 @@ class Recurrence(ValueMixin):
 
 
     def equals(self, comp):
-        return (self.mFreq == comp.mFreq) \
-                and (self.mUseCount == comp.mUseCount) and (self.mCount == comp.mCount) \
-                and (self.mUseUntil == comp.mUseUntil) and (self.mUntil == comp.mUntil) \
-                and (self.mInterval == comp.mInterval) \
-                and self.equalsNum(self.mBySeconds, comp.mBySeconds) \
-                and self.equalsNum(self.mByMinutes, comp.mByMinutes) \
-                and self.equalsNum(self.mByHours, comp.mByHours) \
-                and self.equalsDayNum(self.mByDay, comp.mByDay) \
-                and self.equalsNum(self.mByMonthDay, comp.mByMonthDay) \
-                and self.equalsNum(self.mByYearDay, comp.mByYearDay) \
-                and self.equalsNum(self.mByWeekNo, comp.mByWeekNo) \
-                and self.equalsNum(self.mByMonth, comp.mByMonth) \
-                and self.equalsNum(self.mBySetPos, comp.mBySetPos) \
-                and (self.mWeekstart == comp.mWeekstart)
+        return (
+            (self.mFreq == comp.mFreq)
+            and (self.mUseCount == comp.mUseCount) and (self.mCount == comp.mCount)
+            and (self.mUseUntil == comp.mUseUntil) and (self.mUntil == comp.mUntil)
+            and (self.mInterval == comp.mInterval)
+            and self.equalsNum(self.mBySeconds, comp.mBySeconds)
+            and self.equalsNum(self.mByMinutes, comp.mByMinutes)
+            and self.equalsNum(self.mByHours, comp.mByHours)
+            and self.equalsDayNum(self.mByDay, comp.mByDay)
+            and self.equalsNum(self.mByMonthDay, comp.mByMonthDay)
+            and self.equalsNum(self.mByYearDay, comp.mByYearDay)
+            and self.equalsNum(self.mByWeekNo, comp.mByWeekNo)
+            and self.equalsNum(self.mByMonth, comp.mByMonth)
+            and self.equalsNum(self.mBySetPos, comp.mBySetPos)
+            and (self.mWeekstart == comp.mWeekstart)
+        )
 
 
     def equalsNum(self, items1, items2):
@@ -500,7 +502,7 @@ class Recurrence(ValueMixin):
             avalue = abs(value)
             if min is not None and avalue < min:
                 raise ValueError(errmsg)
-            if max is not None  and avalue > max:
+            if max is not None and avalue > max:
                 raise ValueError(errmsg)
             list.append(value)
 
@@ -794,15 +796,17 @@ class Recurrence(ValueMixin):
 
 
     def hasBy(self):
-        return (self.mBySeconds is not None) and (len(self.mBySeconds) != 0) \
-                or (self.mByMinutes is not None) and (len(self.mByMinutes) != 0) \
-                or (self.mByHours is not None) and (len(self.mByHours) != 0) \
-                or (self.mByDay is not None) and (len(self.mByDay) != 0) \
-                or (self.mByMonthDay is not None) and (len(self.mByMonthDay) != 0) \
-                or (self.mByYearDay is not None) and (len(self.mByYearDay) != 0) \
-                or (self.mByWeekNo is not None) and (len(self.mByWeekNo) != 0) \
-                or (self.mByMonth is not None) and (len(self.mByMonth) != 0) \
-                or (self.mBySetPos is not None) and (len(self.mBySetPos) != 0)
+        return (
+            (self.mBySeconds is not None) and (len(self.mBySeconds) != 0)
+            or (self.mByMinutes is not None) and (len(self.mByMinutes) != 0)
+            or (self.mByHours is not None) and (len(self.mByHours) != 0)
+            or (self.mByDay is not None) and (len(self.mByDay) != 0)
+            or (self.mByMonthDay is not None) and (len(self.mByMonthDay) != 0)
+            or (self.mByYearDay is not None) and (len(self.mByYearDay) != 0)
+            or (self.mByWeekNo is not None) and (len(self.mByWeekNo) != 0)
+            or (self.mByMonth is not None) and (len(self.mByMonth) != 0)
+            or (self.mBySetPos is not None) and (len(self.mBySetPos) != 0)
+        )
 
 
     def isSimpleRule(self):
@@ -819,11 +823,13 @@ class Recurrence(ValueMixin):
         # no others
 
         # First checks the ones we do not handle at all
-        if ((self.mBySeconds is not None) and (len(self.mBySeconds) != 0) \
-                or (self.mByMinutes is not None) and (len(self.mByMinutes) != 0) \
-                or (self.mByHours is not None) and (len(self.mByHours) != 0) \
-                or (self.mByYearDay is not None) and (len(self.mByYearDay) != 0) \
-                or (self.mByWeekNo is not None) and (len(self.mByWeekNo) != 0)):
+        if (
+            (self.mBySeconds is not None) and (len(self.mBySeconds) != 0)
+            or (self.mByMinutes is not None) and (len(self.mByMinutes) != 0)
+            or (self.mByHours is not None) and (len(self.mByHours) != 0)
+            or (self.mByYearDay is not None) and (len(self.mByYearDay) != 0)
+            or (self.mByWeekNo is not None) and (len(self.mByWeekNo) != 0)
+        ):
             return False
 
         # Check BYMONTHDAY numbers (we can handle -7...-1, 1..31)
@@ -1005,7 +1011,7 @@ class Recurrence(ValueMixin):
             set_items = filter(lambda x: not x.invalid(), set_items)
 
             # Always sort the set as BYxxx rules may not be sorted
-            #set_items.sort(cmp=DateTime.sort)
+            # set_items.sort(cmp=DateTime.sort)
             set_items.sort(key=lambda x: x.getPosixTime())
 
             # Process each one in the generated set
@@ -1471,7 +1477,7 @@ class Recurrence(ValueMixin):
                     output.append(temp)
                 else:
                     # Every matching day in the year
-                    for  i in range(1, 54):
+                    for i in range(1, 54):
                         temp = iter1.duplicate()
                         temp.setDayOfWeekInYear(i, iter2[1])
                         if temp.getYear() == (iter1).getYear():
@@ -1699,7 +1705,7 @@ class Recurrence(ValueMixin):
 
     def bySetPosLimit(self, dates):
         # The input dates MUST be sorted in order for this to work properly
-        #dates.sort(cmp=DateTime.sort)
+        # dates.sort(cmp=DateTime.sort)
         dates.sort(key=lambda x: x.getPosixTime())
 
         # Loop over each BYSETPOS and extract the relevant component from the

@@ -68,7 +68,7 @@ class Period(ValueMixin):
 
     def __lt__(self, comp):
         return self.mStart < comp.mStart  \
-                or (self.mStart == comp.mStart) and self.mEnd < comp.mEnd
+            or (self.mStart == comp.mStart) and self.mEnd < comp.mEnd
 
 
     @classmethod

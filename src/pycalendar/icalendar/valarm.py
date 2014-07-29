@@ -583,9 +583,13 @@ class VAlarm(Component):
 
         # Add new (with parameter)
         prop = Property(definitions.cICalProperty_TRIGGER, duration)
-        attr = Parameter(definitions.cICalParameter_RELATED,
-                 (definitions.cICalParameter_RELATED_START,
-                  definitions.cICalParameter_RELATED_END)[not trigger_start])
+        attr = Parameter(
+            definitions.cICalParameter_RELATED,
+            (
+                definitions.cICalParameter_RELATED_START,
+                definitions.cICalParameter_RELATED_END
+            )[not trigger_start]
+        )
         prop.addParameter(attr)
         self.addProperty(prop)
 

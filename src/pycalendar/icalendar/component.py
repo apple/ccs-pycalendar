@@ -164,16 +164,14 @@ class Component(ComponentBase):
     def initDTSTAMP(self):
         self.removeProperties(definitions.cICalProperty_DTSTAMP)
 
-        prop = Property(definitions.cICalProperty_DTSTAMP,
-                                  DateTime.getNowUTC())
+        prop = Property(definitions.cICalProperty_DTSTAMP, DateTime.getNowUTC())
         self.addProperty(prop)
 
 
     def updateLastModified(self):
         self.removeProperties(definitions.cICalProperty_LAST_MODIFIED)
 
-        prop = Property(definitions.cICalProperty_LAST_MODIFIED,
-                                  DateTime.getNowUTC())
+        prop = Property(definitions.cICalProperty_LAST_MODIFIED, DateTime.getNowUTC())
         self.addProperty(prop)
 
 

@@ -53,7 +53,7 @@ class OutputFilter(object):
     # Test to see if sub-component type can be written out
     def testSubComponent(self, oftype):
         return self.mAllSubComponents or (self.mSubComponents is not None) \
-                and oftype in self.mSubComponents
+            and oftype in self.mSubComponents
 
 
     def hasSubComponentFilters(self):

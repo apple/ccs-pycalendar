@@ -64,8 +64,10 @@ class ComponentRecur(Component):
     @staticmethod
     def sort_by_dtstart(e1, e2):
         if e1.self.mStart == e2.self.mStart:
-            if (e1.self.mStart.isDateOnly() and e2.self.mStart.isDateOnly() or
-                not e1.self.mStart.isDateOnly() and not e2.self.mStart.isDateOnly()):
+            if (
+                e1.self.mStart.isDateOnly() and e2.self.mStart.isDateOnly() or
+                not e1.self.mStart.isDateOnly() and not e2.self.mStart.isDateOnly()
+            ):
                 return False
             else:
                 return e1.self.mStart.isDateOnly()
@@ -380,10 +382,12 @@ class ComponentRecur(Component):
     def _resetRecurrenceSet(self):
         # May need to create items
         self.mRecurrences = None
-        if ((self.countProperty(definitions.cICalProperty_RRULE) != 0) or
+        if (
+            (self.countProperty(definitions.cICalProperty_RRULE) != 0) or
             (self.countProperty(definitions.cICalProperty_RDATE) != 0) or
             (self.countProperty(definitions.cICalProperty_EXRULE) != 0) or
-            (self.countProperty(definitions.cICalProperty_EXDATE) != 0)):
+            (self.countProperty(definitions.cICalProperty_EXDATE) != 0)
+        ):
 
             self.mRecurrences = RecurrenceSet()
 
@@ -678,7 +682,7 @@ class ComponentRecur(Component):
         for iter in self.mRecurrences.getRules():
             prop = Property(definitions.cICalProperty_RRULE, iter)
             self.addProperty(prop)
-        for iter in  self.mRecurrences.getDates():
+        for iter in self.mRecurrences.getDates():
             prop = Property(definitions.cICalProperty_RDATE, iter)
             self.addProperty(prop)
 
@@ -699,8 +703,10 @@ class ComponentRecur(Component):
             # If this component does not have its own end/duration property,
             # the determine
             # the end from the master duration
-            if (not self.hasProperty(definitions.cICalProperty_DTEND) and
-                not self.hasProperty(definitions.cICalProperty_DURATION)):
+            if (
+                not self.hasProperty(definitions.cICalProperty_DTEND) and
+                not self.hasProperty(definitions.cICalProperty_DURATION)
+            ):
                 # End is based on original events settings
                 self.mEnd = self.mStart + (self.mMaster.getEnd() - self.mMaster.getStart())
 
