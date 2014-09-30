@@ -279,6 +279,7 @@ class VTimezone(Component):
             items = list(items)
             utcdt = items[0].duplicate()
             utcdt.offsetSeconds(-items[1])
+            utcdt.setTimezoneUTC(True)
             items.insert(1, utcdt)
             utc_results.append(tuple(items))
         utc_results.sort(key=lambda x: x[0].getPosixTime())
