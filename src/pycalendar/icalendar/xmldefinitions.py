@@ -22,6 +22,8 @@ icalendar = "icalendar"
 
 value_recur = "recur"
 
+recur_rscale = "rscale"
+
 recur_freq = "freq"
 recur_freq_secondly = "SECONDLY"
 recur_freq_minutely = "MINUTELY"
@@ -34,6 +36,11 @@ recur_freq_yearly = "YEARLY"
 recur_count = "count"
 recur_until = "until"
 recur_interval = "interval"
+
+recur_skip = "skip"
+recur_skip_yes = "yes"
+recur_skip_backward = "backward"
+recur_skip_forward = "forward"
 
 recur_bysecond = "bysecond"
 recur_byminute = "byminute"
