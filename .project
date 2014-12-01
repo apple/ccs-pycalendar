@@ -3,6 +3,7 @@
 	<name>pycalendar</name>
 	<comment></comment>
 	<projects>
+		<project>cffi</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

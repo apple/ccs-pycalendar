@@ -301,7 +301,7 @@ class DateTime(ValueMixin):
         self.changed()
 
 
-    def setYYMMDD(self, year, month, days):
+    def setYYMMDD(self, year, month, days, isleapmonth=False):
         if (self.mYear != year) or (self.mMonth != month) or (self.mDay != days):
             self.mYear = year
             self.mMonth = month
@@ -321,14 +321,18 @@ class DateTime(ValueMixin):
 
     def offsetYear(self, diff_year):
         self.mYear += diff_year
-        self.normalise()
+
+        # Do special normalization for this case to do a skip backwards if
+        # the new date is invalid
+        if self.mDay > utils.daysInMonth(self.mMonth, self.mYear):
+            self.mDay = utils.daysInMonth(self.mMonth, self.mYear)
 
 
     def getMonth(self):
         return self.mMonth
 
 
-    def setMonth(self, month):
+    def setMonth(self, month, isleapmonth=False):
         if self.mMonth != month:
             self.mMonth = month
             self.changed()
@@ -336,7 +340,24 @@ class DateTime(ValueMixin):
 
     def offsetMonth(self, diff_month):
         self.mMonth += diff_month
-        self.normalise()
+
+        # Normalise month
+        normalised_month = ((self.mMonth - 1) % 12) + 1
+        adjustment_year = (self.mMonth - 1) / 12
+        if (normalised_month - 1) < 0:
+            normalised_month += 12
+            adjustment_year -= 1
+        self.mMonth = normalised_month
+        self.mYear += adjustment_year
+
+        # Do special normalization for this case to do a skip backwards if
+        # the new date is invalid
+        if self.mDay > utils.daysInMonth(self.mMonth, self.mYear):
+            self.mDay = utils.daysInMonth(self.mMonth, self.mYear)
+
+
+    def getLeapMonth(self):
+        return False
 
 
     def getDay(self):
@@ -444,15 +465,21 @@ class DateTime(ValueMixin):
         # What day does the current year start on, and diff that with the current day
         temp = DateTime(year=self.mYear, month=1, day=1)
         first_day = temp.getDayOfWeek()
+        if first_day == 0:
+            first_day = 7
         current_day = self.getDayOfWeek()
+        if current_day == 0:
+            current_day = 7
 
         # Calculate and set yearday for start of week. The first week is the one that contains at least
         # four days (with week start defaulting to MONDAY), so that means the 1st of January would fall
         # on MO, TU, WE, TH.
         if first_day in (DateTime.MONDAY, DateTime.TUESDAY, DateTime.WEDNESDAY, DateTime.THURSDAY):
-            year_day = (weekno - 1) * 7 + current_day - first_day
+            offset = 0
         else:
-            year_day = weekno * 7 + current_day - first_day
+            offset = 1
+
+        year_day = (weekno - 1 + offset) * 7 + current_day - first_day
 
         # It is possible we have a negative offset which means go back to the prior year as part of
         # week #1 exists at the end of that year.
@@ -1143,6 +1170,16 @@ class DateTime(ValueMixin):
         jobject.append(self.getJSONText())
 
 
+    # When doing recurrence iteration we sometimes need to preserve an invalid value for
+    # either day or month (though month is never invalid for Gregorian calendars it can
+    # be for non-Gregorian). For this class we simply set the stored attributes to their
+    # invalid values.
+    def setInvalid(self, year, month, day, isleapmonth=False):
+        self.mYear = year
+        self.mMonth = month
+        self.mDay = day
+
+
     def invalid(self):
         """
         Are any of the current fields invalid.
@@ -1155,6 +1192,32 @@ class DateTime(ValueMixin):
             return True
 
         return False
+
+
+    def invalidSkip(self, skip):
+        """
+        If this is an invalid value skip backward or forward or not at all.
+
+        @param skip: the skip mode (yes, backward, forward)
+        @type skip: L{int}
+        """
+
+        if self.invalid():
+            if skip == definitions.eRecurrence_SKIP_YES:
+                # Leave it as invalid
+                pass
+            elif skip == definitions.eRecurrence_SKIP_BACKWARD:
+                if self.mDay <= 0:
+                    self.mDay = 1
+                    self.offsetDay(-1)
+                else:
+                    self.mDay = utils.daysInMonth(self.mMonth, self.mYear)
+            elif skip == definitions.eRecurrence_SKIP_FORWARD:
+                if self.mDay <= 0:
+                    self.mDay = 1
+                else:
+                    self.mDay = utils.daysInMonth(self.mMonth, self.mYear)
+                    self.offsetDay(1)
 
 
     def normalise(self):
