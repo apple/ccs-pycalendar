@@ -230,8 +230,6 @@ eRecurrence_BYWEEKNO = 10
 eRecurrence_BYMONTH = 11
 eRecurrence_BYSETPOS = 12
 eRecurrence_WKST = 13
-eRecurrence_RSCALE = 14
-eRecurrence_SKIP = 15
 
 cICalValue_RECUR_FREQ = "FREQ"
 cICalValue_RECUR_FREQ_LEN = 5
@@ -258,8 +256,6 @@ cICalValue_RECUR_BYWEEKNO = "BYWEEKNO"
 cICalValue_RECUR_BYMONTH = "BYMONTH"
 cICalValue_RECUR_BYSETPOS = "BYSETPOS"
 cICalValue_RECUR_WKST = "WKST"
-cICalValue_RECUR_RSCALE = "RSCALE"
-cICalValue_RECUR_SKIP = "SKIP"
 
 eRecurrence_WEEKDAY_SU = 0
 eRecurrence_WEEKDAY_MO = 1
@@ -276,14 +272,6 @@ cICalValue_RECUR_WEEKDAY_WE = "WE"
 cICalValue_RECUR_WEEKDAY_TH = "TH"
 cICalValue_RECUR_WEEKDAY_FR = "FR"
 cICalValue_RECUR_WEEKDAY_SA = "SA"
-
-eRecurrence_SKIP_YES = 0
-eRecurrence_SKIP_BACKWARD = 1
-eRecurrence_SKIP_FORWARD = 2
-
-cICalValue_RECUR_SKIP_YES = "YES"
-cICalValue_RECUR_SKIP_BACKWARD = "BACKWARD"
-cICalValue_RECUR_SKIP_FORWARD = "FORWARD"
 
 #     5545 Section 3.8.1.11
 eStatus_VEvent_None = 0
