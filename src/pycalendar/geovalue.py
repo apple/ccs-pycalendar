@@ -52,7 +52,13 @@ class GeoValue(Value):
         try:
             self.mValue = [float(splits[0]), float(splits[1])]
         except ValueError:
-            raise InvalidData("GEO value incorrect", data)
+            if splits[0][-1] == '\\':
+                try:
+                    self.mValue = [float(splits[0][:-1]), float(splits[1])]
+                except ValueError:
+                    raise InvalidData("GEO value incorrect", data)
+            else:
+                raise InvalidData("GEO value incorrect", data)
 
 
     # os - StringIO object
