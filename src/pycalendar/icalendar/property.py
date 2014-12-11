@@ -193,6 +193,10 @@ class Property(PropertyBase):
         elif isinstance(value, str):
             self._init_attr_value_text(value, valuetype if valuetype else self.sDefaultValueTypeMap.get(self.mName.upper(), Value.VALUETYPE_UNKNOWN))
 
+        elif isinstance(value, unicode):
+            value = value.encode("utf-8")
+            self._init_attr_value_text(value, valuetype if valuetype else self.sDefaultValueTypeMap.get(self.mName.upper(), Value.VALUETYPE_UNKNOWN))
+
         elif isinstance(value, DateTime):
             self._init_attr_value_datetime(value)
 
