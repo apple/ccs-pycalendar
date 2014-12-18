@@ -27,5 +27,6 @@ setup (
         'pycalendar',
         'pycalendar.icalendar',
         'pycalendar.vcard',
+        'zonal',
     ]
 )
