@@ -1,5 +1,5 @@
 ##
-#    Copyright (c) 2007-2013 Cyrus Daboo. All rights reserved.
+#    Copyright (c) 2007-2015 Cyrus Daboo. All rights reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -334,24 +334,27 @@ eAction_VAlarm_None = 6
 cICalProperty_ACTION_NONE = "NONE"
 
 
-#    Extensions: draft-york-vpoll-00.txt
+#    Extensions: draft-york-vpoll-03.txt
 
-#    Section 4.1
-cICalParamater_PUBLIC_COMMENT = "PUBLIC-COMMENT"
-cICalParamater_RESPONSE = "RESPONSE"
+#    Section 4.3
+cICalParamater_REQUIRED = "REQUIRED"
 cICalParamater_STAY_INFORMED = "STAY-INFORMED"
 
-#    Section 4.2
+#    Section 4.4
 cICalProperty_ACCEPT_RESPONSE = "ACCEPT-RESPONSE"
+cICalProperty_POLL_COMPLETION = "POLL-COMPLETION"
 cICalProperty_POLL_ITEM_ID = "POLL-ITEM-ID"
-cICalProperty_POLL_WINNER = "POLL-WINNER"
 cICalProperty_POLL_MODE = "POLL-MODE"
 cICalProperty_POLL_MODE_BASIC = "BASIC"
 cICalProperty_POLL_PROPERTIES = "POLL-PROPERTIES"
+cICalProperty_POLL_WINNER = "POLL-WINNER"
+cICalProperty_RESPONSE = "RESPONSE"
 cICalProperty_VOTER = "VOTER"
 
-#    Section 4.3
+#    Section 4.5
 cICalComponent_VPOLL = "VPOLL"
+cICalComponent_VVOTER = "VVOTER"
+cICalComponent_VOTE = "VOTE"
 
 
 #     Mulberry extensions

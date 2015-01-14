@@ -1,5 +1,5 @@
 ##
-#    Copyright (c) 2007-2013 Cyrus Daboo. All rights reserved.
+#    Copyright (c) 2007-2015 Cyrus Daboo. All rights reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -105,10 +105,12 @@ class Property(PropertyBase):
         # Extensions: draft-york-vpoll-00.txt
         # Section 4.2
         definitions.cICalProperty_ACCEPT_RESPONSE   : Value.VALUETYPE_TEXT,
-        definitions.cICalProperty_POLL_ITEM_ID      : Value.VALUETYPE_TEXT,
-        definitions.cICalProperty_POLL_WINNER       : Value.VALUETYPE_TEXT,
+        definitions.cICalProperty_POLL_COMPLETION   : Value.VALUETYPE_TEXT,
+        definitions.cICalProperty_POLL_ITEM_ID      : Value.VALUETYPE_INTEGER,
         definitions.cICalProperty_POLL_MODE         : Value.VALUETYPE_TEXT,
         definitions.cICalProperty_POLL_PROPERTIES   : Value.VALUETYPE_TEXT,
+        definitions.cICalProperty_POLL_WINNER       : Value.VALUETYPE_INTEGER,
+        definitions.cICalProperty_RESPONSE          : Value.VALUETYPE_INTEGER,
         definitions.cICalProperty_VOTER             : Value.VALUETYPE_CALADDRESS,
 
         # Apple Extensions

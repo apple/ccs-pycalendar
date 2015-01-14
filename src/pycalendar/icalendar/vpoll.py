@@ -1,5 +1,5 @@
 ##
-#    Copyright (c) 2007-2013 Cyrus Daboo. All rights reserved.
+#    Copyright (c) 2007-2015 Cyrus Daboo. All rights reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -39,6 +39,7 @@ class VPoll(Component):
         definitions.cICalProperty_LAST_MODIFIED,
         definitions.cICalProperty_POLL_MODE,
         definitions.cICalProperty_POLL_PROPERTIES,
+        definitions.cICalProperty_POLL_WINNER,
         definitions.cICalProperty_PRIORITY,
         definitions.cICalProperty_SEQUENCE,
         definitions.cICalProperty_STATUS,
@@ -67,13 +68,18 @@ class VPoll(Component):
 
     def sortedComponents(self):
         """
-        Also take POLL-ID into account
+        Also take VVOTER and POLL-ID into account
         """
 
         components = self.mComponents[:]
 
-        # Write out the remainder sorted by name, sortKey
-        return sorted(components, key=lambda x: (x.getType().upper(), x.loadValueString(definitions.cICalProperty_POLL_ITEM_ID),))
+        # VVOTER sorts above components with POLL-ITEM-ID
+        def _sortKey(subcomponent):
+            if subcomponent.getType().upper() == definitions.cICalComponent_VVOTER:
+                return ("0", subcomponent.loadValueString(definitions.cICalProperty_VOTER),)
+            else:
+                return (subcomponent.getType().upper(), subcomponent.loadValueInteger(definitions.cICalProperty_POLL_ITEM_ID),)
+        return sorted(components, key=_sortKey)
 
 
 Component.registerComponent(definitions.cICalComponent_VPOLL, VPoll)
