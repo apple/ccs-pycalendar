@@ -845,11 +845,11 @@ class DateTime(ValueMixin):
             self.changed()
 
 
-    def getLocaleDate(self, locale):
+    def getLocaleDate(self, dateTimeFormat):
 
         buf = StringIO.StringIO()
 
-        if locale == DateTime.FULLDATE:
+        if dateTimeFormat == DateTime.FULLDATE:
             buf.write(locale.getDay(self.getDayOfWeek(), locale.LONG))
             buf.write(", ")
             buf.write(locale.getMonth(self.mMonth, locale.LONG))
@@ -857,7 +857,7 @@ class DateTime(ValueMixin):
             buf.write(str(self.mDay))
             buf.write(", ")
             buf.write(str(self.mYear))
-        elif locale == DateTime.ABBREVDATE:
+        elif dateTimeFormat == DateTime.ABBREVDATE:
             buf.write(locale.getDay(self.getDayOfWeek(), locale.SHORT))
             buf.write(", ")
             buf.write(locale.getMonth(self.mMonth, locale.SHORT))
@@ -865,25 +865,25 @@ class DateTime(ValueMixin):
             buf.write(str(self.mDay))
             buf.write(", ")
             buf.write(str(self.mYear))
-        elif locale == DateTime.NUMERICDATE:
+        elif dateTimeFormat == DateTime.NUMERICDATE:
             buf.write(str(self.mMonth))
             buf.write("/")
             buf.write(str(self.mDay))
             buf.write("/")
             buf.write(str(self.mYear))
-        elif locale == DateTime.FULLDATENOYEAR:
+        elif dateTimeFormat == DateTime.FULLDATENOYEAR:
             buf.write(locale.getDay(self.getDayOfWeek(), locale.LONG))
             buf.write(", ")
             buf.write(locale.getMonth(self.mMonth, locale.LONG))
             buf.write(" ")
             buf.write(str(self.mDay))
-        elif locale == DateTime.ABBREVDATENOYEAR:
+        elif dateTimeFormat == DateTime.ABBREVDATENOYEAR:
             buf.write(locale.getDay(self. getDayOfWeek(), locale.SHORT))
             buf.write(", ")
             buf.write(locale.getMonth(self.mMonth, locale.SHORT))
             buf.write(" ")
             buf.write(str(self.mDay))
-        elif locale == DateTime.NUMERICDATENOYEAR:
+        elif dateTimeFormat == DateTime.NUMERICDATENOYEAR:
             buf.write(str(self.mMonth))
             buf.write("/")
             buf.write(str(self.mDay))
