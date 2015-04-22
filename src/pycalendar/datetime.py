@@ -50,36 +50,48 @@ class DateTime(ValueMixin):
 
     def __init__(self, year=None, month=None, day=None, hours=None, minutes=None, seconds=None, tzid=None, utcoffset=None):
 
-        self.mYear = 1970
-        self.mMonth = 1
-        self.mDay = 1
-
-        self.mHours = 0
-        self.mMinutes = 0
-        self.mSeconds = 0
-
-        self.mDateOnly = False
-
-        self.mTZUTC = False
-        self.mTZID = None
-        self.mTZOffset = None
-
-        self.mPosixTimeCached = False
-        self.mPosixTime = 0
-
         if (year is not None) and (month is not None) and (day is not None):
+
             self.mYear = year
             self.mMonth = month
             self.mDay = day
+
             if (hours is not None) and (minutes is not None) and (seconds is not None):
                 self.mHours = hours
                 self.mMinutes = minutes
                 self.mSeconds = seconds
+                self.mDateOnly = False
             else:
+                self.mHours = 0
+                self.mMinutes = 0
+                self.mSeconds = 0
                 self.mDateOnly = True
+
             if tzid:
                 self.mTZUTC = tzid.getUTC()
                 self.mTZID = tzid.getTimezoneID()
+            else:
+                self.mTZUTC = False
+                self.mTZID = None
+            self.mTZOffset = None
+
+        else:
+            self.mYear = 1970
+            self.mMonth = 1
+            self.mDay = 1
+
+            self.mHours = 0
+            self.mMinutes = 0
+            self.mSeconds = 0
+
+            self.mDateOnly = False
+
+            self.mTZUTC = False
+            self.mTZID = None
+            self.mTZOffset = None
+
+        self.mPosixTimeCached = False
+        self.mPosixTime = 0
 
 
     def duplicate(self):
@@ -194,76 +206,31 @@ class DateTime(ValueMixin):
             return 1
         # If either are date only, then just do date compare
         if self.mDateOnly or comp.mDateOnly:
-            if self.mYear == comp.mYear:
-                if self.mMonth == comp.mMonth:
-                    if self.mDay == comp.mDay:
-                        return 0
-                    else:
-                        if self.mDay < comp.mDay:
-                            return -1
-                        else:
-                            return 1
-                else:
-                    if self.mMonth < comp.mMonth:
-                        return -1
-                    else:
-                        return 1
-            else:
-                if self.mYear < comp.mYear:
-                    return -1
-                else:
-                    return 1
+            c = cmp(self.mYear, comp.mYear)
+            if c == 0:
+                c = cmp(self.mMonth, comp.mMonth)
+                if c == 0:
+                    c = cmp(self.mDay, comp.mDay)
+            return c
 
         # If they have the same timezone do simple compare - no posix calc
         # needed
         elif (Timezone.same(self.mTZUTC, self.mTZID, comp.mTZUTC, comp.mTZID)):
-            if self.mYear == comp.mYear:
-                if self.mMonth == comp.mMonth:
-                    if self.mDay == comp.mDay:
-                        if self.mHours == comp.mHours:
-                            if self.mMinutes == comp.mMinutes:
-                                if self.mSeconds == comp.mSeconds:
-                                    return 0
-                                else:
-                                    if self.mSeconds < comp.mSeconds:
-                                        return -1
-                                    else:
-                                        return 1
-                            else:
-                                if self.mMinutes < comp.mMinutes:
-                                    return -1
-                                else:
-                                    return 1
-                        else:
-                            if self.mHours < comp.mHours:
-                                return -1
-                            else:
-                                return 1
-                    else:
-                        if self.mDay < comp.mDay:
-                            return -1
-                        else:
-                            return 1
-                else:
-                    if self.mMonth < comp.mMonth:
-                        return -1
-                    else:
-                        return 1
-            else:
-                if self.mYear < comp.mYear:
-                    return -1
-                else:
-                    return 1
+            c = cmp(self.mYear, comp.mYear)
+            if c == 0:
+                c = cmp(self.mMonth, comp.mMonth)
+                if c == 0:
+                    c = cmp(self.mDay, comp.mDay)
+                    if c == 0:
+                        c = cmp(self.mHours, comp.mHours)
+                        if c == 0:
+                            c = cmp(self.mMinutes, comp.mMinutes)
+                            if c == 0:
+                                c = cmp(self.mSeconds, comp.mSeconds)
+            return c
+
         else:
-            posix1 = self.getPosixTime()
-            posix2 = comp.getPosixTime()
-            if posix1 == posix2:
-                return 0
-            else:
-                if posix1 < posix2:
-                    return -1
-                else:
-                    return 1
+            return cmp(self.getPosixTime(), comp.getPosixTime())
 
 
     def compareDate(self, comp):

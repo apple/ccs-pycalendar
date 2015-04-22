@@ -27,6 +27,7 @@ class Timezone(object):
     """
 
     sDefaultTimezone = None
+    UTCTimezone = None
 
     def __init__(self, utc=None, tzid=None):
 
@@ -127,3 +128,4 @@ class Timezone(object):
             return TimezoneDatabase.getTimezoneDescriptor(self.mTimezone, dt)
 
 Timezone.sDefaultTimezone = Timezone()
+Timezone.UTCTimezone = Timezone(utc=True)

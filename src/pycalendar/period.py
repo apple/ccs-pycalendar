@@ -28,26 +28,28 @@ class Period(ValueMixin):
 
         if end is not None:
             self.mEnd = end
-            self.mDuration = self.mEnd - self.mStart
+            self.mDuration = None
             self.mUseDuration = False
         elif duration is not None:
             self.mDuration = duration
-            self.mEnd = self.mStart + self.mDuration
+            self.mEnd = None
             self.mUseDuration = True
         else:
             self.mEnd = self.mStart.duplicate()
-            self.mDuration = Duration()
+            self.mDuration = None
             self.mUseDuration = False
 
 
     def duplicate(self):
-        other = Period(start=self.mStart.duplicate(), end=self.mEnd.duplicate())
-        other.mUseDuration = self.mUseDuration
+        if self.mUseDuration:
+            other = Period(start=self.mStart.duplicate(), duration=self.mDuration.duplicate())
+        else:
+            other = Period(start=self.mStart.duplicate(), end=self.mEnd.duplicate())
         return other
 
 
     def __hash__(self):
-        return hash((self.mStart, self.mEnd,))
+        return hash((self.mStart, self.getEnd(),))
 
 
     def __repr__(self):
@@ -59,7 +61,7 @@ class Period(ValueMixin):
 
 
     def __eq__(self, comp):
-        return self.mStart == comp.mStart and self.mEnd == comp.mEnd
+        return self.mStart == comp.mStart and self.getEnd() == comp.getEnd()
 
 
     def __gt__(self, comp):
@@ -68,7 +70,7 @@ class Period(ValueMixin):
 
     def __lt__(self, comp):
         return self.mStart < comp.mStart  \
-            or (self.mStart == comp.mStart) and self.mEnd < comp.mEnd
+            or (self.mStart == comp.mStart) and self.getEnd() < comp.getEnd()
 
 
     @classmethod
@@ -79,21 +81,24 @@ class Period(ValueMixin):
 
 
     def parse(self, data, fullISO=False):
-        splits = data.split('/', 1)
-        if len(splits) == 2:
-            start = splits[0]
-            end = splits[1]
+        try:
+            splits = data.split('/', 1)
+            if len(splits) == 2:
+                start = splits[0]
+                end = splits[1]
 
-            self.mStart.parse(start, fullISO)
-            if end[0] == 'P':
-                self.mDuration.parse(end)
-                self.mUseDuration = True
-                self.mEnd = self.mStart + self.mDuration
+                self.mStart.parse(start, fullISO)
+                if end[0] == 'P':
+                    self.mDuration = Duration.parseText(end)
+                    self.mUseDuration = True
+                    self.mEnd = None
+                else:
+                    self.mEnd.parse(end, fullISO)
+                    self.mUseDuration = False
+                    self.mDuration = None
             else:
-                self.mEnd.parse(end, fullISO)
-                self.mUseDuration = False
-                self.mDuration = self.mEnd - self.mStart
-        else:
+                raise ValueError
+        except IndexError:
             raise ValueError
 
 
@@ -146,10 +151,14 @@ class Period(ValueMixin):
 
 
     def getEnd(self):
+        if self.mEnd is None:
+            self.mEnd = self.mStart + self.mDuration
         return self.mEnd
 
 
     def getDuration(self):
+        if self.mDuration is None:
+            self.mDuration = self.mEnd - self.mStart
         return self.mDuration
 
 
@@ -159,11 +168,15 @@ class Period(ValueMixin):
 
     def setUseDuration(self, use):
         self.mUseDuration = use
+        if self.mUseDuration and self.mDuration is None:
+            self.getDuration()
+        elif not self.mUseDuration and self.mEnd is None:
+            self.getEnd()
 
 
     def isDateWithinPeriod(self, dt):
         # Inclusive start, exclusive end
-        return dt >= self.mStart and dt < self.mEnd
+        return dt >= self.mStart and dt < self.getEnd()
 
 
     def isDateBeforePeriod(self, dt):
@@ -173,17 +186,17 @@ class Period(ValueMixin):
 
     def isDateAfterPeriod(self, dt):
         # Exclusive end
-        return dt >= self.mEnd
+        return dt >= self.getEnd()
 
 
     def isPeriodOverlap(self, p):
         # Inclusive start, exclusive end
-        return not (self.mStart >= p.mEnd or self.mEnd <= p.mStart)
+        return not (self.mStart >= p.getEnd() or self.getEnd() <= p.mStart)
 
 
     def adjustToUTC(self):
         self.mStart.adjustToUTC()
-        self.mEnd.adjustToUTC()
+        self.getEnd().adjustToUTC()
 
 
     def describeDuration(self):
