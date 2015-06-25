@@ -456,10 +456,10 @@ class Calendar(ContainerBase):
         return root
 
 
-    def getTextJSON(self, includeTimezones=None):
+    def getTextJSON(self, includeTimezones=None, sort_keys=False):
         jobject = []
         self.writeJSON(jobject, includeTimezones)
-        return json.dumps(jobject[0], indent=2, separators=(',', ':'))
+        return json.dumps(jobject[0], indent=2, separators=(',', ':'), sort_keys=sort_keys)
 
 
     def writeJSON(self, jobject, includeTimezones=None):

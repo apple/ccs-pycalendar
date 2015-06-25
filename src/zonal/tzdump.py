@@ -27,12 +27,12 @@ def loadCalendar(file, verbose):
     cal = Calendar()
     if verbose:
         print "Parsing calendar data: %s" % (file,)
-    fin = open(file, "r")
-    try:
-        cal.parse(fin)
-    except InvalidData, e:
-        print "Failed to parse bad data: %s" % (e.mData,)
-        raise
+    with open(file, "r") as fin:
+        try:
+            cal.parse(fin)
+        except InvalidData, e:
+            print "Failed to parse bad data: %s" % (e.mData,)
+            raise
     return cal
 
 

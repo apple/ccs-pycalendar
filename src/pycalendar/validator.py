@@ -27,7 +27,8 @@ def validate(fname):
     Check whether the contents of the specified file is valid iCalendar or vCard data.
     """
 
-    data = open(fname).read()
+    with open(fname) as f:
+        data = f.read()
 
     ParserContext.allRaise()
 

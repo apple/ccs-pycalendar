@@ -117,7 +117,7 @@ class N(ValueMixin):
 
 
     def parseJSON(self, jobject):
-        self.mValue = tuple(jobject)
+        self.mValue = tuple(map(lambda x: x.encode("utf-8"), jobject))
 
 
     def writeJSON(self, jobject):

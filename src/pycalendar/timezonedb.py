@@ -127,7 +127,8 @@ class TimezoneDatabase(object):
         tzpath = os.path.normpath(tzpath)
         if tzpath.startswith(self.dbpath) and os.path.isfile(tzpath):
             try:
-                self.calendar.parseComponent(open(tzpath))
+                with open(tzpath) as f:
+                    self.calendar.parseComponent(f)
             except (IOError, InvalidData):
                 raise NoTimezoneInDatabase(self.dbpath, tzid)
         else:
