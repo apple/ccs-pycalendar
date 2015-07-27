@@ -17,6 +17,7 @@
 from pycalendar import xmlutils
 from pycalendar.datetime import DateTime
 from pycalendar.icalendar import definitions, xmldefinitions
+from pycalendar.icalendar.exceptions import TooManyInstancesError
 from pycalendar.period import Period
 from pycalendar.valueutils import ValueMixin
 import cStringIO as StringIO
@@ -880,7 +881,7 @@ class Recurrence(ValueMixin):
         return result
 
 
-    def expand(self, start, range, items, float_offset=0):
+    def expand(self, start, range, items, float_offset=0, maxInstances=None):
 
         # Have to normalize this to be very sure we are starting with a valid date, as otherwise
         # we could end up looping forever when doing recurrence.
@@ -906,9 +907,9 @@ class Recurrence(ValueMixin):
 
             # Simple expansion is one where there is no BYXXX rule part
             if not self.hasBy():
-                self.mFullyCached = self.simpleExpand(start, range, self.mRecurrences, float_offset)
+                self.mFullyCached = self.simpleExpand(start, range, self.mRecurrences, float_offset, maxInstances=maxInstances)
             else:
-                self.mFullyCached = self.complexExpand(start, range, self.mRecurrences, float_offset)
+                self.mFullyCached = self.complexExpand(start, range, self.mRecurrences, float_offset, maxInstances=maxInstances)
 
             # Set cache values
             self.mCached = True
@@ -925,7 +926,7 @@ class Recurrence(ValueMixin):
         return limited
 
 
-    def simpleExpand(self, start, range, items, float_offset):
+    def simpleExpand(self, start, range, items, float_offset, maxInstances=None):
         start_iter = start.duplicate()
         ctr = 0
 
@@ -942,6 +943,8 @@ class Recurrence(ValueMixin):
 
             # Add current one to list
             items.append(start_iter.duplicate())
+            if maxInstances and len(items) > maxInstances:
+                raise TooManyInstancesError("Too many instances")
 
             # Get next item
             start_iter.recur(self.mFreq, self.mInterval, allow_invalid=True)
@@ -961,7 +964,7 @@ class Recurrence(ValueMixin):
                     return True
 
 
-    def complexExpand(self, start, range, items, float_offset):
+    def complexExpand(self, start, range, items, float_offset, maxInstances=None):
         start_iter = start.duplicate()
         ctr = 0
 
@@ -1039,6 +1042,8 @@ class Recurrence(ValueMixin):
 
                 # Add current one to list
                 items.append(iter)
+                if maxInstances and len(items) > maxInstances:
+                    raise TooManyInstancesError("Too many instances")
 
                 # Check limits
                 if self.mUseCount:
