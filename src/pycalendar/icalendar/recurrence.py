@@ -1007,9 +1007,6 @@ class Recurrence(ValueMixin):
             elif self.mFreq == definitions.eRecurrence_YEARLY:
                 self.generateYearlySet(start_iter, set_items)
 
-            # Ignore if it is invalid
-            set_items = filter(lambda x: not x.invalid(), set_items)
-
             # Always sort the set as BYxxx rules may not be sorted
             # set_items.sort(cmp=DateTime.sort)
             set_items.sort(key=lambda x: x.getPosixTime())
@@ -1143,6 +1140,9 @@ class Recurrence(ValueMixin):
         if (self.mBySeconds is not None) and (len(self.mBySeconds) != 0):
             items[:] = self.bySecondExpand(items)
 
+        # Remove invalid items before BYSETPOS
+        items[:] = filter(lambda x: not x.invalid(), items)
+
         if (self.mBySetPos is not None) and (len(self.mBySetPos) != 0):
             items[:] = self.bySetPosLimit(items)
 
@@ -1188,6 +1188,9 @@ class Recurrence(ValueMixin):
         if ((self.mBySeconds is not None) and (len(self.mBySeconds) != 0)):
             items[:] = self.bySecondExpand(items)
 
+        # Remove invalid items before BYSETPOS
+        items[:] = filter(lambda x: not x.invalid(), items)
+
         if ((self.mBySetPos is not None) and (len(self.mBySetPos) != 0)):
             items[:] = self.bySetPosLimit(items)
 
@@ -1224,6 +1227,9 @@ class Recurrence(ValueMixin):
 
         if (self.mBySeconds is not None) and (len(self.mBySeconds) != 0):
             items[:] = self.bySecondExpand(items)
+
+        # Remove invalid items before BYSETPOS
+        items[:] = filter(lambda x: not x.invalid(), items)
 
         if (self.mBySetPos is not None) and (len(self.mBySetPos) != 0):
             items[:] = self.bySetPosLimit(items)
@@ -1266,6 +1272,9 @@ class Recurrence(ValueMixin):
 
         if (self.mBySeconds is not None) and (len(self.mBySeconds) != 0):
             items[:] = self.bySecondExpand(items)
+
+        # Remove invalid items before BYSETPOS
+        items[:] = filter(lambda x: not x.invalid(), items)
 
         if (self.mBySetPos is not None) and (len(self.mBySetPos) != 0):
             items[:] = self.bySetPosLimit(items)
@@ -1310,6 +1319,9 @@ class Recurrence(ValueMixin):
 
         if (self.mBySeconds is not None) and (len(self.mBySeconds) != 0):
             items[:] = self.bySecondExpand(items)
+
+        # Remove invalid items before BYSETPOS
+        items[:] = filter(lambda x: not x.invalid(), items)
 
         if (self.mBySetPos is not None) and (len(self.mBySetPos) != 0):
             items[:] = self.bySetPosLimit(items)
@@ -1356,6 +1368,9 @@ class Recurrence(ValueMixin):
 
         if (self.mBySeconds is not None) and (len(self.mBySeconds) != 0):
             items[:] = self.bySecondExpand(items)
+
+        # Remove invalid items before BYSETPOS
+        items[:] = filter(lambda x: not x.invalid(), items)
 
         if (self.mBySetPos is not None) and (len(self.mBySetPos) != 0):
             items[:] = self.bySetPosLimit(items)
@@ -1404,6 +1419,9 @@ class Recurrence(ValueMixin):
             items[:] = self.bySecondLimit(items)
             if (len(items) == 0):
                 return
+
+        # Remove invalid items before BYSETPOS
+        items[:] = filter(lambda x: not x.invalid(), items)
 
         if (self.mBySetPos is not None) and (len(self.mBySetPos) != 0):
             items[:] = self.bySetPosLimit(items)

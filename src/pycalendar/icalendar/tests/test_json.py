@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 ##
 #    Copyright (c) 2007-2013 Cyrus Daboo. All rights reserved.
 #
@@ -13,6 +14,7 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 ##
+
 
 from pycalendar.icalendar.calendar import Calendar
 from pycalendar.icalendar.property import Property
