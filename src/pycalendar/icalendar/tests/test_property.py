@@ -115,6 +115,7 @@ class TestProperty(unittest.TestCase):
 
         test_data = (
             ("ATTENDEE", "mailto:attendee@example.com", "ATTENDEE:mailto:attendee@example.com\r\n"),
+            ("ATTENDEE", u"mailto:attendee@example.com", "ATTENDEE:mailto:attendee@example.com\r\n"),
             ("attendee", "mailto:attendee@example.com", "attendee:mailto:attendee@example.com\r\n"),
             ("ORGANIZER", "mailto:organizer@example.com", "ORGANIZER:mailto:organizer@example.com\r\n"),
             ("ORGANizer", "mailto:organizer@example.com", "ORGANizer:mailto:organizer@example.com\r\n"),

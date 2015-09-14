@@ -472,21 +472,21 @@ class PropertyBase(object):
             prop = cls()
 
             # Get the name
-            prop.mName = jobject[0].upper()
+            prop.mName = jobject[0].encode("utf-8").upper()
 
             # Get the parameters
             if jobject[1]:
                 for name, value in jobject[1].items():
                     # Now add parameter value
                     name = name.upper()
-                    attrvalue = Parameter(name=name, value=value)
+                    attrvalue = Parameter(name=name.encode("utf-8"), value=value.encode("utf-8"))
                     prop.mParameters.setdefault(name, []).append(attrvalue)
 
             # Get default value type from property name and insert a VALUE parameter if current value type is not default
             value_type = cls.sValueTypeMap.get(jobject[2].upper(), Value.VALUETYPE_UNKNOWN)
             default_type = cls.sDefaultValueTypeMap.get(prop.mName.upper(), Value.VALUETYPE_UNKNOWN)
             if default_type != value_type:
-                attrvalue = Parameter(name=cls.sValue, value=jobject[2].upper())
+                attrvalue = Parameter(name=cls.sValue, value=jobject[2].encode("utf-8").upper())
                 prop.mParameters.setdefault(cls.sValue, []).append(attrvalue)
 
             # Get value type from property name

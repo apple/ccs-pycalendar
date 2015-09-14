@@ -14,6 +14,7 @@
 #    limitations under the License.
 ##
 
+from pycalendar.icalendar.exceptions import TooManyInstancesError
 from pycalendar.utils import set_difference
 
 class RecurrenceSet(object):
@@ -182,7 +183,7 @@ class RecurrenceSet(object):
         return self.mExperiods
 
 
-    def expand(self, start, range, items, float_offset=0):
+    def expand(self, start, range, items, float_offset=0, maxInstances=None):
         # Need to return whether the limit was applied or not
         limited = False
 
@@ -197,18 +198,22 @@ class RecurrenceSet(object):
 
         # RRULES
         for iter in self.mRrules:
-            if iter.expand(start, range, include, float_offset=float_offset):
+            if iter.expand(start, range, include, float_offset=float_offset, maxInstances=maxInstances):
                 limited = True
 
         # RDATES
         for iter in self.mRdates:
             if range.isDateWithinPeriod(iter):
                 include.append(iter)
+                if maxInstances and len(include) > maxInstances:
+                    raise TooManyInstancesError("Too many instances")
             else:
                 limited = True
         for iter in self.mRperiods:
             if range.isPeriodOverlap(iter):
                 include.append(iter.getStart())
+                if maxInstances and len(include) > maxInstances:
+                    raise TooManyInstancesError("Too many instances")
             else:
                 limited = True
 

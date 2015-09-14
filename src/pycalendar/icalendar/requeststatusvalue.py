@@ -97,7 +97,7 @@ class RequestStatusValue(Value):
 
 
     def parseJSONValue(self, jobject):
-        self.mValue = jobject
+        self.mValue = map(lambda x: x.encode("utf-8"), jobject)
 
 
     def writeJSONValue(self, jobject):

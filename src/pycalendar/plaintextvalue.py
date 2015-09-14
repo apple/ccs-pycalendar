@@ -48,7 +48,7 @@ class PlainTextValue(Value):
 
 
     def parseJSONValue(self, jobject):
-        self.mValue = str(jobject)
+        self.mValue = jobject.encode("utf-8")
 
 
     def writeJSONValue(self, jobject):

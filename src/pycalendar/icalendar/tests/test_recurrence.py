@@ -19,6 +19,8 @@ from pycalendar.period import Period
 from pycalendar.icalendar.recurrence import Recurrence
 import unittest
 from pycalendar.timezone import Timezone
+import os
+import json
 
 class TestRecurrence(unittest.TestCase):
 
@@ -58,7 +60,6 @@ class TestRecurrence(unittest.TestCase):
         "RSCALE=GREGORIAN;FREQ=YEARLY;COUNT=400;SKIP=BACKWARD",
         "RSCALE=GREGORIAN;FREQ=YEARLY;COUNT=400;SKIP=FORWARD",
         "RSCALE=CHINESE;FREQ=YEARLY;BYMONTH=5,6,6L,7",
-
     )
 
 
@@ -67,7 +68,7 @@ class TestRecurrence(unittest.TestCase):
         for item in TestRecurrence.items:
             recur = Recurrence()
             recur.parse(item)
-            self.assertEqual(recur.getText(), item, "Failed to parse and re-generate '%s' '%s'" % (item, recur.getText()))
+            self.assertEqual(recur.getText(), item, "Failed to parse and re-generate '%s' '%s'" % (item, recur.getText(),))
 
 
     def testParseInvalid(self):
@@ -126,345 +127,102 @@ class TestRecurrence(unittest.TestCase):
             self.assertNotEqual(hashes[i - 1], hashes[i])
 
 
-    def testByWeekNoExpand(self):
-
-        rule = "FREQ=YEARLY;BYWEEKNO=1,2"
-        for rrule in (
-            rule,
-            "RSCALE=GREGORIAN;{};SKIP=YES".format(rule)
-        ):
-            recur = Recurrence()
-            recur.parse(rrule)
-            start = DateTime(2013, 1, 1, 0, 0, 0)
-            end = DateTime(2017, 1, 1, 0, 0, 0)
-            items = []
-            range = Period(start, end)
-            recur.expand(start, range, items)
-            self.assertEqual(
-                items,
-                [
-                    DateTime(2013, 1, 1, 0, 0, 0),
-                    DateTime(2013, 1, 8, 0, 0, 0),
-                    DateTime(2014, 1, 1, 0, 0, 0),
-                    DateTime(2014, 1, 8, 0, 0, 0),
-                    DateTime(2015, 1, 1, 0, 0, 0),
-                    DateTime(2015, 1, 8, 0, 0, 0),
-                    DateTime(2016, 1, 8, 0, 0, 0),
-                    DateTime(2016, 1, 15, 0, 0, 0),
-                ],
-                msg="Failed: {}".format(rrule),
-            )
-
-
-    def testMonthlyInvalidStart(self):
-
-        rule = "FREQ=MONTHLY"
-        for rrule in (
-            rule,
-            "RSCALE=GREGORIAN;{};SKIP=YES".format(rule)
-        ):
-            recur = Recurrence()
-            recur.parse(rrule)
-            start = DateTime(2014, 1, 40, 12, 0, 0)
-            end = DateTime(2015, 1, 1, 0, 0, 0)
-            items = []
-            range = Period(start, end)
-            recur.expand(start, range, items)
-            self.assertEqual(
-                items,
-                [
-                    DateTime(2014, 2, 9, 12, 0, 0),
-                    DateTime(2014, 3, 9, 12, 0, 0),
-                    DateTime(2014, 4, 9, 12, 0, 0),
-                    DateTime(2014, 5, 9, 12, 0, 0),
-                    DateTime(2014, 6, 9, 12, 0, 0),
-                    DateTime(2014, 7, 9, 12, 0, 0),
-                    DateTime(2014, 8, 9, 12, 0, 0),
-                    DateTime(2014, 9, 9, 12, 0, 0),
-                    DateTime(2014, 10, 9, 12, 0, 0),
-                    DateTime(2014, 11, 9, 12, 0, 0),
-                    DateTime(2014, 12, 9, 12, 0, 0),
-                ],
-                msg="Failed: {}".format(rrule),
-            )
-
-
     def testWeeklyTwice(self):
 
-        rule = "FREQ=WEEKLY"
-        for rrule in (
-            rule,
-            "RSCALE=GREGORIAN;{};SKIP=YES".format(rule)
-        ):
-            recur = Recurrence()
-            recur.parse(rrule)
-            start = DateTime(2014, 1, 1, 12, 0, 0, tzid=Timezone(utc=True))
-            end = DateTime(2014, 2, 1, 0, 0, 0, tzid=Timezone(utc=True))
-            items = []
-            range = Period(start, end)
-            recur.expand(DateTime(2014, 1, 1, 12, 0, 0, tzid=Timezone(tzid="America/New_York")), range, items)
-            self.assertEqual(
-                items,
-                [
-                    DateTime(2014, 1, 1, 12, 0, 0, tzid=Timezone(tzid="America/New_York")),
-                    DateTime(2014, 1, 8, 12, 0, 0, tzid=Timezone(tzid="America/New_York")),
-                    DateTime(2014, 1, 15, 12, 0, 0, tzid=Timezone(tzid="America/New_York")),
-                    DateTime(2014, 1, 22, 12, 0, 0, tzid=Timezone(tzid="America/New_York")),
-                    DateTime(2014, 1, 29, 12, 0, 0, tzid=Timezone(tzid="America/New_York")),
+        recur = Recurrence()
+        recur.parse("FREQ=WEEKLY")
+        start = DateTime(2014, 1, 1, 12, 0, 0, tzid=Timezone(utc=True))
+        end = DateTime(2014, 2, 1, 0, 0, 0, tzid=Timezone(utc=True))
+        items = []
+        range = Period(start, end)
+        recur.expand(DateTime(2014, 1, 1, 12, 0, 0, tzid=Timezone(tzid="America/New_York")), range, items)
+        self.assertEqual(
+            items,
+            [
+                DateTime(2014, 1, 1, 12, 0, 0, tzid=Timezone(tzid="America/New_York")),
+                DateTime(2014, 1, 8, 12, 0, 0, tzid=Timezone(tzid="America/New_York")),
+                DateTime(2014, 1, 15, 12, 0, 0, tzid=Timezone(tzid="America/New_York")),
+                DateTime(2014, 1, 22, 12, 0, 0, tzid=Timezone(tzid="America/New_York")),
+                DateTime(2014, 1, 29, 12, 0, 0, tzid=Timezone(tzid="America/New_York")),
 
-                ],
-                msg="Failed: {}".format(rrule),
-            )
+            ],
+        )
 
-            start = DateTime(2014, 1, 1, 12, 0, 0, tzid=Timezone(utc=True))
-            end = DateTime(2014, 3, 1, 0, 0, 0, tzid=Timezone(utc=True))
-            items = []
-            range = Period(start, end)
-            recur.expand(DateTime(2014, 1, 1, 12, 0, 0, tzid=Timezone(tzid="America/New_York")), range, items)
-            self.assertEqual(
-                items,
-                [
-                    DateTime(2014, 1, 1, 12, 0, 0, tzid=Timezone(tzid="America/New_York")),
-                    DateTime(2014, 1, 8, 12, 0, 0, tzid=Timezone(tzid="America/New_York")),
-                    DateTime(2014, 1, 15, 12, 0, 0, tzid=Timezone(tzid="America/New_York")),
-                    DateTime(2014, 1, 22, 12, 0, 0, tzid=Timezone(tzid="America/New_York")),
-                    DateTime(2014, 1, 29, 12, 0, 0, tzid=Timezone(tzid="America/New_York")),
-                    DateTime(2014, 2, 5, 12, 0, 0, tzid=Timezone(tzid="America/New_York")),
-                    DateTime(2014, 2, 12, 12, 0, 0, tzid=Timezone(tzid="America/New_York")),
-                    DateTime(2014, 2, 19, 12, 0, 0, tzid=Timezone(tzid="America/New_York")),
-                    DateTime(2014, 2, 26, 12, 0, 0, tzid=Timezone(tzid="America/New_York")),
-                ],
-                msg="Failed: {}".format(rrule),
-            )
+        start = DateTime(2014, 1, 1, 12, 0, 0, tzid=Timezone(utc=True))
+        end = DateTime(2014, 3, 1, 0, 0, 0, tzid=Timezone(utc=True))
+        items = []
+        range = Period(start, end)
+        recur.expand(DateTime(2014, 1, 1, 12, 0, 0, tzid=Timezone(tzid="America/New_York")), range, items)
+        self.assertEqual(
+            items,
+            [
+                DateTime(2014, 1, 1, 12, 0, 0, tzid=Timezone(tzid="America/New_York")),
+                DateTime(2014, 1, 8, 12, 0, 0, tzid=Timezone(tzid="America/New_York")),
+                DateTime(2014, 1, 15, 12, 0, 0, tzid=Timezone(tzid="America/New_York")),
+                DateTime(2014, 1, 22, 12, 0, 0, tzid=Timezone(tzid="America/New_York")),
+                DateTime(2014, 1, 29, 12, 0, 0, tzid=Timezone(tzid="America/New_York")),
+                DateTime(2014, 2, 5, 12, 0, 0, tzid=Timezone(tzid="America/New_York")),
+                DateTime(2014, 2, 12, 12, 0, 0, tzid=Timezone(tzid="America/New_York")),
+                DateTime(2014, 2, 19, 12, 0, 0, tzid=Timezone(tzid="America/New_York")),
+                DateTime(2014, 2, 26, 12, 0, 0, tzid=Timezone(tzid="America/New_York")),
+            ],
+        )
 
 
     def testMonthlyInUTC(self):
 
-        rule = "FREQ=MONTHLY"
-        for rrule in (
-            rule,
-            "RSCALE=GREGORIAN;{};SKIP=YES".format(rule)
-        ):
-            recur = Recurrence()
-            recur.parse(rrule)
-            start = DateTime(2014, 1, 1, 12, 0, 0, tzid=Timezone(utc=True))
-            end = DateTime(2015, 1, 1, 0, 0, 0, tzid=Timezone(utc=True))
-            items = []
-            range = Period(start, end)
-            recur.expand(DateTime(2014, 1, 1, 12, 0, 0, tzid=Timezone(tzid="America/New_York")), range, items)
-            self.assertEqual(
-                items,
-                [
-                    DateTime(2014, 1, 1, 12, 0, 0, tzid=Timezone(tzid="America/New_York")),
-                    DateTime(2014, 2, 1, 12, 0, 0, tzid=Timezone(tzid="America/New_York")),
-                    DateTime(2014, 3, 1, 12, 0, 0, tzid=Timezone(tzid="America/New_York")),
-                    DateTime(2014, 4, 1, 12, 0, 0, tzid=Timezone(tzid="America/New_York")),
-                    DateTime(2014, 5, 1, 12, 0, 0, tzid=Timezone(tzid="America/New_York")),
-                    DateTime(2014, 6, 1, 12, 0, 0, tzid=Timezone(tzid="America/New_York")),
-                    DateTime(2014, 7, 1, 12, 0, 0, tzid=Timezone(tzid="America/New_York")),
-                    DateTime(2014, 8, 1, 12, 0, 0, tzid=Timezone(tzid="America/New_York")),
-                    DateTime(2014, 9, 1, 12, 0, 0, tzid=Timezone(tzid="America/New_York")),
-                    DateTime(2014, 10, 1, 12, 0, 0),
-                    DateTime(2014, 11, 1, 12, 0, 0),
-                    DateTime(2014, 12, 1, 12, 0, 0),
-                ],
-                msg="Failed: {}".format(rrule),
-            )
+        recur = Recurrence()
+        recur.parse("FREQ=MONTHLY")
+        start = DateTime(2014, 1, 1, 12, 0, 0, tzid=Timezone(utc=True))
+        end = DateTime(2015, 1, 1, 0, 0, 0, tzid=Timezone(utc=True))
+        items = []
+        range = Period(start, end)
+        recur.expand(DateTime(2014, 1, 1, 12, 0, 0, tzid=Timezone(tzid="America/New_York")), range, items)
+        self.assertEqual(
+            items,
+            [
+                DateTime(2014, 1, 1, 12, 0, 0, tzid=Timezone(tzid="America/New_York")),
+                DateTime(2014, 2, 1, 12, 0, 0, tzid=Timezone(tzid="America/New_York")),
+                DateTime(2014, 3, 1, 12, 0, 0, tzid=Timezone(tzid="America/New_York")),
+                DateTime(2014, 4, 1, 12, 0, 0, tzid=Timezone(tzid="America/New_York")),
+                DateTime(2014, 5, 1, 12, 0, 0, tzid=Timezone(tzid="America/New_York")),
+                DateTime(2014, 6, 1, 12, 0, 0, tzid=Timezone(tzid="America/New_York")),
+                DateTime(2014, 7, 1, 12, 0, 0, tzid=Timezone(tzid="America/New_York")),
+                DateTime(2014, 8, 1, 12, 0, 0, tzid=Timezone(tzid="America/New_York")),
+                DateTime(2014, 9, 1, 12, 0, 0, tzid=Timezone(tzid="America/New_York")),
+                DateTime(2014, 10, 1, 12, 0, 0, tzid=Timezone(tzid="America/New_York")),
+                DateTime(2014, 11, 1, 12, 0, 0, tzid=Timezone(tzid="America/New_York")),
+                DateTime(2014, 12, 1, 12, 0, 0, tzid=Timezone(tzid="America/New_York")),
+            ],
+        )
 
 
-    def testMonthlyStart31st(self):
+    def testExampleRules(self):
 
-        rule = "FREQ=MONTHLY"
-        for rrule in (
-            rule,
-            "RSCALE=GREGORIAN;{};SKIP=YES".format(rule)
-        ):
-            recur = Recurrence()
-            recur.parse(rrule)
-            start = DateTime(2014, 1, 31, 12, 0, 0)
-            end = DateTime(2015, 1, 1, 0, 0, 0)
-            items = []
-            range = Period(start, end)
-            recur.expand(start, range, items)
-            self.assertEqual(
-                items,
-                [
-                    DateTime(2014, 1, 31, 12, 0, 0),
-                    DateTime(2014, 3, 31, 12, 0, 0),
-                    DateTime(2014, 5, 31, 12, 0, 0),
-                    DateTime(2014, 7, 31, 12, 0, 0),
-                    DateTime(2014, 8, 31, 12, 0, 0),
-                    DateTime(2014, 10, 31, 12, 0, 0),
-                    DateTime(2014, 12, 31, 12, 0, 0),
-                ],
-                msg="Failed: {}".format(rrule),
-            )
+        examples = os.path.join(os.path.dirname(__file__), "rrule_examples.json")
+        with open(examples) as f:
+            examples = json.loads(f.read())
 
+        for ctr, i in enumerate(examples):
 
-    def testMonthlyByMonthDay31(self):
+            rules = [i["rule"]]
+            if "RSCALE" not in rules[0]:
+                rules.append("RSCALE=GREGORIAN;{};SKIP=YES".format(rules[0]))
+            for rule in rules:
+                recur = Recurrence()
+                recur.parse(rule)
+                start = DateTime.parseText(i["start"])
+                end = DateTime.parseText(i["end"])
+                results = map(DateTime.parseText, i["results"])
 
-        rule = "FREQ=MONTHLY;BYMONTHDAY=31"
-        for rrule in (
-            rule,
-            "RSCALE=GREGORIAN;{};SKIP=YES".format(rule)
-        ):
-            recur = Recurrence()
-            recur.parse(rrule)
-            start = DateTime(2014, 1, 31, 12, 0, 0)
-            end = DateTime(2015, 1, 1, 0, 0, 0)
-            items = []
-            range = Period(start, end)
-            recur.expand(start, range, items)
-            self.assertEqual(
-                items,
-                [
-                    DateTime(2014, 1, 31, 12, 0, 0),
-                    DateTime(2014, 3, 31, 12, 0, 0),
-                    DateTime(2014, 5, 31, 12, 0, 0),
-                    DateTime(2014, 7, 31, 12, 0, 0),
-                    DateTime(2014, 8, 31, 12, 0, 0),
-                    DateTime(2014, 10, 31, 12, 0, 0),
-                    DateTime(2014, 12, 31, 12, 0, 0),
-                ],
-                msg="Failed: {}".format(rrule),
-            )
-
-
-    def testMonthlyByMonthDayMinus31(self):
-
-        rule = "FREQ=MONTHLY;BYMONTHDAY=-31"
-        for rrule in (
-            rule,
-            "RSCALE=GREGORIAN;{};SKIP=YES".format(rule)
-        ):
-            recur = Recurrence()
-            recur.parse(rrule)
-            start = DateTime(2014, 1, 1, 12, 0, 0)
-            end = DateTime(2015, 1, 1, 0, 0, 0)
-            items = []
-            range = Period(start, end)
-            recur.expand(start, range, items)
-            self.assertEqual(
-                items,
-                [
-                    DateTime(2014, 1, 1, 12, 0, 0),
-                    DateTime(2014, 3, 1, 12, 0, 0),
-                    DateTime(2014, 5, 1, 12, 0, 0),
-                    DateTime(2014, 7, 1, 12, 0, 0),
-                    DateTime(2014, 8, 1, 12, 0, 0),
-                    DateTime(2014, 10, 1, 12, 0, 0),
-                    DateTime(2014, 12, 1, 12, 0, 0),
-                ],
-                msg="Failed: {}".format(rrule),
-            )
-
-
-    def testMonthlyByLastFridayExpand(self):
-
-        rule = "FREQ=MONTHLY;BYDAY=-1FR"
-        for rrule in (
-            rule,
-            "RSCALE=GREGORIAN;{};SKIP=YES".format(rule)
-        ):
-            recur = Recurrence()
-            recur.parse(rrule)
-            start = DateTime(2014, 1, 31, 12, 0, 0)
-            end = DateTime(2015, 1, 1, 0, 0, 0)
-            items = []
-            range = Period(start, end)
-            recur.expand(start, range, items)
-            self.assertEqual(
-                items,
-                [
-                    DateTime(2014, 1, 31, 12, 0, 0),
-                    DateTime(2014, 2, 28, 12, 0, 0),
-                    DateTime(2014, 3, 28, 12, 0, 0),
-                    DateTime(2014, 4, 25, 12, 0, 0),
-                    DateTime(2014, 5, 30, 12, 0, 0),
-                    DateTime(2014, 6, 27, 12, 0, 0),
-                    DateTime(2014, 7, 25, 12, 0, 0),
-                    DateTime(2014, 8, 29, 12, 0, 0),
-                    DateTime(2014, 9, 26, 12, 0, 0),
-                    DateTime(2014, 10, 31, 12, 0, 0),
-                    DateTime(2014, 11, 28, 12, 0, 0),
-                    DateTime(2014, 12, 26, 12, 0, 0),
-                ],
-                msg="Failed: {}".format(rrule),
-            )
-
-
-    def testMonthlyByFifthFridayExpand(self):
-
-        rule = "FREQ=MONTHLY;BYDAY=5FR"
-        for rrule in (
-            rule,
-            "RSCALE=GREGORIAN;{};SKIP=YES".format(rule)
-        ):
-            recur = Recurrence()
-            recur.parse(rrule)
-            start = DateTime(2014, 1, 31, 12, 0, 0)
-            end = DateTime(2015, 1, 1, 0, 0, 0)
-            items = []
-            range = Period(start, end)
-            recur.expand(start, range, items)
-            self.assertEqual(
-                items,
-                [
-                    DateTime(2014, 1, 31, 12, 0, 0),
-                    DateTime(2014, 5, 30, 12, 0, 0),
-                    DateTime(2014, 8, 29, 12, 0, 0),
-                    DateTime(2014, 10, 31, 12, 0, 0),
-                ],
-                msg="Failed: {}".format(rrule),
-            )
-
-
-    def testYearlyLeapDay(self):
-
-        rule = "FREQ=YEARLY"
-        for rrule in (
-            rule,
-            "RSCALE=GREGORIAN;{};SKIP=YES".format(rule)
-        ):
-            recur = Recurrence()
-            recur.parse(rrule)
-            start = DateTime(2012, 2, 29, 12, 0, 0)
-            end = DateTime(2020, 1, 1, 0, 0, 0)
-            items = []
-            range = Period(start, end)
-            recur.expand(start, range, items)
-            self.assertEqual(
-                items,
-                [
-                    DateTime(2012, 2, 29, 12, 0, 0),
-                    DateTime(2016, 2, 29, 12, 0, 0),
-                ],
-                msg="Failed: {}".format(rrule),
-            )
-
-
-    def testYearlyYearDay(self):
-
-        rule = "FREQ=YEARLY;BYYEARDAY=366"
-        for rrule in (
-            rule,
-            "RSCALE=GREGORIAN;{};SKIP=YES".format(rule)
-        ):
-            recur = Recurrence()
-            recur.parse(rrule)
-            start = DateTime(2012, 12, 31, 12, 0, 0)
-            end = DateTime(2020, 1, 1, 0, 0, 0)
-            items = []
-            range = Period(start, end)
-            recur.expand(start, range, items)
-            self.assertEqual(
-                items,
-                [
-                    DateTime(2012, 12, 31, 12, 0, 0),
-                    DateTime(2016, 12, 31, 12, 0, 0),
-                ],
-                msg="Failed: {}".format(rrule),
-            )
+                items = []
+                range = Period(start, end)
+                recur.expand(start, range, items)
+                self.assertEqual(
+                    items,
+                    results,
+                    msg="Failed rule: #{} {}".format(ctr + 1, rule)
+                )
 
 
     def testClearOnChange(self):
@@ -491,413 +249,27 @@ class TestRecurrence(unittest.TestCase):
 
 class TestRecurrenceRscale(unittest.TestCase):
 
-    def testMonthlyRscaleStartInLeapYearSkipYes(self):
 
-        recur = Recurrence()
-        recur.parse("RSCALE=CHINESE;FREQ=MONTHLY;SKIP=YES")
-        start = DateTime(2014, 1, 30) # {C}46501230
-        end = DateTime(2018, 1, 1)
-        items = []
-        range = Period(start, end)
-        recur.expand(start, range, items)
-        self.assertEqual(
-            items,
-            [
-                DateTime(2014, 1, 30),
-                DateTime(2014, 3, 30),
-                DateTime(2014, 5, 28),
-                DateTime(2014, 7, 26),
-                DateTime(2014, 9, 23),
-                DateTime(2014, 10, 23),
-                DateTime(2014, 12, 21),
-                DateTime(2015, 2, 18),
-                DateTime(2015, 4, 18),
-                DateTime(2015, 7, 15),
-                DateTime(2015, 9, 12),
-                DateTime(2015, 10, 12),
-                DateTime(2015, 11, 11),
-                DateTime(2016, 1, 9),
-                DateTime(2016, 3, 8),
-                DateTime(2016, 5, 6),
-                DateTime(2016, 8, 2),
-                DateTime(2016, 9, 30),
-                DateTime(2016, 10, 30),
-                DateTime(2016, 12, 28),
-                DateTime(2017, 1, 27),
-                DateTime(2017, 3, 27),
-                DateTime(2017, 5, 25),
-                DateTime(2017, 8, 21),
-                DateTime(2017, 10, 19),
-                DateTime(2017, 12, 17),
-            ],
-        )
+    def testExampleRules(self):
 
+        examples = os.path.join(os.path.dirname(__file__), "rscale_examples.json")
+        with open(examples) as f:
+            examples = json.loads(f.read())
 
-    def testMonthlyRscaleStartInLeapYearSkipForward(self):
+        for ctr, i in enumerate(examples):
 
-        recur = Recurrence()
-        recur.parse("RSCALE=CHINESE;FREQ=MONTHLY;SKIP=FORWARD")
-        start = DateTime(2014, 1, 30) # {C}46501230
-        end = DateTime(2018, 1, 1)
-        items = []
-        range = Period(start, end)
-        recur.expand(start, range, items)
-        self.assertEqual(
-            items,
-            [
-                DateTime(2014, 1, 30),
-                DateTime(2014, 3, 1),
-                DateTime(2014, 3, 30),
-                DateTime(2014, 4, 29),
-                DateTime(2014, 5, 28),
-                DateTime(2014, 6, 27),
-                DateTime(2014, 7, 26),
-                DateTime(2014, 8, 25),
-                DateTime(2014, 9, 23),
-                DateTime(2014, 10, 23),
-                DateTime(2014, 11, 22),
-                DateTime(2014, 12, 21),
-                DateTime(2015, 1, 20),
-                DateTime(2015, 2, 18),
-                DateTime(2015, 3, 20),
-                DateTime(2015, 4, 18),
-                DateTime(2015, 5, 18),
-                DateTime(2015, 6, 16),
-                DateTime(2015, 7, 15),
-                DateTime(2015, 8, 14),
-                DateTime(2015, 9, 12),
-                DateTime(2015, 10, 12),
-                DateTime(2015, 11, 11),
-                DateTime(2015, 12, 11),
-                DateTime(2016, 1, 9),
-                DateTime(2016, 2, 8),
-                DateTime(2016, 3, 8),
-                DateTime(2016, 4, 7),
-                DateTime(2016, 5, 6),
-                DateTime(2016, 6, 5),
-                DateTime(2016, 7, 4),
-                DateTime(2016, 8, 2),
-                DateTime(2016, 9, 1),
-                DateTime(2016, 9, 30),
-                DateTime(2016, 10, 30),
-                DateTime(2016, 11, 29),
-                DateTime(2016, 12, 28),
-                DateTime(2017, 1, 27),
-                DateTime(2017, 2, 26),
-                DateTime(2017, 3, 27),
-                DateTime(2017, 4, 26),
-                DateTime(2017, 5, 25),
-                DateTime(2017, 6, 24),
-                DateTime(2017, 7, 23),
-                DateTime(2017, 8, 21),
-                DateTime(2017, 9, 20),
-                DateTime(2017, 10, 19),
-                DateTime(2017, 11, 18),
-                DateTime(2017, 12, 17),
-            ],
-        )
+            for rule in i["rule"]:
+                recur = Recurrence()
+                recur.parse(rule)
+                start = DateTime.parseText(i["start"])
+                end = DateTime.parseText(i["end"])
+                results = map(DateTime.parseText, i["results"])
 
-
-    def testMonthlyRscaleStartInLeapYearSkipBackwardDefault(self):
-
-        for rrule in (
-            "RSCALE=CHINESE;FREQ=MONTHLY;SKIP=BACKWARD",
-            "RSCALE=CHINESE;FREQ=MONTHLY"
-        ):
-            recur = Recurrence()
-            recur.parse(rrule)
-            start = DateTime(2014, 1, 30) # {C}46501230
-            end = DateTime(2018, 1, 1)
-            items = []
-            range = Period(start, end)
-            recur.expand(start, range, items)
-            self.assertEqual(
-                items,
-                [
-                    DateTime(2014, 1, 30),
-                    DateTime(2014, 2, 28),
-                    DateTime(2014, 3, 30),
-                    DateTime(2014, 4, 28),
-                    DateTime(2014, 5, 28),
-                    DateTime(2014, 6, 26),
-                    DateTime(2014, 7, 26),
-                    DateTime(2014, 8, 24),
-                    DateTime(2014, 9, 23),
-                    DateTime(2014, 10, 23),
-                    DateTime(2014, 11, 21),
-                    DateTime(2014, 12, 21),
-                    DateTime(2015, 1, 19),
-                    DateTime(2015, 2, 18),
-                    DateTime(2015, 3, 19),
-                    DateTime(2015, 4, 18),
-                    DateTime(2015, 5, 17),
-                    DateTime(2015, 6, 15),
-                    DateTime(2015, 7, 15),
-                    DateTime(2015, 8, 13),
-                    DateTime(2015, 9, 12),
-                    DateTime(2015, 10, 12),
-                    DateTime(2015, 11, 11),
-                    DateTime(2015, 12, 10),
-                    DateTime(2016, 1, 9),
-                    DateTime(2016, 2, 7),
-                    DateTime(2016, 3, 8),
-                    DateTime(2016, 4, 6),
-                    DateTime(2016, 5, 6),
-                    DateTime(2016, 6, 4),
-                    DateTime(2016, 7, 3),
-                    DateTime(2016, 8, 2),
-                    DateTime(2016, 8, 31),
-                    DateTime(2016, 9, 30),
-                    DateTime(2016, 10, 30),
-                    DateTime(2016, 11, 28),
-                    DateTime(2016, 12, 28),
-                    DateTime(2017, 1, 27),
-                    DateTime(2017, 2, 25),
-                    DateTime(2017, 3, 27),
-                    DateTime(2017, 4, 25),
-                    DateTime(2017, 5, 25),
-                    DateTime(2017, 6, 23),
-                    DateTime(2017, 7, 22),
-                    DateTime(2017, 8, 21),
-                    DateTime(2017, 9, 19),
-                    DateTime(2017, 10, 19),
-                    DateTime(2017, 11, 17),
-                    DateTime(2017, 12, 17),
-                ],
-            )
-
-
-    def testYearlyLeapDaySkipYes(self):
-
-        recur = Recurrence()
-        recur.parse("RSCALE=GREGORIAN;FREQ=YEARLY;SKIP=YES;COUNT=5")
-        start = DateTime(2016, 2, 29)
-        end = DateTime(2100, 1, 1)
-        items = []
-        range = Period(start, end)
-        recur.expand(start, range, items)
-        self.assertEqual(
-            items,
-            [
-                DateTime(2016, 2, 29),
-                DateTime(2020, 2, 29),
-                DateTime(2024, 2, 29),
-                DateTime(2028, 2, 29),
-                DateTime(2032, 2, 29),
-            ]
-        )
-
-
-    def testYearlyLeapDaySkipForward(self):
-
-        recur = Recurrence()
-        recur.parse("RSCALE=GREGORIAN;FREQ=YEARLY;SKIP=FORWARD;COUNT=5")
-        start = DateTime(2016, 2, 29)
-        end = DateTime(2100, 1, 1)
-        items = []
-        range = Period(start, end)
-        recur.expand(start, range, items)
-        self.assertEqual(
-            items,
-            [
-                DateTime(2016, 2, 29),
-                DateTime(2017, 3, 1),
-                DateTime(2018, 3, 1),
-                DateTime(2019, 3, 1),
-                DateTime(2020, 2, 29),
-            ]
-        )
-
-
-    def testYearlyLeapDaySkipBackwardDefault(self):
-
-        for rrule in (
-            "RSCALE=GREGORIAN;FREQ=YEARLY;SKIP=BACKWARD;COUNT=5",
-            "RSCALE=GREGORIAN;FREQ=YEARLY;COUNT=5",
-        ):
-            recur = Recurrence()
-            recur.parse(rrule)
-            start = DateTime(2016, 2, 29)
-            end = DateTime(2100, 1, 1)
-            items = []
-            range = Period(start, end)
-            recur.expand(start, range, items)
-            self.assertEqual(
-                items,
-                [
-                    DateTime(2016, 2, 29),
-                    DateTime(2017, 2, 28),
-                    DateTime(2018, 2, 28),
-                    DateTime(2019, 2, 28),
-                    DateTime(2020, 2, 29),
-                ]
-            )
-
-
-    def testChineseMonthlyByMonthDay30SkipYes(self):
-
-        rrule = "RSCALE=CHINESE;FREQ=MONTHLY;BYMONTHDAY=30;SKIP=YES"
-        recur = Recurrence()
-        recur.parse(rrule)
-        start = DateTime(2014, 1, 30, 12, 0, 0)
-        end = DateTime(2015, 1, 1, 0, 0, 0)
-        items = []
-        range = Period(start, end)
-        recur.expand(start, range, items)
-        self.assertEqual(
-            items,
-            [
-                DateTime(2014, 1, 30, 12, 0, 0),
-                DateTime(2014, 3, 30, 12, 0, 0),
-                DateTime(2014, 5, 28, 12, 0, 0),
-                DateTime(2014, 7, 26, 12, 0, 0),
-                DateTime(2014, 9, 23, 12, 0, 0),
-                DateTime(2014, 10, 23, 12, 0, 0),
-                DateTime(2014, 12, 21, 12, 0, 0),
-            ],
-            msg="Failed: {} {}".format(rrule, items,),
-        )
-
-
-    def testChineseMonthlyByMonthDay30SkipBackward(self):
-
-        rrule = "RSCALE=CHINESE;FREQ=MONTHLY;BYMONTHDAY=30;SKIP=BACKWARD"
-        recur = Recurrence()
-        recur.parse(rrule)
-        start = DateTime(2014, 1, 30, 12, 0, 0)
-        end = DateTime(2015, 1, 1, 0, 0, 0)
-        items = []
-        range = Period(start, end)
-        recur.expand(start, range, items)
-        self.assertEqual(
-            items,
-            [
-                DateTime(2014, 1, 30, 12, 0, 0),
-                DateTime(2014, 2, 28, 12, 0, 0),
-                DateTime(2014, 3, 30, 12, 0, 0),
-                DateTime(2014, 4, 28, 12, 0, 0),
-                DateTime(2014, 5, 28, 12, 0, 0),
-                DateTime(2014, 6, 26, 12, 0, 0),
-                DateTime(2014, 7, 26, 12, 0, 0),
-                DateTime(2014, 8, 24, 12, 0, 0),
-                DateTime(2014, 9, 23, 12, 0, 0),
-                DateTime(2014, 10, 23, 12, 0, 0),
-                DateTime(2014, 11, 21, 12, 0, 0),
-                DateTime(2014, 12, 21, 12, 0, 0),
-            ],
-            msg="Failed: {} {}".format(rrule, items,),
-        )
-
-
-    def testChineseMonthlyByMonthDay30SkipForward(self):
-
-        rrule = "RSCALE=CHINESE;FREQ=MONTHLY;BYMONTHDAY=30;SKIP=FORWARD"
-        recur = Recurrence()
-        recur.parse(rrule)
-        start = DateTime(2014, 1, 30, 12, 0, 0)
-        end = DateTime(2015, 1, 1, 0, 0, 0)
-        items = []
-        range = Period(start, end)
-        recur.expand(start, range, items)
-        self.assertEqual(
-            items,
-            [
-                DateTime(2014, 1, 30, 12, 0, 0),
-                DateTime(2014, 3, 1, 12, 0, 0),
-                DateTime(2014, 3, 30, 12, 0, 0),
-                DateTime(2014, 4, 29, 12, 0, 0),
-                DateTime(2014, 5, 28, 12, 0, 0),
-                DateTime(2014, 6, 27, 12, 0, 0),
-                DateTime(2014, 7, 26, 12, 0, 0),
-                DateTime(2014, 8, 25, 12, 0, 0),
-                DateTime(2014, 9, 23, 12, 0, 0),
-                DateTime(2014, 10, 23, 12, 0, 0),
-                DateTime(2014, 11, 22, 12, 0, 0),
-                DateTime(2014, 12, 21, 12, 0, 0),
-            ],
-            msg="Failed: {} {}".format(rrule, items,),
-        )
-
-
-    def testChineseMonthlyByMonthDayMinus30SkipYes(self):
-
-        rrule = "RSCALE=CHINESE;FREQ=MONTHLY;BYMONTHDAY=-30;SKIP=YES"
-        recur = Recurrence()
-        recur.parse(rrule)
-        start = DateTime(2014, 1, 30, 12, 0, 0)
-        end = DateTime(2015, 1, 1, 0, 0, 0)
-        items = []
-        range = Period(start, end)
-        recur.expand(start, range, items)
-        self.assertEqual(
-            items,
-            [
-                DateTime(2014, 3, 1, 12, 0, 0),
-                DateTime(2014, 4, 29, 12, 0, 0),
-                DateTime(2014, 6, 27, 12, 0, 0),
-                DateTime(2014, 8, 25, 12, 0, 0),
-                DateTime(2014, 9, 24, 12, 0, 0),
-                DateTime(2014, 11, 22, 12, 0, 0),
-            ],
-            msg="Failed: {} {}".format(rrule, items,),
-        )
-
-
-    def testChineseMonthlyByMonthDayMinus30SkipBackward(self):
-
-        rrule = "RSCALE=CHINESE;FREQ=MONTHLY;BYMONTHDAY=-30;SKIP=BACKWARD"
-        recur = Recurrence()
-        recur.parse(rrule)
-        start = DateTime(2014, 1, 30, 12, 0, 0)
-        end = DateTime(2015, 1, 1, 0, 0, 0)
-        items = []
-        range = Period(start, end)
-        recur.expand(start, range, items)
-        self.assertEqual(
-            items,
-            [
-                DateTime(2014, 1, 30, 12, 0, 0),
-                DateTime(2014, 3, 1, 12, 0, 0),
-                DateTime(2014, 3, 30, 12, 0, 0),
-                DateTime(2014, 4, 29, 12, 0, 0),
-                DateTime(2014, 5, 28, 12, 0, 0),
-                DateTime(2014, 6, 27, 12, 0, 0),
-                DateTime(2014, 7, 26, 12, 0, 0),
-                DateTime(2014, 8, 25, 12, 0, 0),
-                DateTime(2014, 9, 24, 12, 0, 0),
-                DateTime(2014, 10, 23, 12, 0, 0),
-                DateTime(2014, 11, 22, 12, 0, 0),
-                DateTime(2014, 12, 21, 12, 0, 0),
-            ],
-            msg="Failed: {} {}".format(rrule, items,),
-        )
-
-
-    def testChineseMonthlyByMonthDayMinus30SkipForward(self):
-
-        rrule = "RSCALE=CHINESE;FREQ=MONTHLY;BYMONTHDAY=-30;SKIP=FORWARD"
-        recur = Recurrence()
-        recur.parse(rrule)
-        start = DateTime(2014, 1, 30, 12, 0, 0)
-        end = DateTime(2015, 1, 1, 0, 0, 0)
-        items = []
-        range = Period(start, end)
-        recur.expand(start, range, items)
-        self.assertEqual(
-            items,
-            [
-                DateTime(2014, 1, 31, 12, 0, 0),
-                DateTime(2014, 3, 1, 12, 0, 0),
-                DateTime(2014, 3, 31, 12, 0, 0),
-                DateTime(2014, 4, 29, 12, 0, 0),
-                DateTime(2014, 5, 29, 12, 0, 0),
-                DateTime(2014, 6, 27, 12, 0, 0),
-                DateTime(2014, 7, 27, 12, 0, 0),
-                DateTime(2014, 8, 25, 12, 0, 0),
-                DateTime(2014, 9, 24, 12, 0, 0),
-                DateTime(2014, 10, 24, 12, 0, 0),
-                DateTime(2014, 11, 22, 12, 0, 0),
-                DateTime(2014, 12, 22, 12, 0, 0),
-            ],
-            msg="Failed: {} {}".format(rrule, items,),
-        )
+                items = []
+                range = Period(start, end)
+                recur.expand(start, range, items)
+                self.assertEqual(
+                    items,
+                    results,
+                    msg="Failed rule: #{} {}".format(ctr + 1, rule)
+                )

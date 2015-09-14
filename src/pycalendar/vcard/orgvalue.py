@@ -45,7 +45,7 @@ class OrgValue(Value):
 
 
     def parseJSONValue(self, jobject):
-        self.mValue = tuple(jobject)
+        self.mValue = tuple(map(lambda x: x.encode("utf-8"), jobject))
 
 
     def writeJSONValue(self, jobject):

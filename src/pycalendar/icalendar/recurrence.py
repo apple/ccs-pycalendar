@@ -17,6 +17,7 @@
 from pycalendar import xmlutils
 from pycalendar.datetime import DateTime
 from pycalendar.icalendar import definitions, xmldefinitions
+from pycalendar.icalendar.exceptions import TooManyInstancesError
 from pycalendar.period import Period
 from pycalendar.valueutils import ValueMixin
 import cStringIO as StringIO
@@ -385,7 +386,10 @@ class Recurrence(ValueMixin):
 
 
     def setByMonth(self, by):
-        self._setAndclearIfChanged("mByMonth", by[:])
+        # Convert int values in the list to (int, False) L{tuple}'s to match the new API
+        # that includes the leap month indicator
+        items = [(item, False) if isinstance(item, int) else item for item in by]
+        self._setAndclearIfChanged("mByMonth", items)
 
 
     def getByMonthDay(self):
@@ -1013,7 +1017,7 @@ class Recurrence(ValueMixin):
         return result
 
 
-    def expand(self, start, range, items, float_offset=0):
+    def expand(self, start, range, items, float_offset=0, maxInstances=None):
 
         # Have to normalize this to be very sure we are starting with a valid date, as otherwise
         # we could end up looping forever when doing recurrence.
@@ -1039,9 +1043,9 @@ class Recurrence(ValueMixin):
 
             # Simple expansion is one where there is no BYXXX rule part
             if not self.hasBy():
-                self.mFullyCached = self.simpleExpand(start, range, self.mRecurrences, float_offset)
+                self.mFullyCached = self.simpleExpand(start, range, self.mRecurrences, float_offset, maxInstances=maxInstances)
             else:
-                self.mFullyCached = self.complexExpand(start, range, self.mRecurrences, float_offset)
+                self.mFullyCached = self.complexExpand(start, range, self.mRecurrences, float_offset, maxInstances=maxInstances)
 
             # Set cache values
             self.mCached = True
@@ -1058,7 +1062,7 @@ class Recurrence(ValueMixin):
         return limited
 
 
-    def simpleExpand(self, start, range, results, float_offset):
+    def simpleExpand(self, start, range, results, float_offset, maxInstances=None):
 
         if self.mUseUntil:
             float_until = self.mUntil.duplicate()
@@ -1081,6 +1085,8 @@ class Recurrence(ValueMixin):
 
             # Add current one to list
             results.append(start_iter)
+            if maxInstances and len(results) > maxInstances:
+                raise TooManyInstancesError("Too many instances")
 
             # Check limits
             if self.mUseCount:
@@ -1089,7 +1095,7 @@ class Recurrence(ValueMixin):
                     return True
 
 
-    def complexExpand(self, start, range, results, float_offset):
+    def complexExpand(self, start, range, results, float_offset, maxInstances=None):
 
         if self.mUseUntil:
             float_until = self.mUntil.duplicate()
@@ -1129,7 +1135,7 @@ class Recurrence(ValueMixin):
             elif self.mFreq == definitions.eRecurrence_YEARLY:
                 self.generateYearlySet(start_iter, set_items)
 
-            # Ignore if it is invalid
+            # Remove invalid items before BYSETPOS
             def _invalidMap(dt):
                 dt.invalidSkip(self.effectiveSkip())
                 return dt
@@ -1171,6 +1177,8 @@ class Recurrence(ValueMixin):
 
                 # Add current one to list
                 results.append(iter)
+                if maxInstances and len(results) > maxInstances:
+                    raise TooManyInstancesError("Too many instances")
 
                 # Check limits
                 if self.mUseCount:

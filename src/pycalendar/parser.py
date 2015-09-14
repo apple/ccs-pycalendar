@@ -61,6 +61,9 @@ class ParserContext(object):
     # Remove \-escaping in URI values when parsing - only PARSER_FIX or PARSER_ALLOW
     BACKSLASH_IN_URI_VALUE = PARSER_FIX
 
+    # Remove \-escaping in GEO values when parsing - only PARSER_FIX
+    BACKSLASH_IN_GEO_VALUE = PARSER_FIX
+
     @staticmethod
     def allRaise():
         """
@@ -75,4 +78,5 @@ class ParserContext(object):
         ParserContext.INVALID_ADR_N_VALUES = ParserContext.PARSER_RAISE
         ParserContext.INVALID_REQUEST_STATUS_VALUE = ParserContext.PARSER_RAISE
         ParserContext.BACKSLASH_IN_URI_VALUE = ParserContext.PARSER_RAISE
+        ParserContext.BACKSLASH_IN_GEO_VALUE = ParserContext.PARSER_RAISE
         ParserContext.INVALID_REQUEST_STATUS = ParserContext.PARSER_RAISE

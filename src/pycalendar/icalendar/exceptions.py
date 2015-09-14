@@ -1,5 +1,5 @@
 ##
-#    Copyright (c) 2007-2013 Cyrus Daboo. All rights reserved.
+#    Copyright (c) 2015 Cyrus Daboo. All rights reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -14,19 +14,7 @@
 #    limitations under the License.
 ##
 
-from distutils.core import setup, Extension
+from pycalendar.exceptions import ErrorBase
 
-setup (
-    name="pycalendar",
-    version="2.1",
-    description="iCalendar/vCard Library",
-    license="Apache 2.0",
-    platforms=["any"],
-    package_dir={'': 'src'},
-    packages=[
-        'pycalendar',
-        'pycalendar.icalendar',
-        'pycalendar.vcard',
-        'zonal',
-    ]
-)
+class TooManyInstancesError(ErrorBase):
+    pass

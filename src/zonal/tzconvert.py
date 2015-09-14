@@ -53,28 +53,28 @@ class tzconvert(object):
 
     def parse(self, file):
         try:
-            f = open(file, "r")
-            ctr = 0
-            for line in f:
-                ctr += 1
-                line = line[:-1]
-                while True:
-                    if line.startswith("#") or len(line) == 0:
-                        break
-                    elif line.startswith("Rule"):
-                        self.parseRule(line)
-                        break
-                    elif line.startswith("Zone"):
-                        line = self.parseZone(line, f)
-                        if line is None:
+            with open(file, "r") as f:
+                ctr = 0
+                for line in f:
+                    ctr += 1
+                    line = line[:-1]
+                    while True:
+                        if line.startswith("#") or len(line) == 0:
                             break
-                    elif line.startswith("Link"):
-                        self.parseLink(line)
-                        break
-                    elif len(line.strip()) != 0:
-                        assert False, "Could not parse line %d from tzconvert file: '%s'" % (ctr, line,)
-                    else:
-                        break
+                        elif line.startswith("Rule"):
+                            self.parseRule(line)
+                            break
+                        elif line.startswith("Zone"):
+                            line = self.parseZone(line, f)
+                            if line is None:
+                                break
+                        elif line.startswith("Link"):
+                            self.parseLink(line)
+                            break
+                        elif len(line.strip()) != 0:
+                            assert False, "Could not parse line %d from tzconvert file: '%s'" % (ctr, line,)
+                        else:
+                            break
         except:
             print("Failed to parse file %s" % (file,))
             raise
@@ -119,8 +119,8 @@ class tzconvert(object):
     def parseWindowsAliases(self, aliases):
 
         try:
-            xmlfile = open(aliases)
-            xmlroot = XML.ElementTree(file=xmlfile).getroot()
+            with open(aliases) as xmlfile:
+                xmlroot = XML.ElementTree(file=xmlfile).getroot()
         except (IOError, XMLParseError):
             raise ValueError("Unable to open or read windows alias file: {}".format(aliases))
 
@@ -217,7 +217,8 @@ class tzconvert(object):
 
             # Generate link mapping file
             linkPath = os.path.join(outputdir, "links.txt")
-            open(linkPath, "w").write("\n".join(link_list))
+            with open(linkPath, "w") as f:
+                f.write("\n".join(link_list))
 
 
 
