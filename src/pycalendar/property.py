@@ -301,8 +301,8 @@ class PropertyBase(object):
 
             return prop
 
-        except Exception:
-            raise InvalidProperty("Invalid property", data)
+        except Exception as e:
+            raise InvalidProperty("Invalid property", data, cause=e)
 
 
     def parseTextParameters(self, txt, data):

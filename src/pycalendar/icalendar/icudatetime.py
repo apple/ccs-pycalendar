@@ -15,7 +15,8 @@
 ##
 
 from cffi import FFI
-from __builtin__ import classmethod
+from collections import namedtuple
+
 from pycalendar.datetime import DateTime
 from pycalendar.icalendar import definitions
 
@@ -142,6 +143,8 @@ hdr = """
          int32_t              amount,
          UErrorCode*          status);
 
+    void ucal_clear(UCalendar*  cal);
+
     enum UCalendarLimitType {
       /** Minimum value */
       UCAL_MINIMUM,
@@ -178,13 +181,33 @@ class ICUDateTime(object):
     RSCALE_GREGORIAN = "gregorian"
     RSCALE_HEBREW = "hebrew"
 
-    RSCALE_CALCODE = {
+    # Cache known valid RSCALE values. Not sure how we can automatically
+    # extract these from ICU, so for now they are hard-coded. The dict
+    # values are text prefixes used when generating text representations
+    # of the date.
+    VALID_RSCALES = {
         "gregorian": "",
-        "chinese": "C",
+        "japanese": "J",
+        "buddhist": "BT",
+        "roc": "RC",
+        "persian": "P",
         "islamic-civil": "I",
+        "islamic": "I2",
         "hebrew": "H",
+        "chinese": "C",
+        "indian": "IN",
+        "coptic": "CT",
         "ethiopic": "E",
+        "ethiopic-amete-alem": "E2",
+        "iso8601": "I8",
+        "dangi": "D",
+        "islamic-umalqura": "I3",
+        "islamic-tbla": "I4",
+        "islamic-rgsa": "I5",
     }
+
+    # Used to cache day of month, month, and year day limits for each calscale
+    RSCALE_LIMITS = {}
 
     def __init__(self, rscale, ucal):
         """
@@ -214,6 +237,9 @@ class ICUDateTime(object):
     def __del__(self):
         """
         Always close the ICU C{ucal} object.
+
+        FIXME: for PyPy we need to explicitly close all L{ICUDateTime} objects since garbage
+        collection is lazy.
         """
         ICU.ucal_close(self.ucal)
         self.ucal = None
@@ -239,6 +265,10 @@ class ICUDateTime(object):
 
     def __hash__(self):
         return hash(self.getPosixTime())
+
+
+    def __eq__(self, comp):
+        return self.getPosixTime() == comp.getPosixTime()
 
 
     @classmethod
@@ -277,9 +307,70 @@ class ICUDateTime(object):
 
 
     @classmethod
+    def allRSCALEs(cls):
+        """
+        Return the L{list} of known RSCALEs.
+
+        @return: all valid RSCALEs
+        @rtype: L{list}
+        """
+
+        return cls.VALID_RSCALES.keys()
+
+
+    @classmethod
+    def validRSCALE(cls, rscale):
+        """
+        Test to see if the specified calendar scale is valid.
+        We use a cache to maintain known values.
+
+        @param rscale: calendar scale to use
+        @type rscale: L{str}
+
+        @return: L{True} if valid, L{False} if not
+        @rtype: L{bool}
+        """
+
+        return rscale.lower() in cls.VALID_RSCALES
+
+
+    @classmethod
+    def limitsRSCALE(cls, rscale):
+        """
+        Get the day, month, yearday limits for the specified RSCALE to use in bounds
+        checking allowed values.
+
+        @param rscale: calendar scale to use
+        @type rscale: L{str}
+
+        @return: a L{dict} containing keys "monthday", "month" and "yearday"
+        @rtype: L{dict}
+        """
+
+        if rscale not in cls.RSCALE_LIMITS:
+            if rscale is None:
+                # Gregorian limits
+                result = {"monthday": 31, "month": 12, "weekno": 53, "yearday": 366}
+            else:
+                # Fetch limits from ICU
+                result = {}
+                ucal = cls._newUcal(rscale)
+                error = ffi.new("UErrorCode *", 0)
+                result["monthday"] = ICU.ucal_getLimit(ucal, ICU.UCAL_DAY_OF_MONTH, ICU.UCAL_MAXIMUM, error)
+                result["month"] = ICU.ucal_getLimit(ucal, ICU.UCAL_MONTH, ICU.UCAL_MAXIMUM, error) + 1
+                result["weekno"] = ICU.ucal_getLimit(ucal, ICU.UCAL_WEEK_OF_YEAR, ICU.UCAL_MAXIMUM, error)
+                result["yearday"] = ICU.ucal_getLimit(ucal, ICU.UCAL_DAY_OF_YEAR, ICU.UCAL_MAXIMUM, error)
+                ICU.ucal_close(ucal)
+            cls.RSCALE_LIMITS[rscale] = result
+
+        return cls.RSCALE_LIMITS[rscale]
+
+
+    @classmethod
     def _newUcal(cls, rscale):
         """
-        Create an ICU C{ucal} object for the specified calendar scale.
+        Create an ICU C{ucal} object for the specified calendar scale. There needs to be a matching call
+        to ICU.ucal_close to avoid leaking memory.
 
         @param rscale: calendar scale to use
         @type rscale: L{str}
@@ -292,6 +383,7 @@ class ICUDateTime(object):
         ucal = ICU.ucal_open(ffi.NULL, -1, ffi.new("char[]", calsystem), ICU.UCAL_DEFAULT, error)
         if error[0] != ICU.U_ZERO_ERROR:
             raise ValueError("Unable to create ICU calendar for rscale '{}', code: {}".format(rscale, error))
+        ICU.ucal_clear(ucal)
         return ucal
 
 
@@ -330,6 +422,22 @@ class ICUDateTime(object):
         return ICUDateTime(rscale, ucal)
 
 
+    MONTH2ICU = {
+        1: ICU.UCAL_JANUARY,
+        2: ICU.UCAL_FEBRUARY,
+        3: ICU.UCAL_MARCH,
+        4: ICU.UCAL_APRIL,
+        5: ICU.UCAL_MAY,
+        6: ICU.UCAL_JUNE,
+        7: ICU.UCAL_JULY,
+        8: ICU.UCAL_AUGUST,
+        9: ICU.UCAL_SEPTEMBER,
+        10: ICU.UCAL_OCTOBER,
+        11: ICU.UCAL_NOVEMBER,
+        12: ICU.UCAL_DECEMBER,
+        13: ICU.UCAL_UNDECIMBER,
+    }
+
     @classmethod
     def _numericMonthToICU(cls, month):
         """
@@ -341,22 +449,24 @@ class ICUDateTime(object):
         @return: the ICU constant
         @rtype: L{ICU.UCalendarMonths}
         """
-        return {
-            1: ICU.UCAL_JANUARY,
-            2: ICU.UCAL_FEBRUARY,
-            3: ICU.UCAL_MARCH,
-            4: ICU.UCAL_APRIL,
-            5: ICU.UCAL_MAY,
-            6: ICU.UCAL_JUNE,
-            7: ICU.UCAL_JULY,
-            8: ICU.UCAL_AUGUST,
-            9: ICU.UCAL_SEPTEMBER,
-            10: ICU.UCAL_OCTOBER,
-            11: ICU.UCAL_NOVEMBER,
-            12: ICU.UCAL_DECEMBER,
-            13: ICU.UCAL_UNDECIMBER,
-        }[month]
+        return cls.MONTH2ICU[month]
 
+
+    ICU2MONTH = {
+        ICU.UCAL_JANUARY: 1,
+        ICU.UCAL_FEBRUARY: 2,
+        ICU.UCAL_MARCH: 3,
+        ICU.UCAL_APRIL: 4,
+        ICU.UCAL_MAY: 5,
+        ICU.UCAL_JUNE: 6,
+        ICU.UCAL_JULY: 7,
+        ICU.UCAL_AUGUST: 8,
+        ICU.UCAL_SEPTEMBER: 9,
+        ICU.UCAL_OCTOBER: 10,
+        ICU.UCAL_NOVEMBER: 11,
+        ICU.UCAL_DECEMBER: 12,
+        ICU.UCAL_UNDECIMBER: 13,
+    }
 
     @classmethod
     def _icuToNumericMonth(cls, month):
@@ -369,22 +479,24 @@ class ICUDateTime(object):
         @return: the month
         @rtype: L{int}
         """
-        return {
-            ICU.UCAL_JANUARY: 1,
-            ICU.UCAL_FEBRUARY: 2,
-            ICU.UCAL_MARCH: 3,
-            ICU.UCAL_APRIL: 4,
-            ICU.UCAL_MAY: 5,
-            ICU.UCAL_JUNE: 6,
-            ICU.UCAL_JULY: 7,
-            ICU.UCAL_AUGUST: 8,
-            ICU.UCAL_SEPTEMBER: 9,
-            ICU.UCAL_OCTOBER: 10,
-            ICU.UCAL_NOVEMBER: 11,
-            ICU.UCAL_DECEMBER: 12,
-            ICU.UCAL_UNDECIMBER: 13,
-        }[month]
+        return cls.ICU2MONTH[month]
 
+
+    TOICU_HEBREW_MONTH = {
+        (1, False): (1, False),
+        (2, False): (2, False),
+        (3, False): (3, False),
+        (4, False): (4, False),
+        (5, False): (5, False),
+        (5, True): (6, False),
+        (6, False): (7, False),
+        (7, False): (8, False),
+        (8, False): (9, False),
+        (9, False): (10, False),
+        (10, False): (11, False),
+        (11, False): (12, False),
+        (12, False): (13, False),
+    }
 
     @classmethod
     def _adjustToICULeapMonth(cls, rscale, month, isleapmonth):
@@ -406,18 +518,31 @@ class ICUDateTime(object):
         """
 
         if rscale.lower() == cls.RSCALE_HEBREW:
-            if month == 5 and isleapmonth:
-                month = 6
-                isleapmonth = None
-            elif month >= 6:
-                month += 1
-        return (month, isleapmonth,)
+            return cls.TOICU_HEBREW_MONTH[(month, isleapmonth,)]
+        else:
+            return (month, isleapmonth,)
 
+
+    FROMICU_HEBREW_MONTH = {
+        (1, False): (1, False),
+        (2, False): (2, False),
+        (3, False): (3, False),
+        (4, False): (4, False),
+        (5, False): (5, False),
+        (6, False): (5, True),
+        (7, False): (6, False),
+        (8, False): (7, False),
+        (9, False): (8, False),
+        (10, False): (9, False),
+        (11, False): (10, False),
+        (12, False): (11, False),
+        (13, False): (12, False),
+    }
 
     @classmethod
     def _adjustFromICULeapMonth(cls, rscale, month, isleapmonth):
         """
-        For the Hebrew calendar, ISU uses a count of 13 months rather than 12 months
+        For the Hebrew calendar, ICU uses a count of 13 months rather than 12 months
         plus an "isleapmonth" indicator. So when converting to/from ICU we need to make
         that adjustment as we always use 12 months + isleapmonth. This method converts
         to our internal representation from what ICU uses.
@@ -434,12 +559,9 @@ class ICUDateTime(object):
         """
 
         if rscale.lower() == cls.RSCALE_HEBREW:
-            isleapmonth = False
-            if month == 6:
-                isleapmonth = True
-            elif month >= 6:
-                month -= 1
-        return (month, isleapmonth,)
+            return cls.FROMICU_HEBREW_MONTH[(month, isleapmonth,)]
+        else:
+            return (month, isleapmonth,)
 
 
     @classmethod
@@ -492,12 +614,13 @@ class ICUDateTime(object):
         @return: the date components
         @rtype: L{tuple} of (L{int}, L{int}, L{int}, L{bool})
         """
-        year = self.getYear()
-        month = self.getMonth()
-        day = self.getDay()
-        isleapmonth = self.getLeapMonth()
 
+        error = ffi.new("UErrorCode *", 0)
+        year = ICU.ucal_get(self.ucal, ICU.UCAL_EXTENDED_YEAR, error)
+        month = self._icuToNumericMonth(ICU.ucal_get(self.ucal, ICU.UCAL_MONTH, error))
+        isleapmonth = ICU.ucal_get(self.ucal, ICU.UCAL_IS_LEAP_MONTH, error) != 0
         month, isleapmonth = self._adjustFromICULeapMonth(self.rscale, month, isleapmonth)
+        day = ICU.ucal_get(self.ucal, ICU.UCAL_DAY_OF_MONTH, error)
 
         return (year, month, day, isleapmonth,)
 
@@ -525,7 +648,6 @@ class ICUDateTime(object):
         self.setYear(year)
         self.setMonth(month, isleapmonth)
         self.setDay(day)
-
         self.testInvalid(year, month, day, isleapmonth)
 
 
@@ -553,13 +675,17 @@ class ICUDateTime(object):
 
     def getMonth(self):
         error = ffi.new("UErrorCode *", 0)
-        return self._icuToNumericMonth(ICU.ucal_get(self.ucal, ICU.UCAL_MONTH, error))
+        month = self._icuToNumericMonth(ICU.ucal_get(self.ucal, ICU.UCAL_MONTH, error))
+        isleapmonth = ICU.ucal_get(self.ucal, ICU.UCAL_IS_LEAP_MONTH, error) != 0
+        month, isleapmonth = self._adjustFromICULeapMonth(self.rscale, month, isleapmonth)
+        return month
 
 
     def setMonth(self, month, isleapmonth=False):
+        adjusted_month, adjusted_isleapmonth = self._adjustToICULeapMonth(self.rscale, month, isleapmonth)
         old_year, _ignore_old_month, old_day, _ignore_old_isleapmonth = self.getDateComponents()
-        ICU.ucal_set(self.ucal, ICU.UCAL_MONTH, self._numericMonthToICU(month))
-        ICU.ucal_set(self.ucal, ICU.UCAL_IS_LEAP_MONTH, isleapmonth)
+        ICU.ucal_set(self.ucal, ICU.UCAL_MONTH, self._numericMonthToICU(adjusted_month))
+        ICU.ucal_set(self.ucal, ICU.UCAL_IS_LEAP_MONTH, adjusted_isleapmonth)
         self.testInvalid(old_year, month, old_day, isleapmonth)
 
 
@@ -576,7 +702,10 @@ class ICUDateTime(object):
 
     def getLeapMonth(self):
         error = ffi.new("UErrorCode *", 0)
-        return ICU.ucal_get(self.ucal, ICU.UCAL_IS_LEAP_MONTH, error) != 0
+        month = self._icuToNumericMonth(ICU.ucal_get(self.ucal, ICU.UCAL_MONTH, error))
+        isleapmonth = ICU.ucal_get(self.ucal, ICU.UCAL_IS_LEAP_MONTH, error) != 0
+        month, isleapmonth = self._adjustFromICULeapMonth(self.rscale, month, isleapmonth)
+        return isleapmonth
 
 
     def getDay(self):
@@ -861,10 +990,11 @@ class ICUDateTime(object):
 
     # When doing recurrence iteration we sometimes need to preserve an invalid value for
     # either day or month (though month is never invalid for Gregorian calendars it can
-    # be for non-Gregorian). For this class we simply set the stored attributes to their
-    # invalid values.
+    # be for non-Gregorian).
+    YYMMDDLL = namedtuple("YYMMDDLL", ("year", "month", "day", "isleapmonth"))
+
     def setInvalid(self, year, month, day, isleapmonth=False):
-        self.mInvalid = (year, month, day, isleapmonth,)
+        self.mInvalid = self.YYMMDDLL(year, month, day, isleapmonth,)
 
 
     def testInvalid(self, year, month, day, isleapmonth=False):
@@ -894,39 +1024,67 @@ class ICUDateTime(object):
         return self.mInvalid is not None
 
 
-    def invalidSkip(self, skip):
+    def invalidSkip(self, skip, monthly=False):
         """
-        If this is an invalid value skip backward or forward or not at all.
+        If this is an invalid value skip backward or forward or not at all. We need to take into account which
+        component (day or month) is invalid to match with the request skip behavior (skip can be done on the
+        month - if L{monthly} is L{True} - or on the day - if L{monthly} is L{False}.
 
-        @param skip: the skip mode (yes, backward, forward)
+        Note that for a monthly skip, the resulting L{ICUDateTime} may have an invalid day component.
+
+        @param skip: the skip mode (omit, backward, forward)
         @type skip: L{int}
+        @param monthly: skip by month if L{True}, otherwise by day
+        @type monthly: L{bool}
+
+        @return: L{True} if a skip was done, L{False} if not
+        @rtype: L{bool}
         """
 
-        if self.mInvalid:
-            if skip == definitions.eRecurrence_SKIP_YES:
-                # Leave it as invalid
-                pass
-            else:
-                # Need to determine which component (day or month/leap) is invalid,
-                # and react accordingly
-                _ignore_y, m, d, l = self.getDateComponents()
-                if (m, l) != (self.mInvalid[1], self.mInvalid[3]):
-                    # Month/leap is invalid
-                    if skip == definitions.eRecurrence_SKIP_BACKWARD:
-                        # Defaults to skip backward
-                        pass
-                    elif skip == definitions.eRecurrence_SKIP_FORWARD:
-                        self.offsetDay(1)
+        if self.mInvalid is not None:
+            # Need to determine which component (day or month/leap) is invalid,
+            # and react accordingly
+            y, _ignore_m, _ignore_d, _ignore_l = self.getDateComponents()
 
-                elif d != self.mInvalid[2]:
+            # Create a new date with the same year and month/leap, but day set to 1 - that will
+            # determine whether the month is invalid
+            ucal_test = self.duplicate()
+            ucal_test.setYYMMDD(self.mInvalid.year, self.mInvalid.month, 1, self.mInvalid.isleapmonth)
+            _ignore_y, test_m, _ignore_d, test_l = ucal_test.getDateComponents()
+            invalid_month = test_m != self.mInvalid.month or test_l != self.mInvalid.isleapmonth
+
+            # Only skip when the relevant component is being tested
+            if monthly == invalid_month:
+
+                if skip == definitions.eRecurrence_SKIP_OMIT:
+                    # Leave it as invalid
+                    return False
+                else:
+
                     if skip == definitions.eRecurrence_SKIP_BACKWARD:
-                        if self.mInvalid[2] < 1:
+                        if monthly:
+                            # Bump to the month before the bogus leap month
+                            self.setYYMMDD(y, self.mInvalid.month, self.mInvalid.day, False)
+                        else:
+                            day = self.mInvalid.day
+                            self.setYYMMDD(y, self.mInvalid.month, 1, self.mInvalid.isleapmonth)
+                            if day > 0:
+                                self.offsetMonth(1)
                             self.offsetDay(-1)
-                    elif skip == definitions.eRecurrence_SKIP_FORWARD:
-                        if self.mInvalid[2] > 0:
-                            self.offsetDay(1)
+                            self.clearInvalid()
 
-                self.clearInvalid()
+                    elif skip == definitions.eRecurrence_SKIP_FORWARD:
+                        if monthly:
+                            # Bump to the month after the bogus leap month
+                            self.setYYMMDD(y, self.mInvalid.month + 1, self.mInvalid.day, False)
+                        else:
+                            day = self.mInvalid.day
+                            self.setYYMMDD(y, self.mInvalid.month, 1, self.mInvalid.isleapmonth)
+                            if day > 0:
+                                self.offsetMonth(1)
+                            self.clearInvalid()
+
+        return True
 
 
     def normalise(self):
@@ -971,7 +1129,7 @@ class ICUDateTime(object):
         @return: the ISO-8601 text
         @rtype L{str}
         """
-        calcode = self.RSCALE_CALCODE.get(self.rscale.lower(), "{}:".format(self.rscale))
+        calcode = self.VALID_RSCALES.get(self.rscale.lower(), "{}:".format(self.rscale))
         if calcode:
             calcode = "{{{}}}".format(calcode)
         year, month, day, isleapmonth = self.getDateComponents()
@@ -982,14 +1140,14 @@ class ICUDateTime(object):
 
 
 if __name__ == '__main__':
-    newyear = ICUDateTime.fromDateComponents("chinese", 4651, 1, 1, False)
+    newyear = ICUDateTime.fromDateComponents("chinese", 4653, 1, 30, False)
     print("From: {} to {}".format(
         newyear.getText(),
         newyear.convertTo("gregorian").getText(),
     ))
 
-    for i in range(0):
-        newyear.offsetDay(1)
+    for i in range(3):
+        newyear.offsetYear(1)
         print("From: {} to {}".format(
             newyear.getText(),
             newyear.convertTo("gregorian").getText(),

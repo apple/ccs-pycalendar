@@ -23,9 +23,9 @@ import unittest
 
 class MonthlySkips(object):
 
-    def testMonthlySkipYes(self):
+    def testMonthlySkipOmit(self):
 
-        riter = RecurrenceIterator(self.dt, definitions.eRecurrence_MONTHLY, 1, rscale=self.rscale, skip=definitions.eRecurrence_SKIP_YES)
+        riter = RecurrenceIterator(self.dt, definitions.eRecurrence_MONTHLY, 1, rscale=self.rscale, skip=definitions.eRecurrence_SKIP_OMIT)
         results = [riter.next().getText() for _ in range(12)]
         self.assertEqual(
             results,
@@ -136,9 +136,9 @@ class TestMonthlyGregorianICU(unittest.TestCase, MonthlySkips):
 
 class YearlySkipsOnLeapDay(object):
 
-    def testYearlySkipYes(self):
+    def testYearlySkipOmit(self):
 
-        riter = RecurrenceIterator(self.dt, definitions.eRecurrence_YEARLY, 1, rscale=self.rscale, skip=definitions.eRecurrence_SKIP_YES)
+        riter = RecurrenceIterator(self.dt, definitions.eRecurrence_YEARLY, 1, rscale=self.rscale, skip=definitions.eRecurrence_SKIP_OMIT)
         results = [riter.next().getText() for _ in range(5)]
         self.assertEqual(
             results,
@@ -203,10 +203,10 @@ class TestYearlyGregorianICU(unittest.TestCase, YearlySkipsOnLeapDay):
 
 class TestMonthlyChineseICU(unittest.TestCase):
 
-    def testMonthlyStartInLeapYearSkipYes(self):
+    def testMonthlyStartInLeapYearSkipOmit(self):
         dt = ICUDateTime.fromDateComponents("chinese", 4650, 12, 30)
 
-        riter = RecurrenceIterator(dt, definitions.eRecurrence_MONTHLY, 1, rscale=None, skip=definitions.eRecurrence_SKIP_YES)
+        riter = RecurrenceIterator(dt, definitions.eRecurrence_MONTHLY, 1, rscale=None, skip=definitions.eRecurrence_SKIP_OMIT)
         results = []
         while True:
             result = riter.next()
@@ -384,10 +384,10 @@ class TestMonthlyChineseICU(unittest.TestCase):
         )
 
 
-    def testMonthlyRscaleStartInLeapYearSkipYes(self):
+    def testMonthlyRscaleStartInLeapYearSkipOmit(self):
         dt = ICUDateTime.fromDateComponents("chinese", 4650, 12, 30).toDateTime()
 
-        riter = RecurrenceIterator(dt, definitions.eRecurrence_MONTHLY, 1, rscale="chinese", skip=definitions.eRecurrence_SKIP_YES)
+        riter = RecurrenceIterator(dt, definitions.eRecurrence_MONTHLY, 1, rscale="chinese", skip=definitions.eRecurrence_SKIP_OMIT)
         results = []
         while True:
             result = riter.next()

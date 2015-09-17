@@ -16,9 +16,10 @@
 
 class ErrorBase(Exception):
 
-    def __init__(self, reason, data=""):
+    def __init__(self, reason, data="", cause=None):
         self.mReason = reason
         self.mData = data
+        self.mCause = cause
 
 
 

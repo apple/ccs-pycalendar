@@ -17,12 +17,44 @@
 
 import unittest
 from pycalendar.datetime import DateTime
+from pycalendar.icalendar import definitions
 from pycalendar.icalendar.icudatetime import ICUDateTime
 
 class TestICUDateTime(unittest.TestCase):
     """
     Test L{ICUDateTime}
     """
+
+    def testValidRscale(self):
+
+        data_rscale = (
+            ("gregorian", True,),
+            ("chinese", True,),
+            ("foo", False,),
+            ("gregorian", True,),
+            ("chinese", True,),
+            ("foo", False,),
+        )
+
+        for rscale, result in data_rscale:
+            valid = ICUDateTime.validRSCALE(rscale)
+            self.assertEqual(valid, result, "Failed on: %s" % (rscale,))
+
+
+    def testLimitsRscale(self):
+
+        data_rscale = (
+            (None, {"monthday": 31, "month": 12, "weekno": 53, "yearday": 366},),
+            ("gregorian", {"monthday": 31, "month": 12, "weekno": 53, "yearday": 366},),
+            ("chinese", {"monthday": 30, "month": 12, "weekno": 55, "yearday": 385},),
+            ("ethiopic", {"monthday": 30, "month": 13, "weekno": 53, "yearday": 366},),
+            ("hebrew", {"monthday": 30, "month": 13, "weekno": 56, "yearday": 385},),
+        )
+
+        for rscale, result in data_rscale:
+            limit = ICUDateTime.limitsRSCALE(rscale)
+            self.assertEqual(limit, result, "Failed on: %s: %s" % (rscale, limit))
+
 
     def testRoundtripDateText(self):
 
@@ -91,17 +123,23 @@ class TestICUDateTime(unittest.TestCase):
     def testSetMonth(self):
 
         data_date = (
-            ("gregorian", 2012, 1, 2, False, 2, "20120202", False,),
-            ("gregorian", 2012, 1, 29, False, 2, "20120229", False,),
-            ("gregorian", 2012, 1, 31, False, 2, "20120302", True,),
-            ("gregorian", 2012, 2, 29, False, 3, "20120329", False,),
+            ("gregorian", 2012, 1, 2, False, 2, False, "20120202", False,),
+            ("gregorian", 2012, 1, 29, False, 2, False, "20120229", False,),
+            ("gregorian", 2012, 1, 31, False, 2, False, "20120302", True,),
+            ("gregorian", 2012, 2, 29, False, 3, False, "20120329", False,),
+            ("chinese", 4651, 1, 1, False, 9, False, "{C}46510901", False,),
+            ("chinese", 4651, 1, 1, False, 9, True, "{C}465109L01", False,),
+            ("chinese", 4651, 1, 1, False, 10, False, "{C}46511001", False,),
+            ("hebrew", 5774, 1, 1, False, 5, False, "{H}57740501", False,),
+            ("hebrew", 5774, 1, 1, False, 5, True, "{H}577405L01", False,),
+            ("hebrew", 5774, 1, 1, False, 6, False, "{H}57740601", False,),
         )
 
-        for rscale, y, m, d, l, month, result, result_invalid in data_date:
+        for rscale, y, m, d, l, month, leapmonth, result, result_invalid in data_date:
             dt = ICUDateTime.fromDateComponents(rscale, y, m, d, l)
-            dt.setMonth(month)
-            self.assertEqual(dt.getText(), result, "Failed on: {} {} {}".format(month, result, result_invalid,))
-            self.assertEqual(dt.invalid(), result_invalid, "Failed invalid on: {} {} {}".format(month, result, result_invalid,))
+            dt.setMonth(month, leapmonth)
+            self.assertEqual(dt.getText(), result, "Failed on: {} {} {} {}".format(month, leapmonth, result, result_invalid,))
+            self.assertEqual(dt.invalid(), result_invalid, "Failed invalid on: {} {} {} {}".format(month, leapmonth, result, result_invalid,))
 
 
     def testOffsetMonth(self):
@@ -223,3 +261,40 @@ class TestICUDateTime(unittest.TestCase):
             dt = ICUDateTime.fromDateComponents(rscale, y, m, d, l)
             dt.setDayOfWeekInYear(offset, day)
             self.assertEqual(dt.getText(), result, "Failed on: {} vs {}".format(result, dt.getText(),))
+
+
+    def testSkip(self):
+
+        data_date = (
+            ("gregorian", 2015, 2, 29, False, definitions.eRecurrence_SKIP_BACKWARD, False, "20150228",),
+            ("gregorian", 2015, 2, 29, False, definitions.eRecurrence_SKIP_FORWARD, False, "20150301",),
+            ("gregorian", 2015, 2, 29, False, definitions.eRecurrence_SKIP_OMIT, False, None,),
+            ("gregorian", 2015, 2, 29, False, definitions.eRecurrence_SKIP_BACKWARD, True, None,),
+            ("gregorian", 2015, 2, 29, False, definitions.eRecurrence_SKIP_FORWARD, True, None,),
+            ("gregorian", 2015, 2, 29, False, definitions.eRecurrence_SKIP_OMIT, True, None,),
+            ("chinese", 4652, 9, 2, True, definitions.eRecurrence_SKIP_BACKWARD, False, None,),
+            ("chinese", 4652, 9, 2, True, definitions.eRecurrence_SKIP_FORWARD, False, None,),
+            ("chinese", 4652, 9, 2, True, definitions.eRecurrence_SKIP_OMIT, False, None,),
+            ("chinese", 4652, 9, 2, True, definitions.eRecurrence_SKIP_BACKWARD, True, "{C}46520902",),
+            ("chinese", 4652, 9, 2, True, definitions.eRecurrence_SKIP_FORWARD, True, "{C}46521002",),
+            ("chinese", 4652, 9, 2, True, definitions.eRecurrence_SKIP_OMIT, True, None,),
+        )
+
+        ctr = 0
+        for rscale, y, m, d, l, skip, skip_monthly, result in data_date:
+            ctr += 1
+            dt = DateTime.getToday()
+            udt = ICUDateTime.fromDateTime(dt, rscale)
+            udt.setYYMMDD(y, m, d, l)
+            self.assertEqual(udt.invalid(), True)
+            udt.invalidSkip(skip, skip_monthly)
+            test_value = udt.getText() if not udt.invalid() else None
+            self.assertEqual(test_value, result, msg="Failed: #{} {} vs {}".format(ctr, test_value, result))
+
+
+    def testDuplicates(self):
+
+        dt1 = ICUDateTime.fromDateComponents("gregorian", 2011, 1, 2, False)
+        dt2 = ICUDateTime.fromDateComponents("gregorian", 2011, 1, 2, False)
+        dt3 = ICUDateTime.fromDateComponents("gregorian", 2011, 1, 3, False)
+        self.assertEqual(len(set((dt1, dt2, dt3,))), 2)

@@ -56,7 +56,7 @@ class TestRecurrence(unittest.TestCase):
 
         # RSCALE
         "RSCALE=CHINESE;FREQ=DAILY",
-        "RSCALE=GREGORIAN;FREQ=YEARLY;COUNT=400;SKIP=YES",
+        "RSCALE=GREGORIAN;FREQ=YEARLY;COUNT=400;SKIP=OMIT",
         "RSCALE=GREGORIAN;FREQ=YEARLY;COUNT=400;SKIP=BACKWARD",
         "RSCALE=GREGORIAN;FREQ=YEARLY;COUNT=400;SKIP=FORWARD",
         "RSCALE=CHINESE;FREQ=YEARLY;BYMONTH=5,6,6L,7",
@@ -89,6 +89,7 @@ class TestRecurrence(unittest.TestCase):
             "FREQ=MONTHLY;BYHOUR=54",
             "FREQ=MONTHLY;SKIP=YES",
             "RSCALE=CHINESE;FREQ=MONTHLY;SKIP=NO",
+            "RSCALE=CHINESE;FREQ=MONTHLY;SKIP=YES",
         )
 
         for item in items:
@@ -207,7 +208,7 @@ class TestRecurrence(unittest.TestCase):
 
             rules = [i["rule"]]
             if "RSCALE" not in rules[0]:
-                rules.append("RSCALE=GREGORIAN;{};SKIP=YES".format(rules[0]))
+                rules.append("RSCALE=GREGORIAN;{};SKIP=OMIT".format(rules[0]))
             for rule in rules:
                 recur = Recurrence()
                 recur.parse(rule)
@@ -221,8 +222,41 @@ class TestRecurrence(unittest.TestCase):
                 self.assertEqual(
                     items,
                     results,
-                    msg="Failed rule: #{} {}".format(ctr + 1, rule)
+                    msg="Failed rule: #{ctr} {rule}: {items}".format(ctr=ctr + 1, rule=rule, items=items)
                 )
+
+
+    def testLimitWithUntilAndCount(self):
+
+        recur = Recurrence()
+        recur.parse("FREQ=WEEKLY;UNTIL=20130110")
+
+        start = DateTime(2013, 1, 1, 0, 0, 0)
+        end = DateTime(2013, 1, 9, 0, 0, 0)
+        range = Period(start, end)
+        items = []
+        limited = recur.expand(start, range, items)
+        self.assertFalse(limited)
+
+        recur = Recurrence()
+        recur.parse("FREQ=WEEKLY;UNTIL=20130110")
+
+        start = DateTime(2013, 1, 1, 0, 0, 0)
+        end = DateTime(2013, 1, 11, 0, 0, 0)
+        range = Period(start, end)
+        items = []
+        limited = recur.expand(start, range, items)
+        self.assertFalse(limited)
+
+        recur = Recurrence()
+        recur.parse("FREQ=WEEKLY;UNTIL=20130110")
+
+        start = DateTime(2013, 1, 1, 0, 0, 0)
+        end = DateTime(2013, 1, 6, 0, 0, 0)
+        range = Period(start, end)
+        items = []
+        limited = recur.expand(start, range, items)
+        self.assertTrue(limited)
 
 
     def testClearOnChange(self):
@@ -257,7 +291,6 @@ class TestRecurrenceRscale(unittest.TestCase):
             examples = json.loads(f.read())
 
         for ctr, i in enumerate(examples):
-
             for rule in i["rule"]:
                 recur = Recurrence()
                 recur.parse(rule)
@@ -271,5 +304,5 @@ class TestRecurrenceRscale(unittest.TestCase):
                 self.assertEqual(
                     items,
                     results,
-                    msg="Failed rule: #{} {}".format(ctr + 1, rule)
+                    msg="Failed rule: #{ctr} {rule}: {items}".format(ctr=ctr + 1, rule=rule, items=items)
                 )

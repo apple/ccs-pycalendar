@@ -17,12 +17,14 @@
 from pycalendar import xmlutils
 from pycalendar.datetime import DateTime
 from pycalendar.icalendar import definitions, xmldefinitions
-from pycalendar.icalendar.exceptions import TooManyInstancesError
+from pycalendar.icalendar.exceptions import TooManyInstancesError, InvalidRscaleError
+from pycalendar.icalendar.icudatetime import ICUDateTime
+from pycalendar.icalendar.recuriter import RecurrenceIterator
 from pycalendar.period import Period
 from pycalendar.valueutils import ValueMixin
+
 import cStringIO as StringIO
 import xml.etree.cElementTree as XML
-from pycalendar.icalendar.recuriter import RecurrenceIterator
 
 def WeekDayNumCompare_compare(w1, w2):
 
@@ -101,7 +103,7 @@ class Recurrence(ValueMixin):
     cWeekdayRecurMap = dict([(v, k) for k, v in cWeekdayMap.items()])
 
     cSkipMap = {
-        definitions.cICalValue_RECUR_SKIP_YES       : definitions.eRecurrence_SKIP_YES,
+        definitions.cICalValue_RECUR_SKIP_OMIT       : definitions.eRecurrence_SKIP_OMIT,
         definitions.cICalValue_RECUR_SKIP_BACKWARD  : definitions.eRecurrence_SKIP_BACKWARD,
         definitions.cICalValue_RECUR_SKIP_FORWARD   : definitions.eRecurrence_SKIP_FORWARD,
     }
@@ -109,7 +111,7 @@ class Recurrence(ValueMixin):
     cSkipInverseMap = dict([(v, k) for k, v in cSkipMap.items()])
 
     cSkipToXMLMap = {
-        definitions.eRecurrence_SKIP_YES: xmldefinitions.recur_skip_yes,
+        definitions.eRecurrence_SKIP_OMIT: xmldefinitions.recur_skip_omit,
         definitions.eRecurrence_SKIP_BACKWARD: xmldefinitions.recur_skip_backward,
         definitions.eRecurrence_SKIP_FORWARD: xmldefinitions.recur_skip_forward,
     }
@@ -312,6 +314,8 @@ class Recurrence(ValueMixin):
 
 
     def setRscale(self, rscale):
+        if not ICUDateTime.validRSCALE(rscale):
+            raise InvalidRscaleError(rscale)
         self._setAndclearIfChanged("mRscale", rscale)
 
 
@@ -371,10 +375,7 @@ class Recurrence(ValueMixin):
         """
         The default skip value depends on whether RSCALE is used or not
         """
-        if self.mSkip is None:
-            return definitions.eRecurrence_SKIP_YES if self.mRscale is None else definitions.eRecurrence_SKIP_BACKWARD
-        else:
-            return self.mSkip
+        return definitions.eRecurrence_SKIP_OMIT if self.mSkip is None else self.mSkip
 
 
     def setSkip(self, skip):
@@ -517,25 +518,25 @@ class Recurrence(ValueMixin):
                 if self.mByMonthDay is not None:
                     raise ValueError("Recurrence: Only one BYMONTHDAY allowed")
                 self.mByMonthDay = []
-                self.parseList(tvalue, self.mByMonthDay, 1, 31, True, errmsg="Recurrence: Invalid BYMONTHDAY value")
+                self.parseList(tvalue, self.mByMonthDay, 1, ICUDateTime.limitsRSCALE(self.mRscale)["monthday"], True, errmsg="Recurrence: Invalid BYMONTHDAY value")
 
             elif index == definitions.eRecurrence_BYYEARDAY:
                 if self.mByYearDay is not None:
                     raise ValueError("Recurrence: Only one BYYEARDAY allowed")
                 self.mByYearDay = []
-                self.parseList(tvalue, self.mByYearDay, 1, 366, True, errmsg="Recurrence: Invalid BYYEARDAY value")
+                self.parseList(tvalue, self.mByYearDay, 1, ICUDateTime.limitsRSCALE(self.mRscale)["yearday"], True, errmsg="Recurrence: Invalid BYYEARDAY value")
 
             elif index == definitions.eRecurrence_BYWEEKNO:
                 if self.mByWeekNo is not None:
                     raise ValueError("Recurrence: Only one BYWEEKNO allowed")
                 self.mByWeekNo = []
-                self.parseList(tvalue, self.mByWeekNo, 1, 53, True, errmsg="Recurrence: Invalid BYWEEKNO value")
+                self.parseList(tvalue, self.mByWeekNo, 1, ICUDateTime.limitsRSCALE(self.mRscale)["weekno"], True, errmsg="Recurrence: Invalid BYWEEKNO value")
 
             elif index == definitions.eRecurrence_BYMONTH:
                 if self.mByMonth is not None:
                     raise ValueError("Recurrence: Only one BYMONTH allowed")
                 self.mByMonth = []
-                self.parseMonthNumList(tvalue, self.mByMonth, 1, 12, errmsg="Recurrence: Invalid BYMONTH value")
+                self.parseMonthNumList(tvalue, self.mByMonth, 1, ICUDateTime.limitsRSCALE(self.mRscale)["month"], errmsg="Recurrence: Invalid BYMONTH value")
 
             elif index == definitions.eRecurrence_BYSETPOS:
                 if self.mBySetPos is not None:
@@ -551,6 +552,8 @@ class Recurrence(ValueMixin):
 
             elif index == definitions.eRecurrence_RSCALE:
                 self.mRscale = tvalue.upper()
+                if not ICUDateTime.validRSCALE(self.mRscale):
+                    raise InvalidRscaleError(self.mRscale)
 
             elif index == definitions.eRecurrence_SKIP:
                 # Get the SKIP value
@@ -1074,25 +1077,25 @@ class Recurrence(ValueMixin):
         while True:
             start_iter = riter.next()
 
+            # Exit if next item is after until (it is OK if it is the same as
+            # UNTIL as UNTIL is inclusive)
+            if self.mUseUntil and start_iter > float_until:
+                return True
+
             # Exit if after period we want
             if range.isDateAfterPeriod(start_iter):
                 return False
-            elif self.mUseUntil:
-                # Exit if next item is after until (it is OK if it is the same as
-                # UNTIL as UNTIL is inclusive)
-                if start_iter > float_until:
-                    return True
 
             # Add current one to list
             results.append(start_iter)
+
+            # Check maximum limit
             if maxInstances and len(results) > maxInstances:
                 raise TooManyInstancesError("Too many instances")
 
-            # Check limits
-            if self.mUseCount:
-                # Exit if max count reached
-                if len(results) >= self.mCount:
-                    return True
+            # Check count limit and exit if max count reached
+            if self.mUseCount and len(results) >= self.mCount:
+                return True
 
 
     def complexExpand(self, start, range, results, float_offset, maxInstances=None):
@@ -1135,16 +1138,8 @@ class Recurrence(ValueMixin):
             elif self.mFreq == definitions.eRecurrence_YEARLY:
                 self.generateYearlySet(start_iter, set_items)
 
-            # Remove invalid items before BYSETPOS
-            def _invalidMap(dt):
-                dt.invalidSkip(self.effectiveSkip())
-                return dt
-            set_items = map(lambda x: _invalidMap(x), set_items)
-            set_items = filter(lambda x: not x.invalid(), set_items)
-
-            # Always sort the set as BYxxx rules may not be sorted
-            # set_items.sort(cmp=DateTime.sort)
-            set_items.sort(key=lambda x: x.getPosixTime())
+            # Always de-duplicate and sort the set as BYxxx rules may not be sorted
+            set_items = sorted(set(set_items), key=lambda x: x.getPosixTime())
 
             if (self.mBySetPos is not None) and (len(self.mBySetPos) != 0):
                 set_items[:] = self.bySetPosLimit(set_items)
@@ -1164,27 +1159,25 @@ class Recurrence(ValueMixin):
                 if iter < start:
                     continue
 
+                # Exit if next item is after until (its OK if its the same
+                # as UNTIL as UNTIL is inclusive)
+                if self.mUseUntil and iter > float_until:
+                    return True
+
                 # Exit if after period we want
                 if range.isDateAfterPeriod(iter):
                     return False
 
-                # Exit if beyond the UNTIL limit
-                elif self.mUseUntil:
-                    # Exit if next item is after until (its OK if its the same
-                    # as UNTIL as UNTIL is inclusive)
-                    if iter > float_until:
-                        return True
-
                 # Add current one to list
                 results.append(iter)
+
+                # Check maximum limit
                 if maxInstances and len(results) > maxInstances:
                     raise TooManyInstancesError("Too many instances")
 
-                # Check limits
-                if self.mUseCount:
-                    # Exit if max count reached
-                    if len(results) >= self.mCount:
-                        return True
+                # Check count limit and exit if max count reached
+                if self.mUseCount and len(results) >= self.mCount:
+                    return True
 
 
     def clear(self):
@@ -1225,6 +1218,10 @@ class Recurrence(ValueMixin):
         self.clear()
 
 
+    def applySkip(self, items, monthly):
+        items[:] = filter(lambda x: x.invalidSkip(self.effectiveSkip(), monthly), items)
+
+
     def generateYearlySet(self, start, items):
         # All possible BYxxx are valid, though some combinations are not
 
@@ -1233,6 +1230,7 @@ class Recurrence(ValueMixin):
 
         if (self.mByMonth is not None) and (len(self.mByMonth) != 0):
             items[:] = self.byMonthExpand(items)
+        self.applySkip(items, True)
 
         if (self.mByWeekNo is not None) and (len(self.mByWeekNo) != 0):
             items[:] = self.byWeekNoExpand(items)
@@ -1259,6 +1257,7 @@ class Recurrence(ValueMixin):
                 items[:] = self.byDayExpandMonthly(items)
             else:
                 items[:] = self.byDayExpandYearly(items)
+        self.applySkip(items, False)
 
         if (self.mByHours is not None) and (len(self.mByHours) != 0):
             items[:] = self.byHourExpand(items)
@@ -1281,6 +1280,7 @@ class Recurrence(ValueMixin):
             items[:] = self.byMonthLimit(items)
             if (len(items) == 0):
                 return
+        self.applySkip(items, True)
 
         # No BYWEEKNO
 
@@ -1301,6 +1301,7 @@ class Recurrence(ValueMixin):
                 items[:] = self.byDayLimit(items)
             else:
                 items[:] = self.byDayExpandMonthly(items)
+        self.applySkip(items, False)
 
         if ((self.mByHours is not None) and (len(self.mByHours) != 0)):
             items[:] = self.byHourExpand(items)
@@ -1323,6 +1324,7 @@ class Recurrence(ValueMixin):
             items[:] = self.byMonthLimit(items)
             if (len(items) == 0):
                 return
+        self.applySkip(items, True)
 
         if (self.mByWeekNo is not None) and (len(self.mByWeekNo) != 0):
             items[:] = self.byWeekNoLimit(items)
@@ -1335,6 +1337,7 @@ class Recurrence(ValueMixin):
 
         if (self.mByDay is not None) and (len(self.mByDay) != 0):
             items[:] = self.byDayExpandWeekly(items)
+        self.applySkip(items, False)
 
         if (self.mByHours is not None) and (len(self.mByHours) != 0):
             items[:] = self.byHourExpand(items)
@@ -1357,6 +1360,7 @@ class Recurrence(ValueMixin):
             items[:] = self.byMonthLimit(items)
             if (len(items) == 0):
                 return
+        self.applySkip(items, True)
 
         if (self.mByWeekNo is not None) and (len(self.mByWeekNo) != 0):
             items[:] = self.byWeekNoLimit(items)
@@ -1374,6 +1378,7 @@ class Recurrence(ValueMixin):
             items[:] = self.byDayLimit(items)
             if (len(items) == 0):
                 return
+        self.applySkip(items, False)
 
         if (self.mByHours is not None) and (len(self.mByHours) != 0):
             items[:] = self.byHourExpand(items)
@@ -1396,6 +1401,7 @@ class Recurrence(ValueMixin):
             items[:] = self.byMonthLimit(items)
             if (len(items) == 0):
                 return
+        self.applySkip(items, True)
 
         if (self.mByWeekNo is not None) and (len(self.mByWeekNo) != 0):
             items[:] = self.byWeekNoLimit(items)
@@ -1413,6 +1419,7 @@ class Recurrence(ValueMixin):
             items[:] = self.byDayLimit(items)
             if (len(items) == 0):
                 return
+        self.applySkip(items, False)
 
         if (self.mByHours is not None) and (len(self.mByHours) != 0):
             items[:] = self.byHourLimit(items)
@@ -1437,6 +1444,7 @@ class Recurrence(ValueMixin):
             items[:] = self.byMonthLimit(items)
             if (len(items) == 0):
                 return
+        self.applySkip(items, True)
 
         if (self.mByWeekNo is not None) and (len(self.mByWeekNo) != 0):
             items[:] = self.byWeekNoLimit(items)
@@ -1454,6 +1462,7 @@ class Recurrence(ValueMixin):
             items[:] = self.byDayLimit(items)
             if (len(items) == 0):
                 return
+        self.applySkip(items, False)
 
         if (self.mByHours is not None) and (len(self.mByHours) != 0):
             items[:] = self.byHourLimit(items)
@@ -1480,6 +1489,7 @@ class Recurrence(ValueMixin):
             items[:] = self.byMonthLimit(items)
             if (len(items) == 0):
                 return
+        self.applySkip(items, True)
 
         if (self.mByWeekNo is not None) and (len(self.mByWeekNo) != 0):
             items[:] = self.byWeekNoLimit(items)
@@ -1497,6 +1507,7 @@ class Recurrence(ValueMixin):
             items[:] = self.byDayLimit(items)
             if (len(items) == 0):
                 return
+        self.applySkip(items, False)
 
         if (self.mByHours is not None) and (len(self.mByHours) != 0):
             items[:] = self.byHourLimit(items)
@@ -1692,7 +1703,7 @@ class Recurrence(ValueMixin):
 
     def byMonthLimit(self, dates):
         # Keep each date that matches a BYMONTH
-        return filter(lambda date: date.getMonth() in self.mByMonth, dates)
+        return filter(lambda date: (date.getMonth(), date.getLeapMonth(),) in self.mByMonth, dates)
 
 
     def byWeekNoLimit(self, dates):

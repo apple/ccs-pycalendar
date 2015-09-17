@@ -293,6 +293,7 @@ class DateTime(ValueMixin):
         # the new date is invalid
         if self.mDay > utils.daysInMonth(self.mMonth, self.mYear):
             self.mDay = utils.daysInMonth(self.mMonth, self.mYear)
+        self.changed()
 
 
     def getMonth(self):
@@ -321,6 +322,7 @@ class DateTime(ValueMixin):
         # the new date is invalid
         if self.mDay > utils.daysInMonth(self.mMonth, self.mYear):
             self.mDay = utils.daysInMonth(self.mMonth, self.mYear)
+        self.changed()
 
 
     def getLeapMonth(self):
@@ -1161,7 +1163,7 @@ class DateTime(ValueMixin):
         return False
 
 
-    def invalidSkip(self, skip):
+    def invalidSkip(self, skip, monthly=False):
         """
         If this is an invalid value skip backward or forward or not at all.
 
@@ -1169,10 +1171,10 @@ class DateTime(ValueMixin):
         @type skip: L{int}
         """
 
-        if self.invalid():
-            if skip == definitions.eRecurrence_SKIP_YES:
+        if self.invalid() and not monthly:
+            if skip == definitions.eRecurrence_SKIP_OMIT:
                 # Leave it as invalid
-                pass
+                return False
             elif skip == definitions.eRecurrence_SKIP_BACKWARD:
                 if self.mDay <= 0:
                     self.mDay = 1
@@ -1185,6 +1187,7 @@ class DateTime(ValueMixin):
                 else:
                     self.mDay = utils.daysInMonth(self.mMonth, self.mYear)
                     self.offsetDay(1)
+        return True
 
 
     def normalise(self):

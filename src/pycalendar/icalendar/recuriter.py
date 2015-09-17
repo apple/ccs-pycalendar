@@ -23,7 +23,7 @@ class RecurrenceIterator(collections.Iterator):
     An iterator that iterates a simple recurrence pattern.
     """
 
-    def __init__(self, start, freq, interval, rscale=None, skip=definitions.eRecurrence_SKIP_YES, allow_invalid=False):
+    def __init__(self, start, freq, interval, rscale=None, skip=definitions.eRecurrence_SKIP_OMIT, allow_invalid=False):
         """
         @param start: the start date-time
         @type start: L{DateTime} or L{ICUDateTime}
@@ -105,18 +105,16 @@ class RecurrenceIterator(collections.Iterator):
             if dt.getDay() != self.start.getDay():
                 if self.allow_invalid:
                     dt.setInvalid(dt.getYear(), dt.getMonth(), self.start.getDay(), dt.getLeapMonth())
-                elif self.skip == definitions.eRecurrence_SKIP_YES:
+                elif self.skip == definitions.eRecurrence_SKIP_OMIT:
                     # Iterate until we have a valid month
                     while dt.getDay() != self.start.getDay():
                         self.step += self.interval
                         dt = self.start.duplicate()
                         dt.offsetMonth(self.step)
-                elif self.skip == definitions.eRecurrence_SKIP_BACKWARD:
-                    # Both ICU and PyCalendar skip back by default
-                    pass
-                elif self.skip == definitions.eRecurrence_SKIP_FORWARD:
-                    # Go one day forward
-                    dt.offsetDay(1)
+                else:
+                    dt.setInvalid(dt.getYear(), dt.getMonth(), self.start.getDay(), dt.getLeapMonth())
+                    dt.invalidSkip(self.skip, True)
+                    dt.invalidSkip(self.skip, False)
 
         elif self.freq == definitions.eRecurrence_YEARLY:
             dt.offsetYear(self.step)
@@ -126,18 +124,16 @@ class RecurrenceIterator(collections.Iterator):
             if dt.getDay() != self.start.getDay() or dt.getMonth() != self.start.getMonth() or dt.getLeapMonth() != self.start.getLeapMonth():
                 if self.allow_invalid:
                     dt.setInvalid(dt.getYear(), self.start.getMonth(), self.start.getDay(), self.start.getLeapMonth())
-                elif self.skip == definitions.eRecurrence_SKIP_YES:
+                elif self.skip == definitions.eRecurrence_SKIP_OMIT:
                     # Iterate until we have a valid date-time
                     while dt.getDay() != self.start.getDay() or dt.getMonth() != self.start.getMonth() or dt.getLeapMonth() != self.start.getLeapMonth():
                         self.step += self.interval
                         dt = self.start.duplicate()
                         dt.offsetYear(self.step)
-                elif self.skip == definitions.eRecurrence_SKIP_BACKWARD:
-                    # Both ICU and PyCalendar skip back by default
-                    pass
-                elif self.skip == definitions.eRecurrence_SKIP_FORWARD:
-                    # Go one day forward
-                    dt.offsetDay(1)
+                else:
+                    dt.setInvalid(dt.getYear(), self.start.getMonth(), self.start.getDay(), self.start.getLeapMonth())
+                    dt.invalidSkip(self.skip, True)
+                    dt.invalidSkip(self.skip, False)
 
         self.step += self.interval
 
@@ -145,7 +141,9 @@ class RecurrenceIterator(collections.Iterator):
 
 
 if __name__ == '__main__':
-    icudt = ICUDateTime.fromDateComponents("gregorian", 2014, 1, 31)
-    iter = RecurrenceIterator(icudt, definitions.eRecurrence_MONTHLY, 1, definitions.eRecurrence_SKIP_BACKWARD)
-    for i in range(12):
-        print(iter.next().getText())
+    icudt = ICUDateTime.fromDateComponents("gregorian", 2013, 1, 1)
+    iter = RecurrenceIterator(icudt, definitions.eRecurrence_DAILY, 1)
+    for i in range(1200):
+        gregorian = iter.next()
+        nongregorian = gregorian.convertTo("hebrew")
+        print("{}\t{}".format(gregorian.getText(), nongregorian.getText()))

@@ -1,7 +1,10 @@
 [
 	{
-		"title": "MonthlyRscaleStartInLeapYearSkipYes - start: {C}46501230",
-		"rule": ["RSCALE=CHINESE;FREQ=MONTHLY;SKIP=YES"],
+		"title": "MonthlyRscaleStartInLeapYearSkipOmit - start: {C}46501230",
+		"rule": [
+			"RSCALE=CHINESE;FREQ=MONTHLY;SKIP=OMIT",
+            "RSCALE=CHINESE;FREQ=MONTHLY"
+		],
 		"start": "20140130",
 		"end": "20180101",
 		"results": [
@@ -92,10 +95,7 @@
 	},
 	{
 		"title": "MonthlyRscaleStartInLeapYearSkipBackwardDefault - start: {C}46501230",
-		"rule": [
-            "RSCALE=CHINESE;FREQ=MONTHLY;SKIP=BACKWARD",
-            "RSCALE=CHINESE;FREQ=MONTHLY"
-		],
+		"rule": ["RSCALE=CHINESE;FREQ=MONTHLY;SKIP=BACKWARD"],
 		"start": "20140130",
 		"end": "20180101",
 		"results": [
@@ -151,8 +151,11 @@
 		]
 	},
 	{
-		"title": "YearlyLeapDaySkipYes",
-		"rule": ["RSCALE=GREGORIAN;FREQ=YEARLY;SKIP=YES;COUNT=5"],
+		"title": "YearlyLeapDaySkipOmit",
+		"rule": [
+			"RSCALE=GREGORIAN;FREQ=YEARLY;SKIP=OMIT;COUNT=5",
+            "RSCALE=GREGORIAN;FREQ=YEARLY;COUNT=5"
+		],
 		"start": "20160229",
 		"end": "21000101",
 		"results": [
@@ -178,10 +181,7 @@
 	},
 	{
 		"title": "YearlyLeapDaySkipBackwardDefault",
-		"rule": [
-            "RSCALE=GREGORIAN;FREQ=YEARLY;SKIP=BACKWARD;COUNT=5",
-            "RSCALE=GREGORIAN;FREQ=YEARLY;COUNT=5"
-		],
+		"rule": ["RSCALE=GREGORIAN;FREQ=YEARLY;SKIP=BACKWARD;COUNT=5"],
 		"start": "20160229",
 		"end": "21000101",
 		"results": [
@@ -193,8 +193,8 @@
 		]
 	},
 	{
-		"title": "ChineseMonthlyByMonthDay30SkipYes",
-		"rule": ["RSCALE=CHINESE;FREQ=MONTHLY;BYMONTHDAY=30;SKIP=YES"],
+		"title": "ChineseMonthlyByMonthDay30SkipOmit",
+		"rule": ["RSCALE=CHINESE;FREQ=MONTHLY;BYMONTHDAY=30;SKIP=OMIT"],
 		"start": "20140130T120000",
 		"end": "20150101T000000",
 		"results": [
@@ -248,8 +248,8 @@
 		]
 	},
 	{
-		"title": "ChineseMonthlyByMonthDayMinus30SkipYes",
-		"rule": ["RSCALE=CHINESE;FREQ=MONTHLY;BYMONTHDAY=-30;SKIP=YES"],
+		"title": "ChineseMonthlyByMonthDayMinus30SkipOmit",
+		"rule": ["RSCALE=CHINESE;FREQ=MONTHLY;BYMONTHDAY=-30;SKIP=OMIT"],
 		"start": "20140130T120000",
 		"end": "20150101T000000",
 		"results": [
@@ -300,5 +300,316 @@
             "20141122T120000",
             "20141222T120000"
 		]
+	},
+	{
+		"title": "Ethiopic last day of year",
+		"rule": ["RSCALE=ETHIOPIC;FREQ=YEARLY;BYMONTH=13;BYMONTHDAY=-1;COUNT=6"],
+		"start": "20140910",
+		"end": "20200101",
+		"results": ["20140910","20150911","20160910","20170910","20180910","20190911"]
+	},
+
+
+	{
+		"title": "Chinese New Year",
+		"rule": ["RSCALE=CHINESE;FREQ=YEARLY;UNTIL=20180101"],
+		"start": "20130210",
+		"end": "20180101",
+		"results": ["20130210","20140131","20150219","20160208","20170128"]
+	},
+
+
+	{
+		"title": "Chinese monthly",
+		"rule": ["RSCALE=CHINESE;FREQ=MONTHLY;COUNT=4"],
+		"start": "20140920",
+		"end": "20150101",
+		"results": ["20140920","20141020","20141119","20141218"]
+	},
+
+
+	{
+		"title": "Islamic monthly",
+		"rule": ["RSCALE=ISLAMIC-CIVIL;FREQ=MONTHLY;COUNT=4"],
+		"start": "20131025",
+		"end": "20150101",
+		"results": ["20131025","20131124","20131224","20140122"]
+	},
+
+
+	{
+		"title": "Ramadan",
+		"rule": ["RSCALE=ISLAMIC-CIVIL;FREQ=YEARLY;BYMONTH=9;COUNT=5"],
+		"start": "20130709",
+		"end": "20180101",
+		"results": ["20130709","20140629","20150618","20160607","20170527"]
+	},
+
+
+	{
+		"title": "Buddha birthday",
+		"rule": ["RSCALE=DANGI;FREQ=DAILY;BYMONTHDAY=8;BYMONTH=4;UNTIL=20160101"],
+		"start": "20131025",
+		"end": "20160101",
+		"results": ["20140506","20150525"]
+	},
+
+
+	{
+		"title": "No instances in Chinese leap month",
+		"rule": ["RSCALE=CHINESE;FREQ=DAILY;BYMONTHDAY=10;BYMONTH=9;COUNT=3"],
+		"start": "20131025",
+		"end": "20170101",
+		"results": ["20141003","20151022","20161010"]
+	},
+
+
+	{
+		"title": "Chinese 9L leap month skip - daily",
+		"rule": ["RSCALE=CHINESE;FREQ=DAILY;BYMONTHDAY=10;BYMONTH=9L;COUNT=2"],
+		"start": "20141102",
+		"end": "21500101",
+		"results": ["20141102","21091102"]
+	},
+
+
+	{
+		"title": "Chinese 9L leap month skip - monthly",
+		"rule": ["RSCALE=CHINESE;FREQ=MONTHLY;BYMONTHDAY=10;BYMONTH=9L;COUNT=2"],
+		"start": "20141102",
+		"end": "21500101",
+		"results": ["20141102","21091102"]
+	},
+
+
+	{
+		"title": "Chinese 9L leap month skip - yearly",
+		"rule": ["RSCALE=CHINESE;FREQ=YEARLY;BYMONTHDAY=10;BYMONTH=9L;COUNT=2"],
+		"start": "20141102",
+		"end": "21500101",
+		"results": ["20141102","21091102"]
+	},
+
+
+	{
+		"title": "Chinese 4L leap month skip - daily",
+		"rule": ["FREQ=DAILY;RSCALE=CHINESE;UNTIL=21000101;BYMONTHDAY=10;BYMONTH=4L;SKIP=OMIT"],
+		"start": "20131025",
+		"end": "21000101",
+		"results": ["20200601","20580531","20690530","20770531","20880530","20960531"]
+	},
+
+
+	{
+		"title": "Chinese 4L leap month skip - monthly",
+		"rule": ["FREQ=MONTHLY;RSCALE=CHINESE;UNTIL=21000101;BYMONTHDAY=10;BYMONTH=4L;SKIP=OMIT"],
+		"start": "20131025",
+		"end": "21000101",
+		"results": ["20200601","20580531","20690530","20770531","20880530","20960531"]
+	},
+
+
+	{
+		"title": "Chinese 4L leap month skip - yearly",
+		"rule": ["FREQ=YEARLY;RSCALE=CHINESE;UNTIL=21000101;BYMONTHDAY=10;BYMONTH=4L;SKIP=OMIT"],
+		"start": "20131025",
+		"end": "21000101",
+		"results": ["20200601","20580531","20690530","20770531","20880530","20960531"]
+	},
+
+
+	{
+		"title": "Chinese 9L leap month skip back - daily",
+		"rule": ["RSCALE=CHINESE;SKIP=BACKWARD;FREQ=DAILY;BYMONTHDAY=10;BYMONTH=9L;COUNT=3"],
+		"start": "20131025",
+		"end": "20170101",
+		"results": ["20141102"]
+	},
+
+
+	{
+		"title": "Chinese 9L leap month skip back - monthly",
+		"rule": ["RSCALE=CHINESE;SKIP=BACKWARD;FREQ=MONTHLY;BYMONTHDAY=10;BYMONTH=9L;COUNT=3"],
+		"start": "20131025",
+		"end": "20170101",
+		"results": ["20141102"]
+	},
+
+
+	{
+		"title": "Chinese 9L leap month skip back - yearly",
+		"rule": ["RSCALE=CHINESE;SKIP=BACKWARD;FREQ=YEARLY;BYMONTHDAY=10;BYMONTH=9L;COUNT=3"],
+		"start": "20131025",
+		"end": "20170101",
+		"results": ["20141102","20151022","20161010"]
+	},
+
+
+	{
+		"title": "Chinese 9,9L leap month skip back - daily",
+		"rule": ["RSCALE=CHINESE;SKIP=BACKWARD;FREQ=DAILY;BYMONTHDAY=10;BYMONTH=9,9L;COUNT=4"],
+		"start": "20131025",
+		"end": "20170101",
+		"results": ["20141003","20141102","20151022","20161010"]
+	},
+
+	{
+		"title": "Chinese 9,9L leap month skip back - monthly",
+		"rule": ["RSCALE=CHINESE;SKIP=BACKWARD;FREQ=MONTHLY;BYMONTHDAY=10;BYMONTH=9,9L;COUNT=4"],
+		"start": "20131025",
+		"end": "20170101",
+		"results": ["20141003","20141102","20151022","20161010"]
+	},
+
+	{
+		"title": "Chinese 9,9L leap month skip back - yearly",
+		"rule": ["RSCALE=CHINESE;SKIP=BACKWARD;FREQ=YEARLY;BYMONTHDAY=10;BYMONTH=9,9L;COUNT=4"],
+		"start": "20131025",
+		"end": "20170101",
+		"results": ["20141003","20141102","20151022","20161010"]
+	},
+
+
+	{
+		"title": "Hebrew yearly skip",
+		"rule": ["RSCALE=HEBREW;FREQ=YEARLY;COUNT=4"],
+		"start": "20140205",
+		"end": "20230101",
+		"results": ["20140205","20160214","20190210","20220206"]
+	},
+
+
+	{
+		"title": "Hebrew yearly skip forward",
+		"rule": ["RSCALE=HEBREW;FREQ=YEARLY;SKIP=FORWARD;COUNT=4"],
+		"start": "20140205",
+		"end": "20180101",
+		"results": ["20140205","20150224","20160214","20170303"]
+	},
+
+
+	{
+		"title": "Hebrew yearly 5L skip forward",
+		"rule": ["RSCALE=HEBREW;FREQ=YEARLY;BYMONTH=5L;BYMONTHDAY=8;SKIP=FORWARD;COUNT=5"],
+		"start": "20140208",
+		"end": "20190101",
+		"results": ["20140208","20150227","20160217","20170306","20180223"]
+	},
+
+
+	{
+		"title": "Gregorian monthly skip back",
+		"rule": ["RSCALE=GREGORIAN;FREQ=MONTHLY;SKIP=BACKWARD;COUNT=4"],
+		"start": "20140131",
+		"end": "20150101",
+		"results": ["20140131","20140228","20140331","20140430"]
+	},
+
+
+	{
+		"title": "Gregorian monthly skip forward",
+		"rule": ["RSCALE=GREGORIAN;FREQ=MONTHLY;SKIP=FORWARD;COUNT=4"],
+		"start": "20140131",
+		"end": "20150101",
+		"results": ["20140131","20140301","20140331","20140501"]
+	},
+
+
+	{
+		"title": "Gregorian leap day skip forward",
+		"rule": ["RSCALE=GREGORIAN;FREQ=YEARLY;BYMONTH=2;BYMONTHDAY=28,29;SKIP=FORWARD;COUNT=5"],
+		"start": "20150201",
+		"end": "20180101",
+		"results": ["20150228","20150301","20160228","20160229","20170228"]
+	},
+
+
+	{
+		"title": "Gregorian monthly interval skip forward",
+		"rule": ["RSCALE=GREGORIAN;FREQ=MONTHLY;INTERVAL=3;SKIP=FORWARD;COUNT=4"],
+		"start": "20140131",
+		"end": "20150101",
+		"results": ["20140131","20140501","20140731","20141031"]
+	},
+
+
+	{
+		"title": "Gregorian month day skip forward",
+		"rule": ["FREQ=MONTHLY;RSCALE=GREGORIAN;SKIP=FORWARD;COUNT=12;BYMONTHDAY=31"],
+		"start": "20150131",
+		"end": "20160101",
+		"results": ["20150131","20150301","20150331","20150501","20150531","20150701","20150731","20150831","20151001","20151031","20151201","20151231"]
+	},
+
+
+	{
+		"title": "Gregorian last month day skip forward",
+		"rule": ["FREQ=MONTHLY;RSCALE=GREGORIAN;SKIP=FORWARD;COUNT=12;BYMONTHDAY=-1"],
+		"start": "20150131",
+		"end": "20160101",
+		"results": ["20150131","20150228","20150331","20150430","20150531","20150630","20150731","20150831","20150930","20151031","20151130","20151231"]
+	},
+
+
+	{
+		"title": "Hebrew leap month day skip forward",
+		"rule": ["FREQ=YEARLY;RSCALE=HEBREW;SKIP=FORWARD;COUNT=5;BYMONTHDAY=30;BYMONTH=5L"],
+		"start": "20140302",
+		"end": "20190101",
+		"results": ["20140302","20150321","20160310","20170328","20180317"]
+	},
+
+
+	{
+		"title": "Hebrew last leap month day skip forward",
+		"rule": ["FREQ=YEARLY;RSCALE=HEBREW;SKIP=FORWARD;COUNT=5;BYMONTHDAY=-1;BYMONTH=5L"],
+		"start": "20140302",
+		"end": "20190101",
+		"results": ["20140302","20150320","20160310","20170327","20180316"]
+	},
+
+
+	{
+		"title": "Hebrew leap month day skip back",
+		"rule": ["FREQ=YEARLY;RSCALE=HEBREW;SKIP=BACKWARD;COUNT=5;BYMONTHDAY=30;BYMONTH=5L"],
+		"start": "20140302",
+		"end": "20190101",
+		"results": ["20140302","20150219","20160310","20170226","20180215"]
+	},
+
+
+	{
+		"title": "Hebrew last leap month day skip forward",
+		"rule": ["FREQ=YEARLY;RSCALE=HEBREW;SKIP=BACKWARD;COUNT=5;BYMONTHDAY=-1;BYMONTH=5L"],
+		"start": "20140302",
+		"end": "20190101",
+		"results": ["20140302","20150219","20160310","20170226","20180215"]
+	},
+
+
+	{
+		"title": "Chinese leap month day skip forward - daily",
+		"rule": ["FREQ=DAILY;RSCALE=CHINESE;SKIP=FORWARD;COUNT=3;BYMONTHDAY=10;BYMONTH=9L"],
+		"start": "20131025",
+		"end": "20160101",
+		"results": ["20141102"]
+	},
+
+
+	{
+		"title": "Chinese leap month day skip forward - monthly",
+		"rule": ["FREQ=MONTHLY;RSCALE=CHINESE;SKIP=FORWARD;COUNT=3;BYMONTHDAY=10;BYMONTH=9L"],
+		"start": "20131025",
+		"end": "20160101",
+		"results": ["20141102"]
+	},
+
+
+	{
+		"title": "Chinese leap month day skip forward - yearly",
+		"rule": ["FREQ=YEARLY;RSCALE=CHINESE;SKIP=FORWARD;COUNT=3;BYMONTHDAY=10;BYMONTH=9L"],
+		"start": "20131025",
+		"end": "20160101",
+		"results": ["20131112", "20141102","20151121"]
 	}
 ]

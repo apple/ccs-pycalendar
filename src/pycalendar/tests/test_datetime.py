@@ -157,6 +157,74 @@ class TestDateTime(unittest.TestCase):
             self.assertEqual(str(dt), result)
 
 
+    def testCacheChangeOnAdjustment(self):
+
+        # UTC first
+        dt = DateTime(2012, 1, 1, 12, 0, 0, Timezone(tzid="utc"))
+        dt.getPosixTime()
+        self.assertTrue(dt.mPosixTimeCached)
+
+        dt.setYear(2013)
+        self.assertFalse(dt.mPosixTimeCached)
+        dt.getPosixTime()
+        self.assertTrue(dt.mPosixTimeCached)
+
+        dt.offsetYear(1)
+        self.assertFalse(dt.mPosixTimeCached)
+        dt.getPosixTime()
+        self.assertTrue(dt.mPosixTimeCached)
+
+        dt.setMonth(2)
+        self.assertFalse(dt.mPosixTimeCached)
+        dt.getPosixTime()
+        self.assertTrue(dt.mPosixTimeCached)
+
+        dt.offsetMonth(1)
+        self.assertFalse(dt.mPosixTimeCached)
+        dt.getPosixTime()
+        self.assertTrue(dt.mPosixTimeCached)
+
+        dt.setDay(2)
+        self.assertFalse(dt.mPosixTimeCached)
+        dt.getPosixTime()
+        self.assertTrue(dt.mPosixTimeCached)
+
+        dt.offsetDay(1)
+        self.assertFalse(dt.mPosixTimeCached)
+        dt.getPosixTime()
+        self.assertTrue(dt.mPosixTimeCached)
+
+        dt.setHours(2)
+        self.assertFalse(dt.mPosixTimeCached)
+        dt.getPosixTime()
+        self.assertTrue(dt.mPosixTimeCached)
+
+        dt.offsetHours(1)
+        self.assertFalse(dt.mPosixTimeCached)
+        dt.getPosixTime()
+        self.assertTrue(dt.mPosixTimeCached)
+
+        dt.setMinutes(2)
+        self.assertFalse(dt.mPosixTimeCached)
+        dt.getPosixTime()
+        self.assertTrue(dt.mPosixTimeCached)
+
+        dt.offsetMinutes(1)
+        self.assertFalse(dt.mPosixTimeCached)
+        dt.getPosixTime()
+        self.assertTrue(dt.mPosixTimeCached)
+
+        dt.setSeconds(2)
+        self.assertFalse(dt.mPosixTimeCached)
+        dt.getPosixTime()
+        self.assertTrue(dt.mPosixTimeCached)
+
+        dt.offsetSeconds(1)
+        self.assertFalse(dt.mPosixTimeCached)
+        dt.getPosixTime()
+        self.assertTrue(dt.mPosixTimeCached)
+
+
     def testCachePreserveOnAdjustment(self):
 
         # UTC first

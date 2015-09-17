@@ -38,7 +38,7 @@ recur_until = "until"
 recur_interval = "interval"
 
 recur_skip = "skip"
-recur_skip_yes = "yes"
+recur_skip_omit = "omit"
 recur_skip_backward = "backward"
 recur_skip_forward = "forward"
 

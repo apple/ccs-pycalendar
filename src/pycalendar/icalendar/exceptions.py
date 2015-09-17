@@ -18,3 +18,13 @@ from pycalendar.exceptions import ErrorBase
 
 class TooManyInstancesError(ErrorBase):
     pass
+
+
+
+class InvalidRscaleError(ErrorBase):
+    pass
+
+
+
+class RscaleNotAllowedError(ErrorBase):
+    pass
