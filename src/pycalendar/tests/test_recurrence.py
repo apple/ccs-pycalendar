@@ -116,6 +116,48 @@ class TestRecurrence(unittest.TestCase):
             self.assertNotEqual(hashes[i - 1], hashes[i])
 
 
+    def testWeeklyTwice(self):
+
+        recur = PyCalendarRecurrence()
+        recur.parse("FREQ=WEEKLY")
+        start = PyCalendarDateTime(2014, 1, 1, 12, 0, 0, tzid=PyCalendarTimezone(utc=True))
+        end = PyCalendarDateTime(2014, 2, 1, 0, 0, 0, tzid=PyCalendarTimezone(utc=True))
+        items = []
+        range = PyCalendarPeriod(start, end)
+        recur.expand(PyCalendarDateTime(2014, 1, 1, 12, 0, 0, tzid=PyCalendarTimezone(tzid="America/New_York")), range, items)
+        self.assertEqual(
+            items,
+            [
+                PyCalendarDateTime(2014, 1, 1, 12, 0, 0, tzid=PyCalendarTimezone(tzid="America/New_York")),
+                PyCalendarDateTime(2014, 1, 8, 12, 0, 0, tzid=PyCalendarTimezone(tzid="America/New_York")),
+                PyCalendarDateTime(2014, 1, 15, 12, 0, 0, tzid=PyCalendarTimezone(tzid="America/New_York")),
+                PyCalendarDateTime(2014, 1, 22, 12, 0, 0, tzid=PyCalendarTimezone(tzid="America/New_York")),
+                PyCalendarDateTime(2014, 1, 29, 12, 0, 0, tzid=PyCalendarTimezone(tzid="America/New_York")),
+
+            ],
+        )
+
+        start = PyCalendarDateTime(2014, 1, 1, 12, 0, 0, tzid=PyCalendarTimezone(utc=True))
+        end = PyCalendarDateTime(2014, 3, 1, 0, 0, 0, tzid=PyCalendarTimezone(utc=True))
+        items = []
+        range = PyCalendarPeriod(start, end)
+        recur.expand(PyCalendarDateTime(2014, 1, 1, 12, 0, 0, tzid=PyCalendarTimezone(tzid="America/New_York")), range, items)
+        self.assertEqual(
+            items,
+            [
+                PyCalendarDateTime(2014, 1, 1, 12, 0, 0, tzid=PyCalendarTimezone(tzid="America/New_York")),
+                PyCalendarDateTime(2014, 1, 8, 12, 0, 0, tzid=PyCalendarTimezone(tzid="America/New_York")),
+                PyCalendarDateTime(2014, 1, 15, 12, 0, 0, tzid=PyCalendarTimezone(tzid="America/New_York")),
+                PyCalendarDateTime(2014, 1, 22, 12, 0, 0, tzid=PyCalendarTimezone(tzid="America/New_York")),
+                PyCalendarDateTime(2014, 1, 29, 12, 0, 0, tzid=PyCalendarTimezone(tzid="America/New_York")),
+                PyCalendarDateTime(2014, 2, 5, 12, 0, 0, tzid=PyCalendarTimezone(tzid="America/New_York")),
+                PyCalendarDateTime(2014, 2, 12, 12, 0, 0, tzid=PyCalendarTimezone(tzid="America/New_York")),
+                PyCalendarDateTime(2014, 2, 19, 12, 0, 0, tzid=PyCalendarTimezone(tzid="America/New_York")),
+                PyCalendarDateTime(2014, 2, 26, 12, 0, 0, tzid=PyCalendarTimezone(tzid="America/New_York")),
+            ],
+        )
+
+
     def testByWeekNoExpand(self):
 
         recur = PyCalendarRecurrence()
