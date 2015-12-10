@@ -104,14 +104,16 @@ class Period(ValueMixin):
 
     def generate(self, os):
         try:
-            self.mStart.generate(os)
-            os.write("/")
-            if self.mUseDuration:
-                self.mDuration.generate(os)
-            else:
-                self.mEnd.generate(os)
+            os.write(self.getText())
         except:
             pass
+
+
+    def getText(self):
+        return "{}/{}".format(
+            self.mStart.getText(),
+            self.mDuration.getText() if self.mUseDuration else self.mEnd.getText(),
+        )
 
 
     def writeXML(self, node, namespace):

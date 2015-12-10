@@ -40,9 +40,13 @@ class IntegerValue(Value):
     # os - StringIO object
     def generate(self, os):
         try:
-            os.write(str(self.mValue))
+            os.write(self.getTextValue())
         except:
             pass
+
+
+    def getTextValue(self):
+        return str(self.mValue)
 
 
     def writeXML(self, node, namespace):

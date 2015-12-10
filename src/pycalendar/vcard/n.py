@@ -101,7 +101,7 @@ class N(ValueMixin):
 
         results = []
         for i in (N.PREFIX, N.FIRST, N.MIDDLE, N.LAST, N.SUFFIX):
-            result = _stringOrList(self.mValue[i])
+            result = _stringOrList(self.mValue[i]) if self.mValue[i] else ""
             if result:
                 results.append(result)
 
@@ -113,7 +113,14 @@ class N(ValueMixin):
 
 
     def generate(self, os):
-        utils.generateDoubleNestedList(os, self.mValue)
+        try:
+            os.write(self.getText())
+        except:
+            pass
+
+
+    def getText(self):
+        return utils.getDoubleNestedList(self.mValue)
 
 
     def parseJSON(self, jobject):

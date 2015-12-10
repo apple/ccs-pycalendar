@@ -70,24 +70,27 @@ class UTCOffsetValue(Value):
     # os - StringIO object
     def generate(self, os, fullISO=False):
         try:
-            abs_value = self.mValue
-            if abs_value < 0 :
-                sign = "-"
-                abs_value = -self.mValue
-            else:
-                sign = "+"
-
-            secs = abs_value % 60
-            mins = (abs_value / 60) % 60
-            hours = abs_value / (60 * 60)
-
-            s = ("%s%02d:%02d" if fullISO else "%s%02d%02d") % (sign, hours, mins,)
-            if (secs != 0):
-                s = ("%s:%02d" if fullISO else "%s%02d") % (s, secs,)
-
-            os.write(s)
+            os.write(self.getTextValue(fullISO))
         except:
             pass
+
+
+    def getTextValue(self, fullISO=False):
+        abs_value = self.mValue
+        if abs_value < 0 :
+            sign = "-"
+            abs_value = -self.mValue
+        else:
+            sign = "+"
+
+        secs = abs_value % 60
+        mins = (abs_value / 60) % 60
+        hours = abs_value / (60 * 60)
+
+        s = ("%s%02d:%02d" if fullISO else "%s%02d%02d") % (sign, hours, mins,)
+        if (secs != 0):
+            s = ("%s:%02d" if fullISO else "%s%02d") % (s, secs,)
+        return s
 
 
     def writeXML(self, node, namespace):

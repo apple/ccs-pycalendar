@@ -719,5 +719,60 @@ class ComponentRecur(Component):
                 self.mEnd = self.mStart + temp
 
 
+    def deriveComponent(self, recurrenceID):
+        """
+        Derive an overridden component for the associated RECURRENCE-ID. This assumes
+        that the R-ID is valid for the actual recurrence being used. It also assumes
+        that this component is the master.
+
+        @param recurrenceID: the recurrence instance
+        @type recurrenceID: L{DateTime}
+
+        @return: the derived component
+        @rtype: L{ComponentRecur} or L{None}
+        """
+
+        # Create the derived instance
+        newcomp = self.duplicate()
+
+        # Strip out unwanted recurrence properties
+        for propname in (
+            definitions.cICalProperty_RRULE,
+            definitions.cICalProperty_RDATE,
+            definitions.cICalProperty_EXRULE,
+            definitions.cICalProperty_EXDATE,
+            definitions.cICalProperty_RECURRENCE_ID,
+        ):
+            newcomp.removeProperties(propname)
+
+        # New DTSTART is the RECURRENCE-ID we are deriving but adjusted to the
+        # original DTSTART's localtime
+        dtstart = newcomp.getStart()
+        dtend = newcomp.getEnd()
+        oldduration = dtend - dtstart
+
+        newdtstartValue = recurrenceID.duplicate()
+        if not dtstart.isDateOnly():
+            if dtstart.local():
+                newdtstartValue.adjustTimezone(dtstart.getTimezone())
+        else:
+            newdtstartValue.setDateOnly(True)
+
+        newcomp.removeProperties(definitions.cICalProperty_DTSTART)
+        newcomp.removeProperties(definitions.cICalProperty_DTEND)
+        prop = Property(definitions.cICalProperty_DTSTART, newdtstartValue)
+        newcomp.addProperty(prop)
+        if not newcomp.useDuration():
+            prop = Property(definitions.cICalProperty_DTEND, newdtstartValue + oldduration)
+            newcomp.addProperty(prop)
+
+        newcomp.addProperty(Property("RECURRENCE-ID", newdtstartValue))
+
+        # After creating/changing a component we need to do this to keep PyCalendar happy
+        newcomp.finalise()
+
+        return newcomp
+
+
     def createExpanded(self, master, recurid):
         return ComponentExpanded(master, recurid)

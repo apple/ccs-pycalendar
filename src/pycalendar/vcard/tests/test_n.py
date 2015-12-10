@@ -32,6 +32,11 @@ class TestAdrValue(unittest.TestCase):
                 "last;first;middle1,middle2;;suffix",
                 "first middle1 middle2 last suffix",
             ),
+            (
+                ("last", ("first",), "", None, ("suffix",)),
+                "last;first;;;suffix",
+                "first last suffix",
+            ),
         )
 
         for args, result, fullName in data:

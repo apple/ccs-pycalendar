@@ -78,15 +78,13 @@ class MultiValue(Value):
 
     def generate(self, os):
         try:
-            first = True
-            for iter in self.mValues:
-                if first:
-                    first = False
-                else:
-                    os.write(",")
-                iter.generate(os)
+            os.write(self.getTextValue())
         except:
             pass
+
+
+    def getTextValue(self):
+        return ",".join([value.getText() for value in self.mValues])
 
 
     def writeXML(self, node, namespace):

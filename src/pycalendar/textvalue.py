@@ -34,9 +34,14 @@ class TextValue(PlainTextValue):
     # os - StringIO object
     def generate(self, os):
         try:
-            # Encoding required
-            utils.writeTextValue(os, self.mValue)
+            os.write(self.getTextValue())
         except:
             pass
+
+
+    def getTextValue(self):
+        # Encoding required
+        return utils.getTextValue(self.mValue)
+
 
 Value.registerType(Value.VALUETYPE_TEXT, TextValue, xmldefinitions.value_text)

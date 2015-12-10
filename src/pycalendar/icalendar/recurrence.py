@@ -543,134 +543,134 @@ class Recurrence(ValueMixin):
 
     def generate(self, os):
         try:
-            os.write(definitions.cICalValue_RECUR_FREQ)
-            os.write("=")
-
-            if self.mFreq == definitions.eRecurrence_SECONDLY:
-                os.write(definitions.cICalValue_RECUR_SECONDLY)
-
-            elif self.mFreq == definitions.eRecurrence_MINUTELY:
-                os.write(definitions.cICalValue_RECUR_MINUTELY)
-
-            elif self.mFreq == definitions.eRecurrence_HOURLY:
-                os.write(definitions.cICalValue_RECUR_HOURLY)
-
-            elif self.mFreq == definitions.eRecurrence_DAILY:
-                os.write(definitions.cICalValue_RECUR_DAILY)
-
-            elif self.mFreq == definitions.eRecurrence_WEEKLY:
-                os.write(definitions.cICalValue_RECUR_WEEKLY)
-
-            elif self.mFreq == definitions.eRecurrence_MONTHLY:
-                os.write(definitions.cICalValue_RECUR_MONTHLY)
-
-            elif self.mFreq == definitions.eRecurrence_YEARLY:
-                os.write(definitions.cICalValue_RECUR_YEARLY)
-
-            if self.mUseCount:
-                os.write(";")
-                os.write(definitions.cICalValue_RECUR_COUNT)
-                os.write("=")
-                os.write(str(self.mCount))
-            elif self.mUseUntil:
-                os.write(";")
-                os.write(definitions.cICalValue_RECUR_UNTIL)
-                os.write("=")
-                self.mUntil.generate(os)
-
-            if self.mInterval > 1:
-                os.write(";")
-                os.write(definitions.cICalValue_RECUR_INTERVAL)
-                os.write("=")
-                os.write(str(self.mInterval))
-
-            self.generateList(os, definitions.cICalValue_RECUR_BYSECOND, self.mBySeconds)
-            self.generateList(os, definitions.cICalValue_RECUR_BYMINUTE, self.mByMinutes)
-            self.generateList(os, definitions.cICalValue_RECUR_BYHOUR, self.mByHours)
-
-            if (self.mByDay is not None) and (len(self.mByDay) != 0):
-                os.write(";")
-                os.write(definitions.cICalValue_RECUR_BYDAY)
-                os.write("=")
-                comma = False
-                for iter in self.mByDay:
-                    if comma:
-                        os.write(",")
-                    comma = True
-
-                    if iter[0] != 0:
-                        os.write(str(iter[0]))
-
-                    if iter[1] == definitions.eRecurrence_WEEKDAY_SU:
-                        os.write(definitions.cICalValue_RECUR_WEEKDAY_SU)
-
-                    elif iter[1] == definitions.eRecurrence_WEEKDAY_MO:
-                        os.write(definitions.cICalValue_RECUR_WEEKDAY_MO)
-
-                    elif iter[1] == definitions.eRecurrence_WEEKDAY_TU:
-                        os.write(definitions.cICalValue_RECUR_WEEKDAY_TU)
-
-                    elif iter[1] == definitions.eRecurrence_WEEKDAY_WE:
-                        os.write(definitions.cICalValue_RECUR_WEEKDAY_WE)
-
-                    elif iter[1] == definitions.eRecurrence_WEEKDAY_TH:
-                        os.write(definitions.cICalValue_RECUR_WEEKDAY_TH)
-
-                    elif iter[1] == definitions.eRecurrence_WEEKDAY_FR:
-                        os.write(definitions.cICalValue_RECUR_WEEKDAY_FR)
-
-                    elif iter[1] == definitions.eRecurrence_WEEKDAY_SA:
-                        os.write(definitions.cICalValue_RECUR_WEEKDAY_SA)
-
-            self.generateList(os, definitions.cICalValue_RECUR_BYMONTHDAY, self.mByMonthDay)
-            self.generateList(os, definitions.cICalValue_RECUR_BYYEARDAY, self.mByYearDay)
-            self.generateList(os, definitions.cICalValue_RECUR_BYWEEKNO, self.mByWeekNo)
-            self.generateList(os, definitions.cICalValue_RECUR_BYMONTH, self.mByMonth)
-            self.generateList(os, definitions.cICalValue_RECUR_BYSETPOS, self.mBySetPos)
-
-            # MO is the default so we do not need it
-            if self.mWeekstart != definitions.eRecurrence_WEEKDAY_MO:
-                os.write(";")
-                os.write(definitions.cICalValue_RECUR_WKST)
-                os.write("=")
-
-                if self.mWeekstart == definitions.eRecurrence_WEEKDAY_SU:
-                    os.write(definitions.cICalValue_RECUR_WEEKDAY_SU)
-
-                elif self.mWeekstart == definitions.eRecurrence_WEEKDAY_MO:
-                    os.write(definitions.cICalValue_RECUR_WEEKDAY_MO)
-
-                elif self.mWeekstart == definitions.eRecurrence_WEEKDAY_TU:
-                    os.write(definitions.cICalValue_RECUR_WEEKDAY_TU)
-
-                elif self.mWeekstart == definitions.eRecurrence_WEEKDAY_WE:
-                    os.write(definitions.cICalValue_RECUR_WEEKDAY_WE)
-
-                elif self.mWeekstart == definitions.eRecurrence_WEEKDAY_TH:
-                    os.write(definitions.cICalValue_RECUR_WEEKDAY_TH)
-
-                elif self.mWeekstart == definitions.eRecurrence_WEEKDAY_FR:
-                    os.write(definitions.cICalValue_RECUR_WEEKDAY_FR)
-
-                elif self.mWeekstart == definitions.eRecurrence_WEEKDAY_SA:
-                    os.write(definitions.cICalValue_RECUR_WEEKDAY_SA)
-
+            os.write(self.getText())
         except:
             pass
 
 
-    def generateList(self, os, title, items):
+    def getText(self):
+        result = []
+        result.append(definitions.cICalValue_RECUR_FREQ)
+        result.append("=")
+
+        if self.mFreq == definitions.eRecurrence_SECONDLY:
+            result.append(definitions.cICalValue_RECUR_SECONDLY)
+
+        elif self.mFreq == definitions.eRecurrence_MINUTELY:
+            result.append(definitions.cICalValue_RECUR_MINUTELY)
+
+        elif self.mFreq == definitions.eRecurrence_HOURLY:
+            result.append(definitions.cICalValue_RECUR_HOURLY)
+
+        elif self.mFreq == definitions.eRecurrence_DAILY:
+            result.append(definitions.cICalValue_RECUR_DAILY)
+
+        elif self.mFreq == definitions.eRecurrence_WEEKLY:
+            result.append(definitions.cICalValue_RECUR_WEEKLY)
+
+        elif self.mFreq == definitions.eRecurrence_MONTHLY:
+            result.append(definitions.cICalValue_RECUR_MONTHLY)
+
+        elif self.mFreq == definitions.eRecurrence_YEARLY:
+            result.append(definitions.cICalValue_RECUR_YEARLY)
+
+        if self.mUseCount:
+            result.append(";")
+            result.append(definitions.cICalValue_RECUR_COUNT)
+            result.append("=")
+            result.append(str(self.mCount))
+        elif self.mUseUntil:
+            result.append(";")
+            result.append(definitions.cICalValue_RECUR_UNTIL)
+            result.append("=")
+            result.append(self.mUntil.getText())
+
+        if self.mInterval > 1:
+            result.append(";")
+            result.append(definitions.cICalValue_RECUR_INTERVAL)
+            result.append("=")
+            result.append(str(self.mInterval))
+
+        result.append(self.getList(definitions.cICalValue_RECUR_BYSECOND, self.mBySeconds))
+        result.append(self.getList(definitions.cICalValue_RECUR_BYMINUTE, self.mByMinutes))
+        result.append(self.getList(definitions.cICalValue_RECUR_BYHOUR, self.mByHours))
+
+        if (self.mByDay is not None) and (len(self.mByDay) != 0):
+            result.append(";")
+            result.append(definitions.cICalValue_RECUR_BYDAY)
+            result.append("=")
+            comma = False
+            for iter in self.mByDay:
+                if comma:
+                    result.append(",")
+                comma = True
+
+                if iter[0] != 0:
+                    result.append(str(iter[0]))
+
+                if iter[1] == definitions.eRecurrence_WEEKDAY_SU:
+                    result.append(definitions.cICalValue_RECUR_WEEKDAY_SU)
+
+                elif iter[1] == definitions.eRecurrence_WEEKDAY_MO:
+                    result.append(definitions.cICalValue_RECUR_WEEKDAY_MO)
+
+                elif iter[1] == definitions.eRecurrence_WEEKDAY_TU:
+                    result.append(definitions.cICalValue_RECUR_WEEKDAY_TU)
+
+                elif iter[1] == definitions.eRecurrence_WEEKDAY_WE:
+                    result.append(definitions.cICalValue_RECUR_WEEKDAY_WE)
+
+                elif iter[1] == definitions.eRecurrence_WEEKDAY_TH:
+                    result.append(definitions.cICalValue_RECUR_WEEKDAY_TH)
+
+                elif iter[1] == definitions.eRecurrence_WEEKDAY_FR:
+                    result.append(definitions.cICalValue_RECUR_WEEKDAY_FR)
+
+                elif iter[1] == definitions.eRecurrence_WEEKDAY_SA:
+                    result.append(definitions.cICalValue_RECUR_WEEKDAY_SA)
+
+        result.append(self.getList(definitions.cICalValue_RECUR_BYMONTHDAY, self.mByMonthDay))
+        result.append(self.getList(definitions.cICalValue_RECUR_BYYEARDAY, self.mByYearDay))
+        result.append(self.getList(definitions.cICalValue_RECUR_BYWEEKNO, self.mByWeekNo))
+        result.append(self.getList(definitions.cICalValue_RECUR_BYMONTH, self.mByMonth))
+        result.append(self.getList(definitions.cICalValue_RECUR_BYSETPOS, self.mBySetPos))
+
+        # MO is the default so we do not need it
+        if self.mWeekstart != definitions.eRecurrence_WEEKDAY_MO:
+            result.append(";")
+            result.append(definitions.cICalValue_RECUR_WKST)
+            result.append("=")
+
+            if self.mWeekstart == definitions.eRecurrence_WEEKDAY_SU:
+                result.append(definitions.cICalValue_RECUR_WEEKDAY_SU)
+
+            elif self.mWeekstart == definitions.eRecurrence_WEEKDAY_MO:
+                result.append(definitions.cICalValue_RECUR_WEEKDAY_MO)
+
+            elif self.mWeekstart == definitions.eRecurrence_WEEKDAY_TU:
+                result.append(definitions.cICalValue_RECUR_WEEKDAY_TU)
+
+            elif self.mWeekstart == definitions.eRecurrence_WEEKDAY_WE:
+                result.append(definitions.cICalValue_RECUR_WEEKDAY_WE)
+
+            elif self.mWeekstart == definitions.eRecurrence_WEEKDAY_TH:
+                result.append(definitions.cICalValue_RECUR_WEEKDAY_TH)
+
+            elif self.mWeekstart == definitions.eRecurrence_WEEKDAY_FR:
+                result.append(definitions.cICalValue_RECUR_WEEKDAY_FR)
+
+            elif self.mWeekstart == definitions.eRecurrence_WEEKDAY_SA:
+                result.append(definitions.cICalValue_RECUR_WEEKDAY_SA)
+
+        return "".join(result)
+
+
+    def getList(self, title, items):
 
         if (items is not None) and (len(items) != 0):
-            os.write(";")
-            os.write(title)
-            os.write("=")
-            comma = False
-            for e in items:
-                if comma:
-                    os.write(",")
-                comma = True
-                os.write(str(e))
+            return ";{}={}".format(title, ",".join([str(item) for item in items]))
+        else:
+            return ""
 
 
     def writeXML(self, node, namespace):

@@ -63,7 +63,11 @@ class GeoValue(Value):
 
     # os - StringIO object
     def generate(self, os):
-        os.write("%s;%s" % (self.mValue[0], self.mValue[1],))
+        os.write(self.getTextValue())
+
+
+    def getTextValue(self):
+        return "%s;%s" % (self.mValue[0], self.mValue[1],)
 
 
     def writeXML(self, node, namespace):

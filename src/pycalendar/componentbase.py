@@ -153,6 +153,14 @@ class ComponentBase(object):
         self.mComponents.remove(component)
 
 
+    def removeFromParent(self):
+        """
+        Remove this L{ComponentBase} from its parent
+        """
+        if self.mParentComponent is not None:
+            self.mParentComponent.removeComponent(self)
+
+
     def removeAllComponent(self, compname=None):
         if compname:
             compname = compname.upper()

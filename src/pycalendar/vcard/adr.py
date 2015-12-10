@@ -116,7 +116,14 @@ class Adr(ValueMixin):
 
 
     def generate(self, os):
-        utils.generateDoubleNestedList(os, self.mValue)
+        try:
+            os.write(self.getText())
+        except:
+            pass
+
+
+    def getText(self):
+        return utils.getDoubleNestedList(self.mValue)
 
 
     def parseJSON(self, jobject):

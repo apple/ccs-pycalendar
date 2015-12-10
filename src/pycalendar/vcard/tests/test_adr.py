@@ -29,6 +29,10 @@ class TestAdrValue(unittest.TestCase):
                 (("pobox",), ("extended",), ("street1", "street2",), "locality", "region", (), "country"),
                 "pobox;extended;street1,street2;locality;region;;country",
             ),
+            (
+                ("", None, ("street1", "street2",), "locality", "region", (), "country"),
+                ";;street1,street2;locality;region;;country",
+            ),
         )
 
         for args, result in data:

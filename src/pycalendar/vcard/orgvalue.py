@@ -41,7 +41,14 @@ class OrgValue(Value):
 
 
     def generate(self, os):
-        utils.generateTextList(os, self.mValue, ';')
+        try:
+            os.write(self.getTextValue())
+        except:
+            pass
+
+
+    def getTextValue(self):
+        return utils.getTextList(self.mValue, ';')
 
 
     def parseJSONValue(self, jobject):

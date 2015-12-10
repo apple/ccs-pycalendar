@@ -241,31 +241,38 @@ class Duration(ValueMixin):
 
     def generate(self, os):
         try:
-            if not self.mForward and (self.mWeeks or self.mDays or self.mHours or self.mMinutes or self.mSeconds):
-                os.write("-")
-            os.write("P")
-
-            if self.mWeeks != 0:
-                os.write("%dW" % (self.mWeeks,))
-            else:
-                if self.mDays != 0:
-                    os.write("%dD" % (self.mDays,))
-
-                if (self.mHours != 0) or (self.mMinutes != 0) or (self.mSeconds != 0):
-                    os.write("T")
-
-                    if self.mHours != 0:
-                        os.write("%dH" % (self.mHours,))
-
-                    if (self.mMinutes != 0) or ((self.mHours != 0) and (self.mSeconds != 0)):
-                        os.write("%dM" % (self.mMinutes,))
-
-                    if self.mSeconds != 0:
-                        os.write("%dS" % (self.mSeconds,))
-                elif self.mDays == 0:
-                    os.write("T0S")
+            os.write(self.getText())
         except:
             pass
+
+
+    def getText(self):
+        result = []
+        if not self.mForward and (self.mWeeks or self.mDays or self.mHours or self.mMinutes or self.mSeconds):
+            result.append("-")
+        result.append("P")
+
+        if self.mWeeks != 0:
+            result.append("%dW" % (self.mWeeks,))
+        else:
+            if self.mDays != 0:
+                result.append("%dD" % (self.mDays,))
+
+            if (self.mHours != 0) or (self.mMinutes != 0) or (self.mSeconds != 0):
+                result.append("T")
+
+                if self.mHours != 0:
+                    result.append("%dH" % (self.mHours,))
+
+                if (self.mMinutes != 0) or ((self.mHours != 0) and (self.mSeconds != 0)):
+                    result.append("%dM" % (self.mMinutes,))
+
+                if self.mSeconds != 0:
+                    result.append("%dS" % (self.mSeconds,))
+            elif self.mDays == 0:
+                result.append("T0S")
+
+        return "".join(result)
 
 
     def writeXML(self, node, namespace):

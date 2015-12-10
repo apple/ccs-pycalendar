@@ -43,13 +43,18 @@ class URIValue(PlainTextValue):
         Handle a client bug where it sometimes includes a \n in the value and we need
         to make sure that gets encoded rather than included literally which would break syntax.
         """
+        try:
+            os.write(self.getTextValue())
+        except:
+            pass
+
+
+    def getTextValue(self):
         if '\n' in self.mValue:
-            try:
-                # No encoding required
-                os.write(self.mValue.replace("\n", "\\n"))
-            except:
-                pass
+            # No encoding required
+            return self.mValue.replace("\n", "\\n")
         else:
-            super(URIValue, self).generate(os)
+            return super(URIValue, self).getTextValue()
+
 
 Value.registerType(Value.VALUETYPE_URI, URIValue, xmldefinitions.value_uri)

@@ -365,47 +365,8 @@ class Calendar(ContainerBase):
         master = self.masterComponent()
         if master is None:
             return None
-
-        # Create the derived instance
-        newcomp = master.duplicate()
-
-        # Strip out unwanted recurrence properties
-        for propname in (
-            definitions.cICalProperty_RRULE,
-            definitions.cICalProperty_RDATE,
-            definitions.cICalProperty_EXRULE,
-            definitions.cICalProperty_EXDATE,
-            definitions.cICalProperty_RECURRENCE_ID,
-        ):
-            newcomp.removeProperties(propname)
-
-        # New DTSTART is the RECURRENCE-ID we are deriving but adjusted to the
-        # original DTSTART's localtime
-        dtstart = newcomp.getStart()
-        dtend = newcomp.getEnd()
-        oldduration = dtend - dtstart
-
-        newdtstartValue = recurrenceID.duplicate()
-        if not dtstart.isDateOnly():
-            if dtstart.local():
-                newdtstartValue.adjustTimezone(dtstart.getTimezone())
         else:
-            newdtstartValue.setDateOnly(True)
-
-        newcomp.removeProperties(definitions.cICalProperty_DTSTART)
-        newcomp.removeProperties(definitions.cICalProperty_DTEND)
-        prop = Property(definitions.cICalProperty_DTSTART, newdtstartValue)
-        newcomp.addProperty(prop)
-        if not newcomp.useDuration():
-            prop = Property(definitions.cICalProperty_DTEND, newdtstartValue + oldduration)
-            newcomp.addProperty(prop)
-
-        newcomp.addProperty(Property("RECURRENCE-ID", newdtstartValue))
-
-        # After creating/changing a component we need to do this to keep PyCalendar happy
-        newcomp.finalise()
-
-        return newcomp
+            return master.deriveComponent(recurrenceID)
 
 
     def masterComponent(self):

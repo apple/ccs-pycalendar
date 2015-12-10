@@ -79,7 +79,14 @@ class RequestStatusValue(Value):
 
     # os - StringIO object
     def generate(self, os):
-        utils.generateTextList(os, self.mValue if len(self.mValue) < 3 or self.mValue[2] else self.mValue[:2])
+        try:
+            os.write(self.getTextValue())
+        except:
+            pass
+
+
+    def getTextValue(self):
+        return utils.getTextList(self.mValue if len(self.mValue) < 3 or self.mValue[2] else self.mValue[:2])
 
 
     def writeXML(self, node, namespace):

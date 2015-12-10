@@ -96,6 +96,10 @@ class Value(ValueMixin):
         raise NotImplementedError
 
 
+    def getTextValue(self):
+        raise NotImplementedError
+
+
     def setValue(self, value):
         raise NotImplementedError
 

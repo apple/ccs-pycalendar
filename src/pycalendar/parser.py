@@ -79,4 +79,3 @@ class ParserContext(object):
         ParserContext.INVALID_REQUEST_STATUS_VALUE = ParserContext.PARSER_RAISE
         ParserContext.BACKSLASH_IN_URI_VALUE = ParserContext.PARSER_RAISE
         ParserContext.BACKSLASH_IN_GEO_VALUE = ParserContext.PARSER_RAISE
-        ParserContext.INVALID_REQUEST_STATUS = ParserContext.PARSER_RAISE

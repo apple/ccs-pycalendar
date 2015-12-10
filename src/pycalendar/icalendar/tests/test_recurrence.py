@@ -208,7 +208,7 @@ class TestRecurrence(unittest.TestCase):
             self.assertEqual(
                 items,
                 results,
-                msg="Failed rule: #{} {}".format(ctr + 1, i["rule"])
+                msg="Failed rule: #{} {} {}".format(ctr + 1, i["rule"], items)
             )
 
 

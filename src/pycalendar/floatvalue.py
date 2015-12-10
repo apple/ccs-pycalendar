@@ -45,6 +45,10 @@ class FloatValue(Value):
             pass
 
 
+    def getTextValue(self):
+        return str(self.mValue)
+
+
     def writeXML(self, node, namespace):
         value = self.getXMLNode(node, namespace)
         value.text = str(self.mValue)

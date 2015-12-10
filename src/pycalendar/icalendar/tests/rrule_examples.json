@@ -15,6 +15,14 @@
 		]
 	},
 	{
+		"rule": "FREQ=YEARLY;BYWEEKNO=1",
+		"start": "20141130T000000",
+		"end": "20160101T000000",
+		"results": [
+            "20141229T000000"
+		]
+	},
+	{
 		"rule": "FREQ=MONTHLY",
 		"start": "20140140T120000",
 		"end": "20150101T000000",

@@ -42,6 +42,10 @@ class PlainTextValue(Value):
             pass
 
 
+    def getTextValue(self):
+        return self.mValue
+
+
     def writeXML(self, node, namespace):
         value = self.getXMLNode(node, namespace)
         value.text = self.mValue

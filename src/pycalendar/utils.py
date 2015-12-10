@@ -89,48 +89,40 @@ def find_first_of(text, tokens, offset):
 
 
 
-def escapeTextValue(value):
-    os = StringIO.StringIO()
-    writeTextValue(os, value)
-    return os.getvalue()
+def getTextValue(value):
+    result = []
+    start_pos = 0
+    end_pos = find_first_of(value, "\r\n;\\,", start_pos)
+    if end_pos != -1:
+        while True:
+            # Write current segment
+            result.append(value[start_pos:end_pos])
 
+            # Write escape
+            result.append("\\")
+            c = value[end_pos]
+            if c == '\r':
+                result.append("r")
+            elif c == '\n':
+                result.append("n")
+            elif c == ';':
+                result.append(";")
+            elif c == '\\':
+                result.append("\\")
+            elif c == ',':
+                result.append(",")
 
+            # Bump past escapee and look for next segment
+            start_pos = end_pos + 1
 
-def writeTextValue(os, value):
-    try:
-        start_pos = 0
-        end_pos = find_first_of(value, "\r\n;\\,", start_pos)
-        if end_pos != -1:
-            while True:
-                # Write current segment
-                os.write(value[start_pos:end_pos])
+            end_pos = find_first_of(value, "\r\n;\\,", start_pos)
+            if end_pos == -1:
+                result.append(value[start_pos:])
+                break
+    else:
+        result.append(value)
 
-                # Write escape
-                os.write("\\")
-                c = value[end_pos]
-                if c == '\r':
-                    os.write("r")
-                elif c == '\n':
-                    os.write("n")
-                elif c == ';':
-                    os.write(";")
-                elif c == '\\':
-                    os.write("\\")
-                elif c == ',':
-                    os.write(",")
-
-                # Bump past escapee and look for next segment
-                start_pos = end_pos + 1
-
-                end_pos = find_first_of(value, "\r\n;\\,", start_pos)
-                if end_pos == -1:
-                    os.write(value[start_pos:])
-                    break
-        else:
-            os.write(value)
-
-    except:
-        pass
+    return "".join(result)
 
 
 
@@ -287,17 +279,15 @@ def parseTextList(data, sep=';', always_list=False):
 
 
 
-def generateTextList(os, data, sep=';'):
+def getTextList(data, sep=';'):
     """
     Each element of the list must be separately escaped
     """
-    try:
-        if isinstance(data, basestring):
-            data = (data,)
-        results = [escapeTextValue(value) for value in data]
-        os.write(sep.join(results))
-    except:
-        pass
+    if isinstance(data, basestring):
+        data = (data,)
+    elif data is None:
+        data = ("",)
+    return sep.join([getTextValue(value) for value in data])
 
 
 
@@ -343,25 +333,9 @@ def parseDoubleNestedList(data, maxsize):
 
 
 
-def generateDoubleNestedList(os, data):
-    try:
-        def _writeElement(item):
-            if isinstance(item, basestring):
-                writeTextValue(os, item)
-            else:
-                if item:
-                    writeTextValue(os, item[0])
-                    for bit in item[1:]:
-                        os.write(",")
-                        writeTextValue(os, bit)
+def getDoubleNestedList(data):
+    return ";".join([getTextList(item, ",") for item in data])
 
-        for item in data[:-1]:
-            _writeElement(item)
-            os.write(";")
-        _writeElement(data[-1])
-
-    except:
-        pass
 
 # Date/time calcs
 days_in_month = (0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31)
