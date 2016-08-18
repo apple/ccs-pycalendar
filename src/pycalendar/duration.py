@@ -149,7 +149,7 @@ class Duration(ValueMixin):
 
             # Must have a 'P'
             if data[offset] != "P":
-                raise ValueError
+                raise ValueError("Duration: missing 'P'")
             offset += 1
 
             # Look for time
@@ -167,7 +167,7 @@ class Duration(ValueMixin):
                     if offset != maxoffset:
                         if ParserContext.INVALID_DURATION_VALUE != ParserContext.PARSER_RAISE:
                             return
-                        raise ValueError
+                        raise ValueError("Duration: extra data after 'W'")
                     return
                 elif data[offset] == "D":
                     # Have a number of days
@@ -180,10 +180,10 @@ class Duration(ValueMixin):
 
                     # Look for time - exit if none
                     if data[offset] != "T":
-                        raise ValueError
+                        raise ValueError("Duration: no 'T' after 'D'")
                 else:
                     # Error in format
-                    raise ValueError
+                    raise ValueError("Duration: need 'D' or 'W'")
 
             # Have time
             offset += 1
@@ -192,7 +192,7 @@ class Duration(ValueMixin):
             # send T with no additional text
             if offset == maxoffset:
                 if ParserContext.INVALID_DURATION_VALUE == ParserContext.PARSER_RAISE:
-                    raise ValueError
+                    raise ValueError("Duration: need number after 'T'")
                 else:
                     return
             num, offset = strtoul(data, offset)
@@ -233,7 +233,7 @@ class Duration(ValueMixin):
                 if offset == maxoffset:
                     return
 
-            raise ValueError
+            raise ValueError("Duration: invalid data after 'T'")
 
         except IndexError:
             raise ValueError("Duration: index error")

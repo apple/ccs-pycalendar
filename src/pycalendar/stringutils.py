@@ -55,12 +55,12 @@ def strtoul(s, offset=0):
             offset += 1
             continue
         elif offset == 0:
-            raise ValueError
+            raise ValueError("Could not parse a number")
         else:
             return int(s[startoffset:offset]), offset
     else:
         if offset == 0:
-            raise ValueError
+            raise ValueError("Could not parse a number")
         else:
             return int(s[startoffset:]), offset
 

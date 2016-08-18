@@ -56,7 +56,7 @@ class RequestStatusValue(Value):
                     desc = ""
                 rest = None
             else:
-                raise ValueError
+                raise ValueError("RequestStatus: too few value components")
         elif len(result) == 2:
             code, desc = result
             rest = None
@@ -66,12 +66,12 @@ class RequestStatusValue(Value):
             if ParserContext.INVALID_REQUEST_STATUS_VALUE != ParserContext.PARSER_RAISE:
                 code, desc, rest = result[:3]
             else:
-                raise ValueError
+                raise ValueError("RequestStatus: too many value components")
 
         if "\\" in code and ParserContext.INVALID_REQUEST_STATUS_VALUE in (ParserContext.PARSER_IGNORE, ParserContext.PARSER_FIX):
             code = code.replace("\\", "")
         elif ParserContext.INVALID_REQUEST_STATUS_VALUE == ParserContext.PARSER_RAISE:
-            raise ValueError
+            raise ValueError("RequestStatus: cannot have '\\' in value")
 
         # Decoding required
         self.mValue = [code, desc, rest, ] if rest else [code, desc, ]

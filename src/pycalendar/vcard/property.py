@@ -225,7 +225,7 @@ class Property(PropertyBase):
                     # ":;"
                     parameter_name, txt = stringutils.strduptokenstr(txt, "=:;")
                     if parameter_name is None:
-                        raise InvalidProperty("Invalid property", data)
+                        raise InvalidProperty("Invalid property: empty parameter name", data)
 
                     if txt[0] != "=":
                         # Deal with parameters without values
@@ -244,7 +244,7 @@ class Property(PropertyBase):
                         txt = txt[1:]
                         parameter_value, txt = stringutils.strduptokenstr(txt, ":;,")
                         if parameter_value is None:
-                            raise InvalidProperty("Invalid property", data)
+                            raise InvalidProperty("Invalid property: empty parameter name", data)
 
                     # Now add parameter value (decode ^-escaping)
                     if parameter_name is not None:
@@ -256,7 +256,7 @@ class Property(PropertyBase):
                         txt = txt[1:]
                         parameter_value2, txt = stringutils.strduptokenstr(txt, ":;,")
                         if parameter_value2 is None:
-                            raise InvalidProperty("Invalid property", data)
+                            raise InvalidProperty("Invalid property: empty parameter multi-value", data)
                         attrvalue.addValue(decodeParameterValue(parameter_value2))
                 elif txt[0] == ':':
                     txt = txt[1:]

@@ -173,7 +173,7 @@ class DateTime(ValueMixin):
             result.normalise()
             return result
 
-        raise ValueError
+        raise ValueError("DateTime: cannot subtract: {}".format(dateorduration))
 
 
     # Comparators
@@ -969,9 +969,9 @@ class DateTime(ValueMixin):
         index += 2
 
         if ' ' in data[:index] and ParserContext.INVALID_DATETIME_LEADINGSPACE == ParserContext.PARSER_RAISE:
-            raise ValueError
+            raise ValueError("DateTime: spaces not allowed at start")
         if self.mYear < 0 or self.mMonth < 0 or self.mDay < 0:
-            raise ValueError
+            raise ValueError("DateTime: negative date components not allowed")
         return index
 
 
@@ -1000,7 +1000,7 @@ class DateTime(ValueMixin):
         if data[index] == ",":
             index += 1
             if not data[index].isdigit():
-                raise ValueError
+                raise ValueError("DateTime: invalid TZ offset digits")
             while index < dlen and data[index].isdigit():
                 index += 1
 
@@ -1015,7 +1015,7 @@ class DateTime(ValueMixin):
                 elif data[index] == "-":
                     sign = -1
                 else:
-                    raise ValueError
+                    raise ValueError("DateTime: invalid TZ offset sign")
                 index += 1
 
                 # Get hours
@@ -1031,7 +1031,7 @@ class DateTime(ValueMixin):
                 self.mTZID = sign * (hours_offset * 60 + minutes_offset) * 60
 
         if index < dlen:
-            raise ValueError
+            raise ValueError("DateTime: invalid TZ offset length")
         return index
 
 
@@ -1051,7 +1051,7 @@ class DateTime(ValueMixin):
             if index < dlen:
 
                 if data[index] != 'T':
-                    raise ValueError
+                    raise ValueError("DateTime: no 'T' after date")
                 index += 1
 
                 # Parse out the time
@@ -1064,11 +1064,11 @@ class DateTime(ValueMixin):
                     else:
                         if index < dlen:
                             if data[index] != 'Z':
-                                raise ValueError
+                                raise ValueError("DateTime: no 'Z' after time")
                             index += 1
                             self.mTZUTC = True
                             if index < dlen:
-                                raise ValueError
+                                raise ValueError("DateTime: extra data at end")
                 else:
                     self.mTZUTC = False
             else:

@@ -42,11 +42,11 @@ class UTCOffsetValue(Value):
         datalen = len(data)
         if datalen not in ((6, 9,) if fullISO else (5, 7,)):
             self.mValue = 0
-            raise ValueError
+            raise ValueError("UTCOffset: invalid format")
 
         # Get sign
         if data[0] not in ('+', '-'):
-            raise ValueError
+            raise ValueError("UTCOffset: does not start with '+' or '-'")
         plus = (data[0] == '+')
 
         # Get hours

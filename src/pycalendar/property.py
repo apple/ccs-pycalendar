@@ -262,7 +262,7 @@ class PropertyBase(object):
             # Look for parameter or value delimiter
             prop_name, txt = stringutils.strduptokenstr(data, ";:")
             if not prop_name:
-                raise InvalidProperty("Invalid property", data)
+                raise InvalidProperty("Invalid property: empty name", data)
 
             # Get the name
             if prop.sUsesGroup:
@@ -321,11 +321,11 @@ class PropertyBase(object):
                     # Get quoted string or token
                     parameter_name, txt = stringutils.strduptokenstr(txt, "=")
                     if parameter_name is None:
-                        raise InvalidProperty("Invalid property", data)
+                        raise InvalidProperty("Invalid property: empty parameter name", data)
                     txt = txt[1:]
                     parameter_value, txt = stringutils.strduptokenstr(txt, ":;,")
                     if parameter_value is None:
-                        raise InvalidProperty("Invalid property", data)
+                        raise InvalidProperty("Invalid property: empty parameter value", data)
 
                     # Now add parameter value (decode ^-escaping)
                     attrvalue = Parameter(name=parameter_name, value=decodeParameterValue(parameter_value))
@@ -336,13 +336,13 @@ class PropertyBase(object):
                         txt = txt[1:]
                         parameter_value2, txt = stringutils.strduptokenstr(txt, ":;,")
                         if parameter_value2 is None:
-                            raise InvalidProperty("Invalid property", data)
+                            raise InvalidProperty("Invalid property: empty parameter multi-value", data)
                         attrvalue.addValue(decodeParameterValue(parameter_value2))
                 elif txt[0] == ':':
                     return txt[1:]
                 else:
                     # We should never get here but if we do we need to terminate the loop
-                    raise InvalidProperty("Invalid property", data)
+                    raise InvalidProperty("Invalid property: missing value separator", data)
 
         except IndexError:
             raise InvalidProperty("Invalid property: 'parameter index error'", data)

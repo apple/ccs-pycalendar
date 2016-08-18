@@ -97,7 +97,7 @@ class Period(ValueMixin):
                     self.mUseDuration = False
                     self.mDuration = None
             else:
-                raise ValueError
+                raise ValueError("Period: wrong number of '/' components")
         except IndexError:
             raise ValueError("Period: index error")
 

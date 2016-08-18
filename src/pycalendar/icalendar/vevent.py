@@ -74,7 +74,7 @@ class VEvent(ComponentRecur):
         if comp.getType() == definitions.cICalComponent_VALARM:
             super(VEvent, self).addComponent(comp)
         else:
-            raise ValueError
+            raise ValueError("Only 'VALARM' components allowed in 'VEVENT'")
 
 
     def getStatus(self):

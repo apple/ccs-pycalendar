@@ -27,7 +27,7 @@ def readFoldedLine(ins, lines):
         try:
             myline = ins.readline()
             if len(myline) == 0:
-                raise ValueError
+                raise ValueError("Folding: empty first line")
             if myline[-1] == "\n":
                 if myline[-2] == "\r":
                     lines[0] = myline[:-2]
@@ -49,7 +49,7 @@ def readFoldedLine(ins, lines):
         try:
             myline = ins.readline()
             if len(myline) == 0:
-                raise ValueError
+                raise ValueError("Folding: empty next line")
             if myline[-1] == "\n":
                 if myline[-2] == "\r":
                     lines[1] = myline[:-2]
@@ -169,13 +169,13 @@ def decodeTextValue(value):
             elif c == ':':
                 # ":" escape normally invalid
                 if ParserContext.INVALID_COLON_ESCAPE_SEQUENCE == ParserContext.PARSER_RAISE:
-                    raise ValueError
+                    raise ValueError("TextValue: '\\:' not allowed")
                 elif ParserContext.INVALID_COLON_ESCAPE_SEQUENCE == ParserContext.PARSER_FIX:
                     os.write(':')
 
             # Other escaped chars normally not allowed
             elif ParserContext.INVALID_ESCAPE_SEQUENCES == ParserContext.PARSER_RAISE:
-                raise ValueError
+                raise ValueError("TextValue: unknown '\\' escapes not allowed")
             elif ParserContext.INVALID_ESCAPE_SEQUENCES == ParserContext.PARSER_FIX:
                 os.write(c)
 
@@ -337,7 +337,7 @@ def parseDoubleNestedList(data, maxsize):
         if ParserContext.INVALID_ADR_N_VALUES == ParserContext.PARSER_FIX:
             results = results[:maxsize]
         elif ParserContext.INVALID_ADR_N_VALUES == ParserContext.PARSER_RAISE:
-            raise ValueError
+            raise ValueError("ADR: too many components in value")
 
     return tuple(results)
 

@@ -66,7 +66,7 @@ class VTimezone(Component):
                 or (comp.getType() == definitions.cICalComponent_DAYLIGHT)):
             super(VTimezone, self).addComponent(comp)
         else:
-            raise ValueError
+            raise ValueError("Only 'STANDARD' or 'DAYLIGHT' components allowed in 'VTIMEZONE'")
 
 
     def getMapKey(self):

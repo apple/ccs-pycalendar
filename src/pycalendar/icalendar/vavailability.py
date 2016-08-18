@@ -95,7 +95,7 @@ class VAvailability(Component):
         if comp.getType() == definitions.cICalComponent_AVAILABLE:
             super(VAvailability, self).addComponent(comp)
         else:
-            raise ValueError
+            raise ValueError("Only 'AVAILABLE' components allowed in 'VAVAILABILITY'")
 
 
     def sortedPropertyKeyOrder(self):

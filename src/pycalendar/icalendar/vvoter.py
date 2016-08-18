@@ -51,7 +51,7 @@ class VVoter(Component):
         if comp.getType() == definitions.cICalComponent_VOTE:
             super(VVoter, self).addComponent(comp)
         else:
-            raise ValueError
+            raise ValueError("Only 'VOTE' components allowed in 'VVOTER'")
 
 
     def sortedPropertyKeyOrder(self):

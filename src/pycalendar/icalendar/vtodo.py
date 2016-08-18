@@ -145,7 +145,7 @@ class VToDo(ComponentRecur):
         if comp.getType() == definitions.cICalComponent_VALARM:
             super(VToDo, self).addComponent(comp)
         else:
-            raise ValueError
+            raise ValueError("Only 'VALARM' components allowed in 'VTODO'")
 
 
     def getStatus(self):
