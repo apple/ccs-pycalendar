@@ -35,13 +35,13 @@ def validate(fname):
     if data.find("BEGIN:VCALENDAR") != -1:
         try:
             cal = Calendar.parseText(data)
-        except ErrorBase, e:
+        except ErrorBase as e:
             print "Failed to parse iCalendar: %r" % (e,)
             sys.exit(1)
     elif data.find("BEGIN:VCARD") != -1:
         try:
             cal = Card.parseText(data)
-        except ErrorBase, e:
+        except ErrorBase as e:
             print "Failed to parse vCard: %r" % (e,)
             sys.exit(1)
     else:

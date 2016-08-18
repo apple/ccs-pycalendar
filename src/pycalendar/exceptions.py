@@ -21,6 +21,10 @@ class ErrorBase(Exception):
         self.mData = data
 
 
+    def __str__(self):
+        return "{}: {}".format(self.mReason, self.mData) if self.mData else self.mReason
+
+
 
 class InvalidData(ErrorBase):
     pass

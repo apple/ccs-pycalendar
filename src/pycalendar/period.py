@@ -99,7 +99,7 @@ class Period(ValueMixin):
             else:
                 raise ValueError
         except IndexError:
-            raise ValueError
+            raise ValueError("Period: index error")
 
 
     def generate(self, os):

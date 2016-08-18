@@ -226,8 +226,8 @@ class ContainerBase(ComponentBase):
             data = data.read()
         try:
             jobject = json.loads(data)
-        except ValueError, e:
-            raise InvalidData(e, data)
+        except ValueError as e:
+            raise InvalidData("JSON parse: {}".format(e), data)
         return cls.parseJSON(jobject, None, cls(add_defaults=False))
 
 

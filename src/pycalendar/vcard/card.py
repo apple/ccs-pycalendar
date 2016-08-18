@@ -166,8 +166,8 @@ class Card(ContainerBase):
             data = data.read()
         try:
             jobjects = json.loads(data)
-        except ValueError, e:
-            raise InvalidData(e, data)
+        except ValueError as e:
+            raise InvalidData("JSON error: '{}'".format(e), data)
         results = []
         for jobject in jobjects:
             results.append(cls.parseJSON(jobject, None, cls(add_defaults=False)))

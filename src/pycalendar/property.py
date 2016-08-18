@@ -301,8 +301,8 @@ class PropertyBase(object):
 
             return prop
 
-        except Exception:
-            raise InvalidProperty("Invalid property", data)
+        except Exception as e:
+            raise InvalidProperty("Invalid property: '{}'".format(e), data)
 
 
     def parseTextParameters(self, txt, data):
@@ -345,7 +345,7 @@ class PropertyBase(object):
                     raise InvalidProperty("Invalid property", data)
 
         except IndexError:
-            raise InvalidProperty("Invalid property", data)
+            raise InvalidProperty("Invalid property: 'parameter index error'", data)
 
 
     def getText(self):
@@ -507,8 +507,8 @@ class PropertyBase(object):
 
             return prop
 
-        except Exception:
-            raise InvalidProperty("Invalid property", jobject)
+        except Exception as e:
+            raise InvalidProperty("Invalid property: '{}'".format(e), jobject)
 
 
     def writeJSON(self, jobject):
@@ -579,8 +579,8 @@ class PropertyBase(object):
         # Now parse the data
         try:
             self.mValue.parse(data, self.sVariant)
-        except ValueError:
-            raise InvalidProperty("Invalid property value", data)
+        except ValueError as e:
+            raise InvalidProperty("Invalid property value: '{}'".format(e), data)
 
         self._postCreateValue(value_type)
 

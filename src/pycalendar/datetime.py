@@ -1074,7 +1074,7 @@ class DateTime(ValueMixin):
             else:
                 self.mDateOnly = True
         except IndexError:
-            raise ValueError
+            raise ValueError("DateTime: index error")
 
         # Always uncache posix time
         self.changed()

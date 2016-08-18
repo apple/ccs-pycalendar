@@ -383,8 +383,8 @@ class ComponentBase(object):
             return comp
         except ErrorBase:
             raise
-        except Exception:
-            raise InvalidComponent("Invalid component", jobject)
+        except Exception as e:
+            raise InvalidComponent("Invalid component: {}".format(e), jobject)
 
 
     def writeJSON(self, jobject):

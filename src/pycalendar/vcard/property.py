@@ -265,7 +265,7 @@ class Property(PropertyBase):
                     return txt
 
         except IndexError:
-            raise InvalidProperty("Invalid property", data)
+            raise InvalidProperty("Invalid property: index error", data)
 
 
     # Write out the actual property, possibly skipping the value

@@ -236,7 +236,7 @@ class Duration(ValueMixin):
             raise ValueError
 
         except IndexError:
-            raise ValueError
+            raise ValueError("Duration: index error")
 
 
     def generate(self, os):
