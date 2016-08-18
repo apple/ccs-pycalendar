@@ -175,7 +175,7 @@ def decodeTextValue(value):
 
             # Other escaped chars normally not allowed
             elif ParserContext.INVALID_ESCAPE_SEQUENCES == ParserContext.PARSER_RAISE:
-                raise ValueError("TextValue: unknown '\\' escapes not allowed")
+                raise ValueError("TextValue: '\\{}' not allowed".format(c))
             elif ParserContext.INVALID_ESCAPE_SEQUENCES == ParserContext.PARSER_FIX:
                 os.write(c)
 
