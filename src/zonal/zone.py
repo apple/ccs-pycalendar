@@ -88,18 +88,18 @@ class Zone(object):
         """
 
         lines = []
-        for count, rule in enumerate(self.rules):
+        for count, tzrule in enumerate(self.rules):
             if count == 0:
                 items = (
                     "Zone " + self.name,
-                    rule.generate(),
+                    tzrule.generate(),
                 )
             else:
                 items = (
                     "",
                     "",
                     "",
-                    rule.generate(),
+                    tzrule.generate(),
                 )
             lines.append("\t".join(items))
         return "\n".join(lines)
@@ -196,56 +196,56 @@ class Zone(object):
 
         def _generateRuleData():
             # Generate VTIMEZONE component for last set of rules
-            for rule in ruleorder:
-                if rule:
-                    # Accumulate rule portions with the same offset pairs
-                    lastOffsetPair = (rulemap[rule][0][1], rulemap[rule][0][2],)
+            for tzrule in ruleorder:
+                if tzrule:
+                    # Accumulate tzrule portions with the same offset pairs
+                    lastOffsetPair = (rulemap[tzrule][0][1], rulemap[tzrule][0][2],)
                     startIndex = 0
-                    for index in xrange(len(rulemap[rule])):
-                        offsetPair = (rulemap[rule][index][1], rulemap[rule][index][2],)
+                    for index in xrange(len(rulemap[tzrule])):
+                        offsetPair = (rulemap[tzrule][index][1], rulemap[tzrule][index][2],)
                         if offsetPair != lastOffsetPair:
-                            rule.vtimezone(
+                            tzrule.vtimezone(
                                 vtz,
                                 lastZoneRule,
-                                rulemap[rule][startIndex][0],
-                                rulemap[rule][index - 1][0],
-                                rulemap[rule][startIndex][1],
-                                rulemap[rule][startIndex][2],
+                                rulemap[tzrule][startIndex][0],
+                                rulemap[tzrule][index - 1][0],
+                                rulemap[tzrule][startIndex][1],
+                                rulemap[tzrule][startIndex][2],
                                 index - startIndex,
                             )
-                            lastOffsetPair = (rulemap[rule][index][1], rulemap[rule][index][2],)
+                            lastOffsetPair = (rulemap[tzrule][index][1], rulemap[tzrule][index][2],)
                             startIndex = index
 
-                    rule.vtimezone(
+                    tzrule.vtimezone(
                         vtz,
                         lastZoneRule,
-                        rulemap[rule][startIndex][0],
-                        rulemap[rule][index][0],
-                        rulemap[rule][startIndex][1],
-                        rulemap[rule][startIndex][2],
-                        len(rulemap[rule]),
+                        rulemap[tzrule][startIndex][0],
+                        rulemap[tzrule][index][0],
+                        rulemap[tzrule][startIndex][1],
+                        rulemap[tzrule][startIndex][2],
+                        len(rulemap[tzrule]),
                     )
                 else:
                     lastZoneRule.vtimezone(
                         vtz,
                         lastZoneRule,
-                        rulemap[rule][0][0],
-                        rulemap[rule][-1][0],
-                        rulemap[rule][0][1],
-                        rulemap[rule][0][2],
+                        rulemap[tzrule][0][0],
+                        rulemap[tzrule][-1][0],
+                        rulemap[tzrule][0][1],
+                        rulemap[tzrule][0][2],
                     )
             del ruleorder[:]
             rulemap.clear()
 
-        for dt, offsetfrom, offsetto, zonerule, rule in transitions:
+        for dt, offsetfrom, offsetto, zonerule, tzrule in transitions:
 
             # Check for change of rule - we ignore LMT's
             if zonerule.format != "LMT":
                 if lastZoneRule and lastZoneRule != zonerule:
                     _generateRuleData()
-                if rule not in ruleorder:
-                    ruleorder.append(rule)
-                rulemap.setdefault(rule, []).append((dt, offsetfrom, offsetto,))
+                if tzrule not in ruleorder:
+                    ruleorder.append(tzrule)
+                rulemap.setdefault(tzrule, []).append((dt, offsetfrom, offsetto,))
             lastZoneRule = zonerule
 
         # Do left overs
@@ -433,7 +433,7 @@ class ZoneRule(object):
             last_offset = lastOffset
             last_stdoffset = lastStdOffset
             finalUntil = self.getUntilDate()
-            for dt, to_offset, rule in tempresults:
+            for dt, to_offset, tzrule in tempresults:
                 dtutc = dt.getUTC(last_offset, last_stdoffset)
                 if dtutc >= lastUntilUTC:
                     if not found_start and dtutc != lastUntilUTC:
@@ -448,7 +448,7 @@ class ZoneRule(object):
                     if dtutc >= finalUntil.getUTC(last_offset, last_stdoffset):
                         break
 
-                    results.append((dtutc, to_offset, self, rule))
+                    results.append((dtutc, to_offset, self, tzrule))
 
                 last_offset = to_offset
                 last_stdoffset = self.getUTCOffset()
@@ -514,7 +514,6 @@ Rule\tUS\t1987\t2006\t-\tApr\tSun>=1\t2:00\t1:00\tD
 Rule\tUS\t2007\tmax\t-\tMar\tSun>=8\t2:00\t1:00\tD
 Rule\tUS\t2007\tmax\t-\tNov\tSun>=1\t2:00\t0\tS"""
     rules = {}
-    import rule
     ruleset = rule.RuleSet()
     ruleset.parse(rulesdef)
     rules[ruleset.name] = ruleset

@@ -144,10 +144,10 @@ class tzconvert(object):
         """
 
         cal = Calendar()
-        for zone in self.zones.itervalues():
-            if filterzones and zone.name not in filterzones:
+        for tzzone in self.zones.itervalues():
+            if filterzones and tzzone.name not in filterzones:
                 continue
-            vtz = zone.vtimezone(cal, self.rules, minYear, maxYear)
+            vtz = tzzone.vtimezone(cal, self.rules, minYear, maxYear)
             cal.addComponent(vtz)
 
         return cal.getText()
@@ -164,15 +164,15 @@ class tzconvert(object):
         except OSError:
             pass
 
-        for zone in self.zones.itervalues():
-            if filterzones and zone.name not in filterzones:
+        for tzzone in self.zones.itervalues():
+            if filterzones and tzzone.name not in filterzones:
                 continue
             cal = Calendar()
-            vtz = zone.vtimezone(cal, self.rules, minYear, maxYear)
+            vtz = tzzone.vtimezone(cal, self.rules, minYear, maxYear)
             cal.addComponent(vtz)
 
             icsdata = cal.getText()
-            fpath = os.path.join(outputdir, zone.name + ".ics")
+            fpath = os.path.join(outputdir, tzzone.name + ".ics")
             if not os.path.exists(os.path.dirname(fpath)):
                 os.makedirs(os.path.dirname(fpath))
             with open(fpath, "w") as f:

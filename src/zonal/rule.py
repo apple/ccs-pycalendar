@@ -534,7 +534,7 @@ class Rule(object):
                     rrule.setByDay(((offset, rday),))
             else:
                 try:
-                    _ignore_day = int(self.onDay)
+                    int(self.onDay)
                 except:
                     assert False, "onDay value is not recognized: %s" % (self.onDay,)
 

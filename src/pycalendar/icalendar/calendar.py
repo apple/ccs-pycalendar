@@ -536,7 +536,7 @@ class Calendar(ContainerBase):
         dtstart_iter.next()
         dtend_iter = dtend.iter()
         dtend_iter.next()
-        for i in i:
+        for _ignore in (None,):
 
             # Check for non-overlap
             if dtstart_iter > temp.getEnd():

@@ -39,7 +39,7 @@ class OutputFilter(object):
         self.mSubComponents = None
 
     def addSubComponent(self, comp):
-        if self.mSubComponents == None:
+        if self.mSubComponents is None:
             self.mSubComponents = {}
 
         self.mSubComponents[comp.getType()] = comp
