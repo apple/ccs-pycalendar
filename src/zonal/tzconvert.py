@@ -38,6 +38,7 @@ __all__ = (
     "tzconvert",
 )
 
+
 class tzconvert(object):
 
     def __init__(self, verbose=False):
@@ -46,10 +47,8 @@ class tzconvert(object):
         self.links = {}
         self.verbose = verbose
 
-
     def getZoneNames(self):
         return set(self.zones.keys())
-
 
     def parse(self, file):
         try:
@@ -79,12 +78,10 @@ class tzconvert(object):
             print("Failed to parse file %s" % (file,))
             raise
 
-
     def parseRule(self, line):
         ruleitem = rule.Rule()
         ruleitem.parse(line)
         self.rules.setdefault(ruleitem.name, rule.RuleSet()).rules.append(ruleitem)
-
 
     def parseZone(self, line, f):
         os = StringIO.StringIO()
@@ -107,14 +104,12 @@ class tzconvert(object):
 
         return last_line
 
-
     def parseLink(self, line):
 
         splits = line.split()
         linkFrom = splits[1]
         linkTo = splits[2]
         self.links[linkTo] = linkFrom
-
 
     def parseWindowsAliases(self, aliases):
 
@@ -135,7 +130,6 @@ class tzconvert(object):
         except (ValueError, KeyError):
             raise ValueError("Unable to parse windows alias file: {}".format(aliases))
 
-
     def expandZone(self, zonename, minYear, maxYear=2018):
         """
         Expand a zones transition dates up to the specified year.
@@ -143,7 +137,6 @@ class tzconvert(object):
         zone = self.zones[zonename]
         expanded = zone.expand(self.rules, minYear, maxYear)
         return [(item[0], item[1], item[2],) for item in expanded]
-
 
     def vtimezones(self, minYear, maxYear=2018, filterzones=None):
         """
@@ -158,7 +151,6 @@ class tzconvert(object):
             cal.addComponent(vtz)
 
         return cal.getText()
-
 
     def generateZoneinfoFiles(self, outputdir, minYear, maxYear=2018, links=True, windowsAliases=None, filterzones=None):
 
@@ -219,7 +211,6 @@ class tzconvert(object):
             linkPath = os.path.join(outputdir, "links.txt")
             with open(linkPath, "w") as f:
                 f.write("\n".join(link_list))
-
 
 
 def usage(error_msg=None):

@@ -22,6 +22,7 @@ from pycalendar.vcard.card import Card
 import os
 import sys
 
+
 def validate(fname):
     """
     Check whether the contents of the specified file is valid iCalendar or vCard data.

@@ -19,6 +19,7 @@ from pycalendar.urivalue import URIValue
 from pycalendar.icalendar.property import Property
 import unittest
 
+
 class TestURIValue(unittest.TestCase):
 
     def testParseValue(self):
@@ -52,7 +53,6 @@ class TestURIValue(unittest.TestCase):
             req.parse(item, "icalendar")
             test = req.getText()
             self.assertEqual(test, result, "Failed to parse and re-generate '%s'" % (item,))
-
 
     def testParseProperty(self):
 

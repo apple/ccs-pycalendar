@@ -18,6 +18,7 @@
 
 from cStringIO import StringIO
 
+
 class ValueMixin(object):
     """
     Mix-in for operations common to Value's and value-specific classes.
@@ -26,39 +27,31 @@ class ValueMixin(object):
     def __str__(self):
         return self.getText()
 
-
     @classmethod
     def parseText(cls, data):
         value = cls()
         value.parse(data)
         return value
 
-
     def parse(self, data):
         raise NotImplementedError
 
-
     def generate(self, os):
         raise NotImplementedError
-
 
     def getText(self):
         os = StringIO()
         self.generate(os)
         return os.getvalue()
 
-
     def writeXML(self, node, namespace):
         raise NotImplementedError
-
 
     def parseJSON(self, jobject):
         raise NotImplementedError
 
-
     def writeJSON(self, jobject):
         raise NotImplementedError
-
 
 
 class WrapperValue(object):
@@ -72,39 +65,30 @@ class WrapperValue(object):
     def __init__(self, value=None):
         self.mValue = value if value is not None else self._wrappedClass()
 
-
     def getType(self):
         return self._wrappedType
-
 
     def duplicate(self):
         return self.__class__(self.mValue.duplicate())
 
-
     def parse(self, data, variant):
         self.mValue.parse(data)
 
-
     def generate(self, os):
         self.mValue.generate(os)
-
 
     def writeXML(self, node, namespace):
         value = self.getXMLNode(node, namespace)
         value.text = self.mValue.writeXML()
 
-
     def parseJSONValue(self, jobject):
         self.mValue.parseJSON(jobject)
-
 
     def writeJSONValue(self, jobject):
         self.mValue.writeJSON(jobject)
 
-
     def getValue(self):
         return self.mValue
-
 
     def setValue(self, value):
         self.mValue = value

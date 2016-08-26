@@ -33,6 +33,7 @@ from pycalendar.value import Value
 import cStringIO as StringIO
 import xml.etree.cElementTree as XML
 
+
 class PropertyBase(object):
 
     # Mappings between various tokens and internal definitions
@@ -81,91 +82,70 @@ class PropertyBase(object):
         if always_write_value:
             cls.sAlwaysValueTypes.add(propname)
 
-
     def __init__(self, name=None, value=None, valuetype=None):
 
         self.mName = name if name is not None else ""
         self.mParameters = {}
         self.mValue = None
 
-
     def duplicate(self):
         raise NotImplementedError
-
 
     def __hash__(self):
         raise NotImplementedError
 
-
     def __ne__(self, other):
         return not self.__eq__(other)
-
 
     def __eq__(self, other):
         raise NotImplementedError
 
-
     def __repr__(self):
         return "Property: %s" % (self.getText(),)
-
 
     def __str__(self):
         return self.getText()
 
-
     def getGroup(self):
         return self.mGroup if self.sUsesGroup else None
-
 
     def setGroup(self, group):
         if self.sUsesGroup:
             self.mGroup = group
 
-
     def getName(self):
         return self.mName
-
 
     def setName(self, name):
         self.mName = name
 
-
     def getParameters(self):
         return self.mParameters
-
 
     def setParameters(self, parameters):
         self.mParameters = dict([(k.upper(), v) for k, v in parameters.iteritems()])
 
-
     def hasParameter(self, attr):
         return attr.upper() in self.mParameters
-
 
     def getParameterValue(self, attr):
         return self.mParameters[attr.upper()][0].getFirstValue()
 
-
     def getParameterValues(self, attr):
         return self.mParameters[attr.upper()][0].getValues()
-
 
     def addParameter(self, attr):
         self.mParameters.setdefault(attr.getName().upper(), []).append(attr)
 
-
     def replaceParameter(self, attr):
         self.mParameters[attr.getName().upper()] = [attr]
-
 
     def removeParameters(self, attr):
         if attr.upper() in self.mParameters:
             del self.mParameters[attr.upper()]
 
-
     def getValue(self):
         return self.mValue
-
 
     def getBinaryValue(self):
 
@@ -174,14 +154,12 @@ class PropertyBase(object):
         else:
             return None
 
-
     def getCalAddressValue(self):
 
         if isinstance(self.mValue, CalAddressValue):
             return self.mValue
         else:
             return None
-
 
     def getDateTimeValue(self):
 
@@ -190,14 +168,12 @@ class PropertyBase(object):
         else:
             return None
 
-
     def getDurationValue(self):
 
         if isinstance(self.mValue, DurationValue):
             return self.mValue
         else:
             return None
-
 
     def getIntegerValue(self):
 
@@ -206,14 +182,12 @@ class PropertyBase(object):
         else:
             return None
 
-
     def getMultiValue(self):
 
         if isinstance(self.mValue, MultiValue):
             return self.mValue
         else:
             return None
-
 
     def getPeriodValue(self):
 
@@ -222,14 +196,12 @@ class PropertyBase(object):
         else:
             return None
 
-
     def getTextValue(self):
 
         if isinstance(self.mValue, PlainTextValue):
             return self.mValue
         else:
             return None
-
 
     def getURIValue(self):
 
@@ -238,14 +210,12 @@ class PropertyBase(object):
         else:
             return None
 
-
     def getUTCOffsetValue(self):
 
         if isinstance(self.mValue, UTCOffsetValue):
             return self.mValue
         else:
             return None
-
 
     @classmethod
     def parseText(cls, data):
@@ -304,7 +274,6 @@ class PropertyBase(object):
         except Exception as e:
             raise InvalidProperty("Invalid property: '{}'".format(e), data)
 
-
     def parseTextParameters(self, txt, data):
         """
         Parse parameters, return string point at value.
@@ -347,18 +316,15 @@ class PropertyBase(object):
         except IndexError:
             raise InvalidProperty("Invalid property: 'parameter index error'", data)
 
-
     def getText(self):
         os = StringIO.StringIO()
         self.generate(os)
         return os.getvalue()
 
-
     def generate(self, os):
 
         # Write it out always with value
         self.generateValue(os, False)
-
 
     def generateFiltered(self, os, filter):
 
@@ -366,7 +332,6 @@ class PropertyBase(object):
         test, novalue = filter.testPropertyValue(self.mName.upper())
         if test:
             self.generateValue(os, novalue)
-
 
     # Write out the actual property, possibly skipping the value
     def generateValue(self, os, novalue):
@@ -424,12 +389,10 @@ class PropertyBase(object):
 
         os.write("\r\n")
 
-
     def writeXML(self, node, namespace):
 
         # Write it out always with value
         self.generateValueXML(node, namespace, False)
-
 
     def writeXMLFiltered(self, node, namespace, filter):
 
@@ -437,7 +400,6 @@ class PropertyBase(object):
         test, novalue = filter.testPropertyValue(self.mName.upper())
         if test:
             self.generateValueXML(node, namespace, novalue)
-
 
     # Write out the actual property, possibly skipping the value
     def generateValueXML(self, node, namespace, novalue):
@@ -455,7 +417,6 @@ class PropertyBase(object):
         # Write value
         if self.mValue and not novalue:
             self.mValue.writeXML(prop, namespace)
-
 
     @classmethod
     def parseJSON(cls, jobject):
@@ -510,12 +471,10 @@ class PropertyBase(object):
         except Exception as e:
             raise InvalidProperty("Invalid property: '{}'".format(e), jobject)
 
-
     def writeJSON(self, jobject):
 
         # Write it out always with value
         self.generateValueJSON(jobject, False)
-
 
     def writeJSONFiltered(self, jobject, filter):
 
@@ -523,7 +482,6 @@ class PropertyBase(object):
         test, novalue = filter.testPropertyValue(self.mName.upper())
         if test:
             self.generateValueJSON(jobject, novalue)
-
 
     def generateValueJSON(self, jobject, novalue):
 
@@ -543,7 +501,6 @@ class PropertyBase(object):
         if self.mValue and not novalue:
             self.mValue.writeJSON(prop)
 
-
     def determineValueType(self):
         # Get value type from property name
         value_type = self.sDefaultValueTypeMap.get(self.mName.upper(), Value.VALUETYPE_UNKNOWN)
@@ -560,7 +517,6 @@ class PropertyBase(object):
                 value_type = self.sSpecialVariants[self.mName.upper()]
 
         return value_type
-
 
     def createValue(self, data):
         # Tidy first
@@ -584,7 +540,6 @@ class PropertyBase(object):
 
         self._postCreateValue(value_type)
 
-
     def _postCreateValue(self, value_type):
         """
         Do some extra work after creating a value in this property.
@@ -593,7 +548,6 @@ class PropertyBase(object):
         @type value_type: C{str}
         """
         pass
-
 
     def setValue(self, value):
         # Tidy first
@@ -618,7 +572,6 @@ class PropertyBase(object):
         # Special post-create for some types
         self._postCreateValue(value_type)
 
-
     def setupValueParameter(self):
         if self.sValue in self.mParameters:
             del self.mParameters[self.sValue]
@@ -640,7 +593,6 @@ class PropertyBase(object):
             if actual_value is not None and (default_type is not None or actual_type != Value.VALUETYPE_TEXT):
                 self.mParameters.setdefault(self.sValue, []).append(Parameter(name=self.sValue, value=actual_value))
 
-
     # Creation
     def _init_attr_value_int(self, ival):
         # Value
@@ -648,7 +600,6 @@ class PropertyBase(object):
 
         # Parameters
         self.setupValueParameter()
-
 
     def _init_attr_value_text(self, txt, value_type):
         # Value
@@ -659,14 +610,12 @@ class PropertyBase(object):
         # Parameters
         self.setupValueParameter()
 
-
     def _init_attr_value_datetime(self, dt):
         # Value
         self.mValue = DateTimeValue(value=dt)
 
         # Parameters
         self.setupValueParameter()
-
 
     def _init_attr_value_utcoffset(self, utcoffset):
         # Value

@@ -20,6 +20,7 @@ from pycalendar.value import Value
 from pycalendar.valueutils import WrapperValue
 from pycalendar.vcard.adr import Adr
 
+
 class AdrValue(WrapperValue, Value):
 
     _wrappedClass = Adr

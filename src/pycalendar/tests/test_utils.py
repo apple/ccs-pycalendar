@@ -17,6 +17,7 @@
 import unittest
 from pycalendar.utils import encodeParameterValue, decodeParameterValue
 
+
 class TestUtils(unittest.TestCase):
 
     def test_encodeParameterValue(self):
@@ -40,7 +41,6 @@ class TestUtils(unittest.TestCase):
                 decoded = value
             self.assertEqual(encodeParameterValue(value), encoded)
             self.assertEqual(decodeParameterValue(encoded), decoded)
-
 
     def test_decodeParameterValue(self):
         """

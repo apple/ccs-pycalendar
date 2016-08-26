@@ -23,6 +23,7 @@ from pycalendar.icalendar.property import Property
 from pycalendar.icalendar.validation import ICALENDAR_VALUE_CHECKS
 from pycalendar.value import Value
 
+
 class VAlarm(Component):
 
     sActionMap = {
@@ -69,7 +70,6 @@ class VAlarm(Component):
         def getType(self):
             return self.mType
 
-
     class VAlarmAudio(VAlarmAction):
 
         propertyCardinality_1 = (
@@ -111,7 +111,6 @@ class VAlarm(Component):
         def getSpeakText(self):
             return self.mSpeakText
 
-
     class VAlarmDisplay(VAlarmAction):
 
         propertyCardinality_1 = (
@@ -152,7 +151,6 @@ class VAlarm(Component):
 
         def getDescription(self):
             return self.mDescription
-
 
     class VAlarmEmail(VAlarmAction):
 
@@ -228,7 +226,6 @@ class VAlarm(Component):
         def getAttendees(self):
             return self.mAttendees
 
-
     class VAlarmUnknown(VAlarmAction):
 
         propertyCardinality_1 = (
@@ -247,7 +244,6 @@ class VAlarm(Component):
 
         def duplicate(self):
             return VAlarm.VAlarmUnknown()
-
 
     class VAlarmURI(VAlarmAction):
 
@@ -287,7 +283,6 @@ class VAlarm(Component):
         def getURI(self):
             return self.mURI
 
-
     class VAlarmNone(VAlarmAction):
 
         propertyCardinality_1 = (
@@ -299,7 +294,6 @@ class VAlarm(Component):
 
         def duplicate(self):
             return VAlarm.VAlarmNone()
-
 
     def getMimeComponentName(self):
         # Cannot be sent as a separate MIME object
@@ -331,7 +325,7 @@ class VAlarm(Component):
         # Does not repeat by default
         self.mRepeats = 0
         self.mRepeatInterval = Duration()
-        self.mRepeatInterval.setDuration(5 * 60) # Five minutes
+        self.mRepeatInterval.setDuration(5 * 60)  # Five minutes
 
         # Status
         self.mStatusInit = False
@@ -342,7 +336,6 @@ class VAlarm(Component):
 
         # Create action data
         self.mActionData = VAlarm.VAlarmDisplay("")
-
 
     def duplicate(self, parent=None):
         other = super(VAlarm, self).duplicate(parent=parent)
@@ -365,42 +358,32 @@ class VAlarm(Component):
         other.mActionData = self.mActionData.duplicate()
         return other
 
-
     def getType(self):
         return definitions.cICalComponent_VALARM
-
 
     def getAction(self):
         return self.mAction
 
-
     def getActionData(self):
         return self.mActionData
-
 
     def isTriggerAbsolute(self):
         return self.mTriggerAbsolute
 
-
     def getTriggerOn(self):
         return self.mTriggerOn
-
 
     def getTriggerDuration(self):
         return self.mTriggerBy
 
-
     def isTriggerOnStart(self):
         return self.mTriggerOnStart
-
 
     def getRepeats(self):
         return self.mRepeats
 
-
     def getInterval(self):
         return self.mRepeatInterval
-
 
     def added(self):
         # Added to calendar so add to calendar notifier
@@ -409,14 +392,12 @@ class VAlarm(Component):
         # Do inherited
         super(VAlarm, self).added()
 
-
     def removed(self):
         # Removed from calendar so add to calendar notifier
         # calstore::CCalendarNotifier::sCalendarNotifier.RemoveAlarm(this)
 
         # Do inherited
         super(VAlarm, self).removed()
-
 
     def changed(self):
         # Always force recalc of trigger status
@@ -428,7 +409,6 @@ class VAlarm(Component):
         # Do not do inherited as this is always a sub-component and we do not
         # do top-level component changes
         # super.changed()
-
 
     def finalise(self):
         # Do inherited
@@ -493,7 +473,6 @@ class VAlarm(Component):
         if temp is not None:
             self.mLastTrigger = temp
 
-
     def validate(self, doFix=False):
         """
         Validate the data in this component and optionally fix any problems, else raise. If
@@ -521,7 +500,6 @@ class VAlarm(Component):
 
         return fixed, unfixed
 
-
     def editStatus(self, status):
         # Remove existing
         self.removeProperties(definitions.cICalProperty_ALARM_X_ALARMSTATUS)
@@ -538,7 +516,6 @@ class VAlarm(Component):
         elif self.mAlarmStatus == definitions.eAlarm_Status_Disabled:
             status_txt = definitions.cICalProperty_ALARM_X_ALARMSTATUS_DISABLED
         self.addProperty(Property(definitions.cICalProperty_ALARM_X_ALARMSTATUS, status_txt))
-
 
     def editAction(self, action, data):
         # Remove existing
@@ -558,7 +535,6 @@ class VAlarm(Component):
 
         self.mActionData.add(self)
 
-
     def editTriggerOn(self, dt):
         # Remove existing
         self.removeProperties(definitions.cICalProperty_TRIGGER)
@@ -570,7 +546,6 @@ class VAlarm(Component):
         # Add new
         prop = Property(definitions.cICalProperty_TRIGGER, dt)
         self.addProperty(prop)
-
 
     def editTriggerBy(self, duration, trigger_start):
         # Remove existing
@@ -593,7 +568,6 @@ class VAlarm(Component):
         prop.addParameter(attr)
         self.addProperty(prop)
 
-
     def editRepeats(self, repeat, interval):
         # Remove existing
         self.removeProperties(definitions.cICalProperty_REPEAT)
@@ -608,16 +582,13 @@ class VAlarm(Component):
             self.addProperty(Property(definitions.cICalProperty_REPEAT, repeat))
             self.addProperty(Property(definitions.cICalProperty_DURATION, interval))
 
-
     def getAlarmStatus(self):
         return self.mAlarmStatus
-
 
     def getNextTrigger(self, dt):
         if not self.mStatusInit:
             self.initNextTrigger()
         dt.copy(self.mNextTrigger)
-
 
     def alarmTriggered(self, dt):
         # Remove existing
@@ -649,13 +620,11 @@ class VAlarm(Component):
         # Now update dt to the next alarm time
         return self.mAlarmStatus == definitions.eAlarm_Status_Pending
 
-
     def loadAction(self):
         # Delete current one
         self.mActionData = None
         self.mActionData = VAlarm.sActionToAlarmMap.get(self.mAction, VAlarm.VAlarmUnknown)()
         self.mActionData.load(self)
-
 
     def initNextTrigger(self):
         # Do not bother if its completed
@@ -691,7 +660,6 @@ class VAlarm(Component):
                 self.mDoneCount += 1
 
         self.mNextTrigger = trigger
-
 
     def getFirstTrigger(self, dt):
         # If absolute trigger, use that

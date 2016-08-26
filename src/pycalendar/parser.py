@@ -14,6 +14,7 @@
 #    limitations under the License.
 ##
 
+
 class ParserContext(object):
     """
     Ultimately want to have these states as per-object so we can pass a context down
@@ -22,10 +23,10 @@ class ParserContext(object):
     """
 
     (
-        PARSER_ALLOW, # Pass the "suspect" data through to the object model
-        PARSER_IGNORE, # Ignore the "suspect" data
-        PARSER_FIX, # Fix (or if not possible ignore) the "suspect" data
-        PARSER_RAISE, # Raise an exception
+        PARSER_ALLOW,  # Pass the "suspect" data through to the object model
+        PARSER_IGNORE,  # Ignore the "suspect" data
+        PARSER_FIX,  # Fix (or if not possible ignore) the "suspect" data
+        PARSER_RAISE,  # Raise an exception
     ) = range(4)
 
     # Some clients escape ":" - fix

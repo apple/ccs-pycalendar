@@ -23,6 +23,7 @@ import os
 import time
 import uuid
 
+
 class Component(ComponentBase):
 
     uid_ctr = 1
@@ -36,14 +37,12 @@ class Component(ComponentBase):
     def registerComponent(cls, name, comptype):
         cls.mapper[name] = comptype
 
-
     @classmethod
     def makeComponent(cls, compname, parent):
         try:
             return cls.mapper[compname](parent=parent)
         except KeyError:
             return cls.mapper[definitions.cICalComponent_UNKNOWN](parent=parent, comptype=compname)
-
 
     def __init__(self, parent=None):
 
@@ -52,7 +51,6 @@ class Component(ComponentBase):
         self.mSeq = 0
         self.mOriginalSeq = 0
         self.mChanged = False
-
 
     def duplicate(self, parent=None, **args):
 
@@ -65,14 +63,11 @@ class Component(ComponentBase):
 
         return other
 
-
     def __repr__(self):
         return "%s: UID: %s" % (self.getType(), self.getMapKey(),)
 
-
     def getMimeComponentName(self):
         raise NotImplementedError
-
 
     def getMapKey(self):
         if hasattr(self, "mMapKey"):
@@ -83,18 +78,14 @@ class Component(ComponentBase):
             self.mMapKey = str(uuid.uuid4())
             return self.mMapKey
 
-
     def getSortKey(self):
         return self.getMapKey()
-
 
     def getMasterKey(self):
         return self.mUID
 
-
     def getUID(self):
         return self.mUID
-
 
     def setUID(self, uid):
         if uid:
@@ -135,10 +126,8 @@ class Component(ComponentBase):
         prop = Property(definitions.cICalProperty_UID, self.mUID)
         self.addProperty(prop)
 
-
     def getSeq(self):
         return self.mSeq
-
 
     def setSeq(self, seq):
         self.mSeq = seq
@@ -148,18 +137,14 @@ class Component(ComponentBase):
         prop = Property(definitions.cICalProperty_SEQUENCE, self.mSeq)
         self.addProperty(prop)
 
-
     def getOriginalSeq(self):
         return self.mOriginalSeq
-
 
     def getChanged(self):
         return self.mChanged
 
-
     def setChanged(self, changed):
         self.mChanged = changed
-
 
     def initDTSTAMP(self):
         self.removeProperties(definitions.cICalProperty_DTSTAMP)
@@ -167,13 +152,11 @@ class Component(ComponentBase):
         prop = Property(definitions.cICalProperty_DTSTAMP, DateTime.getNowUTC())
         self.addProperty(prop)
 
-
     def updateLastModified(self):
         self.removeProperties(definitions.cICalProperty_LAST_MODIFIED)
 
         prop = Property(definitions.cICalProperty_LAST_MODIFIED, DateTime.getNowUTC())
         self.addProperty(prop)
-
 
     def finalise(self):
         # Get UID
@@ -191,10 +174,8 @@ class Component(ComponentBase):
         # same calendar
         self.mOriginalSeq = self.mSeq
 
-
     def canGenerateInstance(self):
         return True
-
 
     def getTimezones(self, tzids):
         # Look for all date-time properties

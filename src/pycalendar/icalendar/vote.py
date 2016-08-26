@@ -18,6 +18,7 @@ from pycalendar.icalendar import definitions
 from pycalendar.icalendar.component import Component
 from pycalendar.icalendar.validation import ICALENDAR_VALUE_CHECKS
 
+
 class Vote(Component):
 
     propertyCardinality_1 = (
@@ -33,14 +34,11 @@ class Vote(Component):
     def __init__(self, parent=None):
         super(Vote, self).__init__(parent=parent)
 
-
     def duplicate(self, parent=None):
         return super(Vote, self).duplicate(parent=parent)
 
-
     def getType(self):
         return definitions.cICalComponent_VOTE
-
 
     def sortedPropertyKeyOrder(self):
         return (

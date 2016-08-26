@@ -18,6 +18,7 @@ from pycalendar.icalendar import definitions
 from pycalendar.icalendar.component import Component
 from pycalendar.icalendar.validation import ICALENDAR_VALUE_CHECKS
 
+
 class VVoter(Component):
 
     propertyCardinality_1 = (
@@ -37,14 +38,11 @@ class VVoter(Component):
     def __init__(self, parent=None):
         super(VVoter, self).__init__(parent=parent)
 
-
     def duplicate(self, parent=None):
         return super(VVoter, self).duplicate(parent=parent)
 
-
     def getType(self):
         return definitions.cICalComponent_VVOTER
-
 
     def addComponent(self, comp):
         # We can embed the available components only
@@ -53,12 +51,10 @@ class VVoter(Component):
         else:
             raise ValueError("Only 'VOTE' components allowed in 'VVOTER'")
 
-
     def sortedPropertyKeyOrder(self):
         return (
             definitions.cICalProperty_VOTER,
         )
-
 
     def sortedComponents(self):
         """

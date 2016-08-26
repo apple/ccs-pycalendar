@@ -19,6 +19,7 @@ import cStringIO as StringIO
 import difflib
 import unittest
 
+
 class TestXML(unittest.TestCase):
 
     data = (

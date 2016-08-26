@@ -20,16 +20,15 @@ from pycalendar import utils, xmldefinitions
 from pycalendar.plaintextvalue import PlainTextValue
 from pycalendar.value import Value
 
+
 class TextValue(PlainTextValue):
 
     def getType(self):
         return Value.VALUETYPE_TEXT
 
-
     def parse(self, data, variant):
         # Decoding required
         self.mValue = utils.decodeTextValue(data)
-
 
     # os - StringIO object
     def generate(self, os):

@@ -25,6 +25,7 @@ import cStringIO as StringIO
 import time
 import xml.etree.cElementTree as XML
 
+
 class DateTime(ValueMixin):
 
     SUNDAY = 0
@@ -46,7 +47,6 @@ class DateTime(ValueMixin):
     def sort(e1, e2):
 
         return e1.compareDateTime(e2)
-
 
     def __init__(self, year=None, month=None, day=None, hours=None, minutes=None, seconds=None, tzid=None, utcoffset=None):
 
@@ -93,7 +93,6 @@ class DateTime(ValueMixin):
         self.mPosixTimeCached = False
         self.mPosixTime = 0
 
-
     def duplicate(self):
         other = DateTime(self.mYear, self.mMonth, self.mDay, self.mHours, self.mMinutes, self.mSeconds)
 
@@ -108,20 +107,16 @@ class DateTime(ValueMixin):
 
         return other
 
-
     def duplicateAsUTC(self):
         other = self.duplicate()
         other.adjustToUTC()
         return other
 
-
     def __repr__(self):
         return "DateTime: %s" % (self.getText(),)
 
-
     def __hash__(self):
         return hash(self.getPosixTime())
-
 
     # Operators
     def __add__(self, duration):
@@ -130,7 +125,6 @@ class DateTime(ValueMixin):
         result.mSeconds += duration.getTotalSeconds()
         result.normalise()
         return result
-
 
     def __sub__(self, dateorduration):
 
@@ -175,31 +169,24 @@ class DateTime(ValueMixin):
 
         raise ValueError("DateTime: cannot subtract: {}".format(dateorduration))
 
-
     # Comparators
     def __eq__(self, comp):
         return self.compareDateTime(comp) == 0
 
-
     def __ne__(self, comp):
         return self.compareDateTime(comp) != 0
-
 
     def __ge__(self, comp):
         return self.compareDateTime(comp) >= 0
 
-
     def __le__(self, comp):
         return self.compareDateTime(comp) <= 0
-
 
     def __gt__(self, comp):
         return self.compareDateTime(comp) > 0
 
-
     def __lt__(self, comp):
         return self.compareDateTime(comp) < 0
-
 
     def compareDateTime(self, comp):
         if comp is None:
@@ -232,10 +219,8 @@ class DateTime(ValueMixin):
         else:
             return cmp(self.getPosixTime(), comp.getPosixTime())
 
-
     def compareDate(self, comp):
         return (self.mYear == comp.mYear) and (self.mMonth == comp.mMonth) and (self.mDay == comp.mDay)
-
 
     def getPosixTime(self):
         # Look for cached value (or floating time which has to be calculated
@@ -258,15 +243,12 @@ class DateTime(ValueMixin):
 
         return self.mPosixTime
 
-
     def isDateOnly(self):
         return self.mDateOnly
-
 
     def setDateOnly(self, date_only):
         self.mDateOnly = date_only
         self.changed()
-
 
     def setYYMMDD(self, year, month, days):
         if (self.mYear != year) or (self.mMonth != month) or (self.mDay != days):
@@ -275,51 +257,41 @@ class DateTime(ValueMixin):
             self.mDay = days
             self.changed()
 
-
     def getYear(self):
         return self.mYear
-
 
     def setYear(self, year):
         if self.mYear != year:
             self.mYear = year
             self.changed()
 
-
     def offsetYear(self, diff_year):
         self.mYear += diff_year
         self.normalise()
 
-
     def getMonth(self):
         return self.mMonth
-
 
     def setMonth(self, month):
         if self.mMonth != month:
             self.mMonth = month
             self.changed()
 
-
     def offsetMonth(self, diff_month):
         self.mMonth += diff_month
         self.normalise()
 
-
     def getDay(self):
         return self.mDay
-
 
     def setDay(self, day):
         if self.mDay != day:
             self.mDay = day
             self.changed()
 
-
     def offsetDay(self, diff_day):
         self.mDay += diff_day
         self.normalise()
-
 
     def setYearDay(self, day, allow_invalid=False):
         # 1 .. 366 offset from start, or
@@ -355,10 +327,8 @@ class DateTime(ValueMixin):
         else:
             self.changed()
 
-
     def getYearDay(self):
         return self.mDay + utils.daysUptoMonth(self.mMonth, self.mYear)
-
 
     def setMonthDay(self, day, allow_invalid=False):
         # 1 .. 31 offset from start, or
@@ -384,7 +354,6 @@ class DateTime(ValueMixin):
         else:
             self.changed()
 
-
     def isMonthDay(self, day):
         if day > 0:
             return self.mDay == day
@@ -392,7 +361,6 @@ class DateTime(ValueMixin):
             return self.mDay - 1 - utils.daysInMonth(self.mMonth, self.mYear) == day
         else:
             return False
-
 
     def setWeekNo(self, weekno):
         """
@@ -429,7 +397,6 @@ class DateTime(ValueMixin):
             year_day += 1
         self.setYearDay(year_day)
 
-
     def getWeekNo(self):
         """
         Return the ISO week number for the current date.
@@ -461,7 +428,6 @@ class DateTime(ValueMixin):
 
         return week_no
 
-
     def isWeekNo(self, weekno):
         # This is the iso 8601 week number definition
 
@@ -471,7 +437,6 @@ class DateTime(ValueMixin):
             # This needs to calculate the negative offset from the last week in
             # the current year
             return False
-
 
     def setDayOfWeekInYear(self, offset, day):
         # Set to first day in year
@@ -498,7 +463,6 @@ class DateTime(ValueMixin):
             self.mDay = 365 + [1, 0][not utils.isLeapYear(self.mYear)] - cycle
 
         self.normalise()
-
 
     def setDayOfWeekInMonth(self, offset, day, allow_invalid=False):
         # Set to first day in month
@@ -529,7 +493,6 @@ class DateTime(ValueMixin):
         else:
             self.changed()
 
-
     def setNextDayOfWeek(self, start, day):
         # Set to first day in month
         self.mDay = start
@@ -543,7 +506,6 @@ class DateTime(ValueMixin):
         self.mDay += day - first_day
 
         self.normalise()
-
 
     def isDayOfWeekInMonth(self, offset, day):
         # First of the actual day must match
@@ -562,7 +524,6 @@ class DateTime(ValueMixin):
         # Now compare dates
         return self.compareDate(temp)
 
-
     def getDayOfWeek(self):
         # Count days since 01-Jan-1970 which was a Thursday
         result = DateTime.THURSDAY + self.daysSince1970()
@@ -571,7 +532,6 @@ class DateTime(ValueMixin):
             result += 7
 
         return result
-
 
     def getMonthText(self, short_txt):
         # Make sure range is valid
@@ -583,10 +543,8 @@ class DateTime(ValueMixin):
                 [locale.SHORT, locale.LONG][not short_txt]
             )
 
-
     def getDayOfWeekText(self, day):
         return locale.getDay(day, locale.SHORT)
-
 
     def setHHMMSS(self, hours, minutes, seconds):
         if (self.mHours != hours) or (self.mMinutes != minutes) or (self.mSeconds != seconds):
@@ -595,93 +553,74 @@ class DateTime(ValueMixin):
             self.mSeconds = seconds
             self.changed()
 
-
     def getHours(self):
         return self.mHours
-
 
     def setHours(self, hours):
         if self.mHours != hours:
             self.mHours = hours
             self.changed()
 
-
     def offsetHours(self, diff_hour):
         self.mHours += diff_hour
         self.normalise()
 
-
     def getMinutes(self):
         return self.mMinutes
-
 
     def setMinutes(self, minutes):
         if self.mMinutes != minutes:
             self.mMinutes = minutes
             self.changed()
 
-
     def offsetMinutes(self, diff_minutes):
         self.mMinutes += diff_minutes
         self.normalise()
 
-
     def getSeconds(self):
         return self.mSeconds
-
 
     def setSeconds(self, seconds):
         if self.mSeconds != seconds:
             self.mSeconds = seconds
             self.changed()
 
-
     def offsetSeconds(self, diff_seconds):
         self.mSeconds += diff_seconds
         self.normalise()
 
-
     def getTimezoneUTC(self):
         return self.mTZUTC
-
 
     def setTimezoneUTC(self, utc):
         if self.mTZUTC != utc:
             self.mTZUTC = utc
             self.changed()
 
-
     def getTimezoneID(self):
         return self.mTZID
-
 
     def setTimezoneID(self, tzid):
         self.mTZUTC = False
         self.mTZID = tzid
         self.changed()
 
-
     def utc(self):
         return self.mTZUTC
-
 
     def local(self):
         return (not self.mTZUTC) and self.mTZID
 
-
     def floating(self):
         return (not self.mTZUTC) and not self.mTZID
 
-
     def getTimezone(self):
         return Timezone(utc=self.mTZUTC, tzid=self.mTZID)
-
 
     def setTimezone(self, tzid):
         self.mTZUTC = tzid.getUTC()
         self.mTZID = tzid.getTimezoneID()
         self.changed()
-
 
     def adjustTimezone(self, tzid):
         # Only if different
@@ -693,7 +632,6 @@ class DateTime(ValueMixin):
             offset_to = self.timeZoneSecondsOffset(relative_to_utc=True)
             self.offsetSeconds(offset_to)
         return self
-
 
     def adjustToUTC(self):
         if self.local() and not self.mDateOnly:
@@ -715,18 +653,15 @@ class DateTime(ValueMixin):
 
         return self
 
-
     def getAdjustedTime(self, tzid=None):
         # Copy this and adjust to input timezone
         adjusted = self.duplicate()
         adjusted.adjustTimezone(tzid)
         return adjusted
 
-
     def setToday(self):
         tz = Timezone(utc=self.mTZUTC, tzid=self.mTZID)
         self.copy_ICalendarDateTime(self.getToday(tz))
-
 
     @staticmethod
     def getToday(tzid=None):
@@ -737,11 +672,9 @@ class DateTime(ValueMixin):
         temp = DateTime(year=now_tm.tm_year, month=now_tm.tm_mon, day=now_tm.tm_mday, tzid=tzid)
         return temp
 
-
     def setNow(self):
         tz = Timezone(utc=self.mTZUTC, tzid=self.mTZID)
         self.copy_ICalendarDateTime(self.getNow(tz))
-
 
     @staticmethod
     def getNow(tzid):
@@ -749,10 +682,8 @@ class DateTime(ValueMixin):
         utc.adjustTimezone(tzid if tzid is not None else Timezone())
         return utc
 
-
     def setNowUTC(self):
         self.copy_DateTime(self.getNowUTC())
-
 
     @staticmethod
     def getNowUTC():
@@ -762,7 +693,6 @@ class DateTime(ValueMixin):
         tzid = Timezone(utc=True)
 
         return DateTime(year=now_tm.tm_year, month=now_tm.tm_mon, day=now_tm.tm_mday, hours=now_tm.tm_hour, minutes=now_tm.tm_min, seconds=now_tm.tm_sec, tzid=tzid)
-
 
     def recur(self, freq, interval, allow_invalid=False):
         # Add appropriate interval
@@ -811,7 +741,6 @@ class DateTime(ValueMixin):
         else:
             self.changed()
 
-
     def getLocaleDate(self, dateTimeFormat):
 
         buf = StringIO.StringIO()
@@ -856,7 +785,6 @@ class DateTime(ValueMixin):
             buf.write(str(self.mDay))
 
         return buf.getvalue()
-
 
     def getTime(self, with_seconds, am_pm, tzid):
 
@@ -906,10 +834,8 @@ class DateTime(ValueMixin):
 
         return buf.getvalue()
 
-
     def getLocaleDateTime(self, locale, with_seconds, am_pm, tzid):
         return self.getLocaleDate(locale) + " " + self.getTime(with_seconds, am_pm, tzid)
-
 
     def getText(self):
 
@@ -925,7 +851,6 @@ class DateTime(ValueMixin):
                 return "%04d%02d%02dT%02d%02d%02d%s%02d%02d" % (self.mYear, self.mMonth, self.mDay, self.mHours, self.mMinutes, self.mSeconds, sign, hours, minutes)
             else:
                 return "%04d%02d%02dT%02d%02d%02d" % (self.mYear, self.mMonth, self.mDay, self.mHours, self.mMinutes, self.mSeconds)
-
 
     def getXMLText(self):
 
@@ -950,7 +875,6 @@ class DateTime(ValueMixin):
         dt.parse(data, fullISO)
         return dt
 
-
     def parseDate(self, data, fullISO):
         # Get year
         self.mYear = int(data[0:4])
@@ -974,7 +898,6 @@ class DateTime(ValueMixin):
             raise ValueError("DateTime: negative date components not allowed")
         return index
 
-
     def parseTime(self, data, index, fullISO):
         # Get hours
         self.mHours = int(data[index:index + 2])
@@ -993,7 +916,6 @@ class DateTime(ValueMixin):
         index += 2
 
         return index
-
 
     def parseFractionalAndUTCOffset(self, data, index, dlen):
         # Optional fraction
@@ -1033,7 +955,6 @@ class DateTime(ValueMixin):
         if index < dlen:
             raise ValueError("DateTime: invalid TZ offset length")
         return index
-
 
     def parse(self, data, fullISO=False):
 
@@ -1079,17 +1000,14 @@ class DateTime(ValueMixin):
         # Always uncache posix time
         self.changed()
 
-
     def generate(self, os):
         try:
             os.write(self.getText())
         except:
             pass
 
-
     def generateRFC2822(self, os):
         pass
-
 
     def writeXML(self, node, namespace):
         value = XML.SubElement(
@@ -1101,14 +1019,11 @@ class DateTime(ValueMixin):
         )
         value.text = self.getXMLText()
 
-
     def parseJSON(self, jobject):
         self.parse(str(jobject), True)
 
-
     def writeJSON(self, jobject):
         jobject.append(self.getJSONText())
-
 
     def invalid(self):
         """
@@ -1122,7 +1037,6 @@ class DateTime(ValueMixin):
             return True
 
         return False
-
 
     def normalise(self):
         # Normalise seconds
@@ -1186,7 +1100,6 @@ class DateTime(ValueMixin):
         # Always invalidate posix time cache
         self.changed()
 
-
     def timeZoneSecondsOffset(self, relative_to_utc=False):
         if self.mTZUTC:
             return 0
@@ -1195,16 +1108,13 @@ class DateTime(ValueMixin):
             self.mTZOffset = tz.timeZoneSecondsOffset(self, relative_to_utc)
         return self.mTZOffset
 
-
     def timeZoneDescriptor(self):
         tz = Timezone(utc=self.mTZUTC, tzid=self.mTZID)
         return tz.timeZoneDescriptor(self)
 
-
     def changed(self):
         self.mPosixTimeCached = False
         self.mTZOffset = None
-
 
     def daysSince1970(self):
         # Add days between 1970 and current year (ignoring leap days)

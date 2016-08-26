@@ -20,6 +20,7 @@ from pycalendar import xmlutils
 from pycalendar.valueutils import ValueMixin
 import xml.etree.cElementTree as XML
 
+
 class Value(ValueMixin):
 
     (
@@ -52,27 +53,22 @@ class Value(ValueMixin):
     _xmlMap = {}
     _jsonMap = {}
 
-
     def __hash__(self):
         return hash((self.getType(), self.getValue()))
 
-
     def __ne__(self, other):
         return not self.__eq__(other)
-
 
     def __eq__(self, other):
         if not isinstance(other, Value):
             return False
         return self.getType() == other.getType() and self.getValue() == other.getValue()
 
-
     @classmethod
     def registerType(clz, type, cls, xmlNode, jsonNode=None):
         clz._typeMap[type] = cls
         clz._xmlMap[type] = xmlNode
         clz._jsonMap[type] = xmlNode if jsonNode is None else jsonNode
-
 
     @classmethod
     def createFromType(clz, value_type):
@@ -83,43 +79,33 @@ class Value(ValueMixin):
         else:
             return clz._typeMap.get(Value.VALUETYPE_UNKNOWN)(value_type)
 
-
     def getType(self):
         raise NotImplementedError
-
 
     def getRealType(self):
         return self.getType()
 
-
     def getValue(self):
         raise NotImplementedError
-
 
     def setValue(self, value):
         raise NotImplementedError
 
-
     def parse(self, data, variant):
         raise NotImplementedError
-
 
     def writeXML(self, node, namespace):
         raise NotImplementedError
 
-
     def parseJSONValue(self, jobject):
         raise NotImplementedError
-
 
     def writeJSON(self, jobject):
         jobject.append(self._jsonMap[self.getType()])
         self.writeJSONValue(jobject)
 
-
     def writeJSONValue(self, jobject):
         raise NotImplementedError
-
 
     def getXMLNode(self, node, namespace):
         return XML.SubElement(node, xmlutils.makeTag(namespace, self._xmlMap[self.getType()]))

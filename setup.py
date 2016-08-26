@@ -16,7 +16,7 @@
 
 from distutils.core import setup, Extension
 
-setup (
+setup(
     name="pycalendar",
     version="2.1",
     description="iCalendar/vCard Library",

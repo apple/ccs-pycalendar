@@ -19,6 +19,7 @@ from pycalendar.duration import Duration
 from pycalendar.value import Value
 from pycalendar.valueutils import WrapperValue
 
+
 class DurationValue(WrapperValue, Value):
 
     _wrappedClass = Duration

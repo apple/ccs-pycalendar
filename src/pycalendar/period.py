@@ -20,6 +20,7 @@ from pycalendar.duration import Duration
 from pycalendar.valueutils import ValueMixin
 import xml.etree.cElementTree as XML
 
+
 class Period(ValueMixin):
 
     def __init__(self, start=None, end=None, duration=None):
@@ -39,7 +40,6 @@ class Period(ValueMixin):
             self.mDuration = None
             self.mUseDuration = False
 
-
     def duplicate(self):
         if self.mUseDuration:
             other = Period(start=self.mStart.duplicate(), duration=self.mDuration.duplicate())
@@ -47,38 +47,30 @@ class Period(ValueMixin):
             other = Period(start=self.mStart.duplicate(), end=self.mEnd.duplicate())
         return other
 
-
     def __hash__(self):
         return hash((self.mStart, self.getEnd(),))
-
 
     def __repr__(self):
         return "Period %s" % (self.getText(),)
 
-
     def __str__(self):
         return self.getText()
-
 
     def __eq__(self, comp):
         return self.mStart == comp.mStart and self.getEnd() == comp.getEnd()
 
-
     def __gt__(self, comp):
         return self.mStart > comp
-
 
     def __lt__(self, comp):
         return self.mStart < comp.mStart  \
             or (self.mStart == comp.mStart) and self.getEnd() < comp.getEnd()
-
 
     @classmethod
     def parseText(cls, data):
         period = cls()
         period.parse(data)
         return period
-
 
     def parse(self, data, fullISO=False):
         try:
@@ -101,7 +93,6 @@ class Period(ValueMixin):
         except IndexError:
             raise ValueError("Period: index error")
 
-
     def generate(self, os):
         try:
             self.mStart.generate(os)
@@ -112,7 +103,6 @@ class Period(ValueMixin):
                 self.mEnd.generate(os)
         except:
             pass
-
 
     def writeXML(self, node, namespace):
         start = XML.SubElement(node, xmlutils.makeTag(namespace, xmldefinitions.period_start))
@@ -125,14 +115,12 @@ class Period(ValueMixin):
             end = XML.SubElement(node, xmlutils.makeTag(namespace, xmldefinitions.period_end))
             end.text = self.mEnd.getXMLText()
 
-
     def parseJSON(self, jobject):
         """
         jCal encodes this as an array of two values. We convert back into a single "/"
         separated string and parse as normal.
         """
         self.parse("%s/%s" % tuple(jobject), True)
-
 
     def writeJSON(self, jobject):
         """
@@ -145,26 +133,21 @@ class Period(ValueMixin):
             value.append(self.mEnd.getXMLText())
         jobject.append(value)
 
-
     def getStart(self):
         return self.mStart
-
 
     def getEnd(self):
         if self.mEnd is None:
             self.mEnd = self.mStart + self.mDuration
         return self.mEnd
 
-
     def getDuration(self):
         if self.mDuration is None:
             self.mDuration = self.mEnd - self.mStart
         return self.mDuration
 
-
     def getUseDuration(self):
         return self.mUseDuration
-
 
     def setUseDuration(self, use):
         self.mUseDuration = use
@@ -173,31 +156,25 @@ class Period(ValueMixin):
         elif not self.mUseDuration and self.mEnd is None:
             self.getEnd()
 
-
     def isDateWithinPeriod(self, dt):
         # Inclusive start, exclusive end
         return dt >= self.mStart and dt < self.getEnd()
-
 
     def isDateBeforePeriod(self, dt):
         # Inclusive start
         return dt < self.mStart
 
-
     def isDateAfterPeriod(self, dt):
         # Exclusive end
         return dt >= self.getEnd()
-
 
     def isPeriodOverlap(self, p):
         # Inclusive start, exclusive end
         return not (self.mStart >= p.getEnd() or self.getEnd() <= p.mStart)
 
-
     def adjustToUTC(self):
         self.mStart.adjustToUTC()
         self.getEnd().adjustToUTC()
-
 
     def describeDuration(self):
         return ""

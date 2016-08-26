@@ -16,6 +16,7 @@
 
 from pycalendar.value import Value
 
+
 class MultiValue(Value):
 
     def __init__(self, type):
@@ -23,36 +24,28 @@ class MultiValue(Value):
         self.mType = type
         self.mValues = []
 
-
     def __hash__(self):
         return hash(tuple(self.mValues))
-
 
     def duplicate(self):
         other = MultiValue(self.mType)
         other.mValues = [i.duplicate() for i in self.mValues]
         return other
 
-
     def getType(self):
         return self.mType
-
 
     def getRealType(self):
         return Value.VALUETYPE_MULTIVALUE
 
-
     def getValue(self):
         return self.mValues
-
 
     def getValues(self):
         return self.mValues
 
-
     def addValue(self, value):
         self.mValues.append(value)
-
 
     def setValue(self, value):
         newValues = []
@@ -61,7 +54,6 @@ class MultiValue(Value):
             val.setValue(v)
             newValues.append(val)
         self.mValues = newValues
-
 
     def parse(self, data, variant):
         # Tokenize on comma
@@ -75,7 +67,6 @@ class MultiValue(Value):
             value.parse(token, variant)
             self.mValues.append(value)
 
-
     def generate(self, os):
         try:
             first = True
@@ -88,18 +79,15 @@ class MultiValue(Value):
         except:
             pass
 
-
     def writeXML(self, node, namespace):
         for iter in self.mValues:
             iter.writeXML(node, namespace)
-
 
     def parseJSONValue(self, jobject):
         for jvalue in jobject:
             value = Value.createFromType(self.mType)
             value.parseJSONValue(jvalue)
             self.mValues.append(value)
-
 
     def writeJSONValue(self, jobject):
         for iter in self.mValues:

@@ -20,19 +20,17 @@ from cStringIO import StringIO
 from pycalendar import xmldefinitions
 from pycalendar.value import Value
 
+
 class UTCOffsetValue(Value):
 
     def __init__(self, value=0):
         self.mValue = value
 
-
     def duplicate(self):
         return UTCOffsetValue(self.mValue)
 
-
     def getType(self):
         return Value.VALUETYPE_UTC_OFFSET
-
 
     def parse(self, data, variant):
 
@@ -66,12 +64,11 @@ class UTCOffsetValue(Value):
         if not plus:
             self.mValue = -self.mValue
 
-
     # os - StringIO object
     def generate(self, os, fullISO=False):
         try:
             abs_value = self.mValue
-            if abs_value < 0 :
+            if abs_value < 0:
                 sign = "-"
                 abs_value = -self.mValue
             else:
@@ -89,7 +86,6 @@ class UTCOffsetValue(Value):
         except:
             pass
 
-
     def writeXML(self, node, namespace):
 
         os = StringIO()
@@ -100,10 +96,8 @@ class UTCOffsetValue(Value):
         value = self.getXMLNode(node, namespace)
         value.text = text
 
-
     def parseJSONValue(self, jobject):
         self.parse(str(jobject), variant="vcard")
-
 
     def writeJSONValue(self, jobject):
 
@@ -112,10 +106,8 @@ class UTCOffsetValue(Value):
         text = os.getvalue()
         jobject.append(text)
 
-
     def getValue(self):
         return self.mValue
-
 
     def setValue(self, value):
         self.mValue = value

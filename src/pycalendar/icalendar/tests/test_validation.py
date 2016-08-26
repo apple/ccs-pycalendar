@@ -18,6 +18,7 @@ from pycalendar.exceptions import ValidationError
 from pycalendar.icalendar.calendar import Calendar
 from pycalendar.tests.utils import TestPyCalendar
 
+
 class TestValidation(TestPyCalendar):
 
     def test_basic(self):
@@ -69,7 +70,6 @@ END:VCALENDAR
             fixed, unfixed = cal.validate(doFix=False)
             self.assertEqual(set(fixed), test_fixed, msg="Failed test: %s" % (title,))
             self.assertEqual(set(unfixed), test_unfixed, msg="Failed test: %s" % (title,))
-
 
     def test_mode_no_fix_no_raise(self):
 
@@ -222,7 +222,6 @@ END:VCALENDAR
             self.assertEqual(set(fixed), test_fixed, msg="Failed test: %s" % (title,))
             self.assertEqual(set(unfixed), test_unfixed, msg="Failed test: %s" % (title,))
 
-
     def test_mode_fix_no_raise(self):
 
         data = (
@@ -372,7 +371,6 @@ END:VCALENDAR
             self.assertEqual(str(cal), test_new, msg="Failed test: %s" % (title,))
             self.assertEqual(set(fixed), test_fixed, msg="Failed test: %s" % (title,))
             self.assertEqual(set(unfixed), test_unfixed, msg="Failed test: %s" % (title,))
-
 
     def test_mode_no_fix_raise(self):
 
@@ -535,7 +533,6 @@ END:VCALENDAR
                 self.assertEqual(set(fixed), test_fixed, msg="Failed test: %s" % (title,))
                 self.assertEqual(set(unfixed), test_unfixed, msg="Failed test: %s" % (title,))
 
-
     def test_mode_fix_raise(self):
 
         data = (
@@ -696,7 +693,6 @@ END:VCALENDAR
                 self.assertEqual(str(cal), test_new, msg="Failed test: %s" % (title,))
                 self.assertEqual(set(fixed), test_fixed, msg="Failed test: %s" % (title,))
                 self.assertEqual(set(unfixed), test_unfixed, msg="Failed test: %s" % (title,))
-
 
     def test_vevent(self):
         data = (
@@ -983,7 +979,6 @@ END:VCALENDAR
             self.assertEqual(set(fixed), test_fixed, msg="Failed test: %s" % (title,))
             self.assertEqual(set(unfixed), test_unfixed, msg="Failed test: %s" % (title,))
 
-
     def test_vfreebusy(self):
         data = (
             (
@@ -1053,7 +1048,6 @@ END:VCALENDAR
             self.assertEqual(set(fixed), test_fixed, msg="Failed test: %s" % (title,))
             self.assertEqual(set(unfixed), test_unfixed, msg="Failed test: %s" % (title,))
 
-
     def test_vjournal(self):
         data = (
             (
@@ -1120,7 +1114,6 @@ END:VCALENDAR
             self.assertEqual(str(cal), test_new, msg="Failed test: %s" % (title,))
             self.assertEqual(set(fixed), test_fixed, msg="Failed test: %s" % (title,))
             self.assertEqual(set(unfixed), test_unfixed, msg="Failed test: %s" % (title,))
-
 
     def test_vtimezone(self):
         data = (
@@ -1265,7 +1258,6 @@ END:VCALENDAR
             self.assertEqual(str(cal), test_new, msg="Failed test: %s" % (title,))
             self.assertEqual(set(fixed), test_fixed, msg="Failed test: %s" % (title,))
             self.assertEqual(set(unfixed), test_unfixed, msg="Failed test: %s" % (title,))
-
 
     def test_vtodo(self):
         data = (
@@ -1488,7 +1480,6 @@ END:VCALENDAR
             self.assertEqual(set(fixed), test_fixed, msg="Failed test: %s" % (title,))
             self.assertEqual(set(unfixed), test_unfixed, msg="Failed test: %s" % (title,))
 
-
     def test_vavailability(self):
         data = (
             (
@@ -1686,7 +1677,6 @@ END:VCALENDAR
             self.assertEqual(set(fixed), test_fixed, msg="Failed test: %s" % (title,))
             self.assertEqual(set(unfixed), test_unfixed, msg="Failed test: %s" % (title,))
 
-
     def test_available(self):
         data = (
             (
@@ -1879,7 +1869,6 @@ END:VCALENDAR
             self.assertEqual(str(cal), test_new, msg="Failed test: %s" % (title,))
             self.assertEqual(set(fixed), test_fixed, msg="Failed test: %s" % (title,))
             self.assertEqual(set(unfixed), test_unfixed, msg="Failed test: %s" % (title,))
-
 
     def test_valarm(self):
         data = (
@@ -2570,7 +2559,6 @@ END:VCALENDAR
             self.assertEqual(set(fixed), test_fixed, msg="Failed test: %s" % (title,))
             self.assertEqual(set(unfixed), test_unfixed, msg="Failed test: %s" % (title,))
 
-
     def test_xcomponents(self):
         data = (
             (
@@ -2718,7 +2706,6 @@ END:VCALENDAR
             self.assertEqual(str(cal), test_new, msg="Failed test: %s" % (title,))
             self.assertEqual(set(fixed), test_fixed, msg="Failed test: %s" % (title,))
             self.assertEqual(set(unfixed), test_unfixed, msg="Failed test: %s" % (title,))
-
 
     def test_STATUS_fix(self):
         """

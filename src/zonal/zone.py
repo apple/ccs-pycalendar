@@ -32,6 +32,7 @@ __all__ = (
     "ZoneRule",
 )
 
+
 class Zone(object):
     """
     A tzdata Zone object containing a set of ZoneRules
@@ -41,10 +42,8 @@ class Zone(object):
         self.name = ""
         self.rules = []
 
-
     def __str__(self):
         return self.generate()
-
 
     def __eq__(self, other):
         return other and (
@@ -52,10 +51,8 @@ class Zone(object):
             self.rules == other.rules
         )
 
-
     def __ne__(self, other):
         return not self.__eq__(other)
-
 
     def parse(self, lines):
         """
@@ -83,7 +80,6 @@ class Zone(object):
             if rule.gmtoff != "#":
                 self.rules.append(rule)
 
-
     def generate(self):
         """
         Generate a partial Zone line.
@@ -107,7 +103,6 @@ class Zone(object):
                 )
             lines.append("\t".join(items))
         return "\n".join(lines)
-
 
     def expand(self, rules, minYear, maxYear):
         """
@@ -173,7 +168,6 @@ class Zone(object):
 
         return results
 
-
     def vtimezone(self, calendar, rules, minYear, maxYear):
         """
         Generate a VTIMEZONE for this Zone.
@@ -199,7 +193,6 @@ class Zone(object):
         lastZoneRule = None
         ruleorder = []
         rulemap = {}
-
 
         def _generateRuleData():
             # Generate VTIMEZONE component for last set of rules
@@ -263,7 +256,6 @@ class Zone(object):
         vtz.finalise()
         return vtz
 
-
     def _compressRDateComponents(self, vtz):
         """
         Compress sub-components with RDATEs into a single component with multiple
@@ -297,7 +289,6 @@ class Zone(object):
                     vtz.mComponents.remove(mergeFrom)
 
 
-
 class ZoneRule(object):
     """
     A specific rule for a portion of a Zone
@@ -310,10 +301,8 @@ class ZoneRule(object):
         self.format = ""
         self.until = None
 
-
     def __str__(self):
         return self.generate()
-
 
     def __eq__(self, other):
         return other and (
@@ -323,10 +312,8 @@ class ZoneRule(object):
             self.until == other.until
         )
 
-
     def __ne__(self, other):
         return not self.__eq__(other)
-
 
     def parse(self, line, offset):
         """
@@ -343,7 +330,6 @@ class ZoneRule(object):
         if len(splits) >= 6 - offset:
             self.until = " ".join(splits[5 - offset:])
 
-
     def generate(self):
         """
         Generate a partial Zone line.
@@ -358,7 +344,6 @@ class ZoneRule(object):
         if self.until:
             items = items + (self.until,)
         return "\t".join(items)
-
 
     def getUntilDate(self):
 
@@ -412,7 +397,6 @@ class ZoneRule(object):
         self._cached_until = utils.DateTime(dt, mode)
         return self._cached_until
 
-
     def getUTCOffset(self):
 
         if hasattr(self, "_cached_utc_offset"):
@@ -428,7 +412,6 @@ class ZoneRule(object):
         if negative:
             self._cached_uutc_offset = -self._cached_uutc_offset
         return self._cached_uutc_offset
-
 
     def expand(self, rules, results, lastUntilUTC, lastOffset, lastStdOffset, maxYear):
 
@@ -476,7 +459,6 @@ class ZoneRule(object):
 
             return last_offset, last_stdoffset
 
-
     def expand_norule(self, results, lastUntil, maxYear):
         to_offset = 0
         if self.rule[0].isdigit():
@@ -488,7 +470,6 @@ class ZoneRule(object):
         # Always add a transition for the start of this rule
         results.append((lastUntil, self.getUTCOffset() + to_offset, self, None))
         return (self.getUTCOffset() + to_offset, self.getUTCOffset())
-
 
     def vtimezone(self, vtz, zonerule, start, end, offsetfrom, offsetto):
 

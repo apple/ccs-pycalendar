@@ -24,24 +24,19 @@ class OutputFilter(object):
         self.mAllProperties = False
         self.mProperties = None
 
-
     def getType(self):
         return self.mType
-
 
     # Test to see if component type can be written out
     def testComponent(self, oftype):
         return self.mType == oftype
 
-
     def isAllSubComponents(self):
         return self.mAllSubComponents
-
 
     def setAllSubComponents(self):
         self.mAllSubComponents = True
         self.mSubComponents = None
-
 
     def addSubComponent(self, comp):
         if self.mSubComponents == None:
@@ -49,16 +44,13 @@ class OutputFilter(object):
 
         self.mSubComponents[comp.getType()] = comp
 
-
     # Test to see if sub-component type can be written out
     def testSubComponent(self, oftype):
         return self.mAllSubComponents or (self.mSubComponents is not None) \
             and oftype in self.mSubComponents
 
-
     def hasSubComponentFilters(self):
         return self.mSubComponents is not None
-
 
     def getSubComponentFilter(self, type):
         if self.mSubComponents is not None:
@@ -66,15 +58,12 @@ class OutputFilter(object):
         else:
             return None
 
-
     def isAllProperties(self):
         return self.mAllProperties
-
 
     def setAllProperties(self):
         self.mAllProperties = True
         self.mProperties = None
-
 
     def addProperty(self, name, no_value):
         if self.mProperties is None:
@@ -82,10 +71,8 @@ class OutputFilter(object):
 
         self.mProperties[name] = no_value
 
-
     def hasPropertyFilters(self):
         return self.mProperties is not None
-
 
     # Test to see if property can be written out and also return whether
     # the property value is used

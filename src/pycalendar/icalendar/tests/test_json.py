@@ -22,6 +22,7 @@ import difflib
 import unittest
 import json
 
+
 class TestJSON(unittest.TestCase):
 
     data = (
@@ -773,7 +774,6 @@ END:VCALENDAR
         for item1, item2 in self.data:
             _doRoundtrip(item1, item2)
 
-
     def testParseJSON(self):
 
         def _doRoundtrip(caldata, jcaldata):
@@ -792,7 +792,6 @@ END:VCALENDAR
         for item1, item2 in self.data:
             _doRoundtrip(item1, item2)
 
-
     def testParseJSONi18n(self):
 
         def _doRoundtrip(caldata, jcaldata):
@@ -810,7 +809,6 @@ END:VCALENDAR
 
         for item1, item2 in self.i18ndata:
             _doRoundtrip(item1, item2)
-
 
     def testjCalExample1(self):
 
@@ -858,7 +856,6 @@ END:VCALENDAR
             test2,
             "\n".join(difflib.unified_diff(str(test1).splitlines(), test2.splitlines()))
         )
-
 
     def testjCalExample2(self):
 
@@ -1018,7 +1015,6 @@ END:VCALENDAR
         )
 
 
-
 class TestJSONProperty(unittest.TestCase):
 
     test_data = (
@@ -1053,7 +1049,6 @@ class TestJSONProperty(unittest.TestCase):
         # Parameter escaping
         ["attendee", {"cn": "My 'Test' Name", "role": "CHAIR"}, "cal-address", "mailto:jdoe@example.com"],
     )
-
 
     def testParseGenerate(self):
 

@@ -20,6 +20,7 @@ from pycalendar.icalendar.component import Component
 from pycalendar.icalendar.componentrecur import ComponentRecur
 from pycalendar.icalendar.validation import ICALENDAR_VALUE_CHECKS
 
+
 class VJournal(ComponentRecur):
 
     propertyCardinality_1 = (
@@ -46,22 +47,17 @@ class VJournal(ComponentRecur):
     def __init__(self, parent=None):
         super(VJournal, self).__init__(parent=parent)
 
-
     def duplicate(self, parent=None):
         return super(VJournal, self).duplicate(parent=parent)
-
 
     def getType(self):
         return definitions.cICalComponent_VJOURNAL
 
-
     def getMimeComponentName(self):
         return itipdefinitions.cICalMIMEComponent_VJOURNAL
 
-
     def finalise(self):
         super(VJournal, self).finalise()
-
 
     def sortedPropertyKeyOrder(self):
         return (

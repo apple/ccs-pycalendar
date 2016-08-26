@@ -17,6 +17,7 @@
 from pycalendar.vcard.adr import Adr
 import unittest
 
+
 class TestAdrValue(unittest.TestCase):
 
     def testInit(self):

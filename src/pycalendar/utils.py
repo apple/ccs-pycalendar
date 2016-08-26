@@ -17,6 +17,7 @@
 from pycalendar.parser import ParserContext
 import cStringIO as StringIO
 
+
 def readFoldedLine(ins, lines):
 
     # If line2 already has data, transfer that into line1
@@ -80,7 +81,6 @@ def readFoldedLine(ins, lines):
     return True
 
 
-
 def find_first_of(text, tokens, offset):
     for ctr, c in enumerate(text[offset:]):
         if c in tokens:
@@ -88,12 +88,10 @@ def find_first_of(text, tokens, offset):
     return -1
 
 
-
 def escapeTextValue(value):
     os = StringIO.StringIO()
     writeTextValue(os, value)
     return os.getvalue()
-
 
 
 def writeTextValue(os, value):
@@ -131,7 +129,6 @@ def writeTextValue(os, value):
 
     except:
         pass
-
 
 
 def decodeTextValue(value):
@@ -195,7 +192,6 @@ def decodeTextValue(value):
     return os.getvalue()
 
 
-
 def encodeParameterValue(value):
     """
     RFC6868 parameter encoding.
@@ -231,7 +227,6 @@ def encodeParameterValue(value):
         return value
 
 
-
 def decodeParameterValue(value):
     """
     RFC6868 parameter decoding.
@@ -264,7 +259,6 @@ def decodeParameterValue(value):
         return value
 
 
-
 # vCard text list parsing/generation
 def parseTextList(data, sep=';', always_list=False):
     """
@@ -286,7 +280,6 @@ def parseTextList(data, sep=';', always_list=False):
     return tuple(results) if len(results) > 1 or always_list else (results[0] if len(results) else "")
 
 
-
 def generateTextList(os, data, sep=';'):
     """
     Each element of the list must be separately escaped
@@ -298,7 +291,6 @@ def generateTextList(os, data, sep=';'):
         os.write(sep.join(results))
     except:
         pass
-
 
 
 # vCard double-nested list parsing/generation
@@ -342,7 +334,6 @@ def parseDoubleNestedList(data, maxsize):
     return tuple(results)
 
 
-
 def generateDoubleNestedList(os, data):
     try:
         def _writeElement(item):
@@ -367,6 +358,7 @@ def generateDoubleNestedList(os, data):
 days_in_month = (0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31)
 days_in_month_leap = (0, 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31)
 
+
 def daysInMonth(month, year):
     # NB month is 1..12 so use dummy value at start of array to avoid index
     # adjustment
@@ -378,6 +370,7 @@ def daysInMonth(month, year):
 days_upto_month = (0, 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334)
 days_upto_month_leap = (0, 0, 31, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335)
 
+
 def daysUptoMonth(month, year):
     # NB month is 1..12 so use dummy value at start of array to avoid index
     # adjustment
@@ -387,6 +380,8 @@ def daysUptoMonth(month, year):
         return days_upto_month[month]
 
 cachedLeapYears = {}
+
+
 def isLeapYear(year):
 
     try:
@@ -400,6 +395,8 @@ def isLeapYear(year):
         return result
 
 cachedLeapDaysSince1970 = {}
+
+
 def leapDaysSince1970(year_offset):
 
     try:
@@ -417,11 +414,9 @@ def leapDaysSince1970(year_offset):
         return result
 
 
-
 # Packed date
 def packDate(year, month, day):
     return (year << 16) | (month << 8) | (day + 128)
-
 
 
 def unpackDate(data, unpacked):
@@ -430,20 +425,16 @@ def unpackDate(data, unpacked):
     unpacked[2] = (data & 0xFF) - 128
 
 
-
 def unpackDateYear(data):
     return (data & 0xFFFF0000) >> 16
-
 
 
 def unpackDateMonth(data):
     return (data & 0x0000FF00) >> 8
 
 
-
 def unpackDateDay(data):
     return (data & 0xFF) - 128
-
 
 
 # Display elements
@@ -517,7 +508,6 @@ def getMonthTable(month, year, weekstart, table, today_index):
             day -= 1
 
     return table, today_index
-
 
 
 def set_difference(v1, v2):

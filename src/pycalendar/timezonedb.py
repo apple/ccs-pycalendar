@@ -18,6 +18,7 @@ from pycalendar.exceptions import NoTimezoneInDatabase, \
     InvalidData
 import os
 
+
 class TimezoneDatabase(object):
     """
     On demand timezone database cache. This scans a TZdb directory for .ics files matching a
@@ -26,18 +27,15 @@ class TimezoneDatabase(object):
 
     sTimezoneDatabase = None
 
-
     @staticmethod
     def createTimezoneDatabase(dbpath):
         TimezoneDatabase.sTimezoneDatabase = TimezoneDatabase()
         TimezoneDatabase.sTimezoneDatabase.setPath(dbpath)
 
-
     @staticmethod
     def clearTimezoneDatabase():
         if TimezoneDatabase.sTimezoneDatabase is not None:
             TimezoneDatabase.sTimezoneDatabase.clear()
-
 
     def __init__(self):
         from pycalendar.icalendar.calendar import Calendar
@@ -46,10 +44,8 @@ class TimezoneDatabase(object):
         self.tzcache = {}
         self.stdtzcache = set()
 
-
     def setPath(self, dbpath):
         self.dbpath = dbpath
-
 
     def clear(self):
         from pycalendar.icalendar.calendar import Calendar
@@ -57,18 +53,15 @@ class TimezoneDatabase(object):
         self.tzcache.clear()
         self.stdtzcache.clear()
 
-
     @staticmethod
     def getTimezoneDatabase():
         if TimezoneDatabase.sTimezoneDatabase is None:
             TimezoneDatabase.sTimezoneDatabase = TimezoneDatabase()
         return TimezoneDatabase.sTimezoneDatabase
 
-
     @staticmethod
     def getTimezone(tzid):
         return TimezoneDatabase.getTimezoneDatabase()._getTimezone(tzid)
-
 
     @staticmethod
     def getTimezoneInCalendar(tzid):
@@ -85,7 +78,6 @@ class TimezoneDatabase(object):
         else:
             return None
 
-
     @staticmethod
     def getTimezoneOffsetSeconds(tzid, dt, relative_to_utc=False):
         # Cache it first
@@ -94,7 +86,6 @@ class TimezoneDatabase(object):
             return tz.getTimezoneOffsetSeconds(dt, relative_to_utc)
         else:
             return 0
-
 
     @staticmethod
     def getTimezoneDescriptor(tzid, dt):
@@ -105,11 +96,9 @@ class TimezoneDatabase(object):
         else:
             return ""
 
-
     @staticmethod
     def isStandardTimezone(tzid):
         return TimezoneDatabase.getTimezoneDatabase()._isStandardTimezone(tzid)
-
 
     def cacheTimezone(self, tzid):
         """
@@ -134,7 +123,6 @@ class TimezoneDatabase(object):
         else:
             raise NoTimezoneInDatabase(self.dbpath, tzid)
 
-
     def addTimezone(self, tz):
         """
         Add the specified VTIMEZONE component to this object's L{Calendar} cache. This component
@@ -146,7 +134,6 @@ class TimezoneDatabase(object):
         copy = tz.duplicate(self.calendar)
         self.calendar.addComponent(copy)
         self.tzcache[copy.getID()] = copy
-
 
     def _addStandardTimezone(self, tz):
         """
@@ -161,7 +148,6 @@ class TimezoneDatabase(object):
             self.addTimezone(tz)
         self.stdtzcache.add(tz.getID())
 
-
     def _isStandardTimezone(self, tzid):
         """
         Add the specified VTIMEZONE component to this object's L{Calendar} cache. This component
@@ -171,7 +157,6 @@ class TimezoneDatabase(object):
         @type tzid: L{str}
         """
         return tzid in self.stdtzcache
-
 
     def _getTimezone(self, tzid):
         """
@@ -196,7 +181,6 @@ class TimezoneDatabase(object):
 
         return self.tzcache[tzid]
 
-
     @staticmethod
     def mergeTimezones(cal, tzs):
         """
@@ -212,7 +196,6 @@ class TimezoneDatabase(object):
         # Merge each timezone from other calendar
         for tz in tzs:
             tzdb.mergeTimezone(tz)
-
 
     def mergeTimezone(self, tz):
         """

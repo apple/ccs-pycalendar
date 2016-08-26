@@ -18,6 +18,7 @@ from pycalendar.exceptions import ValidationError
 from pycalendar.vcard.card import Card
 import unittest
 
+
 class TestValidation(unittest.TestCase):
 
     def test_basic(self):
@@ -65,7 +66,6 @@ END:VCARD
             fixed, unfixed = card.validate(doFix=False)
             self.assertEqual(set(fixed), test_fixed, msg="Failed test: %s" % (title,))
             self.assertEqual(set(unfixed), test_unfixed, msg="Failed test: %s" % (title,))
-
 
     def test_mode_no_raise(self):
 
@@ -138,7 +138,6 @@ END:VCARD
             self.assertEqual(str(card), test_new, msg="Failed test: %s" % (title,))
             self.assertEqual(set(fixed), test_fixed, msg="Failed test: %s" % (title,))
             self.assertEqual(set(unfixed), test_unfixed, msg="Failed test: %s" % (title,))
-
 
     def test_mode_raise(self):
 

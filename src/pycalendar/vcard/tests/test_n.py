@@ -17,6 +17,7 @@
 from pycalendar.vcard.n import N
 import unittest
 
+
 class TestAdrValue(unittest.TestCase):
 
     def testInit(self):
@@ -56,7 +57,6 @@ class TestAdrValue(unittest.TestCase):
                 n.duplicate().getText(),
                 result,
             )
-
 
     def testInitWithKeywords(self):
 

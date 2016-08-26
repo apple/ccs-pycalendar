@@ -19,6 +19,7 @@ from pycalendar.icalendar.component import Component
 from pycalendar.icalendar.validation import ICALENDAR_VALUE_CHECKS
 import uuid
 
+
 class UnknownComponent(Component):
 
     propertyValueChecks = ICALENDAR_VALUE_CHECKS
@@ -28,37 +29,29 @@ class UnknownComponent(Component):
         self.mType = comptype
         self.mMapKey = str(uuid.uuid4())
 
-
     def duplicate(self, parent=None):
         return super(UnknownComponent, self).duplicate(parent=parent, comptype=self.mType)
-
 
     def getType(self):
         return self.mType
 
-
     def getBeginDelimiter(self):
         return "BEGIN:" + self.mType
-
 
     def getEndDelimiter(self):
         return "END:" + self.mType
 
-
     def getMimeComponentName(self):
         return "unknown"
 
-
     def getMapKey(self):
         return self.mMapKey
-
 
     def getSortKey(self):
         """
         We do not want unknown components sorted.
         """
         return ""
-
 
     def sortedPropertyKeyOrder(self):
         return (

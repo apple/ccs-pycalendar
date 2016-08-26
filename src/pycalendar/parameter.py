@@ -24,6 +24,7 @@ from pycalendar import xmldefinitions, xmlutils
 from pycalendar.utils import encodeParameterValue
 import xml.etree.cElementTree as XML
 
+
 class Parameter(object):
 
     def __init__(self, name, value=None):
@@ -35,55 +36,43 @@ class Parameter(object):
         else:
             self.mValues = value
 
-
     def duplicate(self):
         other = Parameter(self.mName)
         other.mValues = self.mValues[:]
         return other
 
-
     def __hash__(self):
         return hash((self.mName.upper(), tuple(self.mValues)))
 
-
     def __ne__(self, other):
         return not self.__eq__(other)
-
 
     def __eq__(self, other):
         if not isinstance(other, Parameter):
             return False
         return self.mName.upper() == other.mName.upper() and self.mValues == other.mValues
 
-
     def getName(self):
         return self.mName
-
 
     def setName(self, name):
         self.mName = name
 
-
     def getFirstValue(self):
         return self.mValues[0]
-
 
     def getValues(self):
         return self.mValues
 
-
     def setValues(self, values):
         self.mValues = values
-
 
     def addValue(self, value):
         self.mValues.append(value)
 
-
     def removeValue(self, value):
         self.mValues.remove(value)
         return len(self.mValues)
-
 
     def generate(self, os):
         try:
@@ -107,7 +96,6 @@ class Parameter(object):
             # We ignore errors
             pass
 
-
     def generateValue(self, os, str):
 
         # ^-escaping
@@ -119,14 +107,12 @@ class Parameter(object):
         else:
             os.write(str)
 
-
     def writeXML(self, node, namespace):
         param = XML.SubElement(node, xmlutils.makeTag(namespace, self.getName()))
         for value in self.getValues():
             # TODO: need to figure out proper value types
             text = XML.SubElement(param, xmlutils.makeTag(namespace, xmldefinitions.value_text))
             text.text = value
-
 
     def writeJSON(self, jobject):
         jobject[self.getName().lower()] = self.mValues if len(self.mValues) != 1 else self.mValues[0]

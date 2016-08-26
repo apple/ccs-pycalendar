@@ -19,6 +19,7 @@ from zonal.zone import Zone
 from zonal.rule import RuleSet
 from pycalendar.icalendar.calendar import Calendar
 
+
 class TestZone(unittest.TestCase):
 
     def test_parse(self):
@@ -38,7 +39,6 @@ class TestZone(unittest.TestCase):
         zone.parse(zonedef)
 
         self.assertEqual(str(zone), zonedef_result)
-
 
     def test_vtimezone(self):
 

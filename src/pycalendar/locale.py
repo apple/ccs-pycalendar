@@ -38,9 +38,10 @@ s24HourTime = False
 sDDMMDate = False
 
 #     0..6 - Sunday - Saturday
+
+
 def getDay(day, strl):
     return {LONG: cLongDays[day], SHORT: cShortDays[day], ABBREVIATED: cAbbrevDays[day]}[strl]
-
 
 
 #     1..12 - January - December
@@ -48,13 +49,11 @@ def getMonth(month, strl):
     return {LONG: cLongMonths[month], SHORT: cShortMonths[month], ABBREVIATED: cAbbrevMonths[month]}[strl]
 
 
-
 #     Use 24 hour time display
 def use24HourTime():
 
     # TODO: get 24 hour option from system prefs
     return s24HourTime
-
 
 
 #     Use DD/MM date display

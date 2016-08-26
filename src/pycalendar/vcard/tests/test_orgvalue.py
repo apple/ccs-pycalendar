@@ -18,6 +18,7 @@ from pycalendar.vcard.orgvalue import OrgValue
 from pycalendar.vcard.property import Property
 import unittest
 
+
 class TestNValue(unittest.TestCase):
 
     def testParseValue(self):
@@ -34,7 +35,6 @@ class TestNValue(unittest.TestCase):
             req.parse(item, "vcard")
             test = req.getText()
             self.assertEqual(test, result, "Failed to parse and re-generate '%s'" % (item,))
-
 
     def testParseProperty(self):
 

@@ -19,6 +19,7 @@ from pycalendar.icalendar import definitions
 from pycalendar.icalendar.component import Component
 from pycalendar.icalendar.validation import ICALENDAR_VALUE_CHECKS
 
+
 class VTimezone(Component):
 
     propertyCardinality_1 = (
@@ -43,35 +44,29 @@ class VTimezone(Component):
         self.mCachedExpandAllMaxYear = None
         self.mCachedOffsets = None
 
-
     def duplicate(self, parent=None):
         other = super(VTimezone, self).duplicate(parent=parent)
         other.mID = self.mID
         other.mUTCOffsetSortKey = self.mUTCOffsetSortKey
         return other
 
-
     def getType(self):
         return definitions.cICalComponent_VTIMEZONE
-
 
     def getMimeComponentName(self):
         # Cannot be sent as a separate MIME object
         return None
 
-
     def addComponent(self, comp):
         # We can embed the timezone components only
-        if ((comp.getType() == definitions.cICalComponent_STANDARD)
-                or (comp.getType() == definitions.cICalComponent_DAYLIGHT)):
+        if ((comp.getType() == definitions.cICalComponent_STANDARD) or
+                (comp.getType() == definitions.cICalComponent_DAYLIGHT)):
             super(VTimezone, self).addComponent(comp)
         else:
             raise ValueError("Only 'STANDARD' or 'DAYLIGHT' components allowed in 'VTIMEZONE'")
 
-
     def getMapKey(self):
         return self.mID
-
 
     def finalise(self):
         # Get TZID
@@ -84,7 +79,6 @@ class VTimezone(Component):
 
         # Do inherited
         super(VTimezone, self).finalise()
-
 
     def validate(self, doFix=False):
         """
@@ -110,10 +104,8 @@ class VTimezone(Component):
 
         return fixed, unfixed
 
-
     def getID(self):
         return self.mID
-
 
     def getUTCOffsetSortKey(self):
         if self.mUTCOffsetSortKey is None:
@@ -133,7 +125,6 @@ class VTimezone(Component):
                 self.mUTCOffsetSortKey = 0
 
         return self.mUTCOffsetSortKey
-
 
     def getTimezoneOffsetSeconds(self, dt, relative_to_utc=False):
         """
@@ -184,7 +175,6 @@ class VTimezone(Component):
 
         return 0
 
-
     def getTimezoneDescriptor(self, dt):
         result = ""
 
@@ -215,10 +205,8 @@ class VTimezone(Component):
 
         return result
 
-
     def mergeTimezone(self, tz):
         pass
-
 
     @staticmethod
     def tuple_bisect_right(a, x, relative_to_utc=False):
@@ -236,7 +224,6 @@ class VTimezone(Component):
             else:
                 lo = mid + 1
         return lo
-
 
     def findTimezoneElement(self, dt):
         # Need to make the incoming date-time relative to the DTSTART in the
@@ -268,7 +255,6 @@ class VTimezone(Component):
 
         return found
 
-
     def expandAll(self, start, end, with_name=False):
         results = []
         for item in self.mComponents:
@@ -285,14 +271,12 @@ class VTimezone(Component):
         utc_results.sort(key=lambda x: x[0].getPosixTime())
         return utc_results
 
-
     def sortedPropertyKeyOrder(self):
         return (
             definitions.cICalProperty_TZID,
             definitions.cICalProperty_LAST_MODIFIED,
             definitions.cICalProperty_TZURL,
         )
-
 
     @staticmethod
     def sortByUTCOffsetComparator(tz1, tz2):

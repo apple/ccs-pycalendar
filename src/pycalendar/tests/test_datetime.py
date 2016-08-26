@@ -20,15 +20,16 @@ from pycalendar.parser import ParserContext
 from pycalendar.timezone import Timezone
 import unittest
 
+
 class TestDateTime(unittest.TestCase):
 
     def _patch(self, obj, attr, value):
         oldvalue = getattr(obj, attr)
         setattr(obj, attr, value)
+
         def _restore():
             setattr(obj, attr, oldvalue)
         self.addCleanup(_restore)
-
 
     def testDuplicateASUTC(self):
 
@@ -51,7 +52,6 @@ class TestDateTime(unittest.TestCase):
             dup = item.duplicateAsUTC()
             self.assertEqual(str(dup), str(result), "Failed to convert '%s'" % (item,))
 
-
     def testDuplicateInSet(self):
 
         s = set(
@@ -63,7 +63,6 @@ class TestDateTime(unittest.TestCase):
 
         self.assertTrue(DateTime(2011, 1, 1, 0, 0, 0, tzid=Timezone(utc=True)) in s)
         self.assertFalse(DateTime(2011, 1, 3, 0, 0, 0, tzid=Timezone(utc=True)) in s)
-
 
     def testRoundtrip(self):
 
@@ -101,7 +100,6 @@ class TestDateTime(unittest.TestCase):
             dt = DateTime.parseText(item, True)
             self.assertEqual(dt.getText(), result, "Failed on: %s" % (item,))
 
-
     def testBadParse(self):
 
         self._patch(ParserContext, "INVALID_DATETIME_LEADINGSPACE", ParserContext.PARSER_RAISE)
@@ -138,7 +136,6 @@ class TestDateTime(unittest.TestCase):
         for item in data2:
             self.assertRaises(ValueError, DateTime.parseText, item, False)
 
-
     def testBadParseFixed(self):
 
         self._patch(ParserContext, "INVALID_DATETIME_LEADINGSPACE", ParserContext.PARSER_ALLOW)
@@ -155,7 +152,6 @@ class TestDateTime(unittest.TestCase):
         for item, result in data:
             dt = DateTime.parseText(item)
             self.assertEqual(str(dt), result)
-
 
     def testCachePreserveOnAdjustment(self):
 
@@ -351,7 +347,6 @@ END:VCALENDAR
         self.assertTrue(dt2.mPosixTimeCached)
         self.assertEqual(dt2.mPosixTime, dt.mPosixTime)
         self.assertEqual(dt2.mTZOffset, 0)
-
 
     def testSetWeekNo(self):
 

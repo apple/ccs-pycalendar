@@ -19,6 +19,7 @@
 from pycalendar import utils
 from pycalendar.value import Value
 
+
 class OrgValue(Value):
     """
     mValue is a str or tuple of str
@@ -27,34 +28,26 @@ class OrgValue(Value):
     def __init__(self, value=None):
         self.mValue = value
 
-
     def duplicate(self):
         return OrgValue(self.mValue)
-
 
     def getType(self):
         return Value.VALUETYPE_ORG
 
-
     def parse(self, data, variant="vcard"):
         self.mValue = utils.parseTextList(data, ';')
-
 
     def generate(self, os):
         utils.generateTextList(os, self.mValue, ';')
 
-
     def parseJSONValue(self, jobject):
         self.mValue = tuple(map(lambda x: x.encode("utf-8"), jobject))
-
 
     def writeJSONValue(self, jobject):
         jobject.append(list(self.mValue))
 
-
     def getValue(self):
         return self.mValue
-
 
     def setValue(self, value):
         self.mValue = value

@@ -23,6 +23,7 @@ from pycalendar.icalendar.validation import ICALENDAR_VALUE_CHECKS
 from pycalendar.period import Period
 from pycalendar.value import Value
 
+
 class VTimezoneElement(Component):
 
     propertyCardinality_1 = (
@@ -47,7 +48,6 @@ class VTimezoneElement(Component):
         self.mCachedExpandBelow = None
         self.mCachedExpandBelowItems = None
 
-
     def duplicate(self, parent=None):
         other = super(VTimezoneElement, self).duplicate(parent=parent)
         other.mStart = self.mStart.duplicate()
@@ -58,7 +58,6 @@ class VTimezoneElement(Component):
         other.mCachedExpandBelow = None
         other.mCachedExpandBelowItems = None
         return other
-
 
     def finalise(self):
         # Get DTSTART
@@ -90,29 +89,23 @@ class VTimezoneElement(Component):
         # Do inherited
         super(VTimezoneElement, self).finalise()
 
-
     def getSortKey(self):
         """
         We do not want these components sorted.
         """
         return ""
 
-
     def getStart(self):
         return self.mStart
-
 
     def getUTCOffset(self):
         return self.mUTCOffset
 
-
     def getUTCOffsetFrom(self):
         return self.mUTCOffsetFrom
 
-
     def getTZName(self):
         return self.mTZName
-
 
     def expandBelow(self, below):
 
@@ -155,7 +148,6 @@ class VTimezoneElement(Component):
                 return self.mCachedExpandBelowItems[0]
 
             return self.mStart
-
 
     def expandAll(self, start, end, with_name):
 

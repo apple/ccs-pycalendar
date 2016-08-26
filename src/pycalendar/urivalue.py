@@ -21,11 +21,11 @@ from pycalendar.plaintextvalue import PlainTextValue
 from pycalendar.value import Value
 from pycalendar.parser import ParserContext
 
+
 class URIValue(PlainTextValue):
 
     def getType(self):
         return URIValue.VALUETYPE_URI
-
 
     def parse(self, data, variant):
 
@@ -35,7 +35,6 @@ class URIValue(PlainTextValue):
         else:
             # No decoding required
             self.mValue = data
-
 
     # os - StringIO object
     def generate(self, os):

@@ -21,6 +21,7 @@ from pycalendar.icalendar.recurrence import Recurrence
 from pycalendar.period import Period
 import sys
 
+
 def instances(start, rrule):
     """
     Expand an RRULE.

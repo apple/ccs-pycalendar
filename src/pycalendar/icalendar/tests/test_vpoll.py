@@ -19,6 +19,7 @@ import cStringIO as StringIO
 import difflib
 import unittest
 
+
 class TestCalendar(unittest.TestCase):
 
     data = (
@@ -92,9 +93,7 @@ END:VCALENDAR
 
     )
 
-
     def testRoundtrip(self):
-
 
         def _doRoundtrip(caldata, resultdata=None):
             test1 = resultdata if resultdata is not None else caldata

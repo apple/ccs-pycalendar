@@ -16,6 +16,7 @@
 
 from hashlib import md5
 
+
 def strduptokenstr(txt, tokens):
 
     # First punt over any leading space - this is not common so test the
@@ -45,7 +46,6 @@ def strduptokenstr(txt, tokens):
         return txt, ""
 
 
-
 def strtoul(s, offset=0):
 
     max = len(s)
@@ -65,7 +65,6 @@ def strtoul(s, offset=0):
             return int(s[startoffset:]), offset
 
 
-
 def strindexfind(s, ss, default_index):
     if s and ss:
         i = 0
@@ -76,7 +75,6 @@ def strindexfind(s, ss, default_index):
             i += 1
 
     return default_index
-
 
 
 def strnindexfind(s, ss, default_index):
@@ -91,7 +89,6 @@ def strnindexfind(s, ss, default_index):
     return default_index
 
 
-
 def compareStringsSafe(s1, s2):
     if s1 is None and s2 is None:
         return True
@@ -99,7 +96,6 @@ def compareStringsSafe(s1, s2):
         return False
     else:
         return s1 == s2
-
 
 
 def md5digest(txt):

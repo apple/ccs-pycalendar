@@ -16,6 +16,7 @@
 
 from pycalendar.timezone import Timezone
 
+
 class CalendarManager(object):
 
     sICalendarManager = None
@@ -23,14 +24,12 @@ class CalendarManager(object):
     def __init__(self):
         Timezone.sDefaultTimezone = Timezone()
 
-
     def initManager(self):
         # TODO: - read in timezones from vtimezones.ics file
 
         # Eventually we need to read these from prefs - for now they are
         # hard-coded to my personal prefs!
         self.setDefaultTimezone(Timezone(utc=False, tzid="US/Eastern"))
-
 
     def setDefaultTimezoneID(self, tzid):
         # Check for UTC
@@ -41,17 +40,14 @@ class CalendarManager(object):
             temp = Timezone(utc=False, tzid=tzid)
             self.setDefaultTimezone(temp)
 
-
     def setDefaultTimezone(self, tzid):
         Timezone.sDefaultTimezone = tzid
-
 
     def getDefaultTimezoneID(self):
         if Timezone.sDefaultTimezone.getUTC():
             return "UTC"
         else:
             return Timezone.sDefaultTimezone.getTimezoneID()
-
 
     def getDefaultTimezone(self):
         return Timezone.sDefaultTimezone

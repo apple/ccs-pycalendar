@@ -346,7 +346,6 @@ class TestTimezoneDB(TestPyCalendar):
         for vtz in NonStandardTZs:
             Calendar.parseData(vtz)
 
-
     def test_getTimezone(self):
         """
         L{TimezoneDatabase.getTimezone} returns correct result.
@@ -367,7 +366,6 @@ class TestTimezoneDB(TestPyCalendar):
             else:
                 self.assertTrue(tz is None)
 
-
     def test_getTimezoneInCalendar(self):
         """
         L{TimezoneDatabase.getTimezoneInCalendar} returns correct result.
@@ -387,7 +385,6 @@ class TestTimezoneDB(TestPyCalendar):
                 self.assertEqual(cal.getComponents()[0].getID(), tzid)
             else:
                 self.assertTrue(cal is None)
-
 
     def test_isStandardTimezone(self):
         """

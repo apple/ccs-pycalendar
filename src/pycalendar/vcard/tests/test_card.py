@@ -22,6 +22,7 @@ import cStringIO as StringIO
 import difflib
 import unittest
 
+
 class TestCard(unittest.TestCase):
 
     data = (
@@ -188,9 +189,7 @@ END:VCARD
         ),
     )
 
-
     def testRoundtrip(self):
-
 
         def _doRoundtrip(caldata, resultdata=None):
             test1 = resultdata if resultdata is not None else caldata
@@ -211,9 +210,7 @@ END:VCARD
         for item, result in self.data:
             _doRoundtrip(item, result)
 
-
     def testRoundtripDuplicate(self):
-
 
         def _doDuplicateRoundtrip(caldata, result):
             card = Card()
@@ -228,9 +225,7 @@ END:VCARD
         for item, result in self.data:
             _doDuplicateRoundtrip(item, result)
 
-
     def testEquality(self):
-
 
         def _doEquality(caldata):
             card1 = Card()
@@ -240,7 +235,6 @@ END:VCARD
             card2.parse(StringIO.StringIO(caldata))
 
             self.assertEqual(card1, card2, "\n".join(difflib.unified_diff(str(card1).splitlines(), str(card2).splitlines())))
-
 
         def _doNonEquality(caldata):
             card1 = Card()
@@ -255,7 +249,6 @@ END:VCARD
         for item, _ignore in self.data:
             _doEquality(item)
             _doNonEquality(item)
-
 
     def testMultiple(self):
 
@@ -352,7 +345,6 @@ END:VCARD
             for card, result in zip(cards, results):
                 self.assertEqual(str(card), result, "\n".join(difflib.unified_diff(str(card).splitlines(), result.splitlines())))
 
-
     def testABapp(self):
 
         data = """BEGIN:VCARD
@@ -393,7 +385,6 @@ END:VCARD
 
         card = Card.parseText(data)
         self.assertEqual(str(card), result)
-
 
     def testParseFail(self):
 
@@ -478,7 +469,6 @@ BOGUS
 
         for item in data:
             self.assertRaises(InvalidData, Card.parseText, item)
-
 
     def testParseBlank(self):
 

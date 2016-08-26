@@ -20,6 +20,7 @@ from pycalendar import xmldefinitions
 from pycalendar.plaintextvalue import PlainTextValue
 from pycalendar.value import Value
 
+
 class BinaryValue(PlainTextValue):
 
     def getType(self):

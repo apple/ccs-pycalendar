@@ -26,6 +26,7 @@ from pycalendar.vcard.property import Property
 from pycalendar.vcard.validation import VCARD_VALUE_CHECKS
 import json
 
+
 class Card(ContainerBase):
 
     sContainerDescriptor = "vCard"
@@ -56,10 +57,8 @@ class Card(ContainerBase):
     def duplicate(self):
         return super(Card, self).duplicate()
 
-
     def getType(self):
         return VCARD
-
 
     def sortedPropertyKeyOrder(self):
         return (
@@ -68,7 +67,6 @@ class Card(ContainerBase):
             Property_UID,
         )
 
-
     @classmethod
     def parseMultipleData(cls, data, format):
 
@@ -76,7 +74,6 @@ class Card(ContainerBase):
             return cls.parseMultipleTextData(data)
         elif format == cls.sFormatJSON:
             return cls.parseMultipleJSONData(data)
-
 
     @classmethod
     def parseMultipleTextData(cls, ins):
@@ -158,7 +155,6 @@ class Card(ContainerBase):
 
         return results
 
-
     @classmethod
     def parseMultipleJSONData(cls, data):
 
@@ -173,11 +169,9 @@ class Card(ContainerBase):
             results.append(cls.parseJSON(jobject, None, cls(add_defaults=False)))
         return results
 
-
     def addDefaultProperties(self):
         self.addProperty(Property(definitions.Property_PRODID, Card.sProdID))
         self.addProperty(Property(definitions.Property_VERSION, "3.0"))
-
 
     def validProperty(self, prop):
         if prop.getName() == definitions.Property_VERSION:

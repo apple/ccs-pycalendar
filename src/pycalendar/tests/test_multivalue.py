@@ -18,6 +18,7 @@ import unittest
 from pycalendar.multivalue import MultiValue
 from pycalendar.value import Value
 
+
 class TestMultiValue(unittest.TestCase):
 
     def testParseValue(self):
@@ -34,7 +35,6 @@ class TestMultiValue(unittest.TestCase):
             test = req.getText()
             self.assertEqual(test, result, "Failed to parse and re-generate '%s'" % (item,))
             self.assertEqual(len(req.mValues), count, "Failed to parse and re-generate '%s'" % (item,))
-
 
     def testSetValue(self):
 

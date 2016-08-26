@@ -14,6 +14,7 @@
 #    limitations under the License.
 ##
 
+
 class DateTime(object):
     """
     A date-time object that wraps the tzdb wall-clock/utc style date-time information
@@ -24,14 +25,11 @@ class DateTime(object):
         self.dt = dt
         self.mode = mode
 
-
     def __repr__(self):
         return str(self.dt)
 
-
     def compareDateTime(self, other):
         return self.dt.compareDateTime(other.dt)
-
 
     def getLocaltime(self, offset, stdoffset):
         new_dt = self.dt.duplicate()
@@ -40,7 +38,6 @@ class DateTime(object):
         elif self.mode == "s":
             new_dt.offsetSeconds(-stdoffset + offset)
         return new_dt
-
 
     def getUTC(self, offset, stdoffset):
         new_dt = self.dt.duplicate()

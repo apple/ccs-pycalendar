@@ -19,6 +19,7 @@ from pycalendar.icalendar import itipdefinitions
 from pycalendar.icalendar.component import Component
 from pycalendar.icalendar.validation import ICALENDAR_VALUE_CHECKS
 
+
 class VAvailability(Component):
 
     propertyCardinality_1 = (
@@ -47,22 +48,17 @@ class VAvailability(Component):
     def __init__(self, parent=None):
         super(VAvailability, self).__init__(parent=parent)
 
-
     def duplicate(self, parent=None):
         return super(VAvailability, self).duplicate(parent=parent)
-
 
     def getType(self):
         return definitions.cICalComponent_VAVAILABILITY
 
-
     def getMimeComponentName(self):
         return itipdefinitions.cICalMIMEComponent_VAVAILABILITY
 
-
     def finalise(self):
         super(VAvailability, self).finalise()
-
 
     def validate(self, doFix=False):
         """
@@ -89,14 +85,12 @@ class VAvailability(Component):
 
         return fixed, unfixed
 
-
     def addComponent(self, comp):
         # We can embed the available components only
         if comp.getType() == definitions.cICalComponent_AVAILABLE:
             super(VAvailability, self).addComponent(comp)
         else:
             raise ValueError("Only 'AVAILABLE' components allowed in 'VAVAILABILITY'")
-
 
     def sortedPropertyKeyOrder(self):
         return (
@@ -105,7 +99,6 @@ class VAvailability(Component):
             definitions.cICalProperty_DURATION,
             definitions.cICalProperty_DTEND,
         )
-
 
     def getTimezones(self, tzids):
         """

@@ -22,6 +22,7 @@ import getopt
 import os
 import sys
 
+
 def loadCalendar(file, verbose):
 
     cal = Calendar()
@@ -36,7 +37,6 @@ def loadCalendar(file, verbose):
     return cal
 
 
-
 def getExpandedDates(cal, start, end):
 
     vtz = cal.getComponents()[0]
@@ -45,18 +45,15 @@ def getExpandedDates(cal, start, end):
     return expanded
 
 
-
 def sortedList(setdata):
     l = list(setdata)
     l.sort(cmp=lambda x, y: DateTime.sort(x[0], y[0]))
     return l
 
 
-
 def formattedExpandedDates(expanded):
     items = sortedList([(item[0], item[1], secondsToTime(item[2]), secondsToTime(item[3]),) for item in expanded])
     return ", ".join(["(%s, %s, %s, %s)" % item for item in items])
-
 
 
 def secondsToTime(seconds):
@@ -72,7 +69,6 @@ def secondsToTime(seconds):
         return "%s%02d:%02d:%02d" % (negative, hours, mins, secs,)
     else:
         return "%s%02d:%02d" % (negative, hours, mins,)
-
 
 
 def usage(error_msg=None):
