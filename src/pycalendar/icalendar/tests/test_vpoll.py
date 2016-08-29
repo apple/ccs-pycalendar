@@ -20,7 +20,7 @@ import difflib
 import unittest
 
 
-class TestCalendar(unittest.TestCase):
+class TestVPoll(unittest.TestCase):
 
     data = (
         """BEGIN:VCALENDAR

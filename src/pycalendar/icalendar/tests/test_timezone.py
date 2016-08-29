@@ -20,7 +20,7 @@ from pycalendar.timezone import Timezone
 import unittest
 
 
-class TestCalendar(unittest.TestCase):
+class TestTimezone(unittest.TestCase):
 
     def testOffsets(self):
 

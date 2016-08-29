@@ -21,7 +21,7 @@ import cStringIO as StringIO
 import unittest
 
 
-class TestCalendar(unittest.TestCase):
+class TestI18N(unittest.TestCase):
 
     def testAddCN(self):
 

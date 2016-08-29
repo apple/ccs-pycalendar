@@ -18,7 +18,7 @@ import cStringIO as StringIO
 import unittest
 
 
-class TestCalendar(unittest.TestCase):
+class TestComponentRecur(unittest.TestCase):
 
     def testDuplicateWithRecurrenceChange(self):
 
