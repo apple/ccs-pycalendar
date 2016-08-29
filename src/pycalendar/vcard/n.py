@@ -101,7 +101,6 @@ class N(ValueMixin):
         except:
             pass
 
-
     def getText(self):
         return utils.getDoubleNestedList(self.mValue)
 

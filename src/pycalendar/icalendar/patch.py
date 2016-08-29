@@ -22,6 +22,7 @@ from pycalendar.datetime import DateTime
 from pycalendar.icalendar.property import Property
 from pycalendar.icalendar.calendar import Calendar
 
+
 class PatchDocument(object):
     """
     Represents an entire patch document by maintaining a list of all its commands.
@@ -31,7 +32,6 @@ class PatchDocument(object):
         self.commands = []
         if text:
             self.parseText(text)
-
 
     def parseText(self, text):
 
@@ -46,7 +46,6 @@ class PatchDocument(object):
         if lines:
             raise ValueError("Lines left after parsing commands: {}".format(lines))
 
-
     def applyPatch(self, calendar):
         """
         Apply the patch to the specified calendar. The supplied L{Calendar} object will be
@@ -57,7 +56,6 @@ class PatchDocument(object):
         """
         for command in self.commands:
             command.applyPatch(calendar)
-
 
 
 class Command(object):
@@ -76,7 +74,6 @@ class Command(object):
         self.action = None
         self.path = None
         self.data = None
-
 
     @classmethod
     def create(cls, action, path, data=None):
@@ -100,7 +97,6 @@ class Command(object):
         command.path = path
         command.data = data
         return command
-
 
     @classmethod
     def parseFromText(cls, lines):
@@ -138,7 +134,6 @@ class Command(object):
 
         return Command.create(action, path, "\r\n".join(data) if data else None)
 
-
     def applyPatch(self, calendar):
         """
         Apply the patch to the specified calendar. The supplied L{Calendar} object will be
@@ -151,7 +146,6 @@ class Command(object):
         call = getattr(self, "{}Action".format(self.action))
         if call is not None:
             call(matching_items)
-
 
     def createAction(self, matches):
         """
@@ -184,7 +178,6 @@ class Command(object):
                     property.addParameter(parameter.duplicate())
         else:
             raise ValueError("create action path is not valid: {}".format(self.path))
-
 
     def updateAction(self, matches):
         """
@@ -239,7 +232,6 @@ class Command(object):
         else:
             raise ValueError("update action path is not valid: {}".format(self.path))
 
-
     def deleteAction(self, matches):
         """
         Execute a delete action on the matched items.
@@ -261,14 +253,11 @@ class Command(object):
         else:
             raise ValueError("delete action path is not valid: {}".format(self.path))
 
-
     def addAction(self, matches):
         pass
 
-
     def removeAction(self, matches):
         pass
-
 
     def componentData(self):
         """
@@ -288,7 +277,6 @@ END:VCALENDAR
         calendar = Calendar.parseText(newdata)
         return calendar.getComponents()
 
-
     def propertyData(self):
         """
         Parse the data item into a list of properties.
@@ -297,7 +285,6 @@ END:VCALENDAR
         @rtype: L{list} of L{Property}
         """
         return [Property.parseText(line) for line in self.data.splitlines()]
-
 
     def parameterData(self):
         """
@@ -314,7 +301,6 @@ END:VCALENDAR
             for parameters in newproperty.getParameters().values():
                 newparameters.extend(parameters)
         return newparameters
-
 
 
 class Path(object):
@@ -334,7 +320,6 @@ class Path(object):
         self.parameter = None
         self._parsePath(path)
 
-
     def targetComponent(self):
         """
         Indicate whether the path targets a component.
@@ -343,7 +328,6 @@ class Path(object):
         @rtype: L{bool}
         """
         return self.property is None
-
 
     def targetProperty(self):
         """
@@ -358,7 +342,6 @@ class Path(object):
             self.parameter is None
         )
 
-
     def targetPropertyNoName(self):
         """
         Indicate whether the path targets a property.
@@ -367,7 +350,6 @@ class Path(object):
         @rtype: L{bool}
         """
         return self.property is not None and self.property.noName()
-
 
     def targetParameter(self):
         """
@@ -382,7 +364,6 @@ class Path(object):
             not self.parameter.noName()
         )
 
-
     def targetParameterNoName(self):
         """
         Indicate whether the path targets a parameter.
@@ -395,7 +376,6 @@ class Path(object):
             self.parameter is not None and
             self.parameter.noName()
         )
-
 
     def _parsePath(self, path):
         """
@@ -423,7 +403,6 @@ class Path(object):
         if parameter_segment is not None:
             self.parameter = Path.ParameterSegment(parameter_segment)
 
-
     class ComponentSegment(object):
         """
         Represents a component segment of an L{Path}.
@@ -443,7 +422,6 @@ class Path(object):
 
             self._parseSegment(segment)
 
-
         def __repr__(self):
             return "<ComponentSegment: {name}[{uid}][{rid}]".format(
                 name=self.name,
@@ -451,13 +429,11 @@ class Path(object):
                 rid=(self.rid_value if self.rid_value is not None else "*") if self.rid else None
             )
 
-
         def __eq__(self, other):
             return (self.name == other.name) and \
                 (self.uid == other.uid) and \
                 (self.rid == other.rid) and \
                 (self.rid_value == other.rid_value)
-
 
         def _parseSegment(self, segment):
             """
@@ -488,7 +464,6 @@ class Path(object):
                 self.name = segment
 
             self.name = self.name.upper()
-
 
         def match(self, items):
             """
@@ -530,7 +505,6 @@ class Path(object):
 
             return results
 
-
     class PropertySegment(object):
         """
         Represents a property segment of an L{Path}.
@@ -547,15 +521,12 @@ class Path(object):
             self.matchCondition = None
             self._parseSegment(segment)
 
-
         def __repr__(self):
             return "<PropertySegment: {s.name}[{s.matchCondition}]".format(s=self)
-
 
         def __eq__(self, other):
             return (self.name == other.name) and \
                 (self.matchCondition == other.matchCondition)
-
 
         def _parseSegment(self, segment):
             """
@@ -581,10 +552,8 @@ class Path(object):
             else:
                 self.name = segment
 
-
         def noName(self):
             return self.name == ""
-
 
         def match(self, components, for_update):
             """
@@ -616,7 +585,6 @@ class Path(object):
 
             return results
 
-
     class ParameterSegment(object):
         """
         Represents a parameter segment of an L{Path}.
@@ -632,14 +600,11 @@ class Path(object):
             self.name = None
             self._parseSegment(segment)
 
-
         def __repr__(self):
             return "<ParameterSegment: {s.name}".format(s=self)
 
-
         def __eq__(self, other):
             return (self.name == other.name)
-
 
         def _parseSegment(self, segment):
             """
@@ -653,10 +618,8 @@ class Path(object):
             else:
                 self.name = segment
 
-
         def noName(self):
             return self.name == ""
-
 
         def match(self, properties):
             """
@@ -681,7 +644,6 @@ class Path(object):
                 results = [(component, property, None,) for component, property in properties]
 
             return results
-
 
     def match(self, calendar, for_update=False):
         """

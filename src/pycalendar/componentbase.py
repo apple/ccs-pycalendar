@@ -142,7 +142,6 @@ class ComponentBase(object):
         if self.mParentComponent is not None:
             self.mParentComponent.removeComponent(self)
 
-
     def removeAllComponent(self, compname=None):
         if compname:
             compname = compname.upper()

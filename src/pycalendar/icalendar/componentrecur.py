@@ -724,6 +724,5 @@ class ComponentRecur(Component):
 
         return newcomp
 
-
     def createExpanded(self, master, recurid):
         return ComponentExpanded(master, recurid)

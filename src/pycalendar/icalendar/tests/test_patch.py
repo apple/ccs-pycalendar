@@ -22,8 +22,8 @@ from pycalendar.icalendar.patch import Command, Path, PatchDocument
 import operator
 import unittest
 
-class TestPatchDocument(unittest.TestCase):
 
+class TestPatchDocument(unittest.TestCase):
 
     def _testPatch(self, data):
 
@@ -32,7 +32,6 @@ class TestPatchDocument(unittest.TestCase):
             patcher = PatchDocument(items["patch"])
             patcher.applyPatch(calendar)
             self.assertEqual(str(calendar), items["after"].replace("\n", "\r\n"), msg="Failed test #{}: {}\n{}".format(ctr + 1, items["title"], str(calendar)))
-
 
     def test_createComponent_Simple(self):
         """
@@ -173,7 +172,6 @@ END:VALARM
         ]
 
         self._testPatch(data)
-
 
     def test_createProperty_Simple(self):
         """
@@ -329,7 +327,6 @@ TRANSP:TRANSPARENT
 
         self._testPatch(data)
 
-
     def test_createParameter_Simple(self):
         """
         Test that creation of a single parameter works.
@@ -405,7 +402,6 @@ END:VCALENDAR
         ]
 
         self._testPatch(data)
-
 
     def test_updateComponent_Simple(self):
         """
@@ -583,7 +579,6 @@ END:VEVENT
 
         self._testPatch(data)
 
-
     def test_updateComponent_Recur(self):
         """
         Test that update of components works.
@@ -636,7 +631,6 @@ SUMMARY:New Year's Day - party time
         ]
 
         self._testPatch(data)
-
 
     def test_updateProperty_Simple(self):
         """
@@ -824,7 +818,6 @@ STATUS:CONFIRMED
         ]
 
         self._testPatch(data)
-
 
     def test_deleteComponent_Simple(self):
         """
@@ -1024,7 +1017,6 @@ END:VCALENDAR
         ]
 
         self._testPatch(data)
-
 
     def test_deleteProperty_Simple(self):
         """
@@ -1258,7 +1250,6 @@ END:VCALENDAR
 
         self._testPatch(data)
 
-
     def test_deleteParameter_Simple(self):
         """
         Test that deletion of a single parameter works.
@@ -1425,7 +1416,6 @@ END:VCALENDAR
         self._testPatch(data)
 
 
-
 class TestCommand(unittest.TestCase):
 
     def testCreate(self):
@@ -1454,7 +1444,6 @@ class TestCommand(unittest.TestCase):
             else:
                 self.assertTrue(valid)
                 self.assertTrue(isinstance(command, Command))
-
 
     def testParseLines(self):
         test_data = (
@@ -1504,7 +1493,6 @@ bar
             else:
                 self.assertTrue(valid, msg=txt)
                 self.assertTrue(isinstance(command, Command))
-
 
 
 class TestPath(unittest.TestCase):
@@ -1761,7 +1749,6 @@ class TestPath(unittest.TestCase):
                 self.assertEqual(path.property, property)
                 self.assertEqual(path.parameter, parameter)
 
-
     def testType(self):
 
         data = [
@@ -1780,7 +1767,6 @@ class TestPath(unittest.TestCase):
             self.assertEqual(path.targetPropertyNoName(), isPropertyNoName)
             self.assertEqual(path.targetParameter(), isParameter)
             self.assertEqual(path.targetParameterNoName(), isParameterNoName)
-
 
     def testMatch_Components_Simple(self):
 
@@ -1840,7 +1826,6 @@ END:VCALENDAR
         matched = path.match(calendar)
         self.assertEqual(len(matched), 1)
         self.assertIs(matched[0], calendar.getComponents("VEVENT")[0])
-
 
     def testMatch_Components_Multiple(self):
 
@@ -1924,7 +1909,6 @@ END:VCALENDAR
             self.assertEqual(len(matched), 1)
             self.assertIs(matched[0], components_by_uid[key])
 
-
     def testMatch_Components_Recurring(self):
 
         icalendar = """BEGIN:VCALENDAR
@@ -1988,7 +1972,6 @@ END:VCALENDAR
         matched = path.match(calendar)
         self.assertEqual(len(matched), 1)
         self.assertIs(matched[0], components_by_rid[None])
-
 
     def testMatch_Properties_Simple(self):
 
@@ -2082,7 +2065,6 @@ END:VCALENDAR
         matched = path.match(calendar)
         self.assertEqual(len(matched), 0)
 
-
     def testMatch_Parameters_Simple(self):
 
         icalendar = """BEGIN:VCALENDAR
@@ -2143,7 +2125,6 @@ END:VCALENDAR
         )
 
 
-
 class TestComponentSegment(unittest.TestCase):
 
     test_data = (
@@ -2179,7 +2160,6 @@ class TestComponentSegment(unittest.TestCase):
                 self.assertEqual(component.rid_value, DateTime.parseText(rid_value) if rid_value else None)
 
 
-
 class TestPropertySegment(unittest.TestCase):
 
     test_data = (
@@ -2209,7 +2189,6 @@ class TestPropertySegment(unittest.TestCase):
                 self.assertTrue(valid)
                 self.assertEqual(property.name, name)
                 self.assertEqual(property.matchCondition, matchCondition)
-
 
 
 class TestParameterSegment(unittest.TestCase):

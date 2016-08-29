@@ -93,6 +93,5 @@ class WrapperValue(object):
     def getTextValue(self):
         return self.mValue.getText()
 
-
     def setValue(self, value):
         self.mValue = value

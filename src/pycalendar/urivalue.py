@@ -47,7 +47,6 @@ class URIValue(PlainTextValue):
         except:
             pass
 
-
     def getTextValue(self):
         if '\n' in self.mValue:
             # No encoding required

@@ -37,7 +37,6 @@ class TextValue(PlainTextValue):
         except:
             pass
 
-
     def getTextValue(self):
         # Encoding required
         return utils.getTextValue(self.mValue)

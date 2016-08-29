@@ -43,7 +43,6 @@ class OrgValue(Value):
         except:
             pass
 
-
     def getTextValue(self):
         return utils.getTextList(self.mValue, ';')
 
