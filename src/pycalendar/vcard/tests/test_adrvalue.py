@@ -18,6 +18,7 @@ from pycalendar.vcard.adrvalue import AdrValue
 from pycalendar.vcard.property import Property
 import unittest
 
+
 class TestAdrValue(unittest.TestCase):
 
     def testParseValue(self):
@@ -40,7 +41,6 @@ class TestAdrValue(unittest.TestCase):
             req.parse(item, "vcard")
             test = req.getText()
             self.assertEqual(test, result, "Failed to parse and re-generate '%s'" % (item,))
-
 
     def testParseProperty(self):
 

@@ -24,11 +24,13 @@ import os
 import sys
 from pycalendar.icalendar import definitions
 
+
 def loadCalendarFromZoneinfo(zoneinfopath, skips=(), only=(), verbose=False, quiet=False):
 
     if not quiet:
         print "Scanning for calendar data in: %s" % (zoneinfopath,)
     paths = []
+
     def scanForICS(dirpath):
         for fname in os.listdir(dirpath):
             fpath = os.path.join(dirpath, fname)
@@ -56,7 +58,6 @@ def loadCalendarFromZoneinfo(zoneinfopath, skips=(), only=(), verbose=False, qui
     return loadCalendar(paths, verbose)
 
 
-
 def loadCalendar(files, verbose):
 
     cal = Calendar()
@@ -72,7 +73,6 @@ def loadCalendar(files, verbose):
     return CalendarZonesWrapper(calendar=cal)
 
 
-
 def parseTZData(zonedir, zonefiles):
     parser = tzconvert()
     for file in zonefiles:
@@ -83,7 +83,6 @@ def parseTZData(zonedir, zonefiles):
     return CalendarZonesWrapper(zones=parser)
 
 
-
 class CalendarZonesWrapper(object):
 
     def __init__(self, calendar=None, zones=None):
@@ -91,20 +90,17 @@ class CalendarZonesWrapper(object):
         self.zones = zones
         assert self.calendar is not None or self.zones is not None
 
-
     def getTZIDs(self):
         if self.calendar:
             return getTZIDs(self.calendar)
         elif self.zones:
             return self.zones.getZoneNames()
 
-
     def expandTransitions(self, tzid, start, end):
         if self.calendar:
             return getExpandedDates(self.calendar, tzid, start, end)
         elif self.zones:
             return self.zones.expandZone(tzid, start.getYear(), end.getYear())
-
 
 
 def compareCalendars(calendar1, calendar2, start, end, filterTzids=(), verbose=False, quiet=False):
@@ -150,7 +146,6 @@ These cannot be checked.""" % (", ".join(sorted(missing)),)
             print "Matched: %s" % (tzid,)
 
 
-
 def getTZIDs(cal):
     results = set()
 
@@ -161,11 +156,9 @@ def getTZIDs(cal):
     return results
 
 
-
 def getExpandedDates(cal, tzid, start, end):
 
     return cal.getTimezone(tzid).expandAll(start, end)
-
 
 
 def sortedList(setdata):
@@ -174,11 +167,9 @@ def sortedList(setdata):
     return l
 
 
-
 def formattedExpandedDates(expanded):
     items = sortedList([(item[0], item[1], secondsToTime(item[2]), secondsToTime(item[3]),) for item in expanded])
     return ", ".join(["(%s, %s, %s, %s)" % item for item in items])
-
 
 
 def secondsToTime(seconds):
@@ -194,7 +185,6 @@ def secondsToTime(seconds):
         return "%s%02d:%02d:%02d" % (negative, hours, mins, secs,)
     else:
         return "%s%02d:%02d" % (negative, hours, mins,)
-
 
 
 def usage(error_msg=None):

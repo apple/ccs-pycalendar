@@ -20,19 +20,17 @@ from cStringIO import StringIO
 from pycalendar import xmldefinitions
 from pycalendar.value import Value
 
+
 class UTCOffsetValue(Value):
 
     def __init__(self, value=0):
         self.mValue = value
 
-
     def duplicate(self):
         return UTCOffsetValue(self.mValue)
 
-
     def getType(self):
         return Value.VALUETYPE_UTC_OFFSET
-
 
     def parse(self, data, variant):
 
@@ -42,11 +40,11 @@ class UTCOffsetValue(Value):
         datalen = len(data)
         if datalen not in ((6, 9,) if fullISO else (5, 7,)):
             self.mValue = 0
-            raise ValueError
+            raise ValueError("UTCOffset: invalid format")
 
         # Get sign
         if data[0] not in ('+', '-'):
-            raise ValueError
+            raise ValueError("UTCOffset: does not start with '+' or '-'")
         plus = (data[0] == '+')
 
         # Get hours
@@ -66,7 +64,6 @@ class UTCOffsetValue(Value):
         if not plus:
             self.mValue = -self.mValue
 
-
     # os - StringIO object
     def generate(self, os, fullISO=False):
         try:
@@ -74,10 +71,9 @@ class UTCOffsetValue(Value):
         except:
             pass
 
-
     def getTextValue(self, fullISO=False):
         abs_value = self.mValue
-        if abs_value < 0 :
+        if abs_value < 0:
             sign = "-"
             abs_value = -self.mValue
         else:
@@ -92,7 +88,6 @@ class UTCOffsetValue(Value):
             s = ("%s:%02d" if fullISO else "%s%02d") % (s, secs,)
         return s
 
-
     def writeXML(self, node, namespace):
 
         os = StringIO()
@@ -103,10 +98,8 @@ class UTCOffsetValue(Value):
         value = self.getXMLNode(node, namespace)
         value.text = text
 
-
     def parseJSONValue(self, jobject):
         self.parse(str(jobject), variant="vcard")
-
 
     def writeJSONValue(self, jobject):
 
@@ -115,10 +108,8 @@ class UTCOffsetValue(Value):
         text = os.getvalue()
         jobject.append(text)
 
-
     def getValue(self):
         return self.mValue
-
 
     def setValue(self, value):
         self.mValue = value

@@ -21,6 +21,7 @@ from pycalendar.icalendar.componentrecur import ComponentRecur
 from pycalendar.icalendar.property import Property
 from pycalendar.icalendar.validation import ICALENDAR_VALUE_CHECKS
 
+
 class VEvent(ComponentRecur):
 
     propertyCardinality_1 = (
@@ -54,36 +55,29 @@ class VEvent(ComponentRecur):
         super(VEvent, self).__init__(parent=parent)
         self.mStatus = definitions.eStatus_VEvent_None
 
-
     def duplicate(self, parent=None):
         other = super(VEvent, self).duplicate(parent=parent)
         other.mStatus = self.mStatus
         return other
 
-
     def getType(self):
         return definitions.cICalComponent_VEVENT
 
-
     def getMimeComponentName(self):
         return itipdefinitions.cICalMIMEComponent_VEVENT
-
 
     def addComponent(self, comp):
         # We can embed the alarm components only
         if comp.getType() == definitions.cICalComponent_VALARM:
             super(VEvent, self).addComponent(comp)
         else:
-            raise ValueError
-
+            raise ValueError("Only 'VALARM' components allowed in 'VEVENT'")
 
     def getStatus(self):
         return self.mStatus
 
-
     def setStatus(self, status):
         self.mStatus = status
-
 
     def finalise(self):
         # Do inherited
@@ -97,7 +91,6 @@ class VEvent(ComponentRecur):
                 self.mStatus = definitions.eStatus_VEvent_Confirmed
             elif temp == definitions.cICalProperty_STATUS_CANCELLED:
                 self.mStatus = definitions.eStatus_VEvent_Cancelled
-
 
     def validate(self, doFix=False):
         """
@@ -131,7 +124,6 @@ class VEvent(ComponentRecur):
 
         return fixed, unfixed
 
-
     # Editing
     def editStatus(self, status):
         # Only if it is different
@@ -158,7 +150,6 @@ class VEvent(ComponentRecur):
             if value is not None:
                 prop = Property(definitions.cICalProperty_STATUS, value)
                 self.addProperty(prop)
-
 
     def sortedPropertyKeyOrder(self):
         return (

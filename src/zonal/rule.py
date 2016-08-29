@@ -33,6 +33,7 @@ __all__ = (
     "RuleSet",
 )
 
+
 class RuleSet(object):
     """
     A set of tzdata rules tied to a specific Rule name
@@ -42,10 +43,8 @@ class RuleSet(object):
         self.name = ""
         self.rules = []
 
-
     def __str__(self):
         return self.generate()
-
 
     def __eq__(self, other):
         return other and (
@@ -53,10 +52,8 @@ class RuleSet(object):
             self.rules == other.rules
         )
 
-
     def __ne__(self, other):
         return not self.__eq__(other)
-
 
     def parse(self, lines):
         """
@@ -78,7 +75,6 @@ class RuleSet(object):
             rule.parse(line)
             self.rules.append(rule)
 
-
     def generate(self):
         """
         Generate a Rule line.
@@ -87,7 +83,6 @@ class RuleSet(object):
         """
         items = [rule.generate() for rule in self.rules]
         return "\n".join(items)
-
 
     def expand(self, results, zoneinfo, maxYear):
         """
@@ -103,7 +98,6 @@ class RuleSet(object):
         """
         for rule in self.rules:
             rule.expand(results, zoneinfo, maxYear)
-
 
 
 class Rule(object):
@@ -170,7 +164,6 @@ class Rule(object):
 
     MONTH_POS_TO_NAME = ("", "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")
 
-
     def __init__(self):
         self.name = ""
         self.fromYear = ""
@@ -182,10 +175,8 @@ class Rule(object):
         self.saveTime = 0
         self.letter = ""
 
-
     def __str__(self):
         return self.generate()
-
 
     def __eq__(self, other):
         return other and (
@@ -200,10 +191,8 @@ class Rule(object):
             self.letter == other.letter
         )
 
-
     def __ne__(self, other):
         return not self.__eq__(other)
-
 
     def parse(self, line):
         """
@@ -226,7 +215,6 @@ class Rule(object):
         self.saveTime = splits[8]
         self.letter = splits[9]
 
-
     def generate(self):
         """
         Generate a Rule line.
@@ -248,7 +236,6 @@ class Rule(object):
 
         return "\t".join(items)
 
-
     def getOffset(self):
         """
         Return the specified rule offset in seconds.
@@ -267,10 +254,8 @@ class Rule(object):
         else:
             return ((hours * 60) + minutes) * 60
 
-
     def startYear(self):
         return int(self.fromYear)
-
 
     def endYear(self):
         if self.toYear == "only":
@@ -279,7 +264,6 @@ class Rule(object):
             return 9999
         else:
             return int(self.toYear)
-
 
     def datetimeForYear(self, year):
         """
@@ -335,7 +319,6 @@ class Rule(object):
                 assert False, "onDay value is not recognized: %s" % (self.onDay,)
 
         return dt, special
-
 
     def getOnDayDetails(self, start, indicatedDay, indicatedOffset):
         """
@@ -401,7 +384,6 @@ class Rule(object):
 
         return offset, day, bymday
 
-
     def expand(self, results, zoneinfo, maxYear):
         """
         Expand the Rule into a set of transition date/offset pairs
@@ -423,7 +405,6 @@ class Rule(object):
         for dt in self.dt_cache:
             results.append((dt, zoneoffset + offset, self))
 
-
     def fullExpand(self, maxYear):
         """
         Do a full recurrence expansion for each year in the Rule's range, upto
@@ -442,7 +423,6 @@ class Rule(object):
         for year in xrange(start, end + 1):
             dt = utils.DateTime(*self.datetimeForYear(year))
             self.dt_cache.append(dt)
-
 
     def vtimezone(self, vtz, zonerule, start, end, offsetfrom, offsetto, instanceCount):
         """
@@ -554,7 +534,7 @@ class Rule(object):
                     rrule.setByDay(((offset, rday),))
             else:
                 try:
-                    _ignore_day = int(self.onDay)
+                    int(self.onDay)
                 except:
                     assert False, "onDay value is not recognized: %s" % (self.onDay,)
 

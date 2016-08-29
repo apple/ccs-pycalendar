@@ -23,6 +23,7 @@ from pycalendar.valueutils import ValueMixin
 import cStringIO as StringIO
 import xml.etree.cElementTree as XML
 
+
 def WeekDayNumCompare_compare(w1, w2):
 
     if w1[0] < w2[0]:
@@ -37,23 +38,21 @@ def WeekDayNumCompare_compare(w1, w2):
         return 0
 
 
-
 def WeekDayNumSort_less_than(w1, w2):
 
     return (w1[0] < w2[0]) or (w1[0] == w2[0]) and (w1[1] < w2[1])
 
 
-
 class Recurrence(ValueMixin):
 
     cFreqMap = {
-        definitions.cICalValue_RECUR_SECONDLY : definitions.eRecurrence_SECONDLY,
-        definitions.cICalValue_RECUR_MINUTELY : definitions.eRecurrence_MINUTELY,
-        definitions.cICalValue_RECUR_HOURLY   : definitions.eRecurrence_HOURLY,
-        definitions.cICalValue_RECUR_DAILY    : definitions.eRecurrence_DAILY,
-        definitions.cICalValue_RECUR_WEEKLY   : definitions.eRecurrence_WEEKLY,
-        definitions.cICalValue_RECUR_MONTHLY  : definitions.eRecurrence_MONTHLY,
-        definitions.cICalValue_RECUR_YEARLY   : definitions.eRecurrence_YEARLY,
+        definitions.cICalValue_RECUR_SECONDLY: definitions.eRecurrence_SECONDLY,
+        definitions.cICalValue_RECUR_MINUTELY: definitions.eRecurrence_MINUTELY,
+        definitions.cICalValue_RECUR_HOURLY: definitions.eRecurrence_HOURLY,
+        definitions.cICalValue_RECUR_DAILY: definitions.eRecurrence_DAILY,
+        definitions.cICalValue_RECUR_WEEKLY: definitions.eRecurrence_WEEKLY,
+        definitions.cICalValue_RECUR_MONTHLY: definitions.eRecurrence_MONTHLY,
+        definitions.cICalValue_RECUR_YEARLY: definitions.eRecurrence_YEARLY,
     }
 
     cFreqToXMLMap = {
@@ -67,30 +66,30 @@ class Recurrence(ValueMixin):
     }
 
     cRecurMap = {
-        definitions.cICalValue_RECUR_FREQ       : definitions.eRecurrence_FREQ,
-        definitions.cICalValue_RECUR_UNTIL      : definitions.eRecurrence_UNTIL,
-        definitions.cICalValue_RECUR_COUNT      : definitions.eRecurrence_COUNT,
-        definitions.cICalValue_RECUR_INTERVAL   : definitions.eRecurrence_INTERVAL,
-        definitions.cICalValue_RECUR_BYSECOND   : definitions.eRecurrence_BYSECOND,
-        definitions.cICalValue_RECUR_BYMINUTE   : definitions.eRecurrence_BYMINUTE,
-        definitions.cICalValue_RECUR_BYHOUR     : definitions.eRecurrence_BYHOUR,
-        definitions.cICalValue_RECUR_BYDAY      : definitions.eRecurrence_BYDAY,
-        definitions.cICalValue_RECUR_BYMONTHDAY : definitions.eRecurrence_BYMONTHDAY,
-        definitions.cICalValue_RECUR_BYYEARDAY  : definitions.eRecurrence_BYYEARDAY,
-        definitions.cICalValue_RECUR_BYWEEKNO   : definitions.eRecurrence_BYWEEKNO,
-        definitions.cICalValue_RECUR_BYMONTH    : definitions.eRecurrence_BYMONTH,
-        definitions.cICalValue_RECUR_BYSETPOS   : definitions.eRecurrence_BYSETPOS,
-        definitions.cICalValue_RECUR_WKST       : definitions.eRecurrence_WKST,
+        definitions.cICalValue_RECUR_FREQ: definitions.eRecurrence_FREQ,
+        definitions.cICalValue_RECUR_UNTIL: definitions.eRecurrence_UNTIL,
+        definitions.cICalValue_RECUR_COUNT: definitions.eRecurrence_COUNT,
+        definitions.cICalValue_RECUR_INTERVAL: definitions.eRecurrence_INTERVAL,
+        definitions.cICalValue_RECUR_BYSECOND: definitions.eRecurrence_BYSECOND,
+        definitions.cICalValue_RECUR_BYMINUTE: definitions.eRecurrence_BYMINUTE,
+        definitions.cICalValue_RECUR_BYHOUR: definitions.eRecurrence_BYHOUR,
+        definitions.cICalValue_RECUR_BYDAY: definitions.eRecurrence_BYDAY,
+        definitions.cICalValue_RECUR_BYMONTHDAY: definitions.eRecurrence_BYMONTHDAY,
+        definitions.cICalValue_RECUR_BYYEARDAY: definitions.eRecurrence_BYYEARDAY,
+        definitions.cICalValue_RECUR_BYWEEKNO: definitions.eRecurrence_BYWEEKNO,
+        definitions.cICalValue_RECUR_BYMONTH: definitions.eRecurrence_BYMONTH,
+        definitions.cICalValue_RECUR_BYSETPOS: definitions.eRecurrence_BYSETPOS,
+        definitions.cICalValue_RECUR_WKST: definitions.eRecurrence_WKST,
     }
 
     cWeekdayMap = {
-        definitions.cICalValue_RECUR_WEEKDAY_SU : definitions.eRecurrence_WEEKDAY_SU,
-        definitions.cICalValue_RECUR_WEEKDAY_MO : definitions.eRecurrence_WEEKDAY_MO,
-        definitions.cICalValue_RECUR_WEEKDAY_TU : definitions.eRecurrence_WEEKDAY_TU,
-        definitions.cICalValue_RECUR_WEEKDAY_WE : definitions.eRecurrence_WEEKDAY_WE,
-        definitions.cICalValue_RECUR_WEEKDAY_TH : definitions.eRecurrence_WEEKDAY_TH,
-        definitions.cICalValue_RECUR_WEEKDAY_FR : definitions.eRecurrence_WEEKDAY_FR,
-        definitions.cICalValue_RECUR_WEEKDAY_SA : definitions.eRecurrence_WEEKDAY_SA,
+        definitions.cICalValue_RECUR_WEEKDAY_SU: definitions.eRecurrence_WEEKDAY_SU,
+        definitions.cICalValue_RECUR_WEEKDAY_MO: definitions.eRecurrence_WEEKDAY_MO,
+        definitions.cICalValue_RECUR_WEEKDAY_TU: definitions.eRecurrence_WEEKDAY_TU,
+        definitions.cICalValue_RECUR_WEEKDAY_WE: definitions.eRecurrence_WEEKDAY_WE,
+        definitions.cICalValue_RECUR_WEEKDAY_TH: definitions.eRecurrence_WEEKDAY_TH,
+        definitions.cICalValue_RECUR_WEEKDAY_FR: definitions.eRecurrence_WEEKDAY_FR,
+        definitions.cICalValue_RECUR_WEEKDAY_SA: definitions.eRecurrence_WEEKDAY_SA,
     }
 
     cWeekdayRecurMap = dict([(v, k) for k, v in cWeekdayMap.items()])
@@ -99,7 +98,6 @@ class Recurrence(ValueMixin):
 
     def __init__(self):
         self.init_Recurrence()
-
 
     def duplicate(self):
         other = Recurrence()
@@ -144,7 +142,6 @@ class Recurrence(ValueMixin):
 
         return other
 
-
     def init_Recurrence(self):
         self.mFreq = definitions.eRecurrence_YEARLY
 
@@ -172,7 +169,6 @@ class Recurrence(ValueMixin):
         self.mFullyCached = False
         self.mRecurrences = None
 
-
     def __hash__(self):
         return hash((
             self.mFreq,
@@ -193,35 +189,31 @@ class Recurrence(ValueMixin):
             self.mWeekstart,
         ))
 
-
     def __ne__(self, other):
         return not self.__eq__(other)
-
 
     def __eq__(self, other):
         if not isinstance(other, Recurrence):
             return False
         return self.equals(other)
 
-
     def equals(self, comp):
         return (
-            (self.mFreq == comp.mFreq)
-            and (self.mUseCount == comp.mUseCount) and (self.mCount == comp.mCount)
-            and (self.mUseUntil == comp.mUseUntil) and (self.mUntil == comp.mUntil)
-            and (self.mInterval == comp.mInterval)
-            and self.equalsNum(self.mBySeconds, comp.mBySeconds)
-            and self.equalsNum(self.mByMinutes, comp.mByMinutes)
-            and self.equalsNum(self.mByHours, comp.mByHours)
-            and self.equalsDayNum(self.mByDay, comp.mByDay)
-            and self.equalsNum(self.mByMonthDay, comp.mByMonthDay)
-            and self.equalsNum(self.mByYearDay, comp.mByYearDay)
-            and self.equalsNum(self.mByWeekNo, comp.mByWeekNo)
-            and self.equalsNum(self.mByMonth, comp.mByMonth)
-            and self.equalsNum(self.mBySetPos, comp.mBySetPos)
-            and (self.mWeekstart == comp.mWeekstart)
+            (self.mFreq == comp.mFreq) and
+            (self.mUseCount == comp.mUseCount) and (self.mCount == comp.mCount) and
+            (self.mUseUntil == comp.mUseUntil) and (self.mUntil == comp.mUntil) and
+            (self.mInterval == comp.mInterval) and
+            self.equalsNum(self.mBySeconds, comp.mBySeconds) and
+            self.equalsNum(self.mByMinutes, comp.mByMinutes) and
+            self.equalsNum(self.mByHours, comp.mByHours) and
+            self.equalsDayNum(self.mByDay, comp.mByDay) and
+            self.equalsNum(self.mByMonthDay, comp.mByMonthDay) and
+            self.equalsNum(self.mByYearDay, comp.mByYearDay) and
+            self.equalsNum(self.mByWeekNo, comp.mByWeekNo) and
+            self.equalsNum(self.mByMonth, comp.mByMonth) and
+            self.equalsNum(self.mBySetPos, comp.mBySetPos) and
+            (self.mWeekstart == comp.mWeekstart)
         )
-
 
     def equalsNum(self, items1, items2):
         # Check sizes first
@@ -245,7 +237,6 @@ class Recurrence(ValueMixin):
                 return False
         return True
 
-
     def equalsDayNum(self, items1, items2):
         # Check sizes first
         if items1 is None:
@@ -268,100 +259,76 @@ class Recurrence(ValueMixin):
                 return False
         return True
 
-
     def _setAndclearIfChanged(self, attr, value):
         if getattr(self, attr) != value:
             self.clear()
             setattr(self, attr, value)
 
-
     def getFreq(self):
         return self.mFreq
-
 
     def setFreq(self, freq):
         self._setAndclearIfChanged("mFreq", freq)
 
-
     def getUseUntil(self):
         return self.mUseUntil
-
 
     def setUseUntil(self, use_until):
         self._setAndclearIfChanged("mUseUntil", use_until)
 
-
     def getUntil(self):
         return self.mUntil
-
 
     def setUntil(self, until):
         self._setAndclearIfChanged("mUntil", until)
 
-
     def getUseCount(self):
         return self.mUseCount
-
 
     def setUseCount(self, use_count):
         self._setAndclearIfChanged("mUseCount", use_count)
 
-
     def getCount(self):
         return self.mCount
-
 
     def setCount(self, count):
         self._setAndclearIfChanged("mCount", count)
 
-
     def getInterval(self):
         return self.mInterval
-
 
     def setInterval(self, interval):
         self._setAndclearIfChanged("mInterval", interval)
 
-
     def getByMonth(self):
         return self.mByMonth
-
 
     def setByMonth(self, by):
         self._setAndclearIfChanged("mByMonth", by[:])
 
-
     def getByMonthDay(self):
         return self.mByMonthDay
-
 
     def setByMonthDay(self, by):
         self._setAndclearIfChanged("mByMonthDay", by[:])
 
-
     def getByYearDay(self):
         return self.mByYearDay
-
 
     def setByYearDay(self, by):
         self._setAndclearIfChanged("mByYearDay", by[:])
 
-
     def getByDay(self):
         return self.mByDay
-
 
     def setByDay(self, by):
         self._setAndclearIfChanged("mByDay", by[:])
 
-
     def getBySetPos(self):
         return self.mBySetPos
 
-
     def setBySetPos(self, by):
         self._setAndclearIfChanged("mBySetPos", by[:])
-
 
     def parse(self, data):
         self.init_Recurrence()
@@ -488,7 +455,6 @@ class Recurrence(ValueMixin):
                     raise ValueError("Recurrence: Invalid WKST value")
                 self.mWeekstart = index
 
-
     def parseList(self, txt, list, min=None, max=None, allowNegative=False, errmsg=""):
 
         if "," in txt:
@@ -506,7 +472,6 @@ class Recurrence(ValueMixin):
             if max is not None and avalue > max:
                 raise ValueError(errmsg)
             list.append(value)
-
 
     def parseListDW(self, txt, list, errmsg=""):
 
@@ -540,13 +505,11 @@ class Recurrence(ValueMixin):
 
             list.append((num, wday))
 
-
     def generate(self, os):
         try:
             os.write(self.getText())
         except:
             pass
-
 
     def getText(self):
         result = []
@@ -664,14 +627,12 @@ class Recurrence(ValueMixin):
 
         return "".join(result)
 
-
     def getList(self, title, items):
 
         if (items is not None) and (len(items) != 0):
             return ";{}={}".format(title, ",".join([str(item) for item in items]))
         else:
             return ""
-
 
     def writeXML(self, node, namespace):
 
@@ -715,13 +676,11 @@ class Recurrence(ValueMixin):
             wkst = XML.SubElement(recur, xmlutils.makeTag(namespace, xmldefinitions.recur_wkst))
             wkst.text = self.cWeekdayRecurMap.get(self.mWeekstart, definitions.cICalValue_RECUR_WEEKDAY_MO)
 
-
     def writeXMLList(self, node, namespace, name, items):
         if items is not None and len(items) != 0:
             for item in items:
                 child = XML.SubElement(node, xmlutils.makeTag(namespace, name))
                 child.text = str(item)
-
 
     def parseJSON(self, jobject):
         """
@@ -742,7 +701,6 @@ class Recurrence(ValueMixin):
                 value = value.replace("-", "").replace(":", "")
             items.append("%s=%s" % (name.upper(), value,))
         self.parse(";".join(items))
-
 
     def writeJSON(self, jobject):
         """
@@ -795,25 +753,22 @@ class Recurrence(ValueMixin):
 
         jobject.append(jdict)
 
-
     def hasBy(self):
         return (
-            (self.mBySeconds is not None) and (len(self.mBySeconds) != 0)
-            or (self.mByMinutes is not None) and (len(self.mByMinutes) != 0)
-            or (self.mByHours is not None) and (len(self.mByHours) != 0)
-            or (self.mByDay is not None) and (len(self.mByDay) != 0)
-            or (self.mByMonthDay is not None) and (len(self.mByMonthDay) != 0)
-            or (self.mByYearDay is not None) and (len(self.mByYearDay) != 0)
-            or (self.mByWeekNo is not None) and (len(self.mByWeekNo) != 0)
-            or (self.mByMonth is not None) and (len(self.mByMonth) != 0)
-            or (self.mBySetPos is not None) and (len(self.mBySetPos) != 0)
+            (self.mBySeconds is not None) and (len(self.mBySeconds) != 0) or
+            (self.mByMinutes is not None) and (len(self.mByMinutes) != 0) or
+            (self.mByHours is not None) and (len(self.mByHours) != 0) or
+            (self.mByDay is not None) and (len(self.mByDay) != 0) or
+            (self.mByMonthDay is not None) and (len(self.mByMonthDay) != 0) or
+            (self.mByYearDay is not None) and (len(self.mByYearDay) != 0) or
+            (self.mByWeekNo is not None) and (len(self.mByWeekNo) != 0) or
+            (self.mByMonth is not None) and (len(self.mByMonth) != 0) or
+            (self.mBySetPos is not None) and (len(self.mBySetPos) != 0)
         )
-
 
     def isSimpleRule(self):
         # One that has no BYxxx rules
         return not self.hasBy()
-
 
     def isAdvancedRule(self):
         # One that has BYMONTH,
@@ -825,11 +780,11 @@ class Recurrence(ValueMixin):
 
         # First checks the ones we do not handle at all
         if (
-            (self.mBySeconds is not None) and (len(self.mBySeconds) != 0)
-            or (self.mByMinutes is not None) and (len(self.mByMinutes) != 0)
-            or (self.mByHours is not None) and (len(self.mByHours) != 0)
-            or (self.mByYearDay is not None) and (len(self.mByYearDay) != 0)
-            or (self.mByWeekNo is not None) and (len(self.mByWeekNo) != 0)
+            (self.mBySeconds is not None) and (len(self.mBySeconds) != 0) or
+            (self.mByMinutes is not None) and (len(self.mByMinutes) != 0) or
+            (self.mByHours is not None) and (len(self.mByHours) != 0) or
+            (self.mByYearDay is not None) and (len(self.mByYearDay) != 0) or
+            (self.mByWeekNo is not None) and (len(self.mByWeekNo) != 0)
         ):
             return False
 
@@ -868,7 +823,6 @@ class Recurrence(ValueMixin):
         # If we get here it must be OK
         return True
 
-
     def getUIDescription(self):
         try:
             # For now just use iCal item
@@ -879,7 +833,6 @@ class Recurrence(ValueMixin):
             result = ""
 
         return result
-
 
     def expand(self, start, range, items, float_offset=0, maxInstances=None):
 
@@ -925,7 +878,6 @@ class Recurrence(ValueMixin):
                 limited = True
         return limited
 
-
     def simpleExpand(self, start, range, items, float_offset, maxInstances=None):
         start_iter = start.duplicate()
         ctr = 0
@@ -962,7 +914,6 @@ class Recurrence(ValueMixin):
                 # UNTIL as UNTIL is inclusive)
                 if start_iter > float_until:
                     return True
-
 
     def complexExpand(self, start, range, items, float_offset, maxInstances=None):
         start_iter = start.duplicate()
@@ -1056,13 +1007,11 @@ class Recurrence(ValueMixin):
             # Get next item
             start_iter.recur(self.mFreq, self.mInterval, allow_invalid=True)
 
-
     def clear(self):
         self.mCached = False
         self.mFullyCached = False
         if self.mRecurrences is not None:
             self.mRecurrences = []
-
 
     # IMPORTANT ExcludeFutureRecurrence assumes mCacheStart is setup with the
     # owning VEVENT's DTSTART
@@ -1094,7 +1043,6 @@ class Recurrence(ValueMixin):
 
         # Now clear out the cached set after making changes
         self.clear()
-
 
     def generateYearlySet(self, start, items):
         # All possible BYxxx are valid, though some combinations are not
@@ -1146,7 +1094,6 @@ class Recurrence(ValueMixin):
         if (self.mBySetPos is not None) and (len(self.mBySetPos) != 0):
             items[:] = self.bySetPosLimit(items)
 
-
     def generateMonthlySet(self, start, items):
         # Cannot have BYYEARDAY and BYWEEKNO
 
@@ -1194,7 +1141,6 @@ class Recurrence(ValueMixin):
         if ((self.mBySetPos is not None) and (len(self.mBySetPos) != 0)):
             items[:] = self.bySetPosLimit(items)
 
-
     def generateWeeklySet(self, start, items):
         # Cannot have BYYEARDAY and BYMONTHDAY
 
@@ -1233,7 +1179,6 @@ class Recurrence(ValueMixin):
 
         if (self.mBySetPos is not None) and (len(self.mBySetPos) != 0):
             items[:] = self.bySetPosLimit(items)
-
 
     def generateDailySet(self, start, items):
         # Cannot have BYYEARDAY
@@ -1278,7 +1223,6 @@ class Recurrence(ValueMixin):
 
         if (self.mBySetPos is not None) and (len(self.mBySetPos) != 0):
             items[:] = self.bySetPosLimit(items)
-
 
     def generateHourlySet(self, start, items):
         # Cannot have BYYEARDAY
@@ -1325,7 +1269,6 @@ class Recurrence(ValueMixin):
 
         if (self.mBySetPos is not None) and (len(self.mBySetPos) != 0):
             items[:] = self.bySetPosLimit(items)
-
 
     def generateMinutelySet(self, start, items):
         # Cannot have BYYEARDAY
@@ -1374,7 +1317,6 @@ class Recurrence(ValueMixin):
 
         if (self.mBySetPos is not None) and (len(self.mBySetPos) != 0):
             items[:] = self.bySetPosLimit(items)
-
 
     def generateSecondlySet(self, start, items):
         # Cannot have BYYEARDAY
@@ -1426,7 +1368,6 @@ class Recurrence(ValueMixin):
         if (self.mBySetPos is not None) and (len(self.mBySetPos) != 0):
             items[:] = self.bySetPosLimit(items)
 
-
     def byMonthExpand(self, dates):
         # Loop over all input items
         output = []
@@ -1439,7 +1380,6 @@ class Recurrence(ValueMixin):
                 output.append(temp)
 
         return output
-
 
     def byWeekNoExpand(self, dates):
         # Loop over all input items
@@ -1454,7 +1394,6 @@ class Recurrence(ValueMixin):
 
         return output
 
-
     def byYearDayExpand(self, dates):
         # Loop over all input items
         output = []
@@ -1468,7 +1407,6 @@ class Recurrence(ValueMixin):
 
         return output
 
-
     def byMonthDayExpand(self, dates):
         # Loop over all input items
         output = []
@@ -1481,7 +1419,6 @@ class Recurrence(ValueMixin):
                 output.append(temp)
 
         return output
-
 
     def byDayExpandYearly(self, dates):
         # Loop over all input items
@@ -1505,7 +1442,6 @@ class Recurrence(ValueMixin):
 
         return output
 
-
     def byDayExpandMonthly(self, dates):
         # Loop over all input items
         output = []
@@ -1527,7 +1463,6 @@ class Recurrence(ValueMixin):
                             output.append(temp)
 
         return output
-
 
     def byDayExpandWeekly(self, dates):
         # Must take into account the WKST value
@@ -1560,7 +1495,6 @@ class Recurrence(ValueMixin):
 
         return output
 
-
     def byHourExpand(self, dates):
         # Loop over all input items
         output = []
@@ -1573,7 +1507,6 @@ class Recurrence(ValueMixin):
                 output.append(temp)
 
         return output
-
 
     def byMinuteExpand(self, dates):
         # Loop over all input items
@@ -1588,7 +1521,6 @@ class Recurrence(ValueMixin):
 
         return output
 
-
     def bySecondExpand(self, dates):
         # Loop over all input items
         output = []
@@ -1601,7 +1533,6 @@ class Recurrence(ValueMixin):
                 output.append(temp)
 
         return output
-
 
     def byMonthLimit(self, dates):
         # Loop over all input items
@@ -1619,7 +1550,6 @@ class Recurrence(ValueMixin):
 
         return output
 
-
     def byWeekNoLimit(self, dates):
         # Loop over all input items
         output = []
@@ -1635,7 +1565,6 @@ class Recurrence(ValueMixin):
                 output.append(iter1)
 
         return output
-
 
     def byMonthDayLimit(self, dates):
         # Loop over all input items
@@ -1654,7 +1583,6 @@ class Recurrence(ValueMixin):
 
         return output
 
-
     def byDayLimit(self, dates):
         # Loop over all input items
         output = []
@@ -1670,7 +1598,6 @@ class Recurrence(ValueMixin):
                 output.append(iter1)
 
         return output
-
 
     def byHourLimit(self, dates):
         # Loop over all input items
@@ -1688,7 +1615,6 @@ class Recurrence(ValueMixin):
 
         return output
 
-
     def byMinuteLimit(self, dates):
         # Loop over all input items
         output = []
@@ -1705,7 +1631,6 @@ class Recurrence(ValueMixin):
 
         return output
 
-
     def bySecondLimit(self, dates):
         # Loop over all input items
         output = []
@@ -1721,7 +1646,6 @@ class Recurrence(ValueMixin):
                 output.append(iter1)
 
         return output
-
 
     def bySetPosLimit(self, dates):
         # The input dates MUST be sorted in order for this to work properly

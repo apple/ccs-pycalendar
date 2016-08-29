@@ -23,6 +23,7 @@ from pycalendar.value import Value
 from pycalendar import xmldefinitions as xmldefinitions_top
 import xml.etree.cElementTree as XML
 
+
 class RequestStatusValue(Value):
     """
     The value is a list of strings (either 2 or 3 items)
@@ -31,18 +32,14 @@ class RequestStatusValue(Value):
     def __init__(self, value=None):
         self.mValue = value if value is not None else ["2.0", "Success"]
 
-
     def __hash__(self):
         return hash(tuple(self.mValue))
-
 
     def duplicate(self):
         return RequestStatusValue(self.mValue[:])
 
-
     def getType(self):
         return Value.VALUETYPE_REQUEST_STATUS
-
 
     def parse(self, data, variant="icalendar"):
 
@@ -56,7 +53,7 @@ class RequestStatusValue(Value):
                     desc = ""
                 rest = None
             else:
-                raise ValueError
+                raise ValueError("RequestStatus: too few value components")
         elif len(result) == 2:
             code, desc = result
             rest = None
@@ -66,16 +63,15 @@ class RequestStatusValue(Value):
             if ParserContext.INVALID_REQUEST_STATUS_VALUE != ParserContext.PARSER_RAISE:
                 code, desc, rest = result[:3]
             else:
-                raise ValueError
+                raise ValueError("RequestStatus: too many value components")
 
         if "\\" in code and ParserContext.INVALID_REQUEST_STATUS_VALUE in (ParserContext.PARSER_IGNORE, ParserContext.PARSER_FIX):
             code = code.replace("\\", "")
         elif ParserContext.INVALID_REQUEST_STATUS_VALUE == ParserContext.PARSER_RAISE:
-            raise ValueError
+            raise ValueError("RequestStatus: cannot have '\\' in value")
 
         # Decoding required
         self.mValue = [code, desc, rest, ] if rest else [code, desc, ]
-
 
     # os - StringIO object
     def generate(self, os):
@@ -84,10 +80,8 @@ class RequestStatusValue(Value):
         except:
             pass
 
-
     def getTextValue(self):
         return utils.getTextList(self.mValue if len(self.mValue) < 3 or self.mValue[2] else self.mValue[:2])
-
 
     def writeXML(self, node, namespace):
         value = self.getXMLNode(node, namespace)
@@ -102,10 +96,8 @@ class RequestStatusValue(Value):
             data = XML.SubElement(value, xmlutils.makeTag(namespace, xmldefinitions.req_status_data))
             data.text = self.mValue[2]
 
-
     def parseJSONValue(self, jobject):
         self.mValue = map(lambda x: x.encode("utf-8"), jobject)
-
 
     def writeJSONValue(self, jobject):
         value = [self.mValue[0], self.mValue[1]]
@@ -113,10 +105,8 @@ class RequestStatusValue(Value):
             value.append(self.mValue[2])
         jobject.append(value)
 
-
     def getValue(self):
         return self.mValue
-
 
     def setValue(self, value):
         self.mValue = value

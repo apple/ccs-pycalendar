@@ -21,6 +21,7 @@ from pycalendar.parser import ParserContext
 from pycalendar.utils import readFoldedLine
 import json
 
+
 class ContainerBase(ComponentBase):
     """
     Represents the top-level component (i.e., VCALENDAR or vCARD)
@@ -41,11 +42,9 @@ class ContainerBase(ComponentBase):
     def setPRODID(cls, prodid):
         cls.sProdID = prodid
 
-
     @classmethod
     def setDomain(cls, domain):
         cls.sDomain = domain
-
 
     def __init__(self, add_defaults=True):
         super(ContainerBase, self).__init__()
@@ -53,18 +52,14 @@ class ContainerBase(ComponentBase):
         if add_defaults:
             self.addDefaultProperties()
 
-
     def duplicate(self):
         return super(ContainerBase, self).duplicate()
-
 
     def getType(self):
         raise NotImplementedError
 
-
     def finalise(self):
         pass
-
 
     def validate(self, doFix=False, doRaise=False):
         """
@@ -79,7 +74,6 @@ class ContainerBase(ComponentBase):
         if doRaise and unfixed:
             raise ValidationError(";".join(unfixed))
         return fixed, unfixed
-
 
     @classmethod
     def parseData(cls, data, format=None):
@@ -99,11 +93,9 @@ class ContainerBase(ComponentBase):
         elif format == cls.sFormatJSON:
             return cls.parseJSONData(data)
 
-
     @classmethod
     def parseText(cls, data):
         return cls.parseTextData(data)
-
 
     @classmethod
     def parseTextData(cls, data):
@@ -114,7 +106,6 @@ class ContainerBase(ComponentBase):
             return cal
         else:
             return None
-
 
     def parse(self, ins):
 
@@ -219,17 +210,15 @@ class ContainerBase(ComponentBase):
 
         return result
 
-
     @classmethod
     def parseJSONData(cls, data):
         if not isinstance(data, str):
             data = data.read()
         try:
             jobject = json.loads(data)
-        except ValueError, e:
-            raise InvalidData(e, data)
+        except ValueError as e:
+            raise InvalidData("JSON parse: {}".format(e), data)
         return cls.parseJSON(jobject, None, cls(add_defaults=False))
-
 
     def getText(self, format=None):
 
@@ -242,16 +231,13 @@ class ContainerBase(ComponentBase):
         else:
             return None
 
-
     def getTextJSON(self):
         jobject = []
         self.writeJSON(jobject)
         return json.dumps(jobject[0], indent=2, separators=(',', ':'))
 
-
     def addDefaultProperties(self):
         raise NotImplementedError
-
 
     def validProperty(self, prop):
         raise NotImplementedError

@@ -14,6 +14,7 @@
 #    limitations under the License.
 ##
 
+
 class FreeBusy(object):
 
     FREE = 0
@@ -26,30 +27,23 @@ class FreeBusy(object):
         self.mType = type if type else FreeBusy.FREE
         self.mPeriod = period.duplicate() if period is not None else None
 
-
     def duplicate(self):
         return FreeBusy(self.mType, self.mPeriod)
-
 
     def setType(self, type):
         self.mType = type
 
-
     def getType(self):
         return self.mType
-
 
     def setPeriod(self, period):
         self.mPeriod = period.duplicate()
 
-
     def getPeriod(self):
         return self.mPeriod
 
-
     def isPeriodOverlap(self, period):
         return self.mPeriod.isPeriodOverlap(period)
-
 
     def resolveOverlaps(self, fb):
         # TODO:

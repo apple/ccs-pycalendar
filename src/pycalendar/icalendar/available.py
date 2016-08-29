@@ -19,6 +19,7 @@ from pycalendar.icalendar.component import Component
 from pycalendar.icalendar.componentrecur import ComponentRecur
 from pycalendar.icalendar.validation import ICALENDAR_VALUE_CHECKS
 
+
 class Available(ComponentRecur):
 
     propertyCardinality_1 = (
@@ -46,14 +47,11 @@ class Available(ComponentRecur):
     def __init__(self, parent=None):
         super(Available, self).__init__(parent=parent)
 
-
     def duplicate(self, parent=None):
         return super(Available, self).duplicate(parent=parent)
 
-
     def getType(self):
         return definitions.cICalComponent_AVAILABLE
-
 
     def validate(self, doFix=False):
         """
@@ -79,7 +77,6 @@ class Available(ComponentRecur):
                 unfixed.append(logProblem)
 
         return fixed, unfixed
-
 
     def sortedPropertyKeyOrder(self):
         return (

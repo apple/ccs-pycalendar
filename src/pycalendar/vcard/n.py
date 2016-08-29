@@ -19,6 +19,7 @@
 from pycalendar import utils
 from pycalendar.valueutils import ValueMixin
 
+
 class N(ValueMixin):
     """
     mValue is a tuple of seven str or tuples of str
@@ -36,65 +37,49 @@ class N(ValueMixin):
     def __init__(self, last="", first="", middle="", prefix="", suffix=""):
         self.mValue = (last, first, middle, prefix, suffix)
 
-
     def duplicate(self):
         return N(*self.mValue)
-
 
     def __hash__(self):
         return hash(self.mValue)
 
-
     def __repr__(self):
         return "N %s" % (self.getText(),)
-
 
     def __eq__(self, comp):
         return self.mValue == comp.mValue
 
-
     def getFirst(self):
         return self.mValue[N.FIRST]
-
 
     def setFirst(self, value):
         self.mValue[N.FIRST] = value
 
-
     def getLast(self):
         return self.mValue[N.LAST]
-
 
     def setLast(self, value):
         self.mValue[N.LAST] = value
 
-
     def getMiddle(self):
         return self.mValue[N.MIDDLE]
-
 
     def setMiddle(self, value):
         self.mValue[N.MIDDLE] = value
 
-
     def getPrefix(self):
         return self.mValue[N.PREFIX]
-
 
     def setPrefix(self, value):
         self.mValue[N.PREFIX] = value
 
-
     def getSuffix(self):
         return self.mValue[N.SUFFIX]
-
 
     def setSuffix(self, value):
         self.mValue[N.SUFFIX] = value
 
-
     def getFullName(self):
-
 
         def _stringOrList(item):
             return item if isinstance(item, basestring) else " ".join(item)
@@ -107,10 +92,8 @@ class N(ValueMixin):
 
         return " ".join(results)
 
-
     def parse(self, data):
         self.mValue = utils.parseDoubleNestedList(data, N.MAXITEMS)
-
 
     def generate(self, os):
         try:
@@ -122,18 +105,14 @@ class N(ValueMixin):
     def getText(self):
         return utils.getDoubleNestedList(self.mValue)
 
-
     def parseJSON(self, jobject):
         self.mValue = tuple(map(lambda x: x.encode("utf-8"), jobject))
-
 
     def writeJSON(self, jobject):
         jobject.append(list(self.mValue))
 
-
     def getValue(self):
         return self.mValue
-
 
     def setValue(self, value):
         self.mValue = value

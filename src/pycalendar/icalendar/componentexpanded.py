@@ -16,6 +16,7 @@
 
 from pycalendar.datetime import DateTime
 
+
 class ComponentExpanded(object):
 
     @staticmethod
@@ -37,7 +38,6 @@ class ComponentExpanded(object):
         else:
             return e1.mInstanceStart < e2.mInstanceStart
 
-
     @staticmethod
     def sort_by_dtstart(e1, e2):
         if e1.mInstanceStart == e2.mInstanceStart:
@@ -51,12 +51,10 @@ class ComponentExpanded(object):
         else:
             return e1.mInstanceStart < e2.mInstanceStart
 
-
     def __init__(self, owner, rid):
 
         self.mOwner = owner
         self.initFromOwner(rid)
-
 
     def duplicate(self):
         other = ComponentExpanded(self.mOwner, None)
@@ -65,41 +63,32 @@ class ComponentExpanded(object):
         other.mRecurring = self.mRecurring
         return other
 
-
     def close(self):
         # Clean-up
         self.mOwner = None
 
-
     def getOwner(self):
         return self.mOwner
-
 
     def getMaster(self):
         return self.mOwner
 
-
     def getTrueMaster(self):
         return self.mOwner.getMaster()
-
 
     def getInstanceStart(self):
         return self.mInstanceStart
 
-
     def getInstanceEnd(self):
         return self.mInstanceEnd
 
-
     def recurring(self):
         return self.mRecurring
-
 
     def isNow(self):
         # Check instance start/end against current date-time
         now = DateTime.getNowUTC()
         return self.mInstanceStart <= now and self.mInstanceEnd > now
-
 
     def initFromOwner(self, rid):
         # There are four possibilities here:

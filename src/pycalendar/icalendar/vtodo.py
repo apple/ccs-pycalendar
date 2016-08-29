@@ -23,6 +23,7 @@ from pycalendar.icalendar.property import Property
 from pycalendar.icalendar.validation import ICALENDAR_VALUE_CHECKS
 import cStringIO as StringIO
 
+
 class VToDo(ComponentRecur):
 
     OVERDUE = 0
@@ -121,7 +122,6 @@ class VToDo(ComponentRecur):
         self.mCompleted = DateTime()
         self.mHasCompleted = False
 
-
     def duplicate(self, parent=None):
         other = super(VToDo, self).duplicate(parent=parent)
         other.mPriority = self.mPriority
@@ -131,30 +131,24 @@ class VToDo(ComponentRecur):
         other.mHasCompleted = self.mHasCompleted
         return other
 
-
     def getType(self):
         return definitions.cICalComponent_VTODO
 
-
     def getMimeComponentName(self):
         return itipdefinitions.cICalMIMEComponent_VTODO
-
 
     def addComponent(self, comp):
         # We can embed the alarm components only
         if comp.getType() == definitions.cICalComponent_VALARM:
             super(VToDo, self).addComponent(comp)
         else:
-            raise ValueError
-
+            raise ValueError("Only 'VALARM' components allowed in 'VTODO'")
 
     def getStatus(self):
         return self.mStatus
 
-
     def setStatus(self, status):
         self.mStatus = status
-
 
     def getStatusText(self):
         sout = StringIO()
@@ -196,7 +190,6 @@ class VToDo(ComponentRecur):
 
         return sout.toString()
 
-
     def getCompletionState(self):
         if self.mStatus in (definitions.eStatus_VToDo_NeedsAction, definitions.eStatus_VToDo_InProcess):
             if self.hasEnd():
@@ -216,22 +209,17 @@ class VToDo(ComponentRecur):
         elif self.mStatus == definitions.eStatus_VToDo_Cancelled:
             return VToDo.CANCELLED
 
-
     def getPriority(self):
         return self.mPriority
-
 
     def setPriority(self, priority):
         self.mPriority = priority
 
-
     def getCompleted(self):
         return self.mCompleted
 
-
     def hasCompleted(self):
         return self.mHasCompleted
-
 
     def finalise(self):
         # Do inherited
@@ -275,7 +263,6 @@ class VToDo(ComponentRecur):
         if self.mHasCompleted:
             self.mCompleted = temp
 
-
     def validate(self, doFix=False):
         """
         Validate the data in this component and optionally fix any problems, else raise. If
@@ -311,7 +298,6 @@ class VToDo(ComponentRecur):
 
         return fixed, unfixed
 
-
     # Editing
     def editStatus(self, status):
         # Only if it is different
@@ -342,7 +328,6 @@ class VToDo(ComponentRecur):
             prop = Property(definitions.cICalProperty_STATUS, value)
             self.addProperty(prop)
 
-
     def editCompleted(self, completed):
         # Remove existing COMPLETED item
         self.removeProperties(definitions.cICalProperty_COMPLETED)
@@ -354,7 +339,6 @@ class VToDo(ComponentRecur):
         self.mHasCompleted = True
         prop = Property(definitions.cICalProperty_STATUS_COMPLETED, self.mCompleted)
         self.addProperty(prop)
-
 
     def sortedPropertyKeyOrder(self):
         return (

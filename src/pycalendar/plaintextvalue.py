@@ -18,20 +18,18 @@
 
 from pycalendar.value import Value
 
+
 class PlainTextValue(Value):
 
     def __init__(self, value=''):
         self.mValue = value
 
-
     def duplicate(self):
         return self.__class__(self.mValue)
-
 
     def parse(self, data, variant):
         # No decoding required
         self.mValue = data
-
 
     # os - StringIO object
     def generate(self, os):
@@ -41,27 +39,21 @@ class PlainTextValue(Value):
         except:
             pass
 
-
     def getTextValue(self):
         return self.mValue
-
 
     def writeXML(self, node, namespace):
         value = self.getXMLNode(node, namespace)
         value.text = self.mValue
 
-
     def parseJSONValue(self, jobject):
         self.mValue = jobject.encode("utf-8")
-
 
     def writeJSONValue(self, jobject):
         jobject.append(self.mValue)
 
-
     def getValue(self):
         return self.mValue
-
 
     def setValue(self, value):
         self.mValue = value

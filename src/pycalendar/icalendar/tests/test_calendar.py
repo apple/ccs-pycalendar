@@ -25,6 +25,7 @@ import cStringIO as StringIO
 import difflib
 import unittest
 
+
 class TestCalendar(unittest.TestCase):
 
     data = (
@@ -313,9 +314,7 @@ END:VCALENDAR
         ),
     )
 
-
     def testRoundtrip(self):
-
 
         def _doRoundtrip(caldata, resultdata=None):
             test1 = resultdata if resultdata is not None else caldata
@@ -339,9 +338,7 @@ END:VCALENDAR
         for item1, item2 in self.data2:
             _doRoundtrip(item1, item2)
 
-
     def testRoundtripDuplicate(self):
-
 
         def _doDuplicateRoundtrip(caldata):
             cal = Calendar()
@@ -355,9 +352,7 @@ END:VCALENDAR
         for item in self.data:
             _doDuplicateRoundtrip(item)
 
-
     def testEquality(self):
-
 
         def _doEquality(caldata):
             cal1 = Calendar()
@@ -367,7 +362,6 @@ END:VCALENDAR
             cal2.parse(StringIO.StringIO(caldata))
 
             self.assertEqual(cal1, cal2, "%s\n\n%s" % (cal1, cal2,))
-
 
         def _doNonEquality(caldata):
             cal1 = Calendar()
@@ -382,7 +376,6 @@ END:VCALENDAR
         for item in self.data:
             _doEquality(item)
             _doNonEquality(item)
-
 
     def testParseComponent(self):
 
@@ -463,7 +456,6 @@ END:VCALENDAR
         cal.parse(StringIO.StringIO(data1))
         cal.parseComponent(StringIO.StringIO(data2))
         self.assertEqual(str(cal), result)
-
 
     def testParseFail(self):
 
@@ -558,7 +550,6 @@ BOGUS
 
         for item in data:
             self.assertRaises(InvalidData, Calendar.parseText, item)
-
 
     def testParseBlank(self):
 
@@ -658,7 +649,6 @@ END:VCALENDAR
             self.assertEqual(str(Calendar.parseText(item)), result)
 
         ParserContext.BLANK_LINES_IN_DATA = save
-
 
     def testGetVEvents(self):
 
@@ -853,7 +843,6 @@ END:VCALENDAR
             )
             instances = tuple([instance.getInstanceStart() for instance in instances])
             self.assertEqual(instances, result, "Failed in %s: got %s, expected %s" % (title, instances, result))
-
 
     def testMasterComponent(self):
 
@@ -1051,7 +1040,6 @@ END:VCALENDAR
             if master is None:
                 master = ""
             self.assertEqual(str(master), result, "Failed in %s: got %s, expected %s" % (title, master, result))
-
 
     def testDeriveComponent(self):
 

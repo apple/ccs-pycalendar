@@ -19,6 +19,7 @@ from pycalendar.duration import Duration
 from pycalendar.period import Period
 import unittest
 
+
 class TestPeriod(unittest.TestCase):
 
     test_data = (
@@ -32,7 +33,6 @@ class TestPeriod(unittest.TestCase):
             period = Period.parseText(result)
             self.assertEqual(period.getText(), result)
 
-
     def testParseBad(self):
 
         test_bad_data = (
@@ -45,7 +45,6 @@ class TestPeriod(unittest.TestCase):
         )
         for data in test_bad_data:
             self.assertRaises(ValueError, Period.parseText, data)
-
 
     def testSetUseDuration(self):
 

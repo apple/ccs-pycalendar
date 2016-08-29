@@ -34,90 +34,91 @@ import cStringIO as StringIO
 handleOptions = ("allow", "ignore", "fix", "raise")
 missingParameterValues = "fix"
 
+
 class Property(PropertyBase):
 
     sDefaultValueTypeMap = {
 
         #     2425 Properties
-        definitions.Property_SOURCE  : Value.VALUETYPE_URI,
-        definitions.Property_NAME    : Value.VALUETYPE_TEXT,
-        definitions.Property_PROFILE : Value.VALUETYPE_TEXT,
+        definitions.Property_SOURCE: Value.VALUETYPE_URI,
+        definitions.Property_NAME: Value.VALUETYPE_TEXT,
+        definitions.Property_PROFILE: Value.VALUETYPE_TEXT,
 
         #     2426 vCard Properties
 
         #     2426 Section 3.1
-        definitions.Property_FN       : Value.VALUETYPE_TEXT,
-        definitions.Property_N        : Value.VALUETYPE_TEXT,
-        definitions.Property_NICKNAME : Value.VALUETYPE_TEXT,
-        definitions.Property_PHOTO    : Value.VALUETYPE_BINARY,
-        definitions.Property_BDAY     : Value.VALUETYPE_DATE,
+        definitions.Property_FN: Value.VALUETYPE_TEXT,
+        definitions.Property_N: Value.VALUETYPE_TEXT,
+        definitions.Property_NICKNAME: Value.VALUETYPE_TEXT,
+        definitions.Property_PHOTO: Value.VALUETYPE_BINARY,
+        definitions.Property_BDAY: Value.VALUETYPE_DATE,
 
         #     2426 Section 3.2
-        definitions.Property_ADR   : Value.VALUETYPE_TEXT,
-        definitions.Property_LABEL : Value.VALUETYPE_TEXT,
+        definitions.Property_ADR: Value.VALUETYPE_TEXT,
+        definitions.Property_LABEL: Value.VALUETYPE_TEXT,
 
         #     2426 Section 3.3
-        definitions.Property_TEL    : Value.VALUETYPE_TEXT,
-        definitions.Property_EMAIL  : Value.VALUETYPE_TEXT,
-        definitions.Property_MAILER : Value.VALUETYPE_TEXT,
+        definitions.Property_TEL: Value.VALUETYPE_TEXT,
+        definitions.Property_EMAIL: Value.VALUETYPE_TEXT,
+        definitions.Property_MAILER: Value.VALUETYPE_TEXT,
 
         #     2426 Section 3.4
-        definitions.Property_TZ  : Value.VALUETYPE_UTC_OFFSET,
-        definitions.Property_GEO : Value.VALUETYPE_FLOAT,
+        definitions.Property_TZ: Value.VALUETYPE_UTC_OFFSET,
+        definitions.Property_GEO: Value.VALUETYPE_FLOAT,
 
         #     2426 Section 3.5
-        definitions.Property_TITLE : Value.VALUETYPE_TEXT,
-        definitions.Property_ROLE  : Value.VALUETYPE_TEXT,
-        definitions.Property_LOGO  : Value.VALUETYPE_BINARY,
-        definitions.Property_AGENT : Value.VALUETYPE_VCARD,
-        definitions.Property_ORG   : Value.VALUETYPE_TEXT,
+        definitions.Property_TITLE: Value.VALUETYPE_TEXT,
+        definitions.Property_ROLE: Value.VALUETYPE_TEXT,
+        definitions.Property_LOGO: Value.VALUETYPE_BINARY,
+        definitions.Property_AGENT: Value.VALUETYPE_VCARD,
+        definitions.Property_ORG: Value.VALUETYPE_TEXT,
 
         #     2426 Section 3.6
-        definitions.Property_CATEGORIES  : Value.VALUETYPE_TEXT,
-        definitions.Property_NOTE        : Value.VALUETYPE_TEXT,
-        definitions.Property_PRODID      : Value.VALUETYPE_TEXT,
-        definitions.Property_REV         : Value.VALUETYPE_DATETIME,
-        definitions.Property_SORT_STRING : Value.VALUETYPE_TEXT,
-        definitions.Property_SOUND       : Value.VALUETYPE_BINARY,
-        definitions.Property_UID         : Value.VALUETYPE_TEXT,
-        definitions.Property_URL         : Value.VALUETYPE_URI,
-        definitions.Property_VERSION     : Value.VALUETYPE_TEXT,
+        definitions.Property_CATEGORIES: Value.VALUETYPE_TEXT,
+        definitions.Property_NOTE: Value.VALUETYPE_TEXT,
+        definitions.Property_PRODID: Value.VALUETYPE_TEXT,
+        definitions.Property_REV: Value.VALUETYPE_DATETIME,
+        definitions.Property_SORT_STRING: Value.VALUETYPE_TEXT,
+        definitions.Property_SOUND: Value.VALUETYPE_BINARY,
+        definitions.Property_UID: Value.VALUETYPE_TEXT,
+        definitions.Property_URL: Value.VALUETYPE_URI,
+        definitions.Property_VERSION: Value.VALUETYPE_TEXT,
 
         #     2426 Section 3.7
-        definitions.Property_CLASS       : Value.VALUETYPE_TEXT,
-        definitions.Property_KEY         : Value.VALUETYPE_BINARY,
+        definitions.Property_CLASS: Value.VALUETYPE_TEXT,
+        definitions.Property_KEY: Value.VALUETYPE_BINARY,
     }
 
     sValueTypeMap = {
-        definitions.Value_BINARY      : Value.VALUETYPE_BINARY,
-        definitions.Value_BOOLEAN     : Value.VALUETYPE_BOOLEAN,
-        definitions.Value_DATE        : Value.VALUETYPE_DATE,
-        definitions.Value_DATE_TIME   : Value.VALUETYPE_DATETIME,
-        definitions.Value_FLOAT       : Value.VALUETYPE_FLOAT,
-        definitions.Value_INTEGER     : Value.VALUETYPE_INTEGER,
-        definitions.Value_TEXT        : Value.VALUETYPE_TEXT,
-        definitions.Value_TIME        : Value.VALUETYPE_TIME,
-        definitions.Value_URI         : Value.VALUETYPE_URI,
-        definitions.Value_UTCOFFSET   : Value.VALUETYPE_UTC_OFFSET,
-        definitions.Value_VCARD       : Value.VALUETYPE_VCARD,
+        definitions.Value_BINARY: Value.VALUETYPE_BINARY,
+        definitions.Value_BOOLEAN: Value.VALUETYPE_BOOLEAN,
+        definitions.Value_DATE: Value.VALUETYPE_DATE,
+        definitions.Value_DATE_TIME: Value.VALUETYPE_DATETIME,
+        definitions.Value_FLOAT: Value.VALUETYPE_FLOAT,
+        definitions.Value_INTEGER: Value.VALUETYPE_INTEGER,
+        definitions.Value_TEXT: Value.VALUETYPE_TEXT,
+        definitions.Value_TIME: Value.VALUETYPE_TIME,
+        definitions.Value_URI: Value.VALUETYPE_URI,
+        definitions.Value_UTCOFFSET: Value.VALUETYPE_UTC_OFFSET,
+        definitions.Value_VCARD: Value.VALUETYPE_VCARD,
     }
 
     sTypeValueMap = {
-        Value.VALUETYPE_ADR        : definitions.Value_TEXT,
-        Value.VALUETYPE_BINARY     : definitions.Value_BINARY,
-        Value.VALUETYPE_BOOLEAN    : definitions.Value_BOOLEAN,
-        Value.VALUETYPE_DATE       : definitions.Value_DATE,
-        Value.VALUETYPE_DATETIME   : definitions.Value_DATE_TIME,
-        Value.VALUETYPE_FLOAT      : definitions.Value_FLOAT,
-        Value.VALUETYPE_GEO        : definitions.Value_FLOAT,
-        Value.VALUETYPE_INTEGER    : definitions.Value_INTEGER,
-        Value.VALUETYPE_N          : definitions.Value_TEXT,
-        Value.VALUETYPE_ORG        : definitions.Value_TEXT,
-        Value.VALUETYPE_TEXT       : definitions.Value_TEXT,
-        Value.VALUETYPE_TIME       : definitions.Value_TIME,
-        Value.VALUETYPE_URI        : definitions.Value_URI,
-        Value.VALUETYPE_UTC_OFFSET : definitions.Value_UTCOFFSET,
-        Value.VALUETYPE_VCARD      : definitions.Value_VCARD,
+        Value.VALUETYPE_ADR: definitions.Value_TEXT,
+        Value.VALUETYPE_BINARY: definitions.Value_BINARY,
+        Value.VALUETYPE_BOOLEAN: definitions.Value_BOOLEAN,
+        Value.VALUETYPE_DATE: definitions.Value_DATE,
+        Value.VALUETYPE_DATETIME: definitions.Value_DATE_TIME,
+        Value.VALUETYPE_FLOAT: definitions.Value_FLOAT,
+        Value.VALUETYPE_GEO: definitions.Value_FLOAT,
+        Value.VALUETYPE_INTEGER: definitions.Value_INTEGER,
+        Value.VALUETYPE_N: definitions.Value_TEXT,
+        Value.VALUETYPE_ORG: definitions.Value_TEXT,
+        Value.VALUETYPE_TEXT: definitions.Value_TEXT,
+        Value.VALUETYPE_TIME: definitions.Value_TIME,
+        Value.VALUETYPE_URI: definitions.Value_URI,
+        Value.VALUETYPE_UTC_OFFSET: definitions.Value_UTCOFFSET,
+        Value.VALUETYPE_VCARD: definitions.Value_VCARD,
     }
 
     sMultiValues = set((
@@ -126,8 +127,8 @@ class Property(PropertyBase):
     ))
 
     sSpecialVariants = {
-        definitions.Property_ADR : Value.VALUETYPE_ADR,
-        definitions.Property_GEO : Value.VALUETYPE_GEO,
+        definitions.Property_ADR: Value.VALUETYPE_ADR,
+        definitions.Property_GEO: Value.VALUETYPE_GEO,
         definitions.Property_N: Value.VALUETYPE_N,
         definitions.Property_ORG: Value.VALUETYPE_ORG,
     }
@@ -176,7 +177,6 @@ class Property(PropertyBase):
         elif isinstance(value, UTCOffsetValue):
             self._init_attr_value_utcoffset(value)
 
-
     def duplicate(self):
         other = Property(self.mGroup, self.mName)
         for attrname, attrs in self.mParameters.items():
@@ -185,7 +185,6 @@ class Property(PropertyBase):
 
         return other
 
-
     def __hash__(self):
         return hash((
             self.mGroup,
@@ -193,7 +192,6 @@ class Property(PropertyBase):
             tuple([tuple(self.mParameters[attrname]) for attrname in sorted(self.mParameters.keys())]),
             self.mValue,
         ))
-
 
     def __eq__(self, other):
         if not isinstance(other, Property):
@@ -204,7 +202,6 @@ class Property(PropertyBase):
             self.mValue == other.mValue and
             self.mParameters == other.mParameters
         )
-
 
     def parseTextParameters(self, txt, data):
         """
@@ -225,7 +222,7 @@ class Property(PropertyBase):
                     # ":;"
                     parameter_name, txt = stringutils.strduptokenstr(txt, "=:;")
                     if parameter_name is None:
-                        raise InvalidProperty("Invalid property", data)
+                        raise InvalidProperty("Invalid property: empty parameter name", data)
 
                     if txt[0] != "=":
                         # Deal with parameters without values
@@ -233,7 +230,7 @@ class Property(PropertyBase):
                             raise InvalidProperty("Invalid property parameter", data)
                         elif ParserContext.VCARD_2_NO_PARAMETER_VALUES == ParserContext.PARSER_ALLOW:
                             parameter_value = None
-                        else: # PARSER_IGNORE and PARSER_FIX
+                        else:  # PARSER_IGNORE and PARSER_FIX
                             parameter_name = None
 
                         if parameter_name.upper() == "BASE64" and ParserContext.VCARD_2_BASE64 == ParserContext.PARSER_FIX:
@@ -244,7 +241,7 @@ class Property(PropertyBase):
                         txt = txt[1:]
                         parameter_value, txt = stringutils.strduptokenstr(txt, ":;,")
                         if parameter_value is None:
-                            raise InvalidProperty("Invalid property", data)
+                            raise InvalidProperty("Invalid property: empty parameter name", data)
 
                     # Now add parameter value (decode ^-escaping)
                     if parameter_name is not None:
@@ -256,7 +253,7 @@ class Property(PropertyBase):
                         txt = txt[1:]
                         parameter_value2, txt = stringutils.strduptokenstr(txt, ":;,")
                         if parameter_value2 is None:
-                            raise InvalidProperty("Invalid property", data)
+                            raise InvalidProperty("Invalid property: empty parameter multi-value", data)
                         attrvalue.addValue(decodeParameterValue(parameter_value2))
                 elif txt[0] == ':':
                     txt = txt[1:]
@@ -265,8 +262,7 @@ class Property(PropertyBase):
                     return txt
 
         except IndexError:
-            raise InvalidProperty("Invalid property", data)
-
+            raise InvalidProperty("Invalid property: index error", data)
 
     # Write out the actual property, possibly skipping the value
     def generateValue(self, os, novalue):
@@ -307,7 +303,6 @@ class Property(PropertyBase):
         else:
             super(Property, self).generateValue(os, novalue)
 
-
     # Creation
     def _init_attr_value_adr(self, reqstatus):
         # Value
@@ -316,14 +311,12 @@ class Property(PropertyBase):
         # Parameters
         self.setupValueParameter()
 
-
     def _init_attr_value_n(self, reqstatus):
         # Value
         self.mValue = NValue(reqstatus)
 
         # Parameters
         self.setupValueParameter()
-
 
     def _init_attr_value_org(self, reqstatus):
         # Value

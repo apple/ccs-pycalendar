@@ -18,6 +18,7 @@ from pycalendar.parser import ParserContext
 from pycalendar.stringutils import strtoul
 from pycalendar.valueutils import ValueMixin
 
+
 class Duration(ValueMixin):
 
     def __init__(self, duration=None, weeks=0, days=0, hours=0, minutes=0, seconds=0):
@@ -34,7 +35,6 @@ class Duration(ValueMixin):
             duration = (((weeks * 7 + days) * 24 + hours) * 60 + minutes) * 60 + seconds
         self.setDuration(duration)
 
-
     def duplicate(self):
         other = Duration(None)
         other.mForward = self.mForward
@@ -48,27 +48,21 @@ class Duration(ValueMixin):
 
         return other
 
-
     def __hash__(self):
         return hash(self.getTotalSeconds())
-
 
     def __eq__(self, comp):
         return self.getTotalSeconds() == comp.getTotalSeconds()
 
-
     def __gt__(self, comp):
         return self.getTotalSeconds() > comp.getTotalSeconds()
-
 
     def __lt__(self, comp):
         return self.getTotalSeconds() < comp.getTotalSeconds()
 
-
     def getTotalSeconds(self):
         return [1, -1][not self.mForward] \
             * (self.mSeconds + (self.mMinutes + (self.mHours + (self.mDays + (self.mWeeks * 7)) * 24) * 60) * 60)
-
 
     def setDuration(self, seconds):
         self.mForward = seconds >= 0
@@ -102,37 +96,29 @@ class Duration(ValueMixin):
 
             self.mWeeks = 0
 
-
     def getForward(self):
         return self.mForward
-
 
     def getWeeks(self):
         return self.mWeeks
 
-
     def getDays(self):
         return self.mDays
-
 
     def getHours(self):
         return self.mHours
 
-
     def getMinutes(self):
         return self.mMinutes
 
-
     def getSeconds(self):
         return self.mSeconds
-
 
     @classmethod
     def parseText(cls, data):
         dur = cls()
         dur.parse(data)
         return dur
-
 
     def parse(self, data):
         # parse format ([+]/-) "P" (dur-date / dur-time / dur-week)
@@ -149,7 +135,7 @@ class Duration(ValueMixin):
 
             # Must have a 'P'
             if data[offset] != "P":
-                raise ValueError
+                raise ValueError("Duration: missing 'P'")
             offset += 1
 
             # Look for time
@@ -167,7 +153,7 @@ class Duration(ValueMixin):
                     if offset != maxoffset:
                         if ParserContext.INVALID_DURATION_VALUE != ParserContext.PARSER_RAISE:
                             return
-                        raise ValueError
+                        raise ValueError("Duration: extra data after 'W'")
                     return
                 elif data[offset] == "D":
                     # Have a number of days
@@ -180,10 +166,10 @@ class Duration(ValueMixin):
 
                     # Look for time - exit if none
                     if data[offset] != "T":
-                        raise ValueError
+                        raise ValueError("Duration: no 'T' after 'D'")
                 else:
                     # Error in format
-                    raise ValueError
+                    raise ValueError("Duration: need 'D' or 'W'")
 
             # Have time
             offset += 1
@@ -192,7 +178,7 @@ class Duration(ValueMixin):
             # send T with no additional text
             if offset == maxoffset:
                 if ParserContext.INVALID_DURATION_VALUE == ParserContext.PARSER_RAISE:
-                    raise ValueError
+                    raise ValueError("Duration: need number after 'T'")
                 else:
                     return
             num, offset = strtoul(data, offset)
@@ -233,18 +219,16 @@ class Duration(ValueMixin):
                 if offset == maxoffset:
                     return
 
-            raise ValueError
+            raise ValueError("Duration: invalid data after 'T'")
 
         except IndexError:
-            raise ValueError
-
+            raise ValueError("Duration: index error")
 
     def generate(self, os):
         try:
             os.write(self.getText())
         except:
             pass
-
 
     def getText(self):
         result = []
@@ -274,14 +258,11 @@ class Duration(ValueMixin):
 
         return "".join(result)
 
-
     def writeXML(self, node, namespace):
         node.text = self.getText()
 
-
     def parseJSON(self, jobject):
         self.parse(str(jobject))
-
 
     def writeJSON(self, jobject):
         jobject.append(self.getText())

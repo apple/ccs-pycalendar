@@ -19,23 +19,20 @@
 from pycalendar import xmldefinitions
 from pycalendar.value import Value
 
+
 class IntegerValue(Value):
 
     def __init__(self, value=None):
         self.mValue = value if value is not None else 0
 
-
     def duplicate(self):
         return IntegerValue(self.mValue)
-
 
     def getType(self):
         return Value.VALUETYPE_INTEGER
 
-
     def parse(self, data, variant):
         self.mValue = int(data)
-
 
     # os - StringIO object
     def generate(self, os):
@@ -44,27 +41,21 @@ class IntegerValue(Value):
         except:
             pass
 
-
     def getTextValue(self):
         return str(self.mValue)
-
 
     def writeXML(self, node, namespace):
         value = self.getXMLNode(node, namespace)
         value.text = str(self.mValue)
 
-
     def parseJSONValue(self, jobject):
         self.mValue = int(jobject)
-
 
     def writeJSONValue(self, jobject):
         jobject.append(self.mValue)
 
-
     def getValue(self):
         return self.mValue
-
 
     def setValue(self, value):
         self.mValue = value

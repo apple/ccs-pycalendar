@@ -17,6 +17,7 @@
 import unittest
 from pycalendar.stringutils import strduptokenstr
 
+
 class TestStringUtils(unittest.TestCase):
 
     def test_strduptokenstr(self):

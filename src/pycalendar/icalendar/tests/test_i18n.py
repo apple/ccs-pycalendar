@@ -20,6 +20,7 @@ from pycalendar.icalendar.calendar import Calendar
 import cStringIO as StringIO
 import unittest
 
+
 class TestCalendar(unittest.TestCase):
 
     def testAddCN(self):

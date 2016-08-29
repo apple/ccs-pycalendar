@@ -19,6 +19,7 @@ from pycalendar.icalendar.property import Property
 from pycalendar.icalendar.requeststatusvalue import RequestStatusValue
 import unittest
 
+
 class TestRequestStatus(unittest.TestCase):
 
     def testParseValue(self):
@@ -36,7 +37,6 @@ class TestRequestStatus(unittest.TestCase):
             req = RequestStatusValue()
             req.parse(item, "icalendar")
             self.assertEqual(req.getText(), item, "Failed to parse and re-generate '%s'" % (item,))
-
 
     def testBadValue(self):
 
@@ -57,7 +57,6 @@ class TestRequestStatus(unittest.TestCase):
 
         ParserContext.INVALID_REQUEST_STATUS_VALUE = oldContext
 
-
     def testTruncatedValue(self):
 
         bad_value = "2.0"
@@ -76,7 +75,6 @@ class TestRequestStatus(unittest.TestCase):
         self.assertRaises(ValueError, req.parse, bad_value)
 
         ParserContext.INVALID_REQUEST_STATUS_VALUE = oldContext
-
 
     def testParseProperty(self):
 

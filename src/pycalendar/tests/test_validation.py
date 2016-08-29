@@ -18,10 +18,10 @@ from pycalendar.icalendar.property import Property
 from pycalendar.validation import partial, PropertyValueChecks
 import unittest
 
+
 class TestValidation(unittest.TestCase):
 
     def test_partial(self):
-
 
         def _test(a, b):
             return (a, b)
@@ -29,7 +29,6 @@ class TestValidation(unittest.TestCase):
         self.assertEqual(partial(_test, "a", "b")(), ("a", "b",))
         self.assertEqual(partial(_test, "a")("b"), ("a", "b",))
         self.assertEqual(partial(_test)("a", "b"), ("a", "b",))
-
 
     def test_stringValue(self):
 
@@ -43,7 +42,6 @@ class TestValidation(unittest.TestCase):
             property = Property.parseText(prop)
             self.assertEqual(PropertyValueChecks.stringValue(test, property), result)
 
-
     def test_alwaysUTC(self):
 
         props = (
@@ -56,7 +54,6 @@ class TestValidation(unittest.TestCase):
         for prop, result in props:
             property = Property.parseText(prop)
             self.assertEqual(PropertyValueChecks.alwaysUTC(property), result)
-
 
     def test_numericRange(self):
 
@@ -72,7 +69,6 @@ class TestValidation(unittest.TestCase):
         for prop, low, high, result in props:
             property = Property.parseText(prop)
             self.assertEqual(PropertyValueChecks.numericRange(low, high, property), result)
-
 
     def test_positiveIntegerOrZero(self):
 

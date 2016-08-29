@@ -20,6 +20,7 @@ from pycalendar.value import Value
 from pycalendar.valueutils import WrapperValue
 from pycalendar.vcard.n import N
 
+
 class NValue(WrapperValue, Value):
 
     _wrappedClass = N

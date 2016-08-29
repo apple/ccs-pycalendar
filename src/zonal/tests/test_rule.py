@@ -18,6 +18,7 @@ import unittest
 from zonal.rule import Rule, RuleSet
 from pycalendar.datetime import DateTime
 
+
 class TestRule(unittest.TestCase):
 
     def test_parse(self):
@@ -34,7 +35,6 @@ class TestRule(unittest.TestCase):
 
             self.assertEqual(str(ruleitem), ruletext)
 
-
     def test_datetimeforyear(self):
         data = (
             ("Rule\tGuat\t2006\tonly\t-\tOct\t1\t0:00\t0\tS", 2006, DateTime(2006, 10, 1, 0, 0, 0), ""),
@@ -48,7 +48,6 @@ class TestRule(unittest.TestCase):
 
             self.assertEqual(ruleitem.datetimeForYear(year), (dt, special))
 
-
     def test_getoffset(self):
         data = (
             ("Rule\tGuat\t2006\tonly\t-\tOct\t1\t0:00\t0\tS", 0),
@@ -61,7 +60,6 @@ class TestRule(unittest.TestCase):
             ruleitem.parse(ruletext)
 
             self.assertEqual(ruleitem.getOffset(), offset)
-
 
 
 class TestRuleSet(unittest.TestCase):

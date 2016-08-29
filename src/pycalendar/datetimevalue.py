@@ -19,18 +19,17 @@ from pycalendar.datetime import DateTime
 from pycalendar.value import Value
 from pycalendar.valueutils import WrapperValue
 
+
 class DateTimeValue(WrapperValue, Value):
 
     _wrappedClass = DateTime
-    _wrappedType = None # Depends on actual value
+    _wrappedType = None  # Depends on actual value
 
     def getType(self):
         return (Value.VALUETYPE_DATETIME, Value.VALUETYPE_DATE)[self.mValue.isDateOnly()]
 
-
     def parse(self, data, variant):
         self.mValue.parse(data, fullISO=(variant == "vcard"))
-
 
     def writeXML(self, node, namespace):
         self.mValue.writeXML(node, namespace)

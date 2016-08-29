@@ -23,6 +23,7 @@ from pycalendar.value import Value
 from pycalendar import xmldefinitions as xmldefinitions_top
 import xml.etree.cElementTree as XML
 
+
 class GeoValue(Value):
     """
     The value is a list of 2 floats
@@ -31,18 +32,14 @@ class GeoValue(Value):
     def __init__(self, value=None):
         self.mValue = value if value is not None else [0.0, 0.0]
 
-
     def __hash__(self):
         return hash(tuple(self.mValue))
-
 
     def duplicate(self):
         return GeoValue(self.mValue[:])
 
-
     def getType(self):
         return Value.VALUETYPE_GEO
-
 
     def parse(self, data, variant="icalendar"):
 
@@ -60,15 +57,12 @@ class GeoValue(Value):
             else:
                 raise InvalidData("GEO value incorrect", data)
 
-
     # os - StringIO object
     def generate(self, os):
         os.write(self.getTextValue())
 
-
     def getTextValue(self):
         return "%s;%s" % (self.mValue[0], self.mValue[1],)
-
 
     def writeXML(self, node, namespace):
         value = self.getXMLNode(node, namespace)
@@ -79,18 +73,14 @@ class GeoValue(Value):
         longitude = XML.SubElement(value, xmlutils.makeTag(namespace, xmldefinitions.geo_longitude))
         longitude.text = self.mValue[1]
 
-
     def parseJSONValue(self, jobject):
         self.mValue = jobject
-
 
     def writeJSONValue(self, jobject):
         jobject.append(list(self.mValue))
 
-
     def getValue(self):
         return self.mValue
-
 
     def setValue(self, value):
         self.mValue = value

@@ -33,6 +33,7 @@ import collections
 import json
 import xml.etree.cElementTree as XML
 
+
 class Calendar(ContainerBase):
 
     REMOVE_ALL = 0
@@ -74,7 +75,6 @@ class Calendar(ContainerBase):
         self.mMasterComponentsByTypeAndUID = collections.defaultdict(lambda: collections.defaultdict(list))
         self.mOverriddenComponentsByUID = collections.defaultdict(list)
 
-
     def __str__(self):
         """
         Override this to generate text without adding timezones - i.e., this will not change the
@@ -82,25 +82,20 @@ class Calendar(ContainerBase):
         """
         return self.getText(includeTimezones=Calendar.NO_TIMEZONES)
 
-
     def duplicate(self):
         other = super(Calendar, self).duplicate()
         other.mName = self.mName
         other.mDescription = self.mDescription
         return other
 
-
     def getType(self):
         return definitions.cICalComponent_VCALENDAR
-
 
     def getName(self):
         return self.mName
 
-
     def setName(self, name):
         self.mName = name
-
 
     def editName(self, name):
         if self.mName != name:
@@ -114,14 +109,11 @@ class Calendar(ContainerBase):
             if len(name):
                 self.ddProperty(Property(definitions.cICalProperty_XWRCALNAME, name))
 
-
     def getDescription(self):
         return self.mDescription
 
-
     def setDescription(self, description):
         self.mDescription = description
-
 
     def editDescription(self, description):
         if self.mDescription != description:
@@ -135,13 +127,11 @@ class Calendar(ContainerBase):
             if len(description):
                 self.addProperty(Property(definitions.cICalProperty_XWRCALDESC, description))
 
-
     def getMethod(self):
         result = ""
         if self.hasProperty(definitions.cICalProperty_METHOD):
             result = self.loadValueString(definitions.cICalProperty_METHOD)
         return result
-
 
     def changeUID(self, oldUID, newUID):
         """
@@ -169,7 +159,6 @@ class Calendar(ContainerBase):
                 self.mMasterComponentsByTypeAndUID[ctype][newUID] = self.mMasterComponentsByTypeAndUID[ctype][oldUID]
                 del self.mMasterComponentsByTypeAndUID[ctype][oldUID]
 
-
     def finalise(self):
         # Get calendar name if present
 
@@ -183,7 +172,6 @@ class Calendar(ContainerBase):
         if temps is not None:
             self.mDescription = temps
 
-
     def sortedComponentNames(self):
         return (
             definitions.cICalComponent_VTIMEZONE,
@@ -194,7 +182,6 @@ class Calendar(ContainerBase):
             definitions.cICalComponent_VAVAILABILITY,
         )
 
-
     def sortedPropertyKeyOrder(self):
         return (
             definitions.cICalProperty_VERSION,
@@ -202,7 +189,6 @@ class Calendar(ContainerBase):
             definitions.cICalProperty_METHOD,
             definitions.cICalProperty_PRODID,
         )
-
 
     def parse(self, ins):
 
@@ -213,7 +199,6 @@ class Calendar(ContainerBase):
         TimezoneDatabase.mergeTimezones(self, self.getComponents(definitions.cICalComponent_VTIMEZONE))
 
         return result
-
 
     def parseComponent(self, ins):
 
@@ -320,7 +305,6 @@ class Calendar(ContainerBase):
 
         return result
 
-
     def addComponent(self, component):
         """
         Override to track components by UID.
@@ -335,7 +319,6 @@ class Calendar(ContainerBase):
             else:
                 self.mMasterComponentsByTypeAndUID[component.getType()][uid] = component
 
-
     def removeComponent(self, component):
         """
         Override to track components by UID.
@@ -349,7 +332,6 @@ class Calendar(ContainerBase):
                 self.mOverriddenComponentsByUID[uid].remove(component)
             else:
                 del self.mMasterComponentsByTypeAndUID[component.getType()][uid]
-
 
     def deriveComponent(self, recurrenceID):
         """
@@ -368,7 +350,6 @@ class Calendar(ContainerBase):
         else:
             return master.deriveComponent(recurrenceID)
 
-
     def masterComponent(self):
         """
         Return the first sub-component of a recurring type that represents the master
@@ -385,7 +366,6 @@ class Calendar(ContainerBase):
         else:
             return None
 
-
     def getText(self, includeTimezones=None, format=None):
 
         if format is None or format == self.sFormatText:
@@ -395,17 +375,14 @@ class Calendar(ContainerBase):
         elif format == self.sFormatJSON:
             return self.getTextJSON(includeTimezones=includeTimezones)
 
-
     def generate(self, os, includeTimezones=None):
         # Make sure all required timezones are in this object
         self.includeMissingTimezones(includeTimezones=includeTimezones)
         super(Calendar, self).generate(os)
 
-
     def getTextXML(self, includeTimezones=None):
         node = self.writeXML(includeTimezones)
         return xmlutils.toString(node)
-
 
     def writeXML(self, includeTimezones=None):
         # Make sure all required timezones are in this object
@@ -416,12 +393,10 @@ class Calendar(ContainerBase):
         super(Calendar, self).writeXML(root, xmldefinitions.iCalendar20_namespace)
         return root
 
-
     def getTextJSON(self, includeTimezones=None, sort_keys=False):
         jobject = []
         self.writeJSON(jobject, includeTimezones)
         return json.dumps(jobject[0], indent=2, separators=(',', ':'), sort_keys=sort_keys)
-
 
     def writeJSON(self, jobject, includeTimezones=None):
         # Make sure all required timezones are in this object
@@ -429,7 +404,6 @@ class Calendar(ContainerBase):
 
         # Root node structure
         super(Calendar, self).writeJSON(jobject)
-
 
     # Get expanded components
     def getVEvents(self, period, list, all_day_at_top=True):
@@ -441,7 +415,6 @@ class Calendar(ContainerBase):
             list.sort(ComponentExpanded.sort_by_dtstart_allday)
         else:
             list.sort(ComponentExpanded.sort_by_dtstart)
-
 
     def getVToDos(self, only_due, all_dates, upto_due_date, list):
         # Get current date-time less one day to test for completed events during the last day
@@ -475,23 +448,19 @@ class Calendar(ContainerBase):
             # TODO: fix this
             # list.append(ComponentExpandedShared(ComponentExpanded(vtodo, None)))
 
-
     def getRecurrenceInstancesItems(self, type, uid, items):
         # Get instances from list
         items.extend(self.mOverriddenComponentsByUID.get(uid, ()))
 
-
     def getRecurrenceInstancesIds(self, type, uid, ids):
         # Get instances from list
         ids.extend([comp.getRecurrenceID() for comp in self.mOverriddenComponentsByUID.get(uid, ())])
-
 
     # Freebusy generation
     def getVFreeBusyList(self, period, list):
         # Look at each VFreeBusy
         for vfreebusy in self.getComponents(definitions.cICalComponent_VFREEBUSY):
             vfreebusy.expandPeriod(period, list)
-
 
     def getVFreeBusyFB(self, period, fb):
         # First create expanded set
@@ -528,7 +497,7 @@ class Calendar(ContainerBase):
         dtstart_iter.next()
         dtend_iter = dtend.iter()
         dtend_iter.next()
-        for i in i:
+        for _ignore in (None,):
 
             # Check for non-overlap
             if dtstart_iter > temp.getEnd():
@@ -547,7 +516,6 @@ class Calendar(ContainerBase):
 
         # Add remaining period as property
         fb.addProperty(Property(definitions.cICalProperty_FREEBUSY, temp))
-
 
     def getFreeBusy(self, period, fb):
         # First create expanded set
@@ -591,18 +559,15 @@ class Calendar(ContainerBase):
         # Add remaining period as property
         FreeBusy.resolveOverlaps(fb)
 
-
     def getTimezoneOffsetSeconds(self, tzid, dt, relative_to_utc=False):
         # Find timezone that matches the name (which is the same as the map key)
         timezone = self.getTimezone(tzid)
         return timezone.getTimezoneOffsetSeconds(dt, relative_to_utc) if timezone else 0
 
-
     def getTimezoneDescriptor(self, tzid, dt):
         # Find timezone that matches the name (which is the same as the map key)
         timezone = self.getTimezone(tzid)
         return timezone.getTimezoneDescriptor(dt) if timezone else ""
-
 
     def getTimezone(self, tzid):
         # Find timezone that matches the name (which is the same as the map key)
@@ -612,12 +577,10 @@ class Calendar(ContainerBase):
         else:
             return None
 
-
     def addDefaultProperties(self):
         self.addProperty(Property(definitions.cICalProperty_PRODID, Calendar.sProdID))
         self.addProperty(Property(definitions.cICalProperty_VERSION, "2.0"))
         self.addProperty(Property(definitions.cICalProperty_CALSCALE, "GREGORIAN"))
-
 
     def validProperty(self, prop):
         if prop.getName() == definitions.cICalProperty_VERSION:
@@ -633,7 +596,6 @@ class Calendar(ContainerBase):
                 return False
 
         return True
-
 
     def includeMissingTimezones(self, includeTimezones=None):
         """
@@ -672,7 +634,6 @@ class Calendar(ContainerBase):
                 if tz is not None:
                     dup = tz.duplicate()
                     self.addComponent(dup)
-
 
     def stripStandardTimezones(self):
         """

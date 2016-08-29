@@ -17,6 +17,7 @@
 from pycalendar import stringutils
 from pycalendar.timezonedb import TimezoneDatabase
 
+
 class Timezone(object):
     """
     Wrapper around a timezone specification. There are three options:
@@ -46,10 +47,8 @@ class Timezone(object):
                 self.mUTC = Timezone.sDefaultTimezone.mUTC
                 self.mTimezone = Timezone.sDefaultTimezone.mTimezone
 
-
     def duplicate(self):
         return Timezone(self.mUTC, self.mTimezone)
-
 
     def equals(self, comp):
         # Always match if any one of them is 'floating'
@@ -59,7 +58,6 @@ class Timezone(object):
             return False
         else:
             return self.mUTC or stringutils.compareStringsSafe(self.mTimezone, comp.mTimezone)
-
 
     @staticmethod
     def same(utc1, tzid1, utc2, tzid2):
@@ -71,35 +69,27 @@ class Timezone(object):
         else:
             return utc1 or stringutils.compareStringsSafe(tzid1, tzid2)
 
-
     @staticmethod
     def is_float(utc, tzid):
         return not utc and not tzid
 
-
     def getUTC(self):
         return self.mUTC
-
 
     def setUTC(self, utc):
         self.mUTC = utc
 
-
     def getTimezoneID(self):
         return self.mTimezone
-
 
     def setTimezoneID(self, tzid):
         self.mTimezone = tzid
 
-
     def floating(self):
         return not self.mUTC and self.mTimezone is None
 
-
     def hasTZID(self):
         return not self.mUTC and self.mTimezone is not None
-
 
     def timeZoneSecondsOffset(self, dt, relative_to_utc=False):
         if self.mUTC:
@@ -111,7 +101,6 @@ class Timezone(object):
         else:
             # Look up timezone and resolve date using default timezones
             return TimezoneDatabase.getTimezoneOffsetSeconds(self.mTimezone, dt, relative_to_utc)
-
 
     def timeZoneDescriptor(self, dt):
         if self.mUTC:

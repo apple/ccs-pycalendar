@@ -22,6 +22,7 @@ from pycalendar.timezone import Timezone
 import os
 import json
 
+
 class TestRecurrence(unittest.TestCase):
 
     items = (
@@ -55,14 +56,12 @@ class TestRecurrence(unittest.TestCase):
         "FREQ=DAILY;BYMINUTE=0,20,40;BYHOUR=9,10,11,12,13,14,15,16",
     )
 
-
     def testParse(self):
 
         for item in TestRecurrence.items:
             recur = Recurrence()
             recur.parse(item)
             self.assertEqual(recur.getText(), item, "Failed to parse and re-generate '%s'" % (item,))
-
 
     def testParseInvalid(self):
 
@@ -85,7 +84,6 @@ class TestRecurrence(unittest.TestCase):
         for item in items:
             self.assertRaises(ValueError, Recurrence().parse, item)
 
-
     def testEquality(self):
 
         recur1 = Recurrence()
@@ -95,7 +93,6 @@ class TestRecurrence(unittest.TestCase):
 
         self.assertEqual(recur1, recur2)
 
-
     def testInequality(self):
 
         recur1 = Recurrence()
@@ -104,7 +101,6 @@ class TestRecurrence(unittest.TestCase):
         recur2.parse("COUNT=400;FREQ=YEARLY;BYMONTH=1")
 
         self.assertNotEqual(recur1, recur2)
-
 
     def testHash(self):
 
@@ -116,7 +112,6 @@ class TestRecurrence(unittest.TestCase):
         hashes.sort()
         for i in range(1, len(hashes)):
             self.assertNotEqual(hashes[i - 1], hashes[i])
-
 
     def testWeeklyTwice(self):
 
@@ -159,7 +154,6 @@ class TestRecurrence(unittest.TestCase):
             ],
         )
 
-
     def testMonthlyInUTC(self):
 
         recur = Recurrence()
@@ -187,7 +181,6 @@ class TestRecurrence(unittest.TestCase):
             ],
         )
 
-
     def testExampleRules(self):
 
         examples = os.path.join(os.path.dirname(__file__), "rrule_examples.json")
@@ -210,7 +203,6 @@ class TestRecurrence(unittest.TestCase):
                 results,
                 msg="Failed rule: #{} {} {}".format(ctr + 1, i["rule"], items)
             )
-
 
     def testClearOnChange(self):
 

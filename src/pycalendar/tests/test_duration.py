@@ -19,6 +19,7 @@ from pycalendar.duration import Duration
 from pycalendar.parser import ParserContext
 import unittest
 
+
 class TestDuration(unittest.TestCase):
 
     test_data = (
@@ -58,13 +59,11 @@ class TestDuration(unittest.TestCase):
         for seconds, result in TestDuration.test_data:
             _doTest(Duration(duration=seconds), result)
 
-
     def testParse(self):
 
         for seconds, result in TestDuration.test_data:
             duration = Duration().parseText(result)
             self.assertEqual(duration.getTotalSeconds(), seconds)
-
 
     def testParseBad(self):
 
@@ -82,7 +81,6 @@ class TestDuration(unittest.TestCase):
         )
         for data in test_bad_data:
             self.assertRaises(ValueError, Duration.parseText, data)
-
 
     def testRelaxedBad(self):
 

@@ -14,32 +14,31 @@
 #    limitations under the License.
 ##
 
+
 class ErrorBase(Exception):
 
     def __init__(self, reason, data=""):
         self.mReason = reason
         self.mData = data
 
+    def __str__(self):
+        return "{}: {}".format(self.mReason, self.mData) if self.mData else self.mReason
 
 
 class InvalidData(ErrorBase):
     pass
 
 
-
 class InvalidComponent(ErrorBase):
     pass
-
 
 
 class InvalidProperty(ErrorBase):
     pass
 
 
-
 class ValidationError(ErrorBase):
     pass
-
 
 
 class NoTimezoneInDatabase(Exception):

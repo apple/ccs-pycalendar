@@ -19,6 +19,7 @@ from pycalendar.icalendar import itipdefinitions
 from pycalendar.icalendar.component import Component
 from pycalendar.icalendar.validation import ICALENDAR_VALUE_CHECKS
 
+
 class VPoll(Component):
 
     propertyCardinality_1 = (
@@ -52,10 +53,8 @@ class VPoll(Component):
     def getType(self):
         return definitions.cICalComponent_VPOLL
 
-
     def getMimeComponentName(self):
         return itipdefinitions.cICalMIMEComponent_VPOLL
-
 
     def sortedPropertyKeyOrder(self):
         return (
@@ -64,7 +63,6 @@ class VPoll(Component):
             definitions.cICalProperty_DURATION,
             definitions.cICalProperty_DTEND,
         )
-
 
     def sortedComponents(self):
         """

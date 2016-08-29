@@ -17,6 +17,8 @@
 from pycalendar.plaintextvalue import PlainTextValue
 
 # Grabbed from http://docs.python.org/library/functools.html since we need to support Python 2.5
+
+
 def partial(func, *args, **keywords):
     def newfunc(*fargs, **fkeywords):
         newkeywords = keywords.copy()
@@ -26,7 +28,6 @@ def partial(func, *args, **keywords):
     newfunc.args = args
     newfunc.keywords = keywords
     return newfunc
-
 
 
 class PropertyValueChecks(object):
@@ -41,7 +42,6 @@ class PropertyValueChecks(object):
 
         return False
 
-
     @staticmethod
     def alwaysUTC(property):
 
@@ -52,7 +52,6 @@ class PropertyValueChecks(object):
 
         return False
 
-
     @staticmethod
     def numericRange(low, high, property):
 
@@ -62,7 +61,6 @@ class PropertyValueChecks(object):
             return value >= low and value <= high
 
         return False
-
 
     @staticmethod
     def positiveIntegerOrZero(property):

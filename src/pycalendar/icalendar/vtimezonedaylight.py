@@ -18,15 +18,14 @@ from pycalendar.icalendar import definitions
 from pycalendar.icalendar.component import Component
 from pycalendar.icalendar.vtimezoneelement import VTimezoneElement
 
+
 class Daylight(VTimezoneElement):
 
     def __init__(self, parent=None):
         super(Daylight, self).__init__(parent=parent)
 
-
     def duplicate(self, parent=None):
         return super(Daylight, self).duplicate(parent=parent)
-
 
     def getType(self):
         return definitions.cICalComponent_DAYLIGHT

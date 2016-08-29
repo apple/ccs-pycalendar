@@ -19,6 +19,7 @@ from pycalendar.period import Period
 from pycalendar.value import Value
 from pycalendar.valueutils import WrapperValue
 
+
 class PeriodValue(WrapperValue, Value):
 
     _wrappedClass = Period

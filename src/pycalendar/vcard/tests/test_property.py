@@ -20,6 +20,7 @@ from pycalendar.parser import ParserContext
 from pycalendar.vcard.property import Property
 import unittest
 
+
 class TestProperty(unittest.TestCase):
 
     test_data = (
@@ -45,14 +46,12 @@ class TestProperty(unittest.TestCase):
             propstr = str(prop)
             self.assertEqual(propstr[:-2], data, "Failed parse/generate: %s to %s" % (data, propstr,))
 
-
     def testEquality(self):
 
         for data in TestProperty.test_data:
             prop1 = Property.parseText(data)
             prop2 = Property.parseText(data)
             self.assertEqual(prop1, prop2, "Failed equality: %s" % (data,))
-
 
     def testParseBad(self):
 
@@ -66,7 +65,6 @@ class TestProperty(unittest.TestCase):
             self.assertRaises(InvalidProperty, Property.parseText, data)
         ParserContext.INVALID_ESCAPE_SEQUENCES = save
 
-
     def testHash(self):
 
         hashes = []
@@ -76,7 +74,6 @@ class TestProperty(unittest.TestCase):
         hashes.sort()
         for i in range(1, len(hashes)):
             self.assertNotEqual(hashes[i - 1], hashes[i])
-
 
     def testDefaultValueCreate(self):
 
@@ -90,7 +87,6 @@ class TestProperty(unittest.TestCase):
         for propname, propvalue, result in test_data:
             prop = Property(name=propname, value=propvalue)
             self.assertEqual(str(prop), result)
-
 
     def testParameterEncodingDecoding(self):
 

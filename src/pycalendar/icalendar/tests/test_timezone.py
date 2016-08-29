@@ -19,6 +19,7 @@ from pycalendar.icalendar.calendar import Calendar
 from pycalendar.timezone import Timezone
 import unittest
 
+
 class TestCalendar(unittest.TestCase):
 
     def testOffsets(self):
@@ -252,7 +253,6 @@ END:VCALENDAR
                 tz.mCachedExpandAllMax = None
                 tzoffset = tz.getTimezoneOffsetSeconds(dt, relative_to_utc)
                 self.assertEqual(tzoffset, offset * 60 * 60, "Failed to match offset for %s at %s without caching, reversed" % (tz.getID(), dt,))
-
 
     def testConversions(self):
 

@@ -25,6 +25,7 @@ from pycalendar.period import Period
 from pycalendar.periodvalue import PeriodValue
 from pycalendar.value import Value
 
+
 class VFreeBusy(Component):
 
     propertyCardinality_1 = (
@@ -53,7 +54,6 @@ class VFreeBusy(Component):
         self.mSpanPeriod = None
         self.mBusyTime = None
 
-
     def duplicate(self, parent=None):
         other = super(VFreeBusy, self).duplicate(parent=parent)
         other.mStart = self.mStart.duplicate()
@@ -65,14 +65,11 @@ class VFreeBusy(Component):
         other.mBusyTime = None
         return other
 
-
     def getType(self):
         return definitions.cICalComponent_VFREEBUSY
 
-
     def getMimeComponentName(self):
         return itipdefinitions.cICalMIMEComponent_VFREEBUSY
-
 
     def finalise(self):
         # Do inherited
@@ -101,7 +98,6 @@ class VFreeBusy(Component):
             self.mDuration = False
             self.mEnd = temp
 
-
     def fixStartEnd(self):
         # End is always greater than start if start exists
         if self.mHasStart and self.mEnd <= self.mStart:
@@ -120,34 +116,26 @@ class VFreeBusy(Component):
                 self.mEnd.offsetDay(1)
                 self.mEnd.setHHMMSS(0, 0, 0)
 
-
     def getStart(self):
         return self.mStart
-
 
     def hasStart(self):
         return self.mHasStart
 
-
     def getEnd(self):
         return self.mEnd
-
 
     def hasEnd(self):
         return self.mHasEnd
 
-
     def useDuration(self):
         return self.mDuration
-
 
     def getSpanPeriod(self):
         return self.mSpanPeriod
 
-
     def getBusyTime(self):
         return self.mBusyTime
-
 
     def editTiming(self):
         # Updated cached values
@@ -161,7 +149,6 @@ class VFreeBusy(Component):
         self.removeProperties(definitions.cICalProperty_DTSTART)
         self.removeProperties(definitions.cICalProperty_DTEND)
         self.removeProperties(definitions.cICalProperty_DURATION)
-
 
     def editTimingStartEnd(self, start, end):
         # Updated cached values
@@ -187,7 +174,6 @@ class VFreeBusy(Component):
             prop = Property(definitions.cICalProperty_DTEND, end)
             self.addProperty(prop)
 
-
     def editTimingStartDuration(self, start, duration):
         # Updated cached values
         self.mHasStart = True
@@ -207,11 +193,10 @@ class VFreeBusy(Component):
         self.addProperty(prop)
 
         # If its an all day event and the duration is one day, ignore it
-        if (not start.isDateOnly() or (duration.getWeeks() != 0)
-                or (duration.getDays() > 1)):
+        if (not start.isDateOnly() or (duration.getWeeks() != 0) or
+                (duration.getDays() > 1)):
             prop = Property(definitions.cICalProperty_DURATION, duration)
             self.addProperty(prop)
-
 
     # Generating info
     def expandPeriodComp(self, period, list):
@@ -223,7 +208,6 @@ class VFreeBusy(Component):
         if (self.mBusyTime is not None) and period.isPeriodOverlap(self.mSpanPeriod):
             list.append(self)
 
-
     def expandPeriodFB(self, period, list):
         # Cache the busy-time details if not done already
         if not self.mCachedBusyTime:
@@ -233,7 +217,6 @@ class VFreeBusy(Component):
         if (self.mBusyTime is not None) and period.isPeriodOverlap(self.mSpanPeriod):
             for fb in self.mBusyTime:
                 list.append(FreeBusy(fb))
-
 
     def cacheBusyTime(self):
 
@@ -334,7 +317,6 @@ class VFreeBusy(Component):
             self.mSpanPeriod = Period(start, end)
 
         self.mCachedBusyTime = True
-
 
     def sortedPropertyKeyOrder(self):
         return (

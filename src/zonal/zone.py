@@ -32,6 +32,7 @@ __all__ = (
     "ZoneRule",
 )
 
+
 class Zone(object):
     """
     A tzdata Zone object containing a set of ZoneRules
@@ -41,10 +42,8 @@ class Zone(object):
         self.name = ""
         self.rules = []
 
-
     def __str__(self):
         return self.generate()
-
 
     def __eq__(self, other):
         return other and (
@@ -52,10 +51,8 @@ class Zone(object):
             self.rules == other.rules
         )
 
-
     def __ne__(self, other):
         return not self.__eq__(other)
-
 
     def parse(self, lines):
         """
@@ -83,7 +80,6 @@ class Zone(object):
             if rule.gmtoff != "#":
                 self.rules.append(rule)
 
-
     def generate(self):
         """
         Generate a partial Zone line.
@@ -92,22 +88,21 @@ class Zone(object):
         """
 
         lines = []
-        for count, rule in enumerate(self.rules):
+        for count, tzrule in enumerate(self.rules):
             if count == 0:
                 items = (
                     "Zone " + self.name,
-                    rule.generate(),
+                    tzrule.generate(),
                 )
             else:
                 items = (
                     "",
                     "",
                     "",
-                    rule.generate(),
+                    tzrule.generate(),
                 )
             lines.append("\t".join(items))
         return "\n".join(lines)
-
 
     def expand(self, rules, minYear, maxYear):
         """
@@ -173,7 +168,6 @@ class Zone(object):
 
         return results
 
-
     def vtimezone(self, calendar, rules, minYear, maxYear):
         """
         Generate a VTIMEZONE for this Zone.
@@ -200,59 +194,58 @@ class Zone(object):
         ruleorder = []
         rulemap = {}
 
-
         def _generateRuleData():
             # Generate VTIMEZONE component for last set of rules
-            for rule in ruleorder:
-                if rule:
-                    # Accumulate rule portions with the same offset pairs
-                    lastOffsetPair = (rulemap[rule][0][1], rulemap[rule][0][2],)
+            for tzrule in ruleorder:
+                if tzrule:
+                    # Accumulate tzrule portions with the same offset pairs
+                    lastOffsetPair = (rulemap[tzrule][0][1], rulemap[tzrule][0][2],)
                     startIndex = 0
-                    for index in xrange(len(rulemap[rule])):
-                        offsetPair = (rulemap[rule][index][1], rulemap[rule][index][2],)
+                    for index in xrange(len(rulemap[tzrule])):
+                        offsetPair = (rulemap[tzrule][index][1], rulemap[tzrule][index][2],)
                         if offsetPair != lastOffsetPair:
-                            rule.vtimezone(
+                            tzrule.vtimezone(
                                 vtz,
                                 lastZoneRule,
-                                rulemap[rule][startIndex][0],
-                                rulemap[rule][index - 1][0],
-                                rulemap[rule][startIndex][1],
-                                rulemap[rule][startIndex][2],
+                                rulemap[tzrule][startIndex][0],
+                                rulemap[tzrule][index - 1][0],
+                                rulemap[tzrule][startIndex][1],
+                                rulemap[tzrule][startIndex][2],
                                 index - startIndex,
                             )
-                            lastOffsetPair = (rulemap[rule][index][1], rulemap[rule][index][2],)
+                            lastOffsetPair = (rulemap[tzrule][index][1], rulemap[tzrule][index][2],)
                             startIndex = index
 
-                    rule.vtimezone(
+                    tzrule.vtimezone(
                         vtz,
                         lastZoneRule,
-                        rulemap[rule][startIndex][0],
-                        rulemap[rule][index][0],
-                        rulemap[rule][startIndex][1],
-                        rulemap[rule][startIndex][2],
-                        len(rulemap[rule]),
+                        rulemap[tzrule][startIndex][0],
+                        rulemap[tzrule][index][0],
+                        rulemap[tzrule][startIndex][1],
+                        rulemap[tzrule][startIndex][2],
+                        len(rulemap[tzrule]),
                     )
                 else:
                     lastZoneRule.vtimezone(
                         vtz,
                         lastZoneRule,
-                        rulemap[rule][0][0],
-                        rulemap[rule][-1][0],
-                        rulemap[rule][0][1],
-                        rulemap[rule][0][2],
+                        rulemap[tzrule][0][0],
+                        rulemap[tzrule][-1][0],
+                        rulemap[tzrule][0][1],
+                        rulemap[tzrule][0][2],
                     )
             del ruleorder[:]
             rulemap.clear()
 
-        for dt, offsetfrom, offsetto, zonerule, rule in transitions:
+        for dt, offsetfrom, offsetto, zonerule, tzrule in transitions:
 
             # Check for change of rule - we ignore LMT's
             if zonerule.format != "LMT":
                 if lastZoneRule and lastZoneRule != zonerule:
                     _generateRuleData()
-                if rule not in ruleorder:
-                    ruleorder.append(rule)
-                rulemap.setdefault(rule, []).append((dt, offsetfrom, offsetto,))
+                if tzrule not in ruleorder:
+                    ruleorder.append(tzrule)
+                rulemap.setdefault(tzrule, []).append((dt, offsetfrom, offsetto,))
             lastZoneRule = zonerule
 
         # Do left overs
@@ -262,7 +255,6 @@ class Zone(object):
 
         vtz.finalise()
         return vtz
-
 
     def _compressRDateComponents(self, vtz):
         """
@@ -297,7 +289,6 @@ class Zone(object):
                     vtz.mComponents.remove(mergeFrom)
 
 
-
 class ZoneRule(object):
     """
     A specific rule for a portion of a Zone
@@ -310,10 +301,8 @@ class ZoneRule(object):
         self.format = ""
         self.until = None
 
-
     def __str__(self):
         return self.generate()
-
 
     def __eq__(self, other):
         return other and (
@@ -323,10 +312,8 @@ class ZoneRule(object):
             self.until == other.until
         )
 
-
     def __ne__(self, other):
         return not self.__eq__(other)
-
 
     def parse(self, line, offset):
         """
@@ -343,7 +330,6 @@ class ZoneRule(object):
         if len(splits) >= 6 - offset:
             self.until = " ".join(splits[5 - offset:])
 
-
     def generate(self):
         """
         Generate a partial Zone line.
@@ -358,7 +344,6 @@ class ZoneRule(object):
         if self.until:
             items = items + (self.until,)
         return "\t".join(items)
-
 
     def getUntilDate(self):
 
@@ -412,7 +397,6 @@ class ZoneRule(object):
         self._cached_until = utils.DateTime(dt, mode)
         return self._cached_until
 
-
     def getUTCOffset(self):
 
         if hasattr(self, "_cached_utc_offset"):
@@ -428,7 +412,6 @@ class ZoneRule(object):
         if negative:
             self._cached_uutc_offset = -self._cached_uutc_offset
         return self._cached_uutc_offset
-
 
     def expand(self, rules, results, lastUntilUTC, lastOffset, lastStdOffset, maxYear):
 
@@ -450,7 +433,7 @@ class ZoneRule(object):
             last_offset = lastOffset
             last_stdoffset = lastStdOffset
             finalUntil = self.getUntilDate()
-            for dt, to_offset, rule in tempresults:
+            for dt, to_offset, tzrule in tempresults:
                 dtutc = dt.getUTC(last_offset, last_stdoffset)
                 if dtutc >= lastUntilUTC:
                     if not found_start and dtutc != lastUntilUTC:
@@ -465,7 +448,7 @@ class ZoneRule(object):
                     if dtutc >= finalUntil.getUTC(last_offset, last_stdoffset):
                         break
 
-                    results.append((dtutc, to_offset, self, rule))
+                    results.append((dtutc, to_offset, self, tzrule))
 
                 last_offset = to_offset
                 last_stdoffset = self.getUTCOffset()
@@ -475,7 +458,6 @@ class ZoneRule(object):
                 results.append((lastUntilUTC, last_offset, self, None))
 
             return last_offset, last_stdoffset
-
 
     def expand_norule(self, results, lastUntil, maxYear):
         to_offset = 0
@@ -488,7 +470,6 @@ class ZoneRule(object):
         # Always add a transition for the start of this rule
         results.append((lastUntil, self.getUTCOffset() + to_offset, self, None))
         return (self.getUTCOffset() + to_offset, self.getUTCOffset())
-
 
     def vtimezone(self, vtz, zonerule, start, end, offsetfrom, offsetto):
 
@@ -533,7 +514,6 @@ Rule\tUS\t1987\t2006\t-\tApr\tSun>=1\t2:00\t1:00\tD
 Rule\tUS\t2007\tmax\t-\tMar\tSun>=8\t2:00\t1:00\tD
 Rule\tUS\t2007\tmax\t-\tNov\tSun>=1\t2:00\t0\tS"""
     rules = {}
-    import rule
     ruleset = rule.RuleSet()
     ruleset.parse(rulesdef)
     rules[ruleset.name] = ruleset

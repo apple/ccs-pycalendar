@@ -17,6 +17,7 @@
 from pycalendar.timezonedb import TimezoneDatabase
 import unittest
 
+
 class TestPyCalendar(unittest.TestCase):
     """
     Base class for all tests. This will do common setup/clean-up.
@@ -24,7 +25,6 @@ class TestPyCalendar(unittest.TestCase):
 
     def setUp(self):
         TimezoneDatabase.createTimezoneDatabase(None)
-
 
     def tearDown(self):
         TimezoneDatabase.clearTimezoneDatabase()
