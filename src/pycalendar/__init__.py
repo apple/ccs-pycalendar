@@ -44,8 +44,8 @@ import icalendar.vevent
 import icalendar.vfreebusy
 import icalendar.vjournal
 import icalendar.vpatch
-import icalendar.vpatchadd
-import icalendar.vpatchremove
+import icalendar.vpatchcreate
+import icalendar.vpatchdelete
 import icalendar.vpatchupdate
 import icalendar.vpoll
 import icalendar.vote

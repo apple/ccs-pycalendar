@@ -359,9 +359,9 @@ cICalComponent_VOTE = "VOTE"
 
 #    Extensions: patch
 cICalComponent_VPATCH = "VPATCH"
-cICalComponent_ADD = "ADD"
+cICalComponent_CREATE = "CREATE"
 cICalComponent_UPDATE = "UPDATE"
-cICalComponent_REMOVE = "REMOVE"
+cICalComponent_DELETE = "DELETE"
 
 cICalProperty_PATCH_ORDER = "PATCH-ORDER"
 cICalProperty_TARGET = "TARGET"

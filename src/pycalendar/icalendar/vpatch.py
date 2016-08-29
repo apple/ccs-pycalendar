@@ -46,9 +46,9 @@ class VPatch(Component):
         )
 
     sortOrder = {
-        definitions.cICalComponent_ADD: 0,
+        definitions.cICalComponent_CREATE: 0,
         definitions.cICalComponent_UPDATE: 1,
-        definitions.cICalComponent_REMOVE: 2
+        definitions.cICalComponent_DELETE: 2
     }
 
     def sortedComponents(self):

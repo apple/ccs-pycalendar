@@ -19,9 +19,9 @@ from pycalendar.icalendar.component import Component
 from pycalendar.icalendar.vpatchcomponent import VPatchComponent
 
 
-class Remove(VPatchComponent):
+class Create(VPatchComponent):
 
     def getType(self):
-        return definitions.cICalComponent_REMOVE
+        return definitions.cICalComponent_CREATE
 
-Component.registerComponent(definitions.cICalComponent_REMOVE, Remove)
+Component.registerComponent(definitions.cICalComponent_CREATE, Create)
