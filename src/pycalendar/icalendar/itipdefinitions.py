@@ -47,3 +47,6 @@ cICalMIMEComponent_VAVAILABILITY = "vavailability"
 cICalMethod_POLLSTATUS = "POLLSTATUS"
 cICalMIMEMethod_POLLSTATUS = "pollstatus"
 cICalMIMEComponent_VPOLL = "vpoll"
+
+# VPATCH
+cICalMIMEComponent_VPATCH = "vpatch"

@@ -357,6 +357,16 @@ cICalComponent_VVOTER = "VVOTER"
 cICalComponent_VOTE = "VOTE"
 
 
+#    Extensions: patch
+cICalComponent_VPATCH = "VPATCH"
+cICalComponent_ADD = "ADD"
+cICalComponent_UPDATE = "UPDATE"
+cICalComponent_REMOVE = "REMOVE"
+
+cICalProperty_PATCH_ORDER = "PATCH-ORDER"
+cICalProperty_TARGET = "TARGET"
+
+
 #     Mulberry extensions
 cICalProperty_ACTION_X_SPEAKTEXT = "X-MULBERRY-SPEAK-TEXT"
 cICalProperty_ALARM_X_LASTTRIGGER = "X-MULBERRY-LAST-TRIGGER"
