@@ -58,8 +58,8 @@ class PatchDocument(object):
             for component in vpatch.getComponents():
                 if component.getType().upper() not in (definitions.cICalComponent_CREATE, definitions.cICalComponent_UPDATE, definitions.cICalComponent_DELETE,):
                     raise ValueError("Invalid component in VPATCH: {}".format(component.getType().upper()))
-                command = Command.parseFromComponent(component)
-                self.commands.append(command)
+                commands = Command.parseFromComponent(component)
+                self.commands.extend(commands)
 
     def applyPatch(self, calendar):
         """
@@ -135,20 +135,29 @@ class Command(object):
         if action not in cls.ACTIONS:
             raise ValueError("Invalid component: {}".format(component.getType().upper()))
 
-        # Get the path from the TARGET property
-        target = component.getPropertyString(definitions.cICalProperty_TARGET)
-        if target is None:
-            raise ValueError("Missing TARGET property in component: {}".format(component.getType().upper()))
-        try:
-            path = Path(target)
-        except ValueError:
-            raise ValueError("Invalid target path: {}".format(target))
-
-        # All but the "delete" action require data
-        data = None
-        if action != Command.DELETE:
+        # DELETE action can have multiple TARGETs - we will treat each of those
+        # as a separate command Get the path from the TARGET property
+        if action == Command.DELETE:
+            targets = component.getProperties()
+            if definitions.cICalProperty_TARGET not in targets:
+                raise ValueError("Missing TARGET properties in component: {}".format(component.getType().upper()))
+            if len(targets) > 1:
+                raise ValueError("Only TARGET properties allowed in component: {}".format(component.getType().upper()))
+            try:
+                return [Command.create(action, Path(target.getTextValue().getValue()), None) for target in targets[definitions.cICalProperty_TARGET]]
+            except ValueError:
+                raise ValueError("Invalid target path: {}".format(targets))
+        else:
+            target = component.getPropertyString(definitions.cICalProperty_TARGET)
+            if target is None:
+                raise ValueError("Missing TARGET property in component: {}".format(component.getType().upper()))
+            try:
+                path = Path(target)
+            except ValueError:
+                raise ValueError("Invalid target path: {}".format(target))
             data = component.duplicate()
             data.removeProperties(definitions.cICalProperty_TARGET)
+            return (Command.create(action, path, data), )
 
         return Command.create(action, path, data)
 
