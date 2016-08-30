@@ -21,36 +21,24 @@ from pycalendar.icalendar.calendar import Calendar
 from pycalendar.icalendar.patch import Command, Path, PatchDocument
 import operator
 import unittest
+import itertools
+import json
+import os
 
-
-class TestPatchDocument(unittest.TestCase):
-
-    def _testPatch(self, data):
-
-        for ctr, items in enumerate(data):
-            calendar = Calendar.parseText(items["before"])
-            patcher = PatchDocument(items["patch"])
-            patcher.applyPatch(calendar)
-            self.assertEqual(str(calendar), items["after"].replace("\n", "\r\n"), msg="Failed test #{}: {}\n{}".format(ctr + 1, items["title"], str(calendar)))
-
-    def test_createComponent_Simple(self):
-        """
-        Test that creation of a single component works.
-        """
-
-        data = [
-            {
-                "title": "Add one component to a calendar",
-                "before": """BEGIN:VCALENDAR
+data = {
+    "create_component_simple": [
+        {
+            "title": "Add one component to a calendar",
+            "before": """BEGIN:VCALENDAR
 VERSION:2.0
 CALSCALE:GREGORIAN
-PRODID:-//mulberrymail.com//Mulberry v4.0//EN
+PRODID:-//example.com//Example v0.1//EN
 END:VCALENDAR
 """,
-                "after": """BEGIN:VCALENDAR
+            "after": """BEGIN:VCALENDAR
 VERSION:2.0
 CALSCALE:GREGORIAN
-PRODID:-//mulberrymail.com//Mulberry v4.0//EN
+PRODID:-//example.com//Example v0.1//EN
 BEGIN:VEVENT
 UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
 DTSTART;VALUE=DATE:20020101
@@ -61,7 +49,13 @@ SUMMARY:New Year's Day
 END:VEVENT
 END:VCALENDAR
 """,
-                "patch": """create /VCALENDAR
+            "patch": """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//example.com//Example v0.1//EN
+BEGIN:VPATCH
+BEGIN:CREATE
+TARGET:/VCALENDAR
 BEGIN:VEVENT
 UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
 DTSTART;VALUE=DATE:20020101
@@ -70,21 +64,23 @@ DTSTAMP:20020101T000000Z
 RRULE:FREQ=YEARLY;UNTIL=20031231;BYMONTH=1
 SUMMARY:New Year's Day
 END:VEVENT
-.
-""",
-            },
-            {
-                "title": "Add two components to a calendar",
-                "before": """BEGIN:VCALENDAR
-VERSION:2.0
-CALSCALE:GREGORIAN
-PRODID:-//mulberrymail.com//Mulberry v4.0//EN
+END:CREATE
+END:VPATCH
 END:VCALENDAR
 """,
-                "after": """BEGIN:VCALENDAR
+        },
+        {
+            "title": "Add two components to a calendar",
+            "before": """BEGIN:VCALENDAR
 VERSION:2.0
 CALSCALE:GREGORIAN
-PRODID:-//mulberrymail.com//Mulberry v4.0//EN
+PRODID:-//example.com//Example v0.1//EN
+END:VCALENDAR
+""",
+            "after": """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//example.com//Example v0.1//EN
 BEGIN:VEVENT
 UID:165EF135-BA92-435A-88C9-562F95030908
 DTSTART;VALUE=DATE:20020401
@@ -103,7 +99,13 @@ SUMMARY:New Year's Day
 END:VEVENT
 END:VCALENDAR
 """,
-                "patch": """create /VCALENDAR
+            "patch": """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//example.com//Example v0.1//EN
+BEGIN:VPATCH
+BEGIN:CREATE
+TARGET:/VCALENDAR
 BEGIN:VEVENT
 UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
 DTSTART;VALUE=DATE:20020101
@@ -120,15 +122,17 @@ DTSTAMP:20020101T000000Z
 RRULE:FREQ=YEARLY
 SUMMARY:April Fool's Day
 END:VEVENT
-.
+END:CREATE
+END:VPATCH
+END:VCALENDAR
 """,
-            },
-            {
-                "title": "Add one component to an event",
-                "before": """BEGIN:VCALENDAR
+        },
+        {
+            "title": "Add one component to an event",
+            "before": """BEGIN:VCALENDAR
 VERSION:2.0
 CALSCALE:GREGORIAN
-PRODID:-//mulberrymail.com//Mulberry v4.0//EN
+PRODID:-//example.com//Example v0.1//EN
 BEGIN:VEVENT
 UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
 DTSTART;VALUE=DATE:20020101
@@ -139,10 +143,10 @@ SUMMARY:New Year's Day
 END:VEVENT
 END:VCALENDAR
 """,
-                "after": """BEGIN:VCALENDAR
+            "after": """BEGIN:VCALENDAR
 VERSION:2.0
 CALSCALE:GREGORIAN
-PRODID:-//mulberrymail.com//Mulberry v4.0//EN
+PRODID:-//example.com//Example v0.1//EN
 BEGIN:VEVENT
 UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
 DTSTART;VALUE=DATE:20020101
@@ -159,31 +163,32 @@ END:VALARM
 END:VEVENT
 END:VCALENDAR
 """,
-                "patch": """create /VCALENDAR/VEVENT
+            "patch": """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//example.com//Example v0.1//EN
+BEGIN:VPATCH
+BEGIN:CREATE
+TARGET:/VCALENDAR/VEVENT
 BEGIN:VALARM
 UID:D9D1AC84-F629-4B9D-9B6B-4A6CA9A11FEF
 DESCRIPTION:Event reminder
 TRIGGER:-PT8M
 ACTION:DISPLAY
 END:VALARM
-.
+END:CREATE
+END:VPATCH
+END:VCALENDAR
 """,
-            },
-        ]
+        },
+    ],
 
-        self._testPatch(data)
-
-    def test_createProperty_Simple(self):
-        """
-        Test that creation of a single property works.
-        """
-
-        data = [
-            {
-                "title": "Add one property to a calendar",
-                "before": """BEGIN:VCALENDAR
+    "create_property_simple": [
+        {
+            "title": "Add one property to a calendar",
+            "before": """BEGIN:VCALENDAR
 VERSION:2.0
-PRODID:-//mulberrymail.com//Mulberry v4.0//EN
+PRODID:-//example.com//Example v0.1//EN
 BEGIN:VEVENT
 UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
 DTSTART;VALUE=DATE:20020101
@@ -194,10 +199,10 @@ SUMMARY:New Year's Day
 END:VEVENT
 END:VCALENDAR
 """,
-                "after": """BEGIN:VCALENDAR
+            "after": """BEGIN:VCALENDAR
 VERSION:2.0
 CALSCALE:GREGORIAN
-PRODID:-//mulberrymail.com//Mulberry v4.0//EN
+PRODID:-//example.com//Example v0.1//EN
 BEGIN:VEVENT
 UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
 DTSTART;VALUE=DATE:20020101
@@ -208,16 +213,24 @@ SUMMARY:New Year's Day
 END:VEVENT
 END:VCALENDAR
 """,
-                "patch": """create /VCALENDAR#
-CALSCALE:GREGORIAN
-.
-""",
-            },
-            {
-                "title": "Add two properties to a calendar",
-                "before": """BEGIN:VCALENDAR
+            "patch": """BEGIN:VCALENDAR
 VERSION:2.0
-PRODID:-//mulberrymail.com//Mulberry v4.0//EN
+CALSCALE:GREGORIAN
+PRODID:-//example.com//Example v0.1//EN
+BEGIN:VPATCH
+BEGIN:CREATE
+TARGET:/VCALENDAR#
+CALSCALE:GREGORIAN
+END:CREATE
+END:VPATCH
+END:VCALENDAR
+""",
+        },
+        {
+            "title": "Add two properties to a calendar",
+            "before": """BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//example.com//Example v0.1//EN
 BEGIN:VEVENT
 UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
 DTSTART;VALUE=DATE:20020101
@@ -228,10 +241,10 @@ SUMMARY:New Year's Day
 END:VEVENT
 END:VCALENDAR
 """,
-                "after": """BEGIN:VCALENDAR
+            "after": """BEGIN:VCALENDAR
 VERSION:2.0
 CALSCALE:GREGORIAN
-PRODID:-//mulberrymail.com//Mulberry v4.0//EN
+PRODID:-//example.com//Example v0.1//EN
 REFRESH-INTERVAL:10
 BEGIN:VEVENT
 UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
@@ -243,18 +256,26 @@ SUMMARY:New Year's Day
 END:VEVENT
 END:VCALENDAR
 """,
-                "patch": """create /VCALENDAR#
+            "patch": """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//example.com//Example v0.1//EN
+BEGIN:VPATCH
+BEGIN:CREATE
+TARGET:/VCALENDAR#
 CALSCALE:GREGORIAN
 REFRESH-INTERVAL:10
-.
+END:CREATE
+END:VPATCH
+END:VCALENDAR
 """,
-            },
-            {
-                "title": "Add one property to an event",
-                "before": """BEGIN:VCALENDAR
+        },
+        {
+            "title": "Add one property to an event",
+            "before": """BEGIN:VCALENDAR
 VERSION:2.0
 CALSCALE:GREGORIAN
-PRODID:-//mulberrymail.com//Mulberry v4.0//EN
+PRODID:-//example.com//Example v0.1//EN
 BEGIN:VEVENT
 UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
 DTSTART;VALUE=DATE:20020101
@@ -265,10 +286,10 @@ SUMMARY:New Year's Day
 END:VEVENT
 END:VCALENDAR
 """,
-                "after": """BEGIN:VCALENDAR
+            "after": """BEGIN:VCALENDAR
 VERSION:2.0
 CALSCALE:GREGORIAN
-PRODID:-//mulberrymail.com//Mulberry v4.0//EN
+PRODID:-//example.com//Example v0.1//EN
 BEGIN:VEVENT
 UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
 DTSTART;VALUE=DATE:20020101
@@ -280,17 +301,25 @@ SUMMARY:New Year's Day
 END:VEVENT
 END:VCALENDAR
 """,
-                "patch": """create /VCALENDAR/VEVENT#
-STATUS:CANCELLED
-.
-""",
-            },
-            {
-                "title": "Add two properties to an event",
-                "before": """BEGIN:VCALENDAR
+            "patch": """BEGIN:VCALENDAR
 VERSION:2.0
 CALSCALE:GREGORIAN
-PRODID:-//mulberrymail.com//Mulberry v4.0//EN
+PRODID:-//example.com//Example v0.1//EN
+BEGIN:VPATCH
+BEGIN:CREATE
+TARGET:/VCALENDAR/VEVENT#
+STATUS:CANCELLED
+END:CREATE
+END:VPATCH
+END:VCALENDAR
+""",
+        },
+        {
+            "title": "Add two properties to an event",
+            "before": """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//example.com//Example v0.1//EN
 BEGIN:VEVENT
 UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
 DTSTART;VALUE=DATE:20020101
@@ -301,10 +330,10 @@ SUMMARY:New Year's Day
 END:VEVENT
 END:VCALENDAR
 """,
-                "after": """BEGIN:VCALENDAR
+            "after": """BEGIN:VCALENDAR
 VERSION:2.0
 CALSCALE:GREGORIAN
-PRODID:-//mulberrymail.com//Mulberry v4.0//EN
+PRODID:-//example.com//Example v0.1//EN
 BEGIN:VEVENT
 UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
 DTSTART;VALUE=DATE:20020101
@@ -317,27 +346,28 @@ TRANSP:TRANSPARENT
 END:VEVENT
 END:VCALENDAR
 """,
-                "patch": """create /VCALENDAR/VEVENT#
+            "patch": """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//example.com//Example v0.1//EN
+BEGIN:VPATCH
+BEGIN:CREATE
+TARGET:/VCALENDAR/VEVENT#
 STATUS:CANCELLED
 TRANSP:TRANSPARENT
-.
+END:CREATE
+END:VPATCH
+END:VCALENDAR
 """,
-            },
-        ]
-
-        self._testPatch(data)
-
-    def test_createParameter_Simple(self):
-        """
-        Test that creation of a single parameter works.
-        """
-
-        data = [
-            {
-                "title": "Add one parameter to a property",
-                "before": """BEGIN:VCALENDAR
+        },
+    ],
+    "update_component_simple": [
+        {
+            "title": "Update one component in a calendar",
+            "before": """BEGIN:VCALENDAR
 VERSION:2.0
-PRODID:-//mulberrymail.com//Mulberry v4.0//EN
+CALSCALE:GREGORIAN
+PRODID:-//example.com//Example v0.1//EN
 BEGIN:VEVENT
 UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
 DTSTART;VALUE=DATE:20020101
@@ -348,87 +378,10 @@ SUMMARY:New Year's Day
 END:VEVENT
 END:VCALENDAR
 """,
-                "after": """BEGIN:VCALENDAR
-VERSION:2.0
-PRODID:-//mulberrymail.com//Mulberry v4.0//EN
-BEGIN:VEVENT
-UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
-DTSTART;VALUE=DATE:20020101
-DTEND;VALUE=DATE:20020102
-DTSTAMP:20020101T000000Z
-RRULE:FREQ=YEARLY;UNTIL=20031231;BYMONTH=1
-SUMMARY;LABEL=Party Time!:New Year's Day
-END:VEVENT
-END:VCALENDAR
-""",
-                "patch": """create /VCALENDAR/VEVENT#SUMMARY;
-;LABEL=Party Time!
-.
-""",
-            },
-            {
-                "title": "Add one parameter to a property with update",
-                "before": """BEGIN:VCALENDAR
-VERSION:2.0
-PRODID:-//mulberrymail.com//Mulberry v4.0//EN
-BEGIN:VEVENT
-UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
-DTSTART;VALUE=DATE:20020101
-DTEND;VALUE=DATE:20020102
-DTSTAMP:20020101T000000Z
-RRULE:FREQ=YEARLY;UNTIL=20031231;BYMONTH=1
-SUMMARY;LABEL=Holiday:New Year's Day
-END:VEVENT
-END:VCALENDAR
-""",
-                "after": """BEGIN:VCALENDAR
-VERSION:2.0
-PRODID:-//mulberrymail.com//Mulberry v4.0//EN
-BEGIN:VEVENT
-UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
-DTSTART;VALUE=DATE:20020101
-DTEND;VALUE=DATE:20020102
-DTSTAMP:20020101T000000Z
-RRULE:FREQ=YEARLY;UNTIL=20031231;BYMONTH=1
-SUMMARY;LABEL=Party Time!:New Year's Day
-END:VEVENT
-END:VCALENDAR
-""",
-                "patch": """create /VCALENDAR/VEVENT#SUMMARY;
-;LABEL=Party Time!
-.
-""",
-            },
-        ]
-
-        self._testPatch(data)
-
-    def test_updateComponent_Simple(self):
-        """
-        Test that update of components works.
-        """
-
-        data = [
-            {
-                "title": "Update one component in a calendar",
-                "before": """BEGIN:VCALENDAR
+            "after": """BEGIN:VCALENDAR
 VERSION:2.0
 CALSCALE:GREGORIAN
-PRODID:-//mulberrymail.com//Mulberry v4.0//EN
-BEGIN:VEVENT
-UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
-DTSTART;VALUE=DATE:20020101
-DTEND;VALUE=DATE:20020102
-DTSTAMP:20020101T000000Z
-RRULE:FREQ=YEARLY;UNTIL=20031231;BYMONTH=1
-SUMMARY:New Year's Day
-END:VEVENT
-END:VCALENDAR
-""",
-                "after": """BEGIN:VCALENDAR
-VERSION:2.0
-CALSCALE:GREGORIAN
-PRODID:-//mulberrymail.com//Mulberry v4.0//EN
+PRODID:-//example.com//Example v0.1//EN
 BEGIN:VEVENT
 UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
 DTSTART;VALUE=DATE:20020101
@@ -439,7 +392,13 @@ SUMMARY:New Year's Day - party time
 END:VEVENT
 END:VCALENDAR
 """,
-                "patch": """update /VCALENDAR/VEVENT
+            "patch": """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//example.com//Example v0.1//EN
+BEGIN:VPATCH
+BEGIN:UPDATE
+TARGET:/VCALENDAR/VEVENT
 BEGIN:VEVENT
 UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
 DTSTART;VALUE=DATE:20020101
@@ -448,15 +407,17 @@ DTSTAMP:20020101T000000Z
 RRULE:FREQ=YEARLY
 SUMMARY:New Year's Day - party time
 END:VEVENT
-.
+END:UPDATE
+END:VPATCH
+END:VCALENDAR
 """,
-            },
-            {
-                "title": "Update one, add another component to a calendar",
-                "before": """BEGIN:VCALENDAR
+        },
+        {
+            "title": "Update one, add another component to a calendar",
+            "before": """BEGIN:VCALENDAR
 VERSION:2.0
 CALSCALE:GREGORIAN
-PRODID:-//mulberrymail.com//Mulberry v4.0//EN
+PRODID:-//example.com//Example v0.1//EN
 BEGIN:VEVENT
 UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
 DTSTART;VALUE=DATE:20020101
@@ -467,10 +428,10 @@ SUMMARY:New Year's Day
 END:VEVENT
 END:VCALENDAR
 """,
-                "after": """BEGIN:VCALENDAR
+            "after": """BEGIN:VCALENDAR
 VERSION:2.0
 CALSCALE:GREGORIAN
-PRODID:-//mulberrymail.com//Mulberry v4.0//EN
+PRODID:-//example.com//Example v0.1//EN
 BEGIN:VEVENT
 UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
 DTSTART;VALUE=DATE:20020101
@@ -491,7 +452,13 @@ SUMMARY:New Year's Day - cancelled
 END:VEVENT
 END:VCALENDAR
 """,
-                "patch": """update /VCALENDAR/VEVENT
+            "patch": """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//example.com//Example v0.1//EN
+BEGIN:VPATCH
+BEGIN:UPDATE
+TARGET:/VCALENDAR/VEVENT
 BEGIN:VEVENT
 UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
 DTSTART;VALUE=DATE:20020101
@@ -510,15 +477,17 @@ RRULE:FREQ=YEARLY
 STATUS:CANCELLED
 SUMMARY:New Year's Day - cancelled
 END:VEVENT
-.
+END:UPDATE
+END:VPATCH
+END:VCALENDAR
 """,
-            },
-            {
-                "title": "Update one component in a calendar with others present",
-                "before": """BEGIN:VCALENDAR
+        },
+        {
+            "title": "Update one component in a calendar with others present",
+            "before": """BEGIN:VCALENDAR
 VERSION:2.0
 CALSCALE:GREGORIAN
-PRODID:-//mulberrymail.com//Mulberry v4.0//EN
+PRODID:-//example.com//Example v0.1//EN
 BEGIN:VEVENT
 UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
 DTSTART;VALUE=DATE:20020101
@@ -539,10 +508,10 @@ SUMMARY:New Year's Day - cancelled
 END:VEVENT
 END:VCALENDAR
 """,
-                "after": """BEGIN:VCALENDAR
+            "after": """BEGIN:VCALENDAR
 VERSION:2.0
 CALSCALE:GREGORIAN
-PRODID:-//mulberrymail.com//Mulberry v4.0//EN
+PRODID:-//example.com//Example v0.1//EN
 BEGIN:VEVENT
 UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
 DTSTART;VALUE=DATE:20020101
@@ -562,7 +531,13 @@ SUMMARY:New Year's Day - it is on again!
 END:VEVENT
 END:VCALENDAR
 """,
-                "patch": """update /VCALENDAR/VEVENT[UID=C3184A66-1ED0-11D9-A5E0-000A958A3252][RECURRENCE-ID=20030101]
+            "patch": """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//example.com//Example v0.1//EN
+BEGIN:VPATCH
+BEGIN:UPDATE
+TARGET:/VCALENDAR/VEVENT[UID=C3184A66-1ED0-11D9-A5E0-000A958A3252][RECURRENCE-ID=20030101]
 BEGIN:VEVENT
 UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
 RECURRENCE-ID;VALUE=DATE:20030101
@@ -572,25 +547,19 @@ DTSTAMP:20020101T000000Z
 RRULE:FREQ=YEARLY
 SUMMARY:New Year's Day - it is on again!
 END:VEVENT
-.
+END:UPDATE
+END:VPATCH
+END:VCALENDAR
 """,
-            },
-        ]
-
-        self._testPatch(data)
-
-    def test_updateComponent_Recur(self):
-        """
-        Test that update of components works.
-        """
-
-        data = [
-            {
-                "title": "Update one property in an instance",
-                "before": """BEGIN:VCALENDAR
+        },
+    ],
+    "update_component_recur": [
+        {
+            "title": "Update one property in an instance",
+            "before": """BEGIN:VCALENDAR
 VERSION:2.0
 CALSCALE:GREGORIAN
-PRODID:-//mulberrymail.com//Mulberry v4.0//EN
+PRODID:-//example.com//Example v0.1//EN
 BEGIN:VEVENT
 UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
 DTSTART;VALUE=DATE:20020101
@@ -601,10 +570,10 @@ SUMMARY:New Year's Day
 END:VEVENT
 END:VCALENDAR
 """,
-                "after": """BEGIN:VCALENDAR
+            "after": """BEGIN:VCALENDAR
 VERSION:2.0
 CALSCALE:GREGORIAN
-PRODID:-//mulberrymail.com//Mulberry v4.0//EN
+PRODID:-//example.com//Example v0.1//EN
 BEGIN:VEVENT
 UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
 DTSTART;VALUE=DATE:20020101
@@ -623,26 +592,26 @@ SUMMARY:New Year's Day - party time
 END:VEVENT
 END:VCALENDAR
 """,
-                "patch": """update /VCALENDAR/VEVENT[UID=C3184A66-1ED0-11D9-A5E0-000A958A3252][RECURRENCE-ID=20020102]#SUMMARY
+            "patch": """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//example.com//Example v0.1//EN
+BEGIN:VPATCH
+BEGIN:UPDATE
+TARGET:/VCALENDAR/VEVENT[UID=C3184A66-1ED0-11D9-A5E0-000A958A3252][RECURRENCE-ID=20020102]#SUMMARY
 SUMMARY:New Year's Day - party time
-.
+END:UPDATE
+END:VPATCH
+END:VCALENDAR
 """,
-            },
-        ]
-
-        self._testPatch(data)
-
-    def test_updateProperty_Simple(self):
-        """
-        Test that update of a single property works.
-        """
-
-        data = [
-            {
-                "title": "Update (add) one property in a calendar",
-                "before": """BEGIN:VCALENDAR
+        },
+    ],
+    "update_property_simple": [
+        {
+            "title": "Update (add) one property in a calendar",
+            "before": """BEGIN:VCALENDAR
 VERSION:2.0
-PRODID:-//mulberrymail.com//Mulberry v4.0//EN
+PRODID:-//example.com//Example v0.1//EN
 BEGIN:VEVENT
 UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
 DTSTART;VALUE=DATE:20020101
@@ -653,9 +622,9 @@ SUMMARY:New Year's Day
 END:VEVENT
 END:VCALENDAR
 """,
-                "after": """BEGIN:VCALENDAR
+            "after": """BEGIN:VCALENDAR
 VERSION:2.0
-PRODID:-//mulberrymail.com//Mulberry v4.0//EN
+PRODID:-//example.com//Example v0.1//EN
 BEGIN:VEVENT
 UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
 DTSTART;VALUE=DATE:20020101
@@ -667,16 +636,24 @@ TRANSP:TRANSPARENT
 END:VEVENT
 END:VCALENDAR
 """,
-                "patch": """update /VCALENDAR/VEVENT#TRANSP
-TRANSP:TRANSPARENT
-.
-""",
-            },
-            {
-                "title": "Update (existing) property in a calendar",
-                "before": """BEGIN:VCALENDAR
+            "patch": """BEGIN:VCALENDAR
 VERSION:2.0
-PRODID:-//mulberrymail.com//Mulberry v4.0//EN
+CALSCALE:GREGORIAN
+PRODID:-//example.com//Example v0.1//EN
+BEGIN:VPATCH
+BEGIN:UPDATE
+TARGET:/VCALENDAR/VEVENT#TRANSP
+TRANSP:TRANSPARENT
+END:UPDATE
+END:VPATCH
+END:VCALENDAR
+""",
+        },
+        {
+            "title": "Update (existing) property in a calendar",
+            "before": """BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//example.com//Example v0.1//EN
 BEGIN:VEVENT
 UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
 DTSTART;VALUE=DATE:20020101
@@ -688,9 +665,9 @@ TRANSP:OPAQUE
 END:VEVENT
 END:VCALENDAR
 """,
-                "after": """BEGIN:VCALENDAR
+            "after": """BEGIN:VCALENDAR
 VERSION:2.0
-PRODID:-//mulberrymail.com//Mulberry v4.0//EN
+PRODID:-//example.com//Example v0.1//EN
 BEGIN:VEVENT
 UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
 DTSTART;VALUE=DATE:20020101
@@ -702,17 +679,25 @@ TRANSP:TRANSPARENT
 END:VEVENT
 END:VCALENDAR
 """,
-                "patch": """update /VCALENDAR/VEVENT#TRANSP
+            "patch": """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//example.com//Example v0.1//EN
+BEGIN:VPATCH
+BEGIN:UPDATE
+TARGET:/VCALENDAR/VEVENT#TRANSP
 TRANSP:TRANSPARENT
-.
+END:UPDATE
+END:VPATCH
+END:VCALENDAR
 """,
-            },
-            {
-                "title": "Update one property in all events",
-                "before": """BEGIN:VCALENDAR
+        },
+        {
+            "title": "Update one property in all events",
+            "before": """BEGIN:VCALENDAR
 VERSION:2.0
 CALSCALE:GREGORIAN
-PRODID:-//mulberrymail.com//Mulberry v4.0//EN
+PRODID:-//example.com//Example v0.1//EN
 BEGIN:VEVENT
 UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
 DTSTART;VALUE=DATE:20020101
@@ -731,10 +716,10 @@ SUMMARY:April Fool's Day
 END:VEVENT
 END:VCALENDAR
 """,
-                "after": """BEGIN:VCALENDAR
+            "after": """BEGIN:VCALENDAR
 VERSION:2.0
 CALSCALE:GREGORIAN
-PRODID:-//mulberrymail.com//Mulberry v4.0//EN
+PRODID:-//example.com//Example v0.1//EN
 BEGIN:VEVENT
 UID:165EF135-BA92-435A-88C9-562F95030908
 DTSTART;VALUE=DATE:20020401
@@ -755,17 +740,25 @@ SUMMARY:New Year's Day
 END:VEVENT
 END:VCALENDAR
 """,
-                "patch": """update /VCALENDAR/VEVENT#STATUS
-STATUS:CONFIRMED
-.
-""",
-            },
-            {
-                "title": "Update one property in one event",
-                "before": """BEGIN:VCALENDAR
+            "patch": """BEGIN:VCALENDAR
 VERSION:2.0
 CALSCALE:GREGORIAN
-PRODID:-//mulberrymail.com//Mulberry v4.0//EN
+PRODID:-//example.com//Example v0.1//EN
+BEGIN:VPATCH
+BEGIN:UPDATE
+TARGET:/VCALENDAR/VEVENT#STATUS
+STATUS:CONFIRMED
+END:UPDATE
+END:VPATCH
+END:VCALENDAR
+""",
+        },
+        {
+            "title": "Update one property in one event",
+            "before": """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//example.com//Example v0.1//EN
 BEGIN:VEVENT
 UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
 DTSTART;VALUE=DATE:20020101
@@ -786,10 +779,10 @@ SUMMARY:April Fool's Day
 END:VEVENT
 END:VCALENDAR
 """,
-                "after": """BEGIN:VCALENDAR
+            "after": """BEGIN:VCALENDAR
 VERSION:2.0
 CALSCALE:GREGORIAN
-PRODID:-//mulberrymail.com//Mulberry v4.0//EN
+PRODID:-//example.com//Example v0.1//EN
 BEGIN:VEVENT
 UID:165EF135-BA92-435A-88C9-562F95030908
 DTSTART;VALUE=DATE:20020401
@@ -810,27 +803,27 @@ SUMMARY:New Year's Day
 END:VEVENT
 END:VCALENDAR
 """,
-                "patch": """update /VCALENDAR/VEVENT[UID=C3184A66-1ED0-11D9-A5E0-000A958A3252]#STATUS
+            "patch": """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//example.com//Example v0.1//EN
+BEGIN:VPATCH
+BEGIN:UPDATE
+TARGET:/VCALENDAR/VEVENT[UID=C3184A66-1ED0-11D9-A5E0-000A958A3252]#STATUS
 STATUS:CONFIRMED
-.
+END:UPDATE
+END:VPATCH
+END:VCALENDAR
 """,
-            },
-        ]
-
-        self._testPatch(data)
-
-    def test_deleteComponent_Simple(self):
-        """
-        Test that deletion of a single component works.
-        """
-
-        data = [
-            {
-                "title": "Remove one component from single event calendar",
-                "before": """BEGIN:VCALENDAR
+        },
+    ],
+    "delete_component_simple": [
+        {
+            "title": "Remove one component from single event calendar",
+            "before": """BEGIN:VCALENDAR
 VERSION:2.0
 CALSCALE:GREGORIAN
-PRODID:-//mulberrymail.com//Mulberry v4.0//EN
+PRODID:-//example.com//Example v0.1//EN
 BEGIN:VEVENT
 UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
 DTSTART;VALUE=DATE:20020101
@@ -841,62 +834,30 @@ SUMMARY:New Year's Day
 END:VEVENT
 END:VCALENDAR
 """,
-                "after": """BEGIN:VCALENDAR
+            "after": """BEGIN:VCALENDAR
 VERSION:2.0
 CALSCALE:GREGORIAN
-PRODID:-//mulberrymail.com//Mulberry v4.0//EN
+PRODID:-//example.com//Example v0.1//EN
 END:VCALENDAR
 """,
-                "patch": """delete /VCALENDAR/VEVENT
-""",
-            },
-            {
-                "title": "Remove one component from multi event calendar",
-                "before": """BEGIN:VCALENDAR
+            "patch": """BEGIN:VCALENDAR
 VERSION:2.0
 CALSCALE:GREGORIAN
-PRODID:-//mulberrymail.com//Mulberry v4.0//EN
-BEGIN:VEVENT
-UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
-DTSTART;VALUE=DATE:20020101
-DTEND;VALUE=DATE:20020102
-DTSTAMP:20020101T000000Z
-RRULE:FREQ=YEARLY;UNTIL=20031231;BYMONTH=1
-SUMMARY:New Year's Day
-END:VEVENT
-BEGIN:VEVENT
-UID:165EF135-BA92-435A-88C9-562F95030908
-DTSTART;VALUE=DATE:20020401
-DURATION:P1D
-DTSTAMP:20020101T000000Z
-RRULE:FREQ=YEARLY
-SUMMARY:April Fool's Day
-END:VEVENT
+PRODID:-//example.com//Example v0.1//EN
+BEGIN:VPATCH
+BEGIN:DELETE
+TARGET:/VCALENDAR/VEVENT
+END:DELETE
+END:VPATCH
 END:VCALENDAR
 """,
-                "after": """BEGIN:VCALENDAR
+        },
+        {
+            "title": "Remove one component from multi event calendar",
+            "before": """BEGIN:VCALENDAR
 VERSION:2.0
 CALSCALE:GREGORIAN
-PRODID:-//mulberrymail.com//Mulberry v4.0//EN
-BEGIN:VEVENT
-UID:165EF135-BA92-435A-88C9-562F95030908
-DTSTART;VALUE=DATE:20020401
-DURATION:P1D
-DTSTAMP:20020101T000000Z
-RRULE:FREQ=YEARLY
-SUMMARY:April Fool's Day
-END:VEVENT
-END:VCALENDAR
-""",
-                "patch": """delete /VCALENDAR/VEVENT[UID=C3184A66-1ED0-11D9-A5E0-000A958A3252]
-""",
-            },
-            {
-                "title": "Remove all components from multi event calendar",
-                "before": """BEGIN:VCALENDAR
-VERSION:2.0
-CALSCALE:GREGORIAN
-PRODID:-//mulberrymail.com//Mulberry v4.0//EN
+PRODID:-//example.com//Example v0.1//EN
 BEGIN:VEVENT
 UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
 DTSTART;VALUE=DATE:20020101
@@ -915,21 +876,80 @@ SUMMARY:April Fool's Day
 END:VEVENT
 END:VCALENDAR
 """,
-                "after": """BEGIN:VCALENDAR
+            "after": """BEGIN:VCALENDAR
 VERSION:2.0
 CALSCALE:GREGORIAN
-PRODID:-//mulberrymail.com//Mulberry v4.0//EN
+PRODID:-//example.com//Example v0.1//EN
+BEGIN:VEVENT
+UID:165EF135-BA92-435A-88C9-562F95030908
+DTSTART;VALUE=DATE:20020401
+DURATION:P1D
+DTSTAMP:20020101T000000Z
+RRULE:FREQ=YEARLY
+SUMMARY:April Fool's Day
+END:VEVENT
 END:VCALENDAR
 """,
-                "patch": """delete /VCALENDAR/VEVENT
-""",
-            },
-            {
-                "title": "Remove one alarm from single event calendar",
-                "before": """BEGIN:VCALENDAR
+            "patch": """BEGIN:VCALENDAR
 VERSION:2.0
 CALSCALE:GREGORIAN
-PRODID:-//mulberrymail.com//Mulberry v4.0//EN
+PRODID:-//example.com//Example v0.1//EN
+BEGIN:VPATCH
+BEGIN:DELETE
+TARGET:/VCALENDAR/VEVENT[UID=C3184A66-1ED0-11D9-A5E0-000A958A3252]
+END:DELETE
+END:VPATCH
+END:VCALENDAR
+""",
+        },
+        {
+            "title": "Remove all components from multi event calendar",
+            "before": """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//example.com//Example v0.1//EN
+BEGIN:VEVENT
+UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
+DTSTART;VALUE=DATE:20020101
+DTEND;VALUE=DATE:20020102
+DTSTAMP:20020101T000000Z
+RRULE:FREQ=YEARLY;UNTIL=20031231;BYMONTH=1
+SUMMARY:New Year's Day
+END:VEVENT
+BEGIN:VEVENT
+UID:165EF135-BA92-435A-88C9-562F95030908
+DTSTART;VALUE=DATE:20020401
+DURATION:P1D
+DTSTAMP:20020101T000000Z
+RRULE:FREQ=YEARLY
+SUMMARY:April Fool's Day
+END:VEVENT
+END:VCALENDAR
+""",
+            "after": """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//example.com//Example v0.1//EN
+END:VCALENDAR
+""",
+            "patch": """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//example.com//Example v0.1//EN
+BEGIN:VPATCH
+BEGIN:DELETE
+TARGET:/VCALENDAR/VEVENT
+END:DELETE
+END:VPATCH
+END:VCALENDAR
+""",
+        },
+        {
+            "title": "Remove one alarm from single event calendar",
+            "before": """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//example.com//Example v0.1//EN
 BEGIN:VEVENT
 UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
 DTSTART;VALUE=DATE:20020101
@@ -946,10 +966,10 @@ END:VALARM
 END:VEVENT
 END:VCALENDAR
 """,
-                "after": """BEGIN:VCALENDAR
+            "after": """BEGIN:VCALENDAR
 VERSION:2.0
 CALSCALE:GREGORIAN
-PRODID:-//mulberrymail.com//Mulberry v4.0//EN
+PRODID:-//example.com//Example v0.1//EN
 BEGIN:VEVENT
 UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
 DTSTART;VALUE=DATE:20020101
@@ -960,15 +980,24 @@ SUMMARY:New Year's Day
 END:VEVENT
 END:VCALENDAR
 """,
-                "patch": """delete /VCALENDAR/VEVENT/VALARM
-""",
-            },
-            {
-                "title": "Remove one alarm from single multi alarm event calendar",
-                "before": """BEGIN:VCALENDAR
+            "patch": """BEGIN:VCALENDAR
 VERSION:2.0
 CALSCALE:GREGORIAN
-PRODID:-//mulberrymail.com//Mulberry v4.0//EN
+PRODID:-//example.com//Example v0.1//EN
+BEGIN:VPATCH
+BEGIN:DELETE
+TARGET:/VCALENDAR/VEVENT/VALARM
+END:DELETE
+END:VPATCH
+END:VCALENDAR
+""",
+        },
+        {
+            "title": "Remove one alarm from single multi alarm event calendar",
+            "before": """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//example.com//Example v0.1//EN
 BEGIN:VEVENT
 UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
 DTSTART;VALUE=DATE:20020101
@@ -991,10 +1020,10 @@ END:VALARM
 END:VEVENT
 END:VCALENDAR
 """,
-                "after": """BEGIN:VCALENDAR
+            "after": """BEGIN:VCALENDAR
 VERSION:2.0
 CALSCALE:GREGORIAN
-PRODID:-//mulberrymail.com//Mulberry v4.0//EN
+PRODID:-//example.com//Example v0.1//EN
 BEGIN:VEVENT
 UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
 DTSTART;VALUE=DATE:20020101
@@ -1011,25 +1040,26 @@ END:VALARM
 END:VEVENT
 END:VCALENDAR
 """,
-                "patch": """delete /VCALENDAR/VEVENT/VALARM[UID=D78F6991-DFDD-491B-8334-FA9BF8E4F11C]
-""",
-            },
-        ]
-
-        self._testPatch(data)
-
-    def test_deleteProperty_Simple(self):
-        """
-        Test that deletion of a single property works.
-        """
-
-        data = [
-            {
-                "title": "Remove one property from VCALENDAR",
-                "before": """BEGIN:VCALENDAR
+            "patch": """BEGIN:VCALENDAR
 VERSION:2.0
 CALSCALE:GREGORIAN
-PRODID:-//mulberrymail.com//Mulberry v4.0//EN
+PRODID:-//example.com//Example v0.1//EN
+BEGIN:VPATCH
+BEGIN:DELETE
+TARGET:/VCALENDAR/VEVENT/VALARM[UID=D78F6991-DFDD-491B-8334-FA9BF8E4F11C]
+END:DELETE
+END:VPATCH
+END:VCALENDAR
+""",
+        },
+    ],
+    "delete_property_simple": [
+        {
+            "title": "Remove one property from VCALENDAR",
+            "before": """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//example.com//Example v0.1//EN
 BEGIN:VEVENT
 UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
 DTSTART;VALUE=DATE:20020101
@@ -1040,9 +1070,9 @@ SUMMARY:New Year's Day
 END:VEVENT
 END:VCALENDAR
 """,
-                "after": """BEGIN:VCALENDAR
+            "after": """BEGIN:VCALENDAR
 VERSION:2.0
-PRODID:-//mulberrymail.com//Mulberry v4.0//EN
+PRODID:-//example.com//Example v0.1//EN
 BEGIN:VEVENT
 UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
 DTSTART;VALUE=DATE:20020101
@@ -1053,15 +1083,24 @@ SUMMARY:New Year's Day
 END:VEVENT
 END:VCALENDAR
 """,
-                "patch": """delete /VCALENDAR#CALSCALE
-""",
-            },
-            {
-                "title": "Remove one property from VEVENT",
-                "before": """BEGIN:VCALENDAR
+            "patch": """BEGIN:VCALENDAR
 VERSION:2.0
 CALSCALE:GREGORIAN
-PRODID:-//mulberrymail.com//Mulberry v4.0//EN
+PRODID:-//example.com//Example v0.1//EN
+BEGIN:VPATCH
+BEGIN:DELETE
+TARGET:/VCALENDAR#CALSCALE
+END:DELETE
+END:VPATCH
+END:VCALENDAR
+""",
+        },
+        {
+            "title": "Remove one property from VEVENT",
+            "before": """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//example.com//Example v0.1//EN
 BEGIN:VEVENT
 UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
 DTSTART;VALUE=DATE:20020101
@@ -1072,10 +1111,10 @@ SUMMARY:New Year's Day
 END:VEVENT
 END:VCALENDAR
 """,
-                "after": """BEGIN:VCALENDAR
+            "after": """BEGIN:VCALENDAR
 VERSION:2.0
 CALSCALE:GREGORIAN
-PRODID:-//mulberrymail.com//Mulberry v4.0//EN
+PRODID:-//example.com//Example v0.1//EN
 BEGIN:VEVENT
 UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
 DTSTART;VALUE=DATE:20020101
@@ -1085,15 +1124,24 @@ SUMMARY:New Year's Day
 END:VEVENT
 END:VCALENDAR
 """,
-                "patch": """delete /VCALENDAR/VEVENT#RRULE
-""",
-            },
-            {
-                "title": "Remove one property from multi event calendar",
-                "before": """BEGIN:VCALENDAR
+            "patch": """BEGIN:VCALENDAR
 VERSION:2.0
 CALSCALE:GREGORIAN
-PRODID:-//mulberrymail.com//Mulberry v4.0//EN
+PRODID:-//example.com//Example v0.1//EN
+BEGIN:VPATCH
+BEGIN:DELETE
+TARGET:/VCALENDAR/VEVENT#RRULE
+END:DELETE
+END:VPATCH
+END:VCALENDAR
+""",
+        },
+        {
+            "title": "Remove one property from multi event calendar",
+            "before": """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//example.com//Example v0.1//EN
 BEGIN:VEVENT
 UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
 DTSTART;VALUE=DATE:20020101
@@ -1112,10 +1160,10 @@ SUMMARY:April Fool's Day
 END:VEVENT
 END:VCALENDAR
 """,
-                "after": """BEGIN:VCALENDAR
+            "after": """BEGIN:VCALENDAR
 VERSION:2.0
 CALSCALE:GREGORIAN
-PRODID:-//mulberrymail.com//Mulberry v4.0//EN
+PRODID:-//example.com//Example v0.1//EN
 BEGIN:VEVENT
 UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
 DTSTART;VALUE=DATE:20020101
@@ -1133,15 +1181,24 @@ SUMMARY:April Fool's Day
 END:VEVENT
 END:VCALENDAR
 """,
-                "patch": """delete /VCALENDAR/VEVENT[UID=C3184A66-1ED0-11D9-A5E0-000A958A3252]#RRULE
-""",
-            },
-            {
-                "title": "Remove one of many properties from VEVENT",
-                "before": """BEGIN:VCALENDAR
+            "patch": """BEGIN:VCALENDAR
 VERSION:2.0
 CALSCALE:GREGORIAN
-PRODID:-//mulberrymail.com//Mulberry v4.0//EN
+PRODID:-//example.com//Example v0.1//EN
+BEGIN:VPATCH
+BEGIN:DELETE
+TARGET:/VCALENDAR/VEVENT[UID=C3184A66-1ED0-11D9-A5E0-000A958A3252]#RRULE
+END:DELETE
+END:VPATCH
+END:VCALENDAR
+""",
+        },
+        {
+            "title": "Remove one of many properties from VEVENT",
+            "before": """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//example.com//Example v0.1//EN
 BEGIN:VEVENT
 UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
 DTSTART;VALUE=DATE:20020101
@@ -1157,10 +1214,10 @@ SUMMARY:New Year's Day
 END:VEVENT
 END:VCALENDAR
 """,
-                "after": """BEGIN:VCALENDAR
+            "after": """BEGIN:VCALENDAR
 VERSION:2.0
 CALSCALE:GREGORIAN
-PRODID:-//mulberrymail.com//Mulberry v4.0//EN
+PRODID:-//example.com//Example v0.1//EN
 BEGIN:VEVENT
 UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
 DTSTART;VALUE=DATE:20020101
@@ -1175,15 +1232,24 @@ SUMMARY:New Year's Day
 END:VEVENT
 END:VCALENDAR
 """,
-                "patch": """delete /VCALENDAR/VEVENT#ATTENDEE[=mailto:user03@example.com]
-""",
-            },
-            {
-                "title": "Remove one of many properties from one of many VEVENTs",
-                "before": """BEGIN:VCALENDAR
+            "patch": """BEGIN:VCALENDAR
 VERSION:2.0
 CALSCALE:GREGORIAN
-PRODID:-//mulberrymail.com//Mulberry v4.0//EN
+PRODID:-//example.com//Example v0.1//EN
+BEGIN:VPATCH
+BEGIN:DELETE
+TARGET:/VCALENDAR/VEVENT#ATTENDEE[=mailto:user03@example.com]
+END:DELETE
+END:VPATCH
+END:VCALENDAR
+""",
+        },
+        {
+            "title": "Remove one of many properties from one of many VEVENTs",
+            "before": """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//example.com//Example v0.1//EN
 BEGIN:VEVENT
 UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
 DTSTART;VALUE=DATE:20020101
@@ -1212,10 +1278,10 @@ SUMMARY:New Year's Day
 END:VEVENT
 END:VCALENDAR
 """,
-                "after": """BEGIN:VCALENDAR
+            "after": """BEGIN:VCALENDAR
 VERSION:2.0
 CALSCALE:GREGORIAN
-PRODID:-//mulberrymail.com//Mulberry v4.0//EN
+PRODID:-//example.com//Example v0.1//EN
 BEGIN:VEVENT
 UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
 DTSTART;VALUE=DATE:20020101
@@ -1243,25 +1309,26 @@ SUMMARY:New Year's Day
 END:VEVENT
 END:VCALENDAR
 """,
-                "patch": """delete /VCALENDAR/VEVENT[RECURRENCE-ID=20120101]#ATTENDEE[=mailto:user03@example.com]
-""",
-            },
-        ]
-
-        self._testPatch(data)
-
-    def test_deleteParameter_Simple(self):
-        """
-        Test that deletion of a single parameter works.
-        """
-
-        data = [
-            {
-                "title": "Remove parameter from all properties in VEVENT",
-                "before": """BEGIN:VCALENDAR
+            "patch": """BEGIN:VCALENDAR
 VERSION:2.0
 CALSCALE:GREGORIAN
-PRODID:-//mulberrymail.com//Mulberry v4.0//EN
+PRODID:-//example.com//Example v0.1//EN
+BEGIN:VPATCH
+BEGIN:DELETE
+TARGET:/VCALENDAR/VEVENT[RECURRENCE-ID=20120101]#ATTENDEE[=mailto:user03@example.com]
+END:DELETE
+END:VPATCH
+END:VCALENDAR
+""",
+        },
+    ],
+    "delete_parameter_simple": [
+        {
+            "title": "Remove parameter from all properties in VEVENT",
+            "before": """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//example.com//Example v0.1//EN
 BEGIN:VEVENT
 UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
 DTSTART;VALUE=DATE:20020101
@@ -1277,10 +1344,10 @@ SUMMARY:New Year's Day
 END:VEVENT
 END:VCALENDAR
 """,
-                "after": """BEGIN:VCALENDAR
+            "after": """BEGIN:VCALENDAR
 VERSION:2.0
 CALSCALE:GREGORIAN
-PRODID:-//mulberrymail.com//Mulberry v4.0//EN
+PRODID:-//example.com//Example v0.1//EN
 BEGIN:VEVENT
 UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
 DTSTART;VALUE=DATE:20020101
@@ -1296,15 +1363,24 @@ SUMMARY:New Year's Day
 END:VEVENT
 END:VCALENDAR
 """,
-                "patch": """delete /VCALENDAR/VEVENT#ATTENDEE;PARTSTAT
-""",
-            },
-            {
-                "title": "Remove parameter from one property in VEVENT",
-                "before": """BEGIN:VCALENDAR
+            "patch": """BEGIN:VCALENDAR
 VERSION:2.0
 CALSCALE:GREGORIAN
-PRODID:-//mulberrymail.com//Mulberry v4.0//EN
+PRODID:-//example.com//Example v0.1//EN
+BEGIN:VPATCH
+BEGIN:DELETE
+TARGET:/VCALENDAR/VEVENT#ATTENDEE;PARTSTAT
+END:DELETE
+END:VPATCH
+END:VCALENDAR
+""",
+        },
+        {
+            "title": "Remove parameter from one property in VEVENT",
+            "before": """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//example.com//Example v0.1//EN
 BEGIN:VEVENT
 UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
 DTSTART;VALUE=DATE:20020101
@@ -1320,10 +1396,10 @@ SUMMARY:New Year's Day
 END:VEVENT
 END:VCALENDAR
 """,
-                "after": """BEGIN:VCALENDAR
+            "after": """BEGIN:VCALENDAR
 VERSION:2.0
 CALSCALE:GREGORIAN
-PRODID:-//mulberrymail.com//Mulberry v4.0//EN
+PRODID:-//example.com//Example v0.1//EN
 BEGIN:VEVENT
 UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
 DTSTART;VALUE=DATE:20020101
@@ -1339,15 +1415,24 @@ SUMMARY:New Year's Day
 END:VEVENT
 END:VCALENDAR
 """,
-                "patch": """delete /VCALENDAR/VEVENT#ATTENDEE[=mailto:user03@example.com];PARTSTAT
-""",
-            },
-            {
-                "title": "Remove one parameter from one of many parameters from one of many VEVENTs",
-                "before": """BEGIN:VCALENDAR
+            "patch": """BEGIN:VCALENDAR
 VERSION:2.0
 CALSCALE:GREGORIAN
-PRODID:-//mulberrymail.com//Mulberry v4.0//EN
+PRODID:-//example.com//Example v0.1//EN
+BEGIN:VPATCH
+BEGIN:DELETE
+TARGET:/VCALENDAR/VEVENT#ATTENDEE[=mailto:user03@example.com];PARTSTAT
+END:DELETE
+END:VPATCH
+END:VCALENDAR
+""",
+        },
+        {
+            "title": "Remove one parameter from one of many parameters from one of many VEVENTs",
+            "before": """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//example.com//Example v0.1//EN
 BEGIN:VEVENT
 UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
 DTSTART;VALUE=DATE:20020101
@@ -1376,10 +1461,10 @@ SUMMARY:New Year's Day
 END:VEVENT
 END:VCALENDAR
 """,
-                "after": """BEGIN:VCALENDAR
+            "after": """BEGIN:VCALENDAR
 VERSION:2.0
 CALSCALE:GREGORIAN
-PRODID:-//mulberrymail.com//Mulberry v4.0//EN
+PRODID:-//example.com//Example v0.1//EN
 BEGIN:VEVENT
 UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
 DTSTART;VALUE=DATE:20020101
@@ -1408,12 +1493,106 @@ SUMMARY:New Year's Day
 END:VEVENT
 END:VCALENDAR
 """,
-                "patch": """delete /VCALENDAR/VEVENT[RECURRENCE-ID=20120101]#ATTENDEE[=mailto:user03@example.com];PARTSTAT
+            "patch": """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//example.com//Example v0.1//EN
+BEGIN:VPATCH
+BEGIN:DELETE
+TARGET:/VCALENDAR/VEVENT[RECURRENCE-ID=20120101]#ATTENDEE[=mailto:user03@example.com];PARTSTAT
+END:DELETE
+END:VPATCH
+END:VCALENDAR
 """,
-            },
-        ]
+        },
+    ],
+}
 
-        self._testPatch(data)
+
+class TestPatchDocument(unittest.TestCase):
+
+    def _testPatch(self, data):
+
+        for ctr, items in enumerate(data):
+            calendar = Calendar.parseText(items["before"])
+            patcher = PatchDocument(Calendar.parseText(items["patch"]))
+            patcher.applyPatch(calendar)
+            self.assertEqual(str(calendar), items["after"].replace("\n", "\r\n"), msg="Failed test #{}: {}\n{}".format(ctr + 1, items["title"], str(calendar)))
+
+    def test_createComponent_Simple(self):
+        """
+        Test that creation of a single component works.
+        """
+
+        self._testPatch(data["create_component_simple"])
+
+    def test_createProperty_Simple(self):
+        """
+        Test that creation of a single property works.
+        """
+
+        self._testPatch(data["create_property_simple"])
+
+    def test_updateComponent_Simple(self):
+        """
+        Test that update of components works.
+        """
+
+        self._testPatch(data["update_component_simple"])
+
+    def test_updateComponent_Recur(self):
+        """
+        Test that update of components works.
+        """
+
+        self._testPatch(data["update_component_recur"])
+
+    def test_updateProperty_Simple(self):
+        """
+        Test that update of a single property works.
+        """
+
+        self._testPatch(data["update_property_simple"])
+
+    def test_deleteComponent_Simple(self):
+        """
+        Test that deletion of a single component works.
+        """
+
+        self._testPatch(data["delete_component_simple"])
+
+    def test_deleteProperty_Simple(self):
+        """
+        Test that deletion of a single property works.
+        """
+
+        self._testPatch(data["delete_property_simple"])
+
+    def test_deleteParameter_Simple(self):
+        """
+        Test that deletion of a single parameter works.
+        """
+
+        self._testPatch(data["delete_parameter_simple"])
+
+
+def componentData(data):
+    """
+    Parse the data item into a component.
+
+    @return: a component
+    @rtype: L{Component}
+    """
+
+    # Data must be a set of components. Wrap the data inside a VCALENDAR and parse
+    newdata = """BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:ignore
+{}
+END:VCALENDAR
+""".format(data)
+    calendar = Calendar.parseText(newdata)
+    return calendar.getComponents()[0]
 
 
 class TestCommand(unittest.TestCase):
@@ -1421,19 +1600,19 @@ class TestCommand(unittest.TestCase):
     def testCreate(self):
         test_data = (
             # Valid
-            (Command.CREATE, "/VCALENDAR", "BEGIN:VEVENT\r\nEND:VEVENT\r\n", True,),
-            (Command.CREATE, Path("/VCALENDAR"), "BEGIN:VEVENT\r\nEND:VEVENT\r\n", True,),
-            (Command.UPDATE, "/VCALENDAR#VERSION", ":2.0\r\n", True,),
-            (Command.UPDATE, Path("/VCALENDAR#VERSION"), ":2.0\r\n", True,),
+            (Command.CREATE, "/VCALENDAR", componentData("BEGIN:VEVENT\r\nEND:VEVENT\r\n"), True,),
+            (Command.CREATE, Path("/VCALENDAR"), componentData("BEGIN:VEVENT\r\nEND:VEVENT\r\n"), True,),
+            (Command.UPDATE, "/VCALENDAR#VERSION", componentData("BEGIN:UPDATE\r\nVERSION:2.0\r\nEND:UPDATE\r\n"), True,),
+            (Command.UPDATE, Path("/VCALENDAR#VERSION"), componentData("BEGIN:UPDATE\r\nVERSION:2.0\r\nEND:UPDATE\r\n"), True,),
             (Command.DELETE, "/VCALENDAR#VERSION", None, True,),
 
             # Invalid
-            ("foo", "/VCALENDAR", "BEGIN:VEVENT\r\nEND:VEVENT\r\n", False,),
-            (Command.CREATE, 1, "BEGIN:VEVENT\r\nEND:VEVENT\r\n", False,),
+            ("foo", "/VCALENDAR", componentData("BEGIN:VEVENT\r\nEND:VEVENT\r\n"), False,),
+            (Command.CREATE, 1, componentData("BEGIN:VEVENT\r\nEND:VEVENT\r\n"), False,),
             (Command.CREATE, "/VCALENDAR", 1, False,),
             (Command.CREATE, "/VCALENDAR", None, False,),
             (Command.UPDATE, "/VCALENDAR#VERSION", None, False,),
-            (Command.DELETE, "/VCALENDAR#VERSION", ":2.0\r\n", False,),
+            (Command.DELETE, "/VCALENDAR#VERSION", componentData("BEGIN:UPDATE\r\nVERSION:2.0\r\nEND:UPDATE\r\n"), False,),
         )
 
         for action, path, data, valid in test_data:
@@ -1443,55 +1622,6 @@ class TestCommand(unittest.TestCase):
                 self.assertFalse(valid)
             else:
                 self.assertTrue(valid)
-                self.assertTrue(isinstance(command, Command))
-
-    def testParseLines(self):
-        test_data = (
-            # Valid
-            ("""create /VCALENDAR
-BEGIN:VEVENT
-END:VEVENT
-.
-""", True,),
-            ("""update /VCALENDAR#VERSION
-:2.0
-.
-""", True,),
-            ("""delete /VCALENDAR#VERSION
-""", True,),
-
-            # Invalid
-            ("""foo /VCALENDAR
-BEGIN:VEVENT
-END:VEVENT
-.
-""", False,),
-            ("""create 1
-BEGIN:VEVENT
-END:VEVENT
-.
-""", False,),
-            ("""create /VCALENDAR
-""", False,),
-            ("""create /VCALENDAR
-foo
-bar
-""", False,),
-            ("""update /VCALENDAR
-""", False,),
-            ("""update /VCALENDAR
-foo
-bar
-""", False,),
-        )
-
-        for txt, valid in test_data:
-            try:
-                command = Command.parseFromText(txt.splitlines())
-            except ValueError:
-                self.assertFalse(valid, msg=txt)
-            else:
-                self.assertTrue(valid, msg=txt)
                 self.assertTrue(isinstance(command, Command))
 
 
@@ -1773,7 +1903,7 @@ class TestPath(unittest.TestCase):
         icalendar = """BEGIN:VCALENDAR
 VERSION:2.0
 CALSCALE:GREGORIAN
-PRODID:-//mulberrymail.com//Mulberry v4.0//EN
+PRODID:-//example.com//Example v0.1//EN
 BEGIN:VEVENT
 UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
 DTSTART;VALUE=DATE:20020101
@@ -1832,7 +1962,7 @@ END:VCALENDAR
         icalendar = """BEGIN:VCALENDAR
 VERSION:2.0
 CALSCALE:GREGORIAN
-PRODID:-//mulberrymail.com//Mulberry v4.0//EN
+PRODID:-//example.com//Example v0.1//EN
 BEGIN:VEVENT
 UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
 DTSTART;VALUE=DATE:20020101
@@ -1914,7 +2044,7 @@ END:VCALENDAR
         icalendar = """BEGIN:VCALENDAR
 VERSION:2.0
 CALSCALE:GREGORIAN
-PRODID:-//mulberrymail.com//Mulberry v4.0//EN
+PRODID:-//example.com//Example v0.1//EN
 BEGIN:VEVENT
 UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
 DTSTART:20020101T120000Z
@@ -1978,7 +2108,7 @@ END:VCALENDAR
         icalendar = """BEGIN:VCALENDAR
 VERSION:2.0
 CALSCALE:GREGORIAN
-PRODID:-//mulberrymail.com//Mulberry v4.0//EN
+PRODID:-//example.com//Example v0.1//EN
 BEGIN:VEVENT
 UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
 DTSTART;VALUE=DATE:20020101
@@ -2070,7 +2200,7 @@ END:VCALENDAR
         icalendar = """BEGIN:VCALENDAR
 VERSION:2.0
 CALSCALE:GREGORIAN
-PRODID:-//mulberrymail.com//Mulberry v4.0//EN
+PRODID:-//example.com//Example v0.1//EN
 BEGIN:VEVENT
 UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
 DTSTART;VALUE=DATE:20020101
@@ -2214,3 +2344,9 @@ class TestParameterSegment(unittest.TestCase):
             else:
                 self.assertTrue(valid)
                 self.assertEqual(property.name, name)
+
+if __name__ == '__main__':
+    all_data = list(itertools.chain(*data.values()))
+    with open(os.path.join(os.path.dirname(__file__), "patch_examples.json"), "w") as f:
+        f.write(json.dumps(all_data, indent=2))
+    print("Updated patch_example.json")

@@ -365,6 +365,7 @@ cICalComponent_DELETE = "DELETE"
 
 cICalProperty_PATCH_ORDER = "PATCH-ORDER"
 cICalProperty_TARGET = "TARGET"
+cICalProperty_SETPARAMETER = "SETPARAMETER"
 
 
 #     Mulberry extensions

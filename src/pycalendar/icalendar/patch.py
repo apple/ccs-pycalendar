@@ -14,13 +14,15 @@
 #    limitations under the License.
 ##
 
-import operator
 from urlparse import unquote
-from pycalendar.icalendar.componentrecur import ComponentRecur
+import operator
+
 from pycalendar.componentbase import ComponentBase
 from pycalendar.datetime import DateTime
+from pycalendar.icalendar import definitions
+from pycalendar.icalendar.componentrecur import ComponentRecur
 from pycalendar.icalendar.property import Property
-from pycalendar.icalendar.calendar import Calendar
+from pycalendar.icalendar.component import Component
 
 
 class PatchDocument(object):
@@ -28,23 +30,36 @@ class PatchDocument(object):
     Represents an entire patch document by maintaining a list of all its commands.
     """
 
-    def __init__(self, text=None):
+    def __init__(self, calendar=None):
         self.commands = []
-        if text:
-            self.parseText(text)
+        if calendar is not None:
+            self.parsePatch(calendar)
 
-    def parseText(self, text):
+    def parsePatch(self, calendar):
+        """
+        Parse an iCalendar object and extract all the VPATCH components in the
+        proper order and parse them as a set of commands to use when applying
+        the patch.
 
-        # Split into lines and parse a sequence of commands from each
-        lines = text.splitlines()
-        while lines:
-            command = Command.parseFromText(lines)
-            if command is None:
-                break
-            self.commands.append(command)
+        @param calendar: iCalendar object to parse
+        @type calendar: L{Calendar}
+        """
 
-        if lines:
-            raise ValueError("Lines left after parsing commands: {}".format(lines))
+        # Get all VPATCH components
+        vpatches = calendar.getComponents(definitions.cICalComponent_VPATCH)
+
+        # Sort
+        def _vpatchOrder(component):
+            return component.loadValueInteger(definitions.cICalProperty_PATCH_ORDER)
+        vpatches = sorted(vpatches, key=_vpatchOrder)
+
+        # Extract commands from each VPATCH
+        for vpatch in vpatches:
+            for component in vpatch.getComponents():
+                if component.getType().upper() not in (definitions.cICalComponent_CREATE, definitions.cICalComponent_UPDATE, definitions.cICalComponent_DELETE,):
+                    raise ValueError("Invalid component in VPATCH: {}".format(component.getType().upper()))
+                command = Command.parseFromComponent(component)
+                self.commands.append(command)
 
     def applyPatch(self, calendar):
         """
@@ -70,6 +85,12 @@ class Command(object):
     REMOVE = "remove"
     ACTIONS = (CREATE, UPDATE, DELETE, ADD, REMOVE)
 
+    componentToAction = {
+        definitions.cICalComponent_CREATE: CREATE,
+        definitions.cICalComponent_UPDATE: UPDATE,
+        definitions.cICalComponent_DELETE: DELETE,
+    }
+
     def __init__(self):
         self.action = None
         self.path = None
@@ -83,7 +104,7 @@ class Command(object):
             path = Path(path)
         elif not isinstance(path, Path):
             raise ValueError("Invalid path: {}".format(path))
-        if data is not None and not isinstance(data, str):
+        if data is not None and not isinstance(data, Component):
             raise ValueError("Invalid data: {}".format(data))
         if action == Command.DELETE:
             if data is not None:
@@ -99,40 +120,37 @@ class Command(object):
         return command
 
     @classmethod
-    def parseFromText(cls, lines):
+    def parseFromComponent(cls, component):
         """
         Parse a command from a list of text format lines.
 
-        @param lines: lines in the patch document. The lines
-            parsed from the list will be removed from the list.
-        @type lines: L{list}
+        @param component: ADD/UPDATE/REMOVE component to process.
+        @type component: L{Component}
 
         @return: L{Command} if a command was parsed, L{None} if not
         """
 
-        # First line must be "<<action>> <<path>>"
-        line = lines.pop(0)
-        action, path = line.split(" ", 1)
-        if action not in Command.ACTIONS:
-            raise ValueError("Invalid action: {}".format(line))
+        # Get the action from the component type
+        action = cls.componentToAction.get(component.getType().upper())
+        if action not in cls.ACTIONS:
+            raise ValueError("Invalid component: {}".format(component.getType().upper()))
+
+        # Get the path from the TARGET property
+        target = component.getPropertyString(definitions.cICalProperty_TARGET)
+        if target is None:
+            raise ValueError("Missing TARGET property in component: {}".format(component.getType().upper()))
         try:
-            path = Path(path)
+            path = Path(target)
         except ValueError:
-            raise ValueError("Invalid path: {}".format(line))
+            raise ValueError("Invalid target path: {}".format(target))
 
         # All but the "delete" action require data
         data = None
         if action != Command.DELETE:
-            data = []
-            while lines:
-                line = lines.pop(0)
-                if line == ".":
-                    break
-                data.append(line)
-            else:
-                raise ValueError("Invalid data: {}".format(data))
+            data = component.duplicate()
+            data.removeProperties(definitions.cICalProperty_TARGET)
 
-        return Command.create(action, path, "\r\n".join(data) if data else None)
+        return Command.create(action, path, data)
 
     def applyPatch(self, calendar):
         """
@@ -156,26 +174,17 @@ class Command(object):
         """
         if self.path.targetComponent():
             # Data is a list of components
-            newcomponents = self.componentData()
             for component in matches:
-                for newcomponent in newcomponents:
+                for newcomponent in self.data.getComponents():
                     component.addComponent(newcomponent.duplicate())
 
         elif self.path.targetPropertyNoName():
             # Data is a list of properties
-            newproperties = self.propertyData()
             for component, _ignore_property in matches:
-                for newproperty in newproperties:
-                    component.addProperty(newproperty.duplicate())
+                for newpropertylist in self.data.getProperties().values():
+                    for newproperty in newpropertylist:
+                        component.addProperty(newproperty.duplicate())
 
-        elif self.path.targetParameterNoName():
-            # Data is a list of parameters
-            newparameters = self.parameterData()
-            for _ignore_component, property, _ignore_parameter_name in matches:
-                for parameter in newparameters:
-                    # Remove existing, then add
-                    property.removeParameters(parameter.getName())
-                    property.addParameter(parameter.duplicate())
         else:
             raise ValueError("create action path is not valid: {}".format(self.path))
 
@@ -196,9 +205,8 @@ class Command(object):
 
             # Now add new components (from the data) to the parent
             if parent is not None:
-                newcomponents = self.componentData()
                 for component in matches:
-                    for newcomponent in newcomponents:
+                    for newcomponent in self.data.getComponents():
                         parent.addComponent(newcomponent.duplicate())
 
         elif self.path.targetProperty():
@@ -210,10 +218,10 @@ class Command(object):
                     component.removeProperty(property)
 
             # Now add new properties (from the data) to each parent component
-            newproperties = self.propertyData()
             for component in components:
-                for newproperty in newproperties:
-                    component.addProperty(newproperty.duplicate())
+                for newpropertylist in self.data.getProperties().values():
+                    for newproperty in newpropertylist:
+                        component.addProperty(newproperty.duplicate())
 
         elif self.path.targetParameterNoName():
             # First remove matched parameters and record the parent properties
@@ -223,9 +231,13 @@ class Command(object):
                 property.removeParameters(parameter_name)
 
             # Now add new parameters (from the data) to each parent property
-            newparameters = self.parameterData()
+            setParameter = self.data.getProperties(definitions.cICalProperty_SETPARAMETER)
+            if len(setParameter) == 0:
+                raise ValueError("No SETPARAMETER property in parameter value update")
+            elif len(setParameter) > 1:
+                raise ValueError("Too many SETPARAMETER properties in parameter value update")
             for property in properties:
-                for parameter in newparameters:
+                for parameter in setParameter[0].getParameters().values():
                     # Remove existing, then add
                     property.removeParameters(parameter.getName())
                     property.addParameter(parameter.duplicate())
@@ -258,49 +270,6 @@ class Command(object):
 
     def removeAction(self, matches):
         pass
-
-    def componentData(self):
-        """
-        Parse the data item into a list of components.
-
-        @return: list of components
-        @rtype: L{list} of L{Component}
-        """
-
-        # Data must be a set of components. Wrap the data inside a VCALENDAR and parse
-        newdata = """BEGIN:VCALENDAR
-VERSION:2.0
-PRODID:ignore
-{}
-END:VCALENDAR
-""".format(self.data)
-        calendar = Calendar.parseText(newdata)
-        return calendar.getComponents()
-
-    def propertyData(self):
-        """
-        Parse the data item into a list of properties.
-
-        @return: list of components
-        @rtype: L{list} of L{Property}
-        """
-        return [Property.parseText(line) for line in self.data.splitlines()]
-
-    def parameterData(self):
-        """
-        Parse the data item into a list of parameters.
-
-        @return: list of components
-        @rtype: L{list} of L{Parameter}
-        """
-
-        # Data must be a sets of parameters. Wrap each set inside a property and then return them all
-        newparameters = []
-        newproperties = [Property.parseText("X-FOO{}:ignore".format(line)) for line in self.data.splitlines()]
-        for newproperty in newproperties:
-            for parameters in newproperty.getParameters().values():
-                newparameters.extend(parameters)
-        return newparameters
 
 
 class Path(object):
