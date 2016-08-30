@@ -180,7 +180,7 @@ class Command(object):
 
         elif self.path.targetPropertyNoName():
             # Data is a list of properties
-            for component, _ignore_property in matches:
+            for component in matches:
                 for newpropertylist in self.data.getProperties().values():
                     for newproperty in newpropertylist:
                         component.addProperty(newproperty.duplicate())
@@ -208,6 +208,19 @@ class Command(object):
                 for component in matches:
                     for newcomponent in self.data.getComponents():
                         parent.addComponent(newcomponent.duplicate())
+
+        elif self.path.targetPropertyNoName():
+            # First remove properties from matched components
+            propnames = self.data.getProperties().keys()
+            for component in matches:
+                for propname in propnames:
+                    component.removeProperties(propname)
+
+            # Add properties to matched components
+            for component in matches:
+                for newpropertylist in self.data.getProperties().values():
+                    for newproperty in newpropertylist:
+                        component.addProperty(newproperty.duplicate())
 
         elif self.path.targetProperty():
             # First remove matched properties and record the parent components
@@ -288,6 +301,14 @@ class Path(object):
         self.property = None
         self.parameter = None
         self._parsePath(path)
+
+    def __str__(self):
+        path = "".join(map(str, self.components))
+        if self.property:
+            path += str(self.property)
+            if self.parameter:
+                path += str(self.parameter)
+        return path
 
     def targetComponent(self):
         """
@@ -391,11 +412,19 @@ class Path(object):
 
             self._parseSegment(segment)
 
+        def __str__(self):
+            path = "/" + self.name
+            if self.uid:
+                path += "[UID={}]".format(self.uid)
+            if self.rid:
+                path += "[RID={}]".format(self.rid_value if self.rid_value is not None else "M")
+            return path
+
         def __repr__(self):
             return "<ComponentSegment: {name}[{uid}][{rid}]".format(
                 name=self.name,
                 uid=self.uid,
-                rid=(self.rid_value if self.rid_value is not None else "*") if self.rid else None
+                rid=(self.rid_value if self.rid_value is not None else "M") if self.rid else None
             )
 
         def __eq__(self, other):
@@ -418,12 +447,15 @@ class Path(object):
                 if segments[0].startswith("UID=") and segments[0][-1] == "]":
                     self.uid = unquote(segments[0][4:-1])
                     del segments[0]
-                if segments and segments[0].startswith("RECURRENCE-ID=") and segments[0][-1] == "]":
-                    rid = unquote(segments[0][14:-1])
-                    try:
-                        self.rid_value = DateTime.parseText(rid) if rid else None
-                    except ValueError:
-                        raise ValueError("Invalid component match {}".format(segment))
+                if segments and segments[0].startswith("RID=") and segments[0][-1] == "]":
+                    rid = unquote(segments[0][4:-1])
+                    if rid == "M":
+                        self.rid_value = None
+                    else:
+                        try:
+                            self.rid_value = DateTime.parseText(rid) if rid else None
+                        except ValueError:
+                            raise ValueError("Invalid component match {}".format(segment))
                     self.rid = True
                     del segments[0]
 
@@ -453,8 +485,8 @@ class Path(object):
                 if self.uid and matches:
                     matches = [item for item in matches if item.getUID() == self.uid]
                 if self.rid and matches:
-                    # self.rid is None if no RECURRENCE-ID= appears in the path.
-                    # self.rid_value is None if RECURRENCE-ID= appears with no value - match the master instance
+                    # self.rid is None if no RID= appears in the path.
+                    # self.rid_value is None if RID= appears with no value - match the master instance
                     # Otherwise match the specific self.rid value.
                     rid_matches = [item for item in matches if isinstance(item, ComponentRecur) and item.getRecurrenceID() == self.rid_value]
                     if len(rid_matches) == 0:
@@ -489,6 +521,12 @@ class Path(object):
             self.name = None
             self.matchCondition = None
             self._parseSegment(segment)
+
+        def __str__(self):
+            path = "#" + self.name
+            if self.matchCondition:
+                path += "[{}{}]".format("=" if self.matchCondition[1] == operator.eq else "!", self.matchCondition[0])
+            return path
 
         def __repr__(self):
             return "<PropertySegment: {s.name}[{s.matchCondition}]".format(s=self)
@@ -569,6 +607,10 @@ class Path(object):
             self.name = None
             self._parseSegment(segment)
 
+        def __str__(self):
+            path = ";" + self.name
+            return path
+
         def __repr__(self):
             return "<ParameterSegment: {s.name}".format(s=self)
 
@@ -637,7 +679,7 @@ class Path(object):
         for component_segment in self.components[1:]:
             results = component_segment.match(results)
 
-        if self.property is not None:
+        if self.property is not None and not self.property.noName():
             results = self.property.match(results, for_update)
             if self.parameter is not None:
                 results = self.parameter.match(results)

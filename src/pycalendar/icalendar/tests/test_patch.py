@@ -537,7 +537,7 @@ CALSCALE:GREGORIAN
 PRODID:-//example.com//Example v0.1//EN
 BEGIN:VPATCH
 BEGIN:UPDATE
-TARGET:/VCALENDAR/VEVENT[UID=C3184A66-1ED0-11D9-A5E0-000A958A3252][RECURRENCE-ID=20030101]
+TARGET:/VCALENDAR/VEVENT[UID=C3184A66-1ED0-11D9-A5E0-000A958A3252][RID=20030101]
 BEGIN:VEVENT
 UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
 RECURRENCE-ID;VALUE=DATE:20030101
@@ -598,7 +598,7 @@ CALSCALE:GREGORIAN
 PRODID:-//example.com//Example v0.1//EN
 BEGIN:VPATCH
 BEGIN:UPDATE
-TARGET:/VCALENDAR/VEVENT[UID=C3184A66-1ED0-11D9-A5E0-000A958A3252][RECURRENCE-ID=20020102]#SUMMARY
+TARGET:/VCALENDAR/VEVENT[UID=C3184A66-1ED0-11D9-A5E0-000A958A3252][RID=20020102]#SUMMARY
 SUMMARY:New Year's Day - party time
 END:UPDATE
 END:VPATCH
@@ -811,6 +811,50 @@ BEGIN:VPATCH
 BEGIN:UPDATE
 TARGET:/VCALENDAR/VEVENT[UID=C3184A66-1ED0-11D9-A5E0-000A958A3252]#STATUS
 STATUS:CONFIRMED
+END:UPDATE
+END:VPATCH
+END:VCALENDAR
+""",
+        },
+        {
+            "title": "Update (existing) properties in a calendar",
+            "before": """BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//example.com//Example v0.1//EN
+BEGIN:VEVENT
+UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
+DTSTART;VALUE=DATE:20020101
+DTEND;VALUE=DATE:20020102
+DTSTAMP:20020101T000000Z
+RRULE:FREQ=YEARLY
+SUMMARY:New Year's Day
+TRANSP:OPAQUE
+END:VEVENT
+END:VCALENDAR
+""",
+            "after": """BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//example.com//Example v0.1//EN
+BEGIN:VEVENT
+UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
+DTSTART;VALUE=DATE:20020101
+DTEND;VALUE=DATE:20020102
+DTSTAMP:20020101T000000Z
+RRULE:FREQ=YEARLY
+SUMMARY:New Year's Day non blocking
+TRANSP:TRANSPARENT
+END:VEVENT
+END:VCALENDAR
+""",
+            "patch": """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//example.com//Example v0.1//EN
+BEGIN:VPATCH
+BEGIN:UPDATE
+TARGET:/VCALENDAR/VEVENT#
+SUMMARY:New Year's Day non blocking
+TRANSP:TRANSPARENT
 END:UPDATE
 END:VPATCH
 END:VCALENDAR
@@ -1315,7 +1359,7 @@ CALSCALE:GREGORIAN
 PRODID:-//example.com//Example v0.1//EN
 BEGIN:VPATCH
 BEGIN:DELETE
-TARGET:/VCALENDAR/VEVENT[RECURRENCE-ID=20120101]#ATTENDEE[=mailto:user03@example.com]
+TARGET:/VCALENDAR/VEVENT[RID=20120101]#ATTENDEE[=mailto:user03@example.com]
 END:DELETE
 END:VPATCH
 END:VCALENDAR
@@ -1499,7 +1543,7 @@ CALSCALE:GREGORIAN
 PRODID:-//example.com//Example v0.1//EN
 BEGIN:VPATCH
 BEGIN:DELETE
-TARGET:/VCALENDAR/VEVENT[RECURRENCE-ID=20120101]#ATTENDEE[=mailto:user03@example.com];PARTSTAT
+TARGET:/VCALENDAR/VEVENT[RID=20120101]#ATTENDEE[=mailto:user03@example.com];PARTSTAT
 END:DELETE
 END:VPATCH
 END:VCALENDAR
@@ -1516,8 +1560,12 @@ class TestPatchDocument(unittest.TestCase):
         for ctr, items in enumerate(data):
             calendar = Calendar.parseText(items["before"])
             patcher = PatchDocument(Calendar.parseText(items["patch"]))
-            patcher.applyPatch(calendar)
-            self.assertEqual(str(calendar), items["after"].replace("\n", "\r\n"), msg="Failed test #{}: {}\n{}".format(ctr + 1, items["title"], str(calendar)))
+            try:
+                patcher.applyPatch(calendar)
+            except Exception as e:
+                self.fail("Failed test #{}: {}\n{}".format(ctr + 1, items["title"], str(e)))
+            else:
+                self.assertEqual(str(calendar), items["after"].replace("\n", "\r\n"), msg="Failed test #{}: {}\n{}".format(ctr + 1, items["title"], str(calendar)))
 
     def test_createComponent_Simple(self):
         """
@@ -1671,11 +1719,11 @@ class TestPath(unittest.TestCase):
             None,
         ),
         (
-            "/VCALENDAR/VEVENT[UID=1234][RECURRENCE-ID=20150907T120000Z]",
+            "/VCALENDAR/VEVENT[UID=1234][RID=20150907T120000Z]",
             True,
             [
                 Path.ComponentSegment("VCALENDAR"),
-                Path.ComponentSegment("VEVENT[UID=1234][RECURRENCE-ID=20150907T120000Z]"),
+                Path.ComponentSegment("VEVENT[UID=1234][RID=20150907T120000Z]"),
             ],
             None,
             None,
@@ -1752,21 +1800,21 @@ class TestPath(unittest.TestCase):
             None,
         ),
         (
-            "/VCALENDAR/VEVENT[UID=1234][RECURRENCE-ID=20150907T120000Z]#SUMMARY",
+            "/VCALENDAR/VEVENT[UID=1234][RID=20150907T120000Z]#SUMMARY",
             True,
             [
                 Path.ComponentSegment("VCALENDAR"),
-                Path.ComponentSegment("VEVENT[UID=1234][RECURRENCE-ID=20150907T120000Z]"),
+                Path.ComponentSegment("VEVENT[UID=1234][RID=20150907T120000Z]"),
             ],
             Path.PropertySegment("SUMMARY"),
             None,
         ),
         (
-            "/VCALENDAR/VEVENT[UID=1234][RECURRENCE-ID=20150907T120000Z]#SUMMARY[=abc]",
+            "/VCALENDAR/VEVENT[UID=1234][RID=20150907T120000Z]#SUMMARY[=abc]",
             True,
             [
                 Path.ComponentSegment("VCALENDAR"),
-                Path.ComponentSegment("VEVENT[UID=1234][RECURRENCE-ID=20150907T120000Z]"),
+                Path.ComponentSegment("VEVENT[UID=1234][RID=20150907T120000Z]"),
             ],
             Path.PropertySegment("SUMMARY[=abc]"),
             None,
@@ -1843,21 +1891,21 @@ class TestPath(unittest.TestCase):
             Path.ParameterSegment("PARTSTAT"),
         ),
         (
-            "/VCALENDAR/VEVENT[UID=1234][RECURRENCE-ID=20150907T120000Z]#ATTENDEE;PARTSTAT",
+            "/VCALENDAR/VEVENT[UID=1234][RID=20150907T120000Z]#ATTENDEE;PARTSTAT",
             True,
             [
                 Path.ComponentSegment("VCALENDAR"),
-                Path.ComponentSegment("VEVENT[UID=1234][RECURRENCE-ID=20150907T120000Z]"),
+                Path.ComponentSegment("VEVENT[UID=1234][RID=20150907T120000Z]"),
             ],
             Path.PropertySegment("ATTENDEE"),
             Path.ParameterSegment("PARTSTAT"),
         ),
         (
-            "/VCALENDAR/VEVENT[UID=1234][RECURRENCE-ID=20150907T120000Z]#ATTENDEE[=abc];PARTSTAT",
+            "/VCALENDAR/VEVENT[UID=1234][RID=20150907T120000Z]#ATTENDEE[=abc];PARTSTAT",
             True,
             [
                 Path.ComponentSegment("VCALENDAR"),
-                Path.ComponentSegment("VEVENT[UID=1234][RECURRENCE-ID=20150907T120000Z]"),
+                Path.ComponentSegment("VEVENT[UID=1234][RID=20150907T120000Z]"),
             ],
             Path.PropertySegment("ATTENDEE[=abc]"),
             Path.ParameterSegment("PARTSTAT"),
@@ -1898,6 +1946,26 @@ class TestPath(unittest.TestCase):
             self.assertEqual(path.targetParameter(), isParameter)
             self.assertEqual(path.targetParameterNoName(), isParameterNoName)
 
+    def testStr(self):
+
+        data = [
+            "/VCALENDAR",
+            "/VCALENDAR/VEVENT",
+            "/VCALENDAR/VEVENT[UID=ABC]",
+            "/VCALENDAR/VEVENT[UID=ABC][RID=20160830]",
+            "/VCALENDAR/VEVENT[UID=ABC][RID=M]",
+            "/VCALENDAR/VEVENT[RID=20160830]",
+            "/VCALENDAR/VEVENT#",
+            "/VCALENDAR/VEVENT#SUMMARY",
+            "/VCALENDAR/VEVENT#SUMMARY[=XYZ]",
+            "/VCALENDAR/VEVENT#SUMMARY[!XYZ]",
+            "/VCALENDAR/VEVENT#SUMMARY;X-PARAM",
+        ]
+
+        for strpath in data:
+            path = Path(strpath)
+            self.assertEqual(strpath, str(path), msg="Mismatch for: {} vs {}".format(strpath, str(path)))
+
     def testMatch_Components_Simple(self):
 
         icalendar = """BEGIN:VCALENDAR
@@ -1935,24 +2003,24 @@ END:VCALENDAR
         self.assertEqual(len(matched), 1)
         self.assertIs(matched[0], calendar.getComponents("VEVENT")[0])
 
-        path = Path("/VCALENDAR/VEVENT[UID=123][RECURRENCE-ID=20150101T000000Z]")
+        path = Path("/VCALENDAR/VEVENT[UID=123][RID=20150101T000000Z]")
         matched = path.match(calendar)
         self.assertEqual(len(matched), 0)
 
-        path = Path("/VCALENDAR/VEVENT[UID=C3184A66-1ED0-11D9-A5E0-000A958A3252][RECURRENCE-ID=]")
+        path = Path("/VCALENDAR/VEVENT[UID=C3184A66-1ED0-11D9-A5E0-000A958A3252][RID=M]")
         matched = path.match(calendar)
         self.assertEqual(len(matched), 1)
         self.assertIs(matched[0], calendar.getComponents("VEVENT")[0])
 
-        path = Path("/VCALENDAR/VEVENT[UID=123][RECURRENCE-ID=]")
+        path = Path("/VCALENDAR/VEVENT[UID=123][RID=M]")
         matched = path.match(calendar)
         self.assertEqual(len(matched), 0)
 
-        path = Path("/VCALENDAR/VEVENT[UID=C3184A66-1ED0-11D9-A5E0-000A958A3252][RECURRENCE-ID=20020101]")
+        path = Path("/VCALENDAR/VEVENT[UID=C3184A66-1ED0-11D9-A5E0-000A958A3252][RID=20020101]")
         matched = path.match(calendar)
         self.assertEqual(len(matched), 1)
 
-        path = Path("/VCALENDAR/VEVENT[UID=C3184A66-1ED0-11D9-A5E0-000A958A3252][RECURRENCE-ID=]")
+        path = Path("/VCALENDAR/VEVENT[UID=C3184A66-1ED0-11D9-A5E0-000A958A3252][RID=M]")
         matched = path.match(calendar)
         self.assertEqual(len(matched), 1)
         self.assertIs(matched[0], calendar.getComponents("VEVENT")[0])
@@ -2016,11 +2084,11 @@ END:VCALENDAR
             self.assertEqual(len(matched), 1)
             self.assertIs(matched[0], components_by_uid[key])
 
-        path = Path("/VCALENDAR/VEVENT[UID=123][RECURRENCE-ID=20150101T000000Z]")
+        path = Path("/VCALENDAR/VEVENT[UID=123][RID=20150101T000000Z]")
         matched = path.match(calendar)
         self.assertEqual(len(matched), 0)
 
-        path = Path("/VCALENDAR/VEVENT[UID=C3184A66-1ED0-11D9-A5E0-000A958A3252][RECURRENCE-ID=]")
+        path = Path("/VCALENDAR/VEVENT[UID=C3184A66-1ED0-11D9-A5E0-000A958A3252][RID=M]")
         matched = path.match(calendar)
         self.assertEqual(len(matched), 1)
         self.assertEqual(
@@ -2029,12 +2097,12 @@ END:VCALENDAR
         )
 
         for key in components_by_uid.keys():
-            path = Path("/VCALENDAR/VEVENT[UID={key}][RECURRENCE-ID=20150101T000000Z]".format(key=key))
+            path = Path("/VCALENDAR/VEVENT[UID={key}][RID=20150101T000000Z]".format(key=key))
             matched = path.match(calendar)
             self.assertEqual(len(matched), 1)
 
         for key in components_by_uid.keys():
-            path = Path("/VCALENDAR/VEVENT[UID={key}][RECURRENCE-ID=]".format(key=key))
+            path = Path("/VCALENDAR/VEVENT[UID={key}][RID=M]".format(key=key))
             matched = path.match(calendar)
             self.assertEqual(len(matched), 1)
             self.assertIs(matched[0], components_by_uid[key])
@@ -2088,17 +2156,17 @@ END:VCALENDAR
             set(components_by_rid.keys()),
         )
 
-        path = Path("/VCALENDAR/VEVENT[UID=123][RECURRENCE-ID=20150101T000000Z]")
+        path = Path("/VCALENDAR/VEVENT[UID=123][RID=20150101T000000Z]")
         matched = path.match(calendar)
         self.assertEqual(len(matched), 0)
 
         for key in components_by_rid.keys():
-            path = Path("/VCALENDAR/VEVENT[UID=C3184A66-1ED0-11D9-A5E0-000A958A3252][RECURRENCE-ID={key}]".format(key=key if key else ""))
+            path = Path("/VCALENDAR/VEVENT[UID=C3184A66-1ED0-11D9-A5E0-000A958A3252][RID={key}]".format(key=key if key else "M"))
             matched = path.match(calendar)
             self.assertEqual(len(matched), 1)
             self.assertIs(matched[0], components_by_rid[key])
 
-        path = Path("/VCALENDAR/VEVENT[UID=C3184A66-1ED0-11D9-A5E0-000A958A3252][RECURRENCE-ID=]")
+        path = Path("/VCALENDAR/VEVENT[UID=C3184A66-1ED0-11D9-A5E0-000A958A3252][RID=M]")
         matched = path.match(calendar)
         self.assertEqual(len(matched), 1)
         self.assertIs(matched[0], components_by_rid[None])
@@ -2134,7 +2202,7 @@ END:VCALENDAR
         self.assertEqual(len(matched), 1)
         self.assertEqual(
             matched[0],
-            (calendar, None,),
+            calendar,
         )
 
         path = Path("/VCALENDAR#FOOBAR")
@@ -2154,7 +2222,7 @@ END:VCALENDAR
         self.assertEqual(len(matched), 1)
         self.assertEqual(
             matched[0],
-            (calendar.getComponents()[0], None,),
+            calendar.getComponents()[0],
         )
 
         # Non-existent - for_update changes behavior
@@ -2262,8 +2330,8 @@ class TestComponentSegment(unittest.TestCase):
         ("VCALENDAR", True, "VCALENDAR", None, None, None,),
         ("VCALENDAR[UID=1234]", True, "VCALENDAR", "1234", None, None,),
         ("VCALENDAR[UID=1234%2F4567]", True, "VCALENDAR", "1234/4567", None, None,),
-        ("VCALENDAR[UID=1234][RECURRENCE-ID=]", True, "VCALENDAR", "1234", True, None,),
-        ("VCALENDAR[UID=1234][RECURRENCE-ID=20150907T120000Z]", True, "VCALENDAR", "1234", True, "20150907T120000Z",),
+        ("VCALENDAR[UID=1234][RID=M]", True, "VCALENDAR", "1234", True, None,),
+        ("VCALENDAR[UID=1234][RID=20150907T120000Z]", True, "VCALENDAR", "1234", True, "20150907T120000Z",),
 
         # Invalid
         ("VCALENDAR[]", False, None, None, None, None,),
@@ -2272,7 +2340,7 @@ class TestComponentSegment(unittest.TestCase):
         ("VCALENDAR[UID=", False, None, None, None, None,),
         ("VCALENDAR[UID=1234][]", False, None, None, None, None,),
         ("VCALENDAR[UID=1234][foo=bar]", False, None, None, None, None,),
-        ("VCALENDAR[UID=1234][RECURRENCE-ID=", False, None, None, None, None,),
+        ("VCALENDAR[UID=1234][RID=M", False, None, None, None, None,),
     )
 
     def testParse(self):
