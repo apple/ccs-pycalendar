@@ -243,7 +243,7 @@ Description:
 if __name__ == '__main__':
 
     # Set the PRODID value used in generated iCalendar data
-    prodid = "-//mulberrymail.com//Zonal//EN"
+    prodid = "-//ccs-pycalendar//Zonal//EN"
     rootdir = "../../temp"
     startYear = 1800
     endYear = 2018

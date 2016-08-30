@@ -26,7 +26,7 @@ class TestXML(unittest.TestCase):
         (
             """BEGIN:VCALENDAR
 VERSION:2.0
-PRODID:-//mulberrymail.com//Mulberry v4.0//EN
+PRODID:-//example.com//Example v0.1//EN
 BEGIN:VEVENT
 UID:12345-67890-3
 DTSTART:20071114T000000Z
@@ -47,7 +47,7 @@ END:VCALENDAR
         <ns0:text>2.0</ns0:text>
       </ns0:version>
       <ns0:prodid>
-        <ns0:text>-//mulberrymail.com//Mulberry v4.0//EN</ns0:text>
+        <ns0:text>-//example.com//Example v0.1//EN</ns0:text>
       </ns0:prodid>
       <ns0:x-test>
         <ns0:unknown>Testing</ns0:unknown>

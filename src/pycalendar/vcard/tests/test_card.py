@@ -402,7 +402,7 @@ UID:ED7A5AEC-AB19-4CE0-AD6A-2923A3E5C4E1:ABPerson
 """.replace("\n", "\r\n"),
 
             """BEGIN:VCALENDAR
-PRODID:-//mulberrymail.com//Mulberry v4.0//EN
+PRODID:-//example.com//Example v0.1//EN
 VERSION:2.0
 END:VCALENDAR
 """.replace("\n", "\r\n"),

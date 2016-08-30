@@ -30,7 +30,7 @@ class TestVPatch(unittest.TestCase):
         """BEGIN:VCALENDAR
 VERSION:2.0
 CALSCALE:GREGORIAN
-PRODID:-//mulberrymail.com//Mulberry v4.0//EN
+PRODID:-//example.com//Example v0.1//EN
 BEGIN:VPATCH
 UID:A979D282-2CDB-484F-BD63-3972094DFFC0
 DTSTAMP:20020101T000000Z
