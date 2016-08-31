@@ -182,17 +182,15 @@ class Command(object):
         if self.action == Command.CREATE:
             if self.path.targetComponent():
                 # Data must be one or more components only
-                if len(self.data.getProperties()) != 0:
-                    raise ValueError("create action for components must not include properties: {}".format(self.path))
-                if len(self.data.getComponents()) == 0:
-                    raise ValueError("create action for components must have at least one component: {}".format(self.path))
+                if len(self.data.getProperties()) + len(self.data.getComponents()) == 0:
+                    raise ValueError("create action for components must include at least one property or component: {}".format(self.path))
 
-            elif self.path.targetPropertyNoName():
-                # Data must be one or more properties only
+            elif self.path.targetProperty():
+                # Data must be one or more SETPARAMETER properties only
                 if len(self.data.getComponents()) != 0:
-                    raise ValueError("create action for properties must not include components: {}".format(self.path))
-                if len(self.data.getProperties()) == 0:
-                    raise ValueError("create action for properties must have at least one property: {}".format(self.path))
+                    raise ValueError("create action for parameters must not include components: {}".format(self.path))
+                if len(self.data.getProperties()) != 1 or definitions.cICalProperty_SETPARAMETER not in self.data.getProperties():
+                    raise ValueError("create action for parameters must have only one or more SETPARAMETER properties: {}".format(self.path))
 
             else:
                 raise ValueError("create action path is not valid: {}".format(self.path))
@@ -273,17 +271,26 @@ class Command(object):
         @type matches: L{list}
         """
         if self.path.targetComponent():
-            # Data is a list of components
+            # Data is a list of components or properties
             for component in matches:
                 for newcomponent in self.data.getComponents():
                     component.addComponent(newcomponent.duplicate())
-
-        elif self.path.targetPropertyNoName():
-            # Data is a list of properties
-            for component in matches:
                 for newpropertylist in self.data.getProperties().values():
                     for newproperty in newpropertylist:
                         component.addProperty(newproperty.duplicate())
+
+        elif self.path.targetProperty():
+            # Now add new parameters (from the data) to each parent property
+            setParameter = self.data.getProperties(definitions.cICalProperty_SETPARAMETER)
+            if len(setParameter) == 0:
+                raise ValueError("No SETPARAMETER property in parameter value update")
+            elif len(setParameter) > 1:
+                raise ValueError("Too many SETPARAMETER properties in parameter value update")
+            for _ignore_component, property in matches:
+                for parameters in setParameter[0].getParameters().values():
+                    # Remove existing, then add
+                    property.removeParameters(parameters[0].getName())
+                    property.addParameter(parameters[0].duplicate())
 
         else:
             raise ValueError("create action path is not valid: {}".format(self.path))
