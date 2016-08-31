@@ -54,6 +54,8 @@ VERSION:2.0
 CALSCALE:GREGORIAN
 PRODID:-//example.com//Example v0.1//EN
 BEGIN:VPATCH
+UID:77CA7115-B195-49FF-8AB9-01A1F3AC4F5C
+DTSTAMP:20160831T102600Z
 BEGIN:CREATE
 TARGET:/VCALENDAR
 BEGIN:VEVENT
@@ -104,6 +106,8 @@ VERSION:2.0
 CALSCALE:GREGORIAN
 PRODID:-//example.com//Example v0.1//EN
 BEGIN:VPATCH
+UID:77CA7115-B195-49FF-8AB9-01A1F3AC4F5C
+DTSTAMP:20160831T102600Z
 BEGIN:CREATE
 TARGET:/VCALENDAR
 BEGIN:VEVENT
@@ -168,6 +172,8 @@ VERSION:2.0
 CALSCALE:GREGORIAN
 PRODID:-//example.com//Example v0.1//EN
 BEGIN:VPATCH
+UID:77CA7115-B195-49FF-8AB9-01A1F3AC4F5C
+DTSTAMP:20160831T102600Z
 BEGIN:CREATE
 TARGET:/VCALENDAR/VEVENT
 BEGIN:VALARM
@@ -218,6 +224,8 @@ VERSION:2.0
 CALSCALE:GREGORIAN
 PRODID:-//example.com//Example v0.1//EN
 BEGIN:VPATCH
+UID:77CA7115-B195-49FF-8AB9-01A1F3AC4F5C
+DTSTAMP:20160831T102600Z
 BEGIN:CREATE
 TARGET:/VCALENDAR#
 CALSCALE:GREGORIAN
@@ -261,6 +269,8 @@ VERSION:2.0
 CALSCALE:GREGORIAN
 PRODID:-//example.com//Example v0.1//EN
 BEGIN:VPATCH
+UID:77CA7115-B195-49FF-8AB9-01A1F3AC4F5C
+DTSTAMP:20160831T102600Z
 BEGIN:CREATE
 TARGET:/VCALENDAR#
 CALSCALE:GREGORIAN
@@ -306,6 +316,8 @@ VERSION:2.0
 CALSCALE:GREGORIAN
 PRODID:-//example.com//Example v0.1//EN
 BEGIN:VPATCH
+UID:77CA7115-B195-49FF-8AB9-01A1F3AC4F5C
+DTSTAMP:20160831T102600Z
 BEGIN:CREATE
 TARGET:/VCALENDAR/VEVENT#
 STATUS:CANCELLED
@@ -351,6 +363,8 @@ VERSION:2.0
 CALSCALE:GREGORIAN
 PRODID:-//example.com//Example v0.1//EN
 BEGIN:VPATCH
+UID:77CA7115-B195-49FF-8AB9-01A1F3AC4F5C
+DTSTAMP:20160831T102600Z
 BEGIN:CREATE
 TARGET:/VCALENDAR/VEVENT#
 STATUS:CANCELLED
@@ -397,6 +411,8 @@ VERSION:2.0
 CALSCALE:GREGORIAN
 PRODID:-//example.com//Example v0.1//EN
 BEGIN:VPATCH
+UID:77CA7115-B195-49FF-8AB9-01A1F3AC4F5C
+DTSTAMP:20160831T102600Z
 BEGIN:UPDATE
 TARGET:/VCALENDAR/VEVENT
 BEGIN:VEVENT
@@ -457,6 +473,8 @@ VERSION:2.0
 CALSCALE:GREGORIAN
 PRODID:-//example.com//Example v0.1//EN
 BEGIN:VPATCH
+UID:77CA7115-B195-49FF-8AB9-01A1F3AC4F5C
+DTSTAMP:20160831T102600Z
 BEGIN:UPDATE
 TARGET:/VCALENDAR/VEVENT
 BEGIN:VEVENT
@@ -536,6 +554,8 @@ VERSION:2.0
 CALSCALE:GREGORIAN
 PRODID:-//example.com//Example v0.1//EN
 BEGIN:VPATCH
+UID:77CA7115-B195-49FF-8AB9-01A1F3AC4F5C
+DTSTAMP:20160831T102600Z
 BEGIN:UPDATE
 TARGET:/VCALENDAR/VEVENT[UID=C3184A66-1ED0-11D9-A5E0-000A958A3252][RID=20030101]
 BEGIN:VEVENT
@@ -597,6 +617,8 @@ VERSION:2.0
 CALSCALE:GREGORIAN
 PRODID:-//example.com//Example v0.1//EN
 BEGIN:VPATCH
+UID:77CA7115-B195-49FF-8AB9-01A1F3AC4F5C
+DTSTAMP:20160831T102600Z
 BEGIN:UPDATE
 TARGET:/VCALENDAR/VEVENT[UID=C3184A66-1ED0-11D9-A5E0-000A958A3252][RID=20020102]#SUMMARY
 SUMMARY:New Year's Day - party time
@@ -641,6 +663,8 @@ VERSION:2.0
 CALSCALE:GREGORIAN
 PRODID:-//example.com//Example v0.1//EN
 BEGIN:VPATCH
+UID:77CA7115-B195-49FF-8AB9-01A1F3AC4F5C
+DTSTAMP:20160831T102600Z
 BEGIN:UPDATE
 TARGET:/VCALENDAR/VEVENT#TRANSP
 TRANSP:TRANSPARENT
@@ -684,6 +708,8 @@ VERSION:2.0
 CALSCALE:GREGORIAN
 PRODID:-//example.com//Example v0.1//EN
 BEGIN:VPATCH
+UID:77CA7115-B195-49FF-8AB9-01A1F3AC4F5C
+DTSTAMP:20160831T102600Z
 BEGIN:UPDATE
 TARGET:/VCALENDAR/VEVENT#TRANSP
 TRANSP:TRANSPARENT
@@ -745,6 +771,8 @@ VERSION:2.0
 CALSCALE:GREGORIAN
 PRODID:-//example.com//Example v0.1//EN
 BEGIN:VPATCH
+UID:77CA7115-B195-49FF-8AB9-01A1F3AC4F5C
+DTSTAMP:20160831T102600Z
 BEGIN:UPDATE
 TARGET:/VCALENDAR/VEVENT#STATUS
 STATUS:CONFIRMED
@@ -808,6 +836,8 @@ VERSION:2.0
 CALSCALE:GREGORIAN
 PRODID:-//example.com//Example v0.1//EN
 BEGIN:VPATCH
+UID:77CA7115-B195-49FF-8AB9-01A1F3AC4F5C
+DTSTAMP:20160831T102600Z
 BEGIN:UPDATE
 TARGET:/VCALENDAR/VEVENT[UID=C3184A66-1ED0-11D9-A5E0-000A958A3252]#STATUS
 STATUS:CONFIRMED
@@ -851,6 +881,8 @@ VERSION:2.0
 CALSCALE:GREGORIAN
 PRODID:-//example.com//Example v0.1//EN
 BEGIN:VPATCH
+UID:77CA7115-B195-49FF-8AB9-01A1F3AC4F5C
+DTSTAMP:20160831T102600Z
 BEGIN:UPDATE
 TARGET:/VCALENDAR/VEVENT#
 SUMMARY:New Year's Day non blocking
@@ -863,7 +895,7 @@ END:VCALENDAR
     ],
     "delete_component_simple": [
         {
-            "title": "Remove one component from single event calendar",
+            "title": "Delete one component from single event calendar",
             "before": """BEGIN:VCALENDAR
 VERSION:2.0
 CALSCALE:GREGORIAN
@@ -889,6 +921,8 @@ VERSION:2.0
 CALSCALE:GREGORIAN
 PRODID:-//example.com//Example v0.1//EN
 BEGIN:VPATCH
+UID:77CA7115-B195-49FF-8AB9-01A1F3AC4F5C
+DTSTAMP:20160831T102600Z
 BEGIN:DELETE
 TARGET:/VCALENDAR/VEVENT
 END:DELETE
@@ -897,7 +931,7 @@ END:VCALENDAR
 """,
         },
         {
-            "title": "Remove one component from multi event calendar",
+            "title": "Delete one component from multi event calendar",
             "before": """BEGIN:VCALENDAR
 VERSION:2.0
 CALSCALE:GREGORIAN
@@ -939,6 +973,8 @@ VERSION:2.0
 CALSCALE:GREGORIAN
 PRODID:-//example.com//Example v0.1//EN
 BEGIN:VPATCH
+UID:77CA7115-B195-49FF-8AB9-01A1F3AC4F5C
+DTSTAMP:20160831T102600Z
 BEGIN:DELETE
 TARGET:/VCALENDAR/VEVENT[UID=C3184A66-1ED0-11D9-A5E0-000A958A3252]
 END:DELETE
@@ -947,7 +983,7 @@ END:VCALENDAR
 """,
         },
         {
-            "title": "Remove all components from multi event calendar",
+            "title": "Delete all components from multi event calendar",
             "before": """BEGIN:VCALENDAR
 VERSION:2.0
 CALSCALE:GREGORIAN
@@ -981,6 +1017,8 @@ VERSION:2.0
 CALSCALE:GREGORIAN
 PRODID:-//example.com//Example v0.1//EN
 BEGIN:VPATCH
+UID:77CA7115-B195-49FF-8AB9-01A1F3AC4F5C
+DTSTAMP:20160831T102600Z
 BEGIN:DELETE
 TARGET:/VCALENDAR/VEVENT
 END:DELETE
@@ -989,7 +1027,7 @@ END:VCALENDAR
 """,
         },
         {
-            "title": "Remove one alarm from single event calendar",
+            "title": "Delete one alarm from single event calendar",
             "before": """BEGIN:VCALENDAR
 VERSION:2.0
 CALSCALE:GREGORIAN
@@ -1029,6 +1067,8 @@ VERSION:2.0
 CALSCALE:GREGORIAN
 PRODID:-//example.com//Example v0.1//EN
 BEGIN:VPATCH
+UID:77CA7115-B195-49FF-8AB9-01A1F3AC4F5C
+DTSTAMP:20160831T102600Z
 BEGIN:DELETE
 TARGET:/VCALENDAR/VEVENT/VALARM
 END:DELETE
@@ -1037,7 +1077,7 @@ END:VCALENDAR
 """,
         },
         {
-            "title": "Remove one alarm from single multi alarm event calendar",
+            "title": "Delete one alarm from single multi alarm event calendar",
             "before": """BEGIN:VCALENDAR
 VERSION:2.0
 CALSCALE:GREGORIAN
@@ -1089,6 +1129,8 @@ VERSION:2.0
 CALSCALE:GREGORIAN
 PRODID:-//example.com//Example v0.1//EN
 BEGIN:VPATCH
+UID:77CA7115-B195-49FF-8AB9-01A1F3AC4F5C
+DTSTAMP:20160831T102600Z
 BEGIN:DELETE
 TARGET:/VCALENDAR/VEVENT/VALARM[UID=D78F6991-DFDD-491B-8334-FA9BF8E4F11C]
 END:DELETE
@@ -1099,7 +1141,7 @@ END:VCALENDAR
     ],
     "delete_property_simple": [
         {
-            "title": "Remove one property from VCALENDAR",
+            "title": "Delete one property from VCALENDAR",
             "before": """BEGIN:VCALENDAR
 VERSION:2.0
 CALSCALE:GREGORIAN
@@ -1132,6 +1174,8 @@ VERSION:2.0
 CALSCALE:GREGORIAN
 PRODID:-//example.com//Example v0.1//EN
 BEGIN:VPATCH
+UID:77CA7115-B195-49FF-8AB9-01A1F3AC4F5C
+DTSTAMP:20160831T102600Z
 BEGIN:DELETE
 TARGET:/VCALENDAR#CALSCALE
 END:DELETE
@@ -1140,7 +1184,7 @@ END:VCALENDAR
 """,
         },
         {
-            "title": "Remove one property from VEVENT",
+            "title": "Delete one property from VEVENT",
             "before": """BEGIN:VCALENDAR
 VERSION:2.0
 CALSCALE:GREGORIAN
@@ -1173,6 +1217,8 @@ VERSION:2.0
 CALSCALE:GREGORIAN
 PRODID:-//example.com//Example v0.1//EN
 BEGIN:VPATCH
+UID:77CA7115-B195-49FF-8AB9-01A1F3AC4F5C
+DTSTAMP:20160831T102600Z
 BEGIN:DELETE
 TARGET:/VCALENDAR/VEVENT#RRULE
 END:DELETE
@@ -1181,7 +1227,7 @@ END:VCALENDAR
 """,
         },
         {
-            "title": "Remove one property from multi event calendar",
+            "title": "Delete one property from multi event calendar",
             "before": """BEGIN:VCALENDAR
 VERSION:2.0
 CALSCALE:GREGORIAN
@@ -1230,6 +1276,8 @@ VERSION:2.0
 CALSCALE:GREGORIAN
 PRODID:-//example.com//Example v0.1//EN
 BEGIN:VPATCH
+UID:77CA7115-B195-49FF-8AB9-01A1F3AC4F5C
+DTSTAMP:20160831T102600Z
 BEGIN:DELETE
 TARGET:/VCALENDAR/VEVENT[UID=C3184A66-1ED0-11D9-A5E0-000A958A3252]#RRULE
 END:DELETE
@@ -1238,7 +1286,7 @@ END:VCALENDAR
 """,
         },
         {
-            "title": "Remove one of many properties from VEVENT",
+            "title": "Delete one of many properties from VEVENT",
             "before": """BEGIN:VCALENDAR
 VERSION:2.0
 CALSCALE:GREGORIAN
@@ -1281,6 +1329,8 @@ VERSION:2.0
 CALSCALE:GREGORIAN
 PRODID:-//example.com//Example v0.1//EN
 BEGIN:VPATCH
+UID:77CA7115-B195-49FF-8AB9-01A1F3AC4F5C
+DTSTAMP:20160831T102600Z
 BEGIN:DELETE
 TARGET:/VCALENDAR/VEVENT#ATTENDEE[=mailto:user03@example.com]
 END:DELETE
@@ -1289,7 +1339,7 @@ END:VCALENDAR
 """,
         },
         {
-            "title": "Remove one of many properties from one of many VEVENTs",
+            "title": "Delete one of many properties from one of many VEVENTs",
             "before": """BEGIN:VCALENDAR
 VERSION:2.0
 CALSCALE:GREGORIAN
@@ -1358,6 +1408,8 @@ VERSION:2.0
 CALSCALE:GREGORIAN
 PRODID:-//example.com//Example v0.1//EN
 BEGIN:VPATCH
+UID:77CA7115-B195-49FF-8AB9-01A1F3AC4F5C
+DTSTAMP:20160831T102600Z
 BEGIN:DELETE
 TARGET:/VCALENDAR/VEVENT[RID=20120101]#ATTENDEE[=mailto:user03@example.com]
 END:DELETE
@@ -1366,7 +1418,7 @@ END:VCALENDAR
 """,
         },
         {
-            "title": "Remove two properties from VCALENDAR",
+            "title": "Delete two properties from VCALENDAR",
             "before": """BEGIN:VCALENDAR
 VERSION:2.0
 CALSCALE:GREGORIAN
@@ -1402,6 +1454,8 @@ VERSION:2.0
 CALSCALE:GREGORIAN
 PRODID:-//example.com//Example v0.1//EN
 BEGIN:VPATCH
+UID:77CA7115-B195-49FF-8AB9-01A1F3AC4F5C
+DTSTAMP:20160831T102600Z
 BEGIN:DELETE
 TARGET:/VCALENDAR/VEVENT#DESCRIPTION
 TARGET:/VCALENDAR/VEVENT#LOCATION
@@ -1413,7 +1467,7 @@ END:VCALENDAR
     ],
     "delete_parameter_simple": [
         {
-            "title": "Remove parameter from all properties in VEVENT",
+            "title": "Delete parameter from all properties in VEVENT",
             "before": """BEGIN:VCALENDAR
 VERSION:2.0
 CALSCALE:GREGORIAN
@@ -1457,6 +1511,8 @@ VERSION:2.0
 CALSCALE:GREGORIAN
 PRODID:-//example.com//Example v0.1//EN
 BEGIN:VPATCH
+UID:77CA7115-B195-49FF-8AB9-01A1F3AC4F5C
+DTSTAMP:20160831T102600Z
 BEGIN:DELETE
 TARGET:/VCALENDAR/VEVENT#ATTENDEE;PARTSTAT
 END:DELETE
@@ -1465,7 +1521,7 @@ END:VCALENDAR
 """,
         },
         {
-            "title": "Remove parameter from one property in VEVENT",
+            "title": "Delete parameter from one property in VEVENT",
             "before": """BEGIN:VCALENDAR
 VERSION:2.0
 CALSCALE:GREGORIAN
@@ -1509,6 +1565,8 @@ VERSION:2.0
 CALSCALE:GREGORIAN
 PRODID:-//example.com//Example v0.1//EN
 BEGIN:VPATCH
+UID:77CA7115-B195-49FF-8AB9-01A1F3AC4F5C
+DTSTAMP:20160831T102600Z
 BEGIN:DELETE
 TARGET:/VCALENDAR/VEVENT#ATTENDEE[=mailto:user03@example.com];PARTSTAT
 END:DELETE
@@ -1517,7 +1575,7 @@ END:VCALENDAR
 """,
         },
         {
-            "title": "Remove one parameter from one of many parameters from one of many VEVENTs",
+            "title": "Delete one parameter from one of many parameters from one of many VEVENTs",
             "before": """BEGIN:VCALENDAR
 VERSION:2.0
 CALSCALE:GREGORIAN
@@ -1587,6 +1645,8 @@ VERSION:2.0
 CALSCALE:GREGORIAN
 PRODID:-//example.com//Example v0.1//EN
 BEGIN:VPATCH
+UID:77CA7115-B195-49FF-8AB9-01A1F3AC4F5C
+DTSTAMP:20160831T102600Z
 BEGIN:DELETE
 TARGET:/VCALENDAR/VEVENT[RID=20120101]#ATTENDEE[=mailto:user03@example.com];PARTSTAT
 END:DELETE
@@ -1596,6 +1656,485 @@ END:VCALENDAR
         },
     ],
 }
+
+dataInvalid = [
+    {
+        "title": "CREATE component - no properties",
+        "patch": """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//example.com//Example v0.1//EN
+BEGIN:VPATCH
+UID:77CA7115-B195-49FF-8AB9-01A1F3AC4F5C
+DTSTAMP:20160831T102600Z
+BEGIN:CREATE
+TARGET:/VCALENDAR
+SUMMARY:foo
+BEGIN:VEVENT
+END:VEVENT
+END:CREATE
+END:VPATCH
+END:VCALENDAR
+""",
+    },
+    {
+        "title": "CREATE component - at least one component",
+        "patch": """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//example.com//Example v0.1//EN
+BEGIN:VPATCH
+UID:77CA7115-B195-49FF-8AB9-01A1F3AC4F5C
+DTSTAMP:20160831T102600Z
+BEGIN:CREATE
+TARGET:/VCALENDAR
+END:CREATE
+END:VPATCH
+END:VCALENDAR
+""",
+    },
+    {
+        "title": "CREATE property - no components",
+        "patch": """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//example.com//Example v0.1//EN
+BEGIN:VPATCH
+UID:77CA7115-B195-49FF-8AB9-01A1F3AC4F5C
+DTSTAMP:20160831T102600Z
+BEGIN:CREATE
+TARGET:/VCALENDAR/VEVENT#
+SUMMARY:foo
+BEGIN:VALARM
+END:VALARM
+END:CREATE
+END:VPATCH
+END:VCALENDAR
+""",
+    },
+    {
+        "title": "CREATE property - at least one property",
+        "patch": """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//example.com//Example v0.1//EN
+BEGIN:VPATCH
+UID:77CA7115-B195-49FF-8AB9-01A1F3AC4F5C
+DTSTAMP:20160831T102600Z
+BEGIN:CREATE
+TARGET:/VCALENDAR/VEVENT#
+END:CREATE
+END:VPATCH
+END:VCALENDAR
+""",
+    },
+    {
+        "title": "CREATE property - no name in path",
+        "patch": """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//example.com//Example v0.1//EN
+BEGIN:VPATCH
+UID:77CA7115-B195-49FF-8AB9-01A1F3AC4F5C
+DTSTAMP:20160831T102600Z
+BEGIN:CREATE
+TARGET:/VCALENDAR/VEVENT#SUMMARY
+SUMMARY:foo
+END:CREATE
+END:VPATCH
+END:VCALENDAR
+""",
+    },
+
+    {
+        "title": "UPDATE component - no properties",
+        "patch": """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//example.com//Example v0.1//EN
+BEGIN:VPATCH
+UID:77CA7115-B195-49FF-8AB9-01A1F3AC4F5C
+DTSTAMP:20160831T102600Z
+BEGIN:UPDATE
+TARGET:/VCALENDAR/VEVENT
+SUMMARY:foo
+BEGIN:VEVENT
+END:VEVENT
+END:UPDATE
+END:VPATCH
+END:VCALENDAR
+""",
+    },
+    {
+        "title": "UPDATE component - at least one component",
+        "patch": """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//example.com//Example v0.1//EN
+BEGIN:VPATCH
+UID:77CA7115-B195-49FF-8AB9-01A1F3AC4F5C
+DTSTAMP:20160831T102600Z
+BEGIN:UPDATE
+TARGET:/VCALENDAR/VEVENT
+END:UPDATE
+END:VPATCH
+END:VCALENDAR
+""",
+    },
+    {
+        "title": "UPDATE component - different component types",
+        "patch": """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//example.com//Example v0.1//EN
+BEGIN:VPATCH
+UID:77CA7115-B195-49FF-8AB9-01A1F3AC4F5C
+DTSTAMP:20160831T102600Z
+BEGIN:UPDATE
+TARGET:/VCALENDAR/VEVENT
+BEGIN:VEVENT
+END:VEVENT
+BEGIN:VALARM
+END:VALARM
+END:UPDATE
+END:VPATCH
+END:VCALENDAR
+""",
+    },
+    {
+        "title": "UPDATE component - one component type match",
+        "patch": """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//example.com//Example v0.1//EN
+BEGIN:VPATCH
+UID:77CA7115-B195-49FF-8AB9-01A1F3AC4F5C
+DTSTAMP:20160831T102600Z
+BEGIN:UPDATE
+TARGET:/VCALENDAR/VEVENT
+BEGIN:VALARM
+END:VALARM
+END:UPDATE
+END:VPATCH
+END:VCALENDAR
+""",
+    },
+    {
+        "title": "UPDATE property - no components",
+        "patch": """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//example.com//Example v0.1//EN
+BEGIN:VPATCH
+UID:77CA7115-B195-49FF-8AB9-01A1F3AC4F5C
+DTSTAMP:20160831T102600Z
+BEGIN:UPDATE
+TARGET:/VCALENDAR/VEVENT#
+SUMMARY:foo
+BEGIN:VALARM
+END:VALARM
+END:UPDATE
+END:VPATCH
+END:VCALENDAR
+""",
+    },
+    {
+        "title": "UPDATE property - at least one property",
+        "patch": """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//example.com//Example v0.1//EN
+BEGIN:VPATCH
+UID:77CA7115-B195-49FF-8AB9-01A1F3AC4F5C
+DTSTAMP:20160831T102600Z
+BEGIN:UPDATE
+TARGET:/VCALENDAR/VEVENT#
+END:UPDATE
+END:VPATCH
+END:VCALENDAR
+""",
+    },
+    {
+        "title": "UPDATE named property - no components",
+        "patch": """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//example.com//Example v0.1//EN
+BEGIN:VPATCH
+UID:77CA7115-B195-49FF-8AB9-01A1F3AC4F5C
+DTSTAMP:20160831T102600Z
+BEGIN:UPDATE
+TARGET:/VCALENDAR/VEVENT#SUMMARY
+SUMMARY:foo
+BEGIN:VALARM
+END:VALARM
+END:UPDATE
+END:VPATCH
+END:VCALENDAR
+""",
+    },
+    {
+        "title": "UPDATE property - at least one property",
+        "patch": """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//example.com//Example v0.1//EN
+BEGIN:VPATCH
+UID:77CA7115-B195-49FF-8AB9-01A1F3AC4F5C
+DTSTAMP:20160831T102600Z
+BEGIN:UPDATE
+TARGET:/VCALENDAR/VEVENT#SUMMARY
+END:UPDATE
+END:VPATCH
+END:VCALENDAR
+""",
+    },
+    {
+        "title": "UPDATE named property - different property names",
+        "patch": """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//example.com//Example v0.1//EN
+BEGIN:VPATCH
+UID:77CA7115-B195-49FF-8AB9-01A1F3AC4F5C
+DTSTAMP:20160831T102600Z
+BEGIN:UPDATE
+TARGET:/VCALENDAR/VEVENT#SUMMARY
+SUMMARY:foo
+DESCRIPTION:bar
+END:UPDATE
+END:VPATCH
+END:VCALENDAR
+""",
+    },
+    {
+        "title": "UPDATE named property - wrong property name",
+        "patch": """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//example.com//Example v0.1//EN
+BEGIN:VPATCH
+UID:77CA7115-B195-49FF-8AB9-01A1F3AC4F5C
+DTSTAMP:20160831T102600Z
+BEGIN:UPDATE
+TARGET:/VCALENDAR/VEVENT#SUMMARY
+DESCRIPTION:bar
+END:UPDATE
+END:VPATCH
+END:VCALENDAR
+""",
+    },
+
+    {
+        "title": "UPDATE parameter - no components",
+        "patch": """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//example.com//Example v0.1//EN
+BEGIN:VPATCH
+UID:77CA7115-B195-49FF-8AB9-01A1F3AC4F5C
+DTSTAMP:20160831T102600Z
+BEGIN:UPDATE
+TARGET:/VCALENDAR/VEVENT#ATTENDEE;
+SETPARAMETER;RSVP=TRUE:1
+BEGIN:VALARM
+END:VALARM
+END:UPDATE
+END:VPATCH
+END:VCALENDAR
+""",
+    },
+    {
+        "title": "UPDATE parameter - at least one property",
+        "patch": """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//example.com//Example v0.1//EN
+BEGIN:VPATCH
+UID:77CA7115-B195-49FF-8AB9-01A1F3AC4F5C
+DTSTAMP:20160831T102600Z
+BEGIN:UPDATE
+TARGET:/VCALENDAR/VEVENT#ATTENDEE;
+END:UPDATE
+END:VPATCH
+END:VCALENDAR
+""",
+    },
+    {
+        "title": "UPDATE parameter - wrong property name",
+        "patch": """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//example.com//Example v0.1//EN
+BEGIN:VPATCH
+UID:77CA7115-B195-49FF-8AB9-01A1F3AC4F5C
+DTSTAMP:20160831T102600Z
+BEGIN:UPDATE
+TARGET:/VCALENDAR/VEVENT#ATTENDEE;
+ATTENDEE;RSVP=TRUE:1
+END:UPDATE
+END:VPATCH
+END:VCALENDAR
+""",
+    },
+    {
+        "title": "UPDATE parameter - no parameter name",
+        "patch": """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//example.com//Example v0.1//EN
+BEGIN:VPATCH
+UID:77CA7115-B195-49FF-8AB9-01A1F3AC4F5C
+DTSTAMP:20160831T102600Z
+BEGIN:UPDATE
+TARGET:/VCALENDAR/VEVENT#ATTENDEE;RSVP
+SETPARAMETER;RSVP=TRUE:1
+END:UPDATE
+END:VPATCH
+END:VCALENDAR
+""",
+    },
+
+    {
+        "title": "DELETE component - no component",
+        "patch": """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//example.com//Example v0.1//EN
+BEGIN:VPATCH
+UID:77CA7115-B195-49FF-8AB9-01A1F3AC4F5C
+DTSTAMP:20160831T102600Z
+BEGIN:DELETE
+TARGET:/VCALENDAR/VEVENT/VALARM
+BEGIN:VALARM
+END:VALARM
+END:DELETE
+END:VPATCH
+END:VCALENDAR
+""",
+    },
+    {
+        "title": "DELETE component - no properties",
+        "patch": """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//example.com//Example v0.1//EN
+BEGIN:VPATCH
+UID:77CA7115-B195-49FF-8AB9-01A1F3AC4F5C
+DTSTAMP:20160831T102600Z
+BEGIN:DELETE
+TARGET:/VCALENDAR/VEVENT/VALARM
+SUMMARY:foo
+END:DELETE
+END:VPATCH
+END:VCALENDAR
+""",
+    },
+
+    {
+        "title": "DELETE property - no component",
+        "patch": """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//example.com//Example v0.1//EN
+BEGIN:VPATCH
+UID:77CA7115-B195-49FF-8AB9-01A1F3AC4F5C
+DTSTAMP:20160831T102600Z
+BEGIN:DELETE
+TARGET:/VCALENDAR/VEVENT#DESCRIPTION
+BEGIN:VALARM
+END:VALARM
+END:DELETE
+END:VPATCH
+END:VCALENDAR
+""",
+    },
+    {
+        "title": "DELETE property - no properties",
+        "patch": """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//example.com//Example v0.1//EN
+BEGIN:VPATCH
+UID:77CA7115-B195-49FF-8AB9-01A1F3AC4F5C
+DTSTAMP:20160831T102600Z
+BEGIN:DELETE
+TARGET:/VCALENDAR/VEVENT#DESCRIPTION
+SUMMARY:foo
+END:DELETE
+END:VPATCH
+END:VCALENDAR
+""",
+    },
+    {
+        "title": "DELETE property - must be named",
+        "patch": """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//example.com//Example v0.1//EN
+BEGIN:VPATCH
+UID:77CA7115-B195-49FF-8AB9-01A1F3AC4F5C
+DTSTAMP:20160831T102600Z
+BEGIN:DELETE
+TARGET:/VCALENDAR/VEVENT#
+END:DELETE
+END:VPATCH
+END:VCALENDAR
+""",
+    },
+
+    {
+        "title": "DELETE parameter - no component",
+        "patch": """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//example.com//Example v0.1//EN
+BEGIN:VPATCH
+UID:77CA7115-B195-49FF-8AB9-01A1F3AC4F5C
+DTSTAMP:20160831T102600Z
+BEGIN:DELETE
+TARGET:/VCALENDAR/VEVENT#ATTENDEE;RSVP
+BEGIN:VALARM
+END:VALARM
+END:DELETE
+END:VPATCH
+END:VCALENDAR
+""",
+    },
+    {
+        "title": "DELETE parameter - no properties",
+        "patch": """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//example.com//Example v0.1//EN
+BEGIN:VPATCH
+UID:77CA7115-B195-49FF-8AB9-01A1F3AC4F5C
+DTSTAMP:20160831T102600Z
+BEGIN:DELETE
+TARGET:/VCALENDAR/VEVENT#ATTENDEE;RSVP
+SUMMARY:foo
+END:DELETE
+END:VPATCH
+END:VCALENDAR
+""",
+    },
+    {
+        "title": "DELETE parameter - must be named",
+        "patch": """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//example.com//Example v0.1//EN
+BEGIN:VPATCH
+UID:77CA7115-B195-49FF-8AB9-01A1F3AC4F5C
+DTSTAMP:20160831T102600Z
+BEGIN:DELETE
+TARGET:/VCALENDAR/VEVENT#ATTENDEE;
+END:DELETE
+END:VPATCH
+END:VCALENDAR
+""",
+    },
+]
 
 
 class TestPatchDocument(unittest.TestCase):
@@ -1667,6 +2206,22 @@ class TestPatchDocument(unittest.TestCase):
         """
 
         self._testPatch(data["delete_parameter_simple"])
+
+    def test_invalid(self):
+        """
+        Test that invalid patch data correctly fail to parse.
+        """
+
+        for ctr, items in enumerate(dataInvalid):
+            vpatch = Calendar.parseText(items["patch"])
+            self.assertTrue(vpatch is not None, msg="Failed to load VPATCH #{}: {}".format(ctr + 1, items["title"]))
+            try:
+                PatchDocument(vpatch)
+            except Exception:
+                print(items["title"])
+                pass
+            else:
+                self.fail("Failed test #{} - no exception raised: {}".format(ctr + 1, items["title"]))
 
 
 def componentData(data):
@@ -2459,7 +3014,24 @@ class TestParameterSegment(unittest.TestCase):
                 self.assertEqual(property.name, name)
 
 if __name__ == '__main__':
-    all_data = list(itertools.chain(*data.values()))
+    order = [
+        "create_component_simple",
+        "create_property_simple",
+        "update_component_simple",
+        "update_component_recur",
+        "update_property_simple",
+        "delete_component_simple",
+        "delete_property_simple",
+        "delete_parameter_simple",
+    ]
+    if len(order) != len(data.keys()):
+        print("WARNING: data and order sizes are different")
+
+    all_data = list(itertools.chain(*[data[key] for key in order]))
     with open(os.path.join(os.path.dirname(__file__), "patch_examples.json"), "w") as f:
         f.write(json.dumps(all_data, indent=2))
     print("Updated patch_example.json")
+
+    with open(os.path.join(os.path.dirname(__file__), "patch_invalid_examples.json"), "w") as f:
+        f.write(json.dumps(dataInvalid, indent=2))
+    print("Updated patch_invalid_examples.json")

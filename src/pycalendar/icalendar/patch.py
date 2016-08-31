@@ -61,6 +61,16 @@ class PatchDocument(object):
                 commands = Command.parseFromComponent(component)
                 self.commands.extend(commands)
 
+        # Validate
+        self.validate()
+
+    def validate(self):
+        """
+        Validate all the commands.
+        """
+        for command in self.commands:
+            command.validate()
+
     def applyPatch(self, calendar):
         """
         Apply the patch to the specified calendar. The supplied L{Calendar} object will be
@@ -138,6 +148,8 @@ class Command(object):
         # DELETE action can have multiple TARGETs - we will treat each of those
         # as a separate command Get the path from the TARGET property
         if action == Command.DELETE:
+            if len(component.getComponents()) != 0:
+                raise ValueError("No components allowed in DELETE")
             targets = component.getProperties()
             if definitions.cICalProperty_TARGET not in targets:
                 raise ValueError("Missing TARGET properties in component: {}".format(component.getType().upper()))
@@ -160,6 +172,85 @@ class Command(object):
             return (Command.create(action, path, data), )
 
         return Command.create(action, path, data)
+
+    def validate(self):
+        """
+        Make sure the semantics of the patch are correct based on the supplied data etc.
+        """
+
+        # Validation depends on the action
+        if self.action == Command.CREATE:
+            if self.path.targetComponent():
+                # Data must be one or more components only
+                if len(self.data.getProperties()) != 0:
+                    raise ValueError("create action for components must not include properties: {}".format(self.path))
+                if len(self.data.getComponents()) == 0:
+                    raise ValueError("create action for components must have at least one component: {}".format(self.path))
+
+            elif self.path.targetPropertyNoName():
+                # Data must be one or more properties only
+                if len(self.data.getComponents()) != 0:
+                    raise ValueError("create action for properties must not include components: {}".format(self.path))
+                if len(self.data.getProperties()) == 0:
+                    raise ValueError("create action for properties must have at least one property: {}".format(self.path))
+
+            else:
+                raise ValueError("create action path is not valid: {}".format(self.path))
+
+        elif self.action == Command.UPDATE:
+            if self.path.targetComponent():
+                # Data must be one or more components only
+                if len(self.data.getProperties()) != 0:
+                    raise ValueError("update action for components must not include properties: {}".format(self.path))
+                if len(self.data.getComponents()) == 0:
+                    raise ValueError("update action for components must have at least one component: {}".format(self.path))
+
+                # Data components must match component being replaced
+                componentNames = set([component.getType() for component in self.data.getComponents()])
+                if len(componentNames) > 1:
+                    raise ValueError("update action for components must have components of the same type: {}".format(self.path))
+                if list(componentNames)[0] != self.path.components[-1].name:
+                    raise ValueError("update action for components must have components with matching type: {}".format(self.path))
+
+            elif self.path.targetPropertyNoName():
+                # Data must be one or more properties only
+                if len(self.data.getComponents()) != 0:
+                    raise ValueError("update action for properties must not include components: {}".format(self.path))
+                if len(self.data.getProperties()) == 0:
+                    raise ValueError("update action for properties must have at least one property: {}".format(self.path))
+
+            elif self.path.targetProperty():
+                # Data must be one or more properties only
+                if len(self.data.getComponents()) != 0:
+                    raise ValueError("update action for properties must not include components: {}".format(self.path))
+                if len(self.data.getProperties()) == 0:
+                    raise ValueError("update action for properties must have at least one property: {}".format(self.path))
+
+                # Data properties must match property being replaced
+                propertyNames = set(self.data.getProperties().keys())
+                if len(propertyNames) > 1:
+                    raise ValueError("update action for specific properties must have properties of the same type: {}".format(self.path))
+                if list(propertyNames)[0] != self.path.property.name:
+                    raise ValueError("update action for specific properties must have properties with matching type: {}".format(self.path))
+
+            elif self.path.targetParameterNoName():
+                # Data must be one or more SETPARAMETER properties only
+                if len(self.data.getComponents()) != 0:
+                    raise ValueError("update action for parameters must not include components: {}".format(self.path))
+                if len(self.data.getProperties()) == 0:
+                    raise ValueError("update action for parameters must have at least one SETPARAMETER property: {}".format(self.path))
+                if set(self.data.getProperties().keys()) != set((definitions.cICalProperty_SETPARAMETER,)):
+                    raise ValueError("update action for parameters must have only SETPARAMETER properties: {}".format(self.path))
+            else:
+                raise ValueError("update action path is not valid: {}".format(self.path))
+
+        elif self.action == Command.DELETE:
+            if self.path.targetComponent() or self.path.targetProperty() or self.path.targetParameter():
+                # Must not be any data at all
+                if self.data is not None:
+                    raise ValueError("delete action cannot have data: {}".format(self.path))
+            else:
+                raise ValueError("update action path is not valid: {}".format(self.path))
 
     def applyPatch(self, calendar):
         """
