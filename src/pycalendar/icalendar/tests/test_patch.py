@@ -525,6 +525,96 @@ END:VCALENDAR
 """,
         },
     ],
+
+    "create_parameter_simple": [
+        {
+            "title": "Add one parameter to a property",
+            "before": """BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//example.com//Example v0.1//EN
+BEGIN:VEVENT
+UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
+DTSTART;VALUE=DATE:20020101
+DTEND;VALUE=DATE:20020102
+DTSTAMP:20020101T000000Z
+RRULE:FREQ=YEARLY;UNTIL=20031231;BYMONTH=1
+SUMMARY:New Year's Day
+END:VEVENT
+END:VCALENDAR
+""",
+            "after": """BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//example.com//Example v0.1//EN
+BEGIN:VEVENT
+UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
+DTSTART;VALUE=DATE:20020101
+DTEND;VALUE=DATE:20020102
+DTSTAMP:20020101T000000Z
+RRULE:FREQ=YEARLY;UNTIL=20031231;BYMONTH=1
+SUMMARY;LANGUAGE=en_US:New Year's Day
+END:VEVENT
+END:VCALENDAR
+""",
+            "patch": """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//example.com//Example v0.1//EN
+BEGIN:VPATCH
+UID:77CA7115-B195-49FF-8AB9-01A1F3AC4F5C
+DTSTAMP:20160831T102600Z
+BEGIN:CREATE
+TARGET:/VCALENDAR/VEVENT#SUMMARY
+SETPARAMETER;LANGUAGE=en_US:1
+END:CREATE
+END:VPATCH
+END:VCALENDAR
+""",
+        },
+        {
+            "title": "Add two parameters to a calendar",
+            "before": """BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//example.com//Example v0.1//EN
+BEGIN:VEVENT
+UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
+DTSTART;VALUE=DATE:20020101
+DTEND;VALUE=DATE:20020102
+DTSTAMP:20020101T000000Z
+RRULE:FREQ=YEARLY;UNTIL=20031231;BYMONTH=1
+SUMMARY:New Year's Day
+END:VEVENT
+END:VCALENDAR
+""",
+            "after": """BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//example.com//Example v0.1//EN
+BEGIN:VEVENT
+UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
+DTSTART;VALUE=DATE:20020101
+DTEND;VALUE=DATE:20020102
+DTSTAMP:20020101T000000Z
+RRULE:FREQ=YEARLY;UNTIL=20031231;BYMONTH=1
+SUMMARY;ALTREP="cid:xyz@example.com";LANGUAGE=en_US:New Year's Day
+END:VEVENT
+END:VCALENDAR
+""",
+            "patch": """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//example.com//Example v0.1//EN
+BEGIN:VPATCH
+UID:77CA7115-B195-49FF-8AB9-01A1F3AC4F5C
+DTSTAMP:20160831T102600Z
+BEGIN:CREATE
+TARGET:/VCALENDAR/VEVENT#SUMMARY
+SETPARAMETER;LANGUAGE=en_US;ALTREP="cid:xyz@example.com":1
+END:CREATE
+END:VPATCH
+END:VCALENDAR
+""",
+        },
+    ],
+
     "update_component_simple": [
         {
             "title": "Update one component in a calendar",
@@ -723,6 +813,7 @@ END:VCALENDAR
 """,
         },
     ],
+
     "update_component_recur": [
         {
             "title": "Update one property in an instance",
@@ -778,6 +869,7 @@ END:VCALENDAR
 """,
         },
     ],
+
     "update_property_simple": [
         {
             "title": "Update (add) one property in a calendar",
@@ -1043,6 +1135,97 @@ END:VCALENDAR
 """,
         },
     ],
+
+
+    "update_parameter_simple": [
+        {
+            "title": "Update one parameter in a property",
+            "before": """BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//example.com//Example v0.1//EN
+BEGIN:VEVENT
+UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
+DTSTART;VALUE=DATE:20020101
+DTEND;VALUE=DATE:20020102
+DTSTAMP:20020101T000000Z
+RRULE:FREQ=YEARLY
+SUMMARY;LANGUAGE=en_US:New Year's Day
+END:VEVENT
+END:VCALENDAR
+""",
+            "after": """BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//example.com//Example v0.1//EN
+BEGIN:VEVENT
+UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
+DTSTART;VALUE=DATE:20020101
+DTEND;VALUE=DATE:20020102
+DTSTAMP:20020101T000000Z
+RRULE:FREQ=YEARLY
+SUMMARY;LANGUAGE=en_GB:New Year's Day
+END:VEVENT
+END:VCALENDAR
+""",
+            "patch": """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//example.com//Example v0.1//EN
+BEGIN:VPATCH
+UID:77CA7115-B195-49FF-8AB9-01A1F3AC4F5C
+DTSTAMP:20160831T102600Z
+BEGIN:UPDATE
+TARGET:/VCALENDAR/VEVENT#SUMMARY;
+SETPARAMETER;LANGUAGE=en_GB:1
+END:UPDATE
+END:VPATCH
+END:VCALENDAR
+""",
+        },
+        {
+            "title": "Update two parameters in a property",
+            "before": """BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//example.com//Example v0.1//EN
+BEGIN:VEVENT
+UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
+DTSTART;VALUE=DATE:20020101
+DTEND;VALUE=DATE:20020102
+DTSTAMP:20020101T000000Z
+RRULE:FREQ=YEARLY
+SUMMARY;ALTREP="cid:abc@example.com";LANGUAGE=en_US:New Year's Day
+END:VEVENT
+END:VCALENDAR
+""",
+            "after": """BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//example.com//Example v0.1//EN
+BEGIN:VEVENT
+UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
+DTSTART;VALUE=DATE:20020101
+DTEND;VALUE=DATE:20020102
+DTSTAMP:20020101T000000Z
+RRULE:FREQ=YEARLY
+SUMMARY;ALTREP="cid:xyz@example.com";LANGUAGE=en_GB:New Year's Day
+END:VEVENT
+END:VCALENDAR
+""",
+            "patch": """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//example.com//Example v0.1//EN
+BEGIN:VPATCH
+UID:77CA7115-B195-49FF-8AB9-01A1F3AC4F5C
+DTSTAMP:20160831T102600Z
+BEGIN:UPDATE
+TARGET:/VCALENDAR/VEVENT#SUMMARY;
+SETPARAMETER;LANGUAGE=en_GB;ALTREP="cid:xyz@example.com":1
+END:UPDATE
+END:VPATCH
+END:VCALENDAR
+""",
+        },
+    ],
+
     "delete_component_simple": [
         {
             "title": "Delete one component from single event calendar",
@@ -1289,6 +1472,7 @@ END:VCALENDAR
 """,
         },
     ],
+
     "delete_property_simple": [
         {
             "title": "Delete one property from VCALENDAR",
@@ -1615,6 +1799,7 @@ END:VCALENDAR
 """,
         },
     ],
+
     "delete_parameter_simple": [
         {
             "title": "Delete parameter from all properties in VEVENT",
@@ -2330,6 +2515,13 @@ class TestPatchDocument(unittest.TestCase):
 
         self._testPatch(data["create_property_simple"])
 
+    def test_createParameter_Simple(self):
+        """
+        Test that creation of a single parameter works.
+        """
+
+        self._testPatch(data["create_parameter_simple"])
+
     def test_updateComponent_Simple(self):
         """
         Test that update of components works.
@@ -2350,6 +2542,13 @@ class TestPatchDocument(unittest.TestCase):
         """
 
         self._testPatch(data["update_property_simple"])
+
+    def test_updateParameter_Simple(self):
+        """
+        Test that update of a single parameter works.
+        """
+
+        self._testPatch(data["update_parameter_simple"])
 
     def test_deleteComponent_Simple(self):
         """
@@ -2383,7 +2582,6 @@ class TestPatchDocument(unittest.TestCase):
             try:
                 PatchDocument(vpatch)
             except Exception:
-                print(items["title"])
                 pass
             else:
                 self.fail("Failed test #{} - no exception raised: {}".format(ctr + 1, items["title"]))
@@ -3182,9 +3380,11 @@ if __name__ == '__main__':
     order = [
         "create_component_simple",
         "create_property_simple",
+        "create_parameter_simple",
         "update_component_simple",
         "update_component_recur",
         "update_property_simple",
+        "update_parameter_simple",
         "delete_component_simple",
         "delete_property_simple",
         "delete_parameter_simple",

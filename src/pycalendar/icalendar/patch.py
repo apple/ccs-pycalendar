@@ -235,10 +235,8 @@ class Command(object):
                 # Data must be one or more SETPARAMETER properties only
                 if len(self.data.getComponents()) != 0:
                     raise ValueError("update action for parameters must not include components: {}".format(self.path))
-                if len(self.data.getProperties()) == 0:
-                    raise ValueError("update action for parameters must have at least one SETPARAMETER property: {}".format(self.path))
-                if set(self.data.getProperties().keys()) != set((definitions.cICalProperty_SETPARAMETER,)):
-                    raise ValueError("update action for parameters must have only SETPARAMETER properties: {}".format(self.path))
+                if len(self.data.getProperties()) != 1 or definitions.cICalProperty_SETPARAMETER not in self.data.getProperties():
+                    raise ValueError("update action for parameters must have only one or more SETPARAMETER properties: {}".format(self.path))
             else:
                 raise ValueError("update action path is not valid: {}".format(self.path))
 
@@ -282,10 +280,6 @@ class Command(object):
         elif self.path.targetProperty():
             # Now add new parameters (from the data) to each parent property
             setParameter = self.data.getProperties(definitions.cICalProperty_SETPARAMETER)
-            if len(setParameter) == 0:
-                raise ValueError("No SETPARAMETER property in parameter value update")
-            elif len(setParameter) > 1:
-                raise ValueError("Too many SETPARAMETER properties in parameter value update")
             for _ignore_component, property in matches:
                 for parameters in setParameter[0].getParameters().values():
                     # Remove existing, then add
@@ -344,23 +338,14 @@ class Command(object):
                         component.addProperty(newproperty.duplicate())
 
         elif self.path.targetParameterNoName():
-            # First remove matched parameters and record the parent properties
-            properties = set()
-            for _ignore_component, property, parameter_name in matches:
-                properties.add(properties)
-                property.removeParameters(parameter_name)
-
-            # Now add new parameters (from the data) to each parent property
+            # Add/replace new parameters (from the data) to each parent property
             setParameter = self.data.getProperties(definitions.cICalProperty_SETPARAMETER)
-            if len(setParameter) == 0:
-                raise ValueError("No SETPARAMETER property in parameter value update")
-            elif len(setParameter) > 1:
-                raise ValueError("Too many SETPARAMETER properties in parameter value update")
-            for property in properties:
-                for parameter in setParameter[0].getParameters().values():
+            for _ignore_component, property, _ignore_parameter_name in matches:
+                for parameters in setParameter[0].getParameters().values():
                     # Remove existing, then add
-                    property.removeParameters(parameter.getName())
-                    property.addParameter(parameter.duplicate())
+                    if property.hasParameter(parameters[0].getName()):
+                        property.removeParameters(parameters[0].getName())
+                    property.addParameter(parameters[0].duplicate())
         else:
             raise ValueError("update action path is not valid: {}".format(self.path))
 
