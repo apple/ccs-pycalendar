@@ -18,6 +18,7 @@ from pycalendar.icalendar import definitions
 from pycalendar.icalendar import itipdefinitions
 from pycalendar.icalendar.component import Component
 from pycalendar.icalendar.validation import ICALENDAR_VALUE_CHECKS
+from pycalendar.icalendar.vpatchdelete import Delete
 
 
 class VPatch(Component):
@@ -59,5 +60,20 @@ class VPatch(Component):
 
         return sorted(components, key=_sortKey)
 
+    def addDefaultProperties(self):
+        self.setUID()
+        self.initDTSTAMP()
+
+    def getDeleteComponent(self):
+        """
+        Get (or create) a L{Delete} component in this VPATCH.
+        """
+        delete = self.getComponents(definitions.cICalComponent_DELETE)
+        if len(delete) == 0:
+            delete = Delete(parent=self)
+            self.addComponent(delete)
+            return delete
+        else:
+            return delete[0]
 
 Component.registerComponent(definitions.cICalComponent_VPATCH, VPatch)

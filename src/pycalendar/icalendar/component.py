@@ -14,14 +14,11 @@
 #    limitations under the License.
 ##
 
-from pycalendar import stringutils
 from pycalendar.componentbase import ComponentBase
 from pycalendar.datetime import DateTime
 from pycalendar.icalendar import definitions
 from pycalendar.icalendar.property import Property
-import os
-import time
-import uuid
+from uuid import uuid4
 
 
 class Component(ComponentBase):
@@ -75,7 +72,7 @@ class Component(ComponentBase):
         elif self.mUID:
             return self.mUID
         else:
-            self.mMapKey = str(uuid.uuid4())
+            self.mMapKey = str(uuid4())
             return self.mMapKey
 
     def getSortKey(self):
@@ -91,35 +88,8 @@ class Component(ComponentBase):
         if uid:
             self.mUID = uid
         else:
-            # Get left-side of UID (first 24 chars of MD5 digest of time, pid
-            # and ctr)
-            lhs_txt = ""
-            lhs_txt += str(time.time())
-            lhs_txt += "."
-            lhs_txt += str(os.getpid())
-            lhs_txt += "."
-            lhs_txt += str(Component.uid_ctr)
-            Component.uid_ctr += 1
-            lhs = stringutils.md5digest(lhs_txt)
-
-            # Get right side (domain) of message-id
-            rhs = None
-
-            # Use app name
-            from pycalendar.icalendar.calendar import Calendar
-            domain = Calendar.sDomain
-            domain += str(Component.uid_ctr)
-
-            # Use first 24 chars of MD5 digest of the domain as the
-            # right-side of message-id
-            rhs = stringutils.md5digest(domain)
-
-            # Generate the UID string
-            new_uid = lhs
-            new_uid += "@"
-            new_uid += rhs
-
-            self.mUID = new_uid
+            # Just use a random uuid
+            self.mUID = str(uuid4())
 
         self.removeProperties(definitions.cICalProperty_UID)
 

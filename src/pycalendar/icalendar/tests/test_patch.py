@@ -15,17 +15,20 @@
 #    limitations under the License.
 ##
 
+import itertools
+import json
+import operator
+import os
+import unittest
 
 from pycalendar.datetime import DateTime
 from pycalendar.icalendar.calendar import Calendar
-from pycalendar.icalendar.patch import Command, Path, PatchDocument
-import operator
-import unittest
-import itertools
-import json
-import os
+from pycalendar.icalendar.patch import Command, Path, PatchDocument, PatchGenerator
+from pycalendar.icalendar.vpatch import VPatch
+from difflib import unified_diff
 
-data = {
+
+dataValid = {
     "create_component_simple": [
         {
             "title": "Add one component to a calendar",
@@ -2506,70 +2509,70 @@ class TestPatchDocument(unittest.TestCase):
         Test that creation of a single component works.
         """
 
-        self._testPatch(data["create_component_simple"])
+        self._testPatch(dataValid["create_component_simple"])
 
     def test_createProperty_Simple(self):
         """
         Test that creation of a single property works.
         """
 
-        self._testPatch(data["create_property_simple"])
+        self._testPatch(dataValid["create_property_simple"])
 
     def test_createParameter_Simple(self):
         """
         Test that creation of a single parameter works.
         """
 
-        self._testPatch(data["create_parameter_simple"])
+        self._testPatch(dataValid["create_parameter_simple"])
 
     def test_updateComponent_Simple(self):
         """
         Test that update of components works.
         """
 
-        self._testPatch(data["update_component_simple"])
+        self._testPatch(dataValid["update_component_simple"])
 
     def test_updateComponent_Recur(self):
         """
         Test that update of components works.
         """
 
-        self._testPatch(data["update_component_recur"])
+        self._testPatch(dataValid["update_component_recur"])
 
     def test_updateProperty_Simple(self):
         """
         Test that update of a single property works.
         """
 
-        self._testPatch(data["update_property_simple"])
+        self._testPatch(dataValid["update_property_simple"])
 
     def test_updateParameter_Simple(self):
         """
         Test that update of a single parameter works.
         """
 
-        self._testPatch(data["update_parameter_simple"])
+        self._testPatch(dataValid["update_parameter_simple"])
 
     def test_deleteComponent_Simple(self):
         """
         Test that deletion of a single component works.
         """
 
-        self._testPatch(data["delete_component_simple"])
+        self._testPatch(dataValid["delete_component_simple"])
 
     def test_deleteProperty_Simple(self):
         """
         Test that deletion of a single property works.
         """
 
-        self._testPatch(data["delete_property_simple"])
+        self._testPatch(dataValid["delete_property_simple"])
 
     def test_deleteParameter_Simple(self):
         """
         Test that deletion of a single parameter works.
         """
 
-        self._testPatch(data["delete_parameter_simple"])
+        self._testPatch(dataValid["delete_parameter_simple"])
 
     def test_invalid(self):
         """
@@ -3376,6 +3379,346 @@ class TestParameterSegment(unittest.TestCase):
                 self.assertTrue(valid)
                 self.assertEqual(property.name, name)
 
+
+class TestPatchMaker(unittest.TestCase):
+
+    def test_processSubComponents(self):
+
+        data = [
+            {
+                "title": "Create component",
+                "old" : """BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//example.com//Example v0.1//EN
+END:VCALENDAR
+""",
+                "new" : """BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//example.com//Example v0.1//EN
+BEGIN:VEVENT
+UID:1234
+END:VEVENT
+END:VCALENDAR
+""",
+                "patch": """BEGIN:VPATCH
+BEGIN:CREATE
+TARGET:/VCALENDAR
+BEGIN:VEVENT
+UID:1234
+END:VEVENT
+END:CREATE
+END:VPATCH
+""",
+            },
+            {
+                "title": "Delete component",
+                "old" : """BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//example.com//Example v0.1//EN
+BEGIN:VEVENT
+UID:1234
+END:VEVENT
+END:VCALENDAR
+""",
+                "new" : """BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//example.com//Example v0.1//EN
+END:VCALENDAR
+""",
+                "patch": """BEGIN:VPATCH
+BEGIN:DELETE
+TARGET:/VCALENDAR/VEVENT
+END:DELETE
+END:VPATCH
+""",
+            },
+            {
+                "title": "Update component",
+                "old" : """BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//example.com//Example v0.1//EN
+BEGIN:VEVENT
+UID:1234
+SUMMARY:old
+END:VEVENT
+END:VCALENDAR
+""",
+                "new" : """BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//example.com//Example v0.1//EN
+BEGIN:VEVENT
+UID:1234
+SUMMARY:new
+END:VEVENT
+END:VCALENDAR
+""",
+                "patch": """BEGIN:VPATCH
+BEGIN:UPDATE
+TARGET:/VCALENDAR/VEVENT[UID=1234]
+BEGIN:VEVENT
+UID:1234
+SUMMARY:new
+END:VEVENT
+END:UPDATE
+END:VPATCH
+""",
+            },
+        ]
+
+        for item in data:
+            oldcal = Calendar.parseText(item["old"])
+            newcal = Calendar.parseText(item["new"])
+            vpatch = VPatch()
+            PatchGenerator.processSubComponents(oldcal, newcal, vpatch, "")
+            self.assertEqual(
+                str(vpatch),
+                item["patch"].replace("\n", "\r\n"),
+                "Failed: {}\n{}".format(item["title"], "\n".join(unified_diff(str(vpatch).splitlines(), item["patch"].splitlines())))
+            )
+
+    def test_processProperties(self):
+
+        data = [
+            {
+                "title": "Create property",
+                "old" : """BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//example.com//Example v0.1//EN
+END:VCALENDAR
+""",
+                "new" : """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//example.com//Example v0.1//EN
+END:VCALENDAR
+""",
+                "patch": """BEGIN:VPATCH
+BEGIN:CREATE
+TARGET:/VCALENDAR
+CALSCALE:GREGORIAN
+END:CREATE
+END:VPATCH
+""",
+            },
+            {
+                "title": "Delete property",
+                "old" : """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//example.com//Example v0.1//EN
+END:VCALENDAR
+""",
+                "new" : """BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//example.com//Example v0.1//EN
+END:VCALENDAR
+""",
+                "patch": """BEGIN:VPATCH
+BEGIN:DELETE
+TARGET:/VCALENDAR#CALSCALE
+END:DELETE
+END:VPATCH
+""",
+            },
+            {
+                "title": "Create & Delete property",
+                "old" : """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//example.com//Example v0.1//EN
+END:VCALENDAR
+""",
+                "new" : """BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//example.com//Example v0.1//EN
+DESCRIPTION:Calendar name
+END:VCALENDAR
+""",
+                "patch": """BEGIN:VPATCH
+BEGIN:CREATE
+TARGET:/VCALENDAR
+DESCRIPTION:Calendar name
+END:CREATE
+BEGIN:DELETE
+TARGET:/VCALENDAR#CALSCALE
+END:DELETE
+END:VPATCH
+""",
+            },
+            {
+                "title": "Singleton update property",
+                "old" : """BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//example.com//Example v0.1//EN
+END:VCALENDAR
+""",
+                "new" : """BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//example.org//Example v0.1//EN
+END:VCALENDAR
+""",
+                "patch": """BEGIN:VPATCH
+BEGIN:UPDATE
+TARGET:/VCALENDAR#
+PRODID:-//example.org//Example v0.1//EN
+END:UPDATE
+END:VPATCH
+""",
+            },
+            {
+                "title": "Create multi-property",
+                "old" : """BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//example.com//Example v0.1//EN
+DESCRIPTION:Calendar name 1
+END:VCALENDAR
+""",
+                "new" : """BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//example.com//Example v0.1//EN
+DESCRIPTION:Calendar name 1
+DESCRIPTION:Calendar name 2
+END:VCALENDAR
+""",
+                "patch": """BEGIN:VPATCH
+BEGIN:CREATE
+TARGET:/VCALENDAR
+DESCRIPTION:Calendar name 2
+END:CREATE
+END:VPATCH
+""",
+            },
+            {
+                "title": "Delete multi-property",
+                "old" : """BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//example.com//Example v0.1//EN
+DESCRIPTION:Calendar name 1
+DESCRIPTION:Calendar name 2
+END:VCALENDAR
+""",
+                "new" : """BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//example.com//Example v0.1//EN
+DESCRIPTION:Calendar name 1
+END:VCALENDAR
+""",
+                "patch": """BEGIN:VPATCH
+BEGIN:DELETE
+TARGET:/VCALENDAR#DESCRIPTION[=Calendar name 2]
+END:DELETE
+END:VPATCH
+""",
+            },
+            {
+                "title": "Update multi-property",
+                "old" : """BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//example.com//Example v0.1//EN
+DESCRIPTION:Calendar name 1
+DESCRIPTION:Calendar name 2
+END:VCALENDAR
+""",
+                "new" : """BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//example.com//Example v0.1//EN
+DESCRIPTION:Calendar name 1
+DESCRIPTION:Calendar name 3
+END:VCALENDAR
+""",
+                "patch": """BEGIN:VPATCH
+BEGIN:CREATE
+TARGET:/VCALENDAR
+DESCRIPTION:Calendar name 3
+END:CREATE
+BEGIN:DELETE
+TARGET:/VCALENDAR#DESCRIPTION[=Calendar name 2]
+END:DELETE
+END:VPATCH
+""",
+            },
+            {
+                "title": "Create parameter",
+                "old" : """BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//example.com//Example v0.1//EN
+DESCRIPTION:Calendar name 1
+END:VCALENDAR
+""",
+                "new" : """BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//example.com//Example v0.1//EN
+DESCRIPTION;LANGUAGE=en_US:Calendar name 1
+END:VCALENDAR
+""",
+                "patch": """BEGIN:VPATCH
+BEGIN:UPDATE
+TARGET:/VCALENDAR#
+DESCRIPTION;LANGUAGE=en_US:Calendar name 1
+END:UPDATE
+END:VPATCH
+""",
+            },
+            {
+                "title": "Update parameter",
+                "old" : """BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//example.com//Example v0.1//EN
+DESCRIPTION;LANGUAGE=en_US:Calendar name 1
+END:VCALENDAR
+""",
+                "new" : """BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//example.com//Example v0.1//EN
+DESCRIPTION;LANGUAGE=en_GB:Calendar name 1
+END:VCALENDAR
+""",
+                "patch": """BEGIN:VPATCH
+BEGIN:UPDATE
+TARGET:/VCALENDAR#
+DESCRIPTION;LANGUAGE=en_GB:Calendar name 1
+END:UPDATE
+END:VPATCH
+""",
+            },
+            {
+                "title": "Update multi-parameter",
+                "old" : """BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//example.com//Example v0.1//EN
+DESCRIPTION;LANGUAGE=en_US:Calendar name 1
+DESCRIPTION;LANGUAGE=en_GB:Calendar name 2
+END:VCALENDAR
+""",
+                "new" : """BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//example.com//Example v0.1//EN
+DESCRIPTION;LANGUAGE=en_US:Calendar name 1
+DESCRIPTION;LANGUAGE=en_CA:Calendar name 2
+END:VCALENDAR
+""",
+                "patch": """BEGIN:VPATCH
+BEGIN:UPDATE
+TARGET:/VCALENDAR#DESCRIPTION[=Calendar name 2]
+DESCRIPTION;LANGUAGE=en_CA:Calendar name 2
+END:UPDATE
+END:VPATCH
+""",
+            },
+        ]
+
+        for item in data:
+            oldcal = Calendar.parseText(item["old"])
+            newcal = Calendar.parseText(item["new"])
+            vpatch = VPatch()
+            PatchGenerator.processProperties(oldcal, newcal, vpatch, "")
+            self.assertEqual(
+                str(vpatch),
+                item["patch"].replace("\n", "\r\n"),
+                "Failed: {}\n{}".format(item["title"], "\n".join(unified_diff(str(vpatch).splitlines(), item["patch"].splitlines())))
+            )
+
+
 if __name__ == '__main__':
     order = [
         "create_component_simple",
@@ -3389,10 +3732,10 @@ if __name__ == '__main__':
         "delete_property_simple",
         "delete_parameter_simple",
     ]
-    if len(order) != len(data.keys()):
+    if len(order) != len(dataValid.keys()):
         print("WARNING: data and order sizes are different")
 
-    all_data = list(itertools.chain(*[data[key] for key in order]))
+    all_data = list(itertools.chain(*[dataValid[key] for key in order]))
     with open(os.path.join(os.path.dirname(__file__), "patch_examples.json"), "w") as f:
         f.write(json.dumps(all_data, indent=2))
     print("Updated patch_example.json")

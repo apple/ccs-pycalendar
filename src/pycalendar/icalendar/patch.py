@@ -14,15 +14,18 @@
 #    limitations under the License.
 ##
 
-from urlparse import unquote
-import operator
-
+from calendar import Calendar
 from pycalendar.componentbase import ComponentBase
 from pycalendar.datetime import DateTime
 from pycalendar.icalendar import definitions
+from pycalendar.icalendar.component import Component
 from pycalendar.icalendar.componentrecur import ComponentRecur
 from pycalendar.icalendar.property import Property
-from pycalendar.icalendar.component import Component
+from pycalendar.icalendar.vpatch import VPatch
+from pycalendar.icalendar.vpatchcreate import Create
+from urlparse import unquote
+import operator
+from pycalendar.icalendar.vpatchupdate import Update
 
 
 class PatchDocument(object):
@@ -777,3 +780,243 @@ class Path(object):
                 results = self.parameter.match(results)
 
         return results
+
+
+class PatchGenerator(object):
+    """
+    Class that manages the creation of a VPATCH by diff'ing two components.
+    """
+
+    @staticmethod
+    def createPatch(oldcalendar, newcalendar):
+        """
+        Create a patch iCelendar object for the difference between
+        L{oldcalendar} and L{newcalendar}.
+
+        @param oldcalendar: the old calendar data
+        @type oldcalendar: L{Calendar}
+        @param newcalendar: thew new calendar data
+        @type newcalendar: L{Calendar}
+        """
+
+        # Create the VPATCH object
+        patch = Calendar()
+        patch.addDefaultProperties()
+        vpatch = VPatch(parent=patch)
+        vpatch.addDefaultProperties()
+        patch.addComponent(vpatch)
+
+        # Recursively traverse the differences between two components, adding
+        # appropriate items to the VPATCH to describe the differences
+        PatchGenerator.diffComponents(oldcalendar, newcalendar, vpatch, "")
+
+    @staticmethod
+    def diffComponents(oldcomponent, newcomponent, vpatch, path):
+        """
+        Recursively traverse the differences between two components, adding
+        appropriate items to the VPATCH to describe the differences.
+
+        @param oldcomponent: the old component
+        @type oldcomponent: L{Component}
+        @param newcomponent: the new component
+        @type newcomponent: L{Component}
+        @param vpatch: the patch to use
+        @type vpatch: L{VPatch}
+        """
+
+        # Process properties then sub-components
+        PatchGenerator.processProperties(oldcomponent, newcomponent, vpatch, path)
+        PatchGenerator.processSubComponents(oldcomponent, newcomponent, vpatch, path)
+
+    @staticmethod
+    def processProperties(oldcomponent, newcomponent, vpatch, path):
+        """
+        Determine the property differences between two components and create
+        appropriate VPATCH entries.
+
+        @param oldcomponent: the old component
+        @type oldcomponent: L{Component}
+        @param newcomponent: the new component
+        @type newcomponent: L{Component}
+        @param vpatch: the patch to use
+        @type vpatch: L{VPatch}
+        """
+
+        # Update path to include this component
+        path += "/{}".format(oldcomponent.getType())
+
+        # Use two way set difference to find new and removed
+        oldset = set(oldcomponent.getProperties().keys())
+        newset = set(newcomponent.getProperties().keys())
+
+        # Create and Update patch components can aggregate changes in some cases, so we will have some common objects for those
+        patchComponent = {
+            "create": None,
+            "update": None,
+            "delete": None,
+        }
+
+        def _getPatchComponent(ptype):
+            if patchComponent[ptype] is None:
+                if ptype == "create":
+                    # Use CREATE component in VPATCH
+                    patchComponent[ptype] = Create(parent=vpatch)
+                    patchComponent[ptype].addProperty(Property(definitions.cICalProperty_TARGET, path))
+                    vpatch.addComponent(patchComponent[ptype])
+                elif ptype == "update":
+                    # Use UPDATE component in VPATCH
+                    patchComponent[ptype] = Update(parent=vpatch)
+                    patchComponent[ptype].addProperty(Property(definitions.cICalProperty_TARGET, "{}#".format(path)))
+                    vpatch.addComponent(patchComponent[ptype])
+                elif ptype == "delete":
+                    # Use UPDATE component in VPATCH
+                    patchComponent[ptype] = vpatch.getDeleteComponent()
+            return patchComponent[ptype]
+
+        # New ones
+        newpropnames = newset - oldset
+        if len(newpropnames) != 0:
+            # Add each property to CREATE
+            for newpropname in newpropnames:
+                for prop in newcomponent.getProperties(newpropname):
+                    _getPatchComponent("create").addProperty(prop.duplicate())
+
+        # Removed ones
+        oldpropnames = oldset - newset
+        if len(oldpropnames) != 0:
+            # Add each property to DELETE
+            for oldpropname in oldpropnames:
+                _getPatchComponent("delete").addProperty(Property(definitions.cICalProperty_TARGET, "{}#{}".format(path, oldpropname)))
+
+        # Ones that exist in both old and new: this is tricky as we now need to find out what is different.
+        # We handle two cases: single occurring properties vs multi-occurring
+        checkpropnames = newset & oldset
+        for propname in checkpropnames:
+            oldprops = oldcomponent.getProperties(propname)
+            newprops = newcomponent.getProperties(propname)
+
+            # Look for singletons
+            if len(oldprops) == 1 and len(newprops) == 1:
+                # Check for difference
+                if oldprops[0] != newprops[0]:
+                    _getPatchComponent("update").addProperty(newprops[0].duplicate())
+
+            # Rest are multi-occurring
+            else:
+                # Removes ones that are exactly the same
+                oldset = set(oldprops)
+                newset = set(newprops)
+                oldsetchanged = oldset - newset
+                newsetchanged = newset - oldset
+
+                # Need to check for ones that have the same value, but different parameters
+                oldvalues = dict([(prop.getValue().getTextValue(), prop) for prop in oldsetchanged])
+                newvalues = dict([(prop.getValue().getTextValue(), prop) for prop in newsetchanged])
+
+                # Ones to remove by value (ones whose value only exists in the old set)
+                for removeval in set(oldvalues.keys()) - set(newvalues.keys()):
+                    _getPatchComponent("delete").addProperty(Property(definitions.cICalProperty_TARGET, "{}#{}[={}]".format(path, propname, removeval)))
+
+                # Ones to create (ones whose value only exists in the new set)
+                for createval in set(newvalues.keys()) - set(oldvalues.keys()):
+                    _getPatchComponent("create").addProperty(newvalues[createval].duplicate())
+
+                # Ones with the same value - check if parameters are different
+                for sameval in set(oldvalues.keys()) & set(newvalues.keys()):
+                    oldprop = oldvalues[sameval]
+                    newprop = newvalues[sameval]
+                    if oldprop != newprop:
+                        # Use UPDATE component targeting property value in VPATCH
+                        update = Update(parent=vpatch)
+                        update.addProperty(Property(definitions.cICalProperty_TARGET, "{}#{}[={}]".format(path, propname, sameval)))
+                        update.addProperty(newprop.duplicate())
+                        vpatch.addComponent(update)
+
+    @staticmethod
+    def processSubComponents(oldcomponent, newcomponent, vpatch, path):
+        """
+        Determine the sub-component differences between two components and create
+        appropriate VPATCH entries.
+
+        @param oldcomponent: the old component
+        @type oldcomponent: L{Component}
+        @param newcomponent: the new component
+        @type newcomponent: L{Component}
+        @param vpatch: the patch to use
+        @type vpatch: L{VPatch}
+        """
+
+        # Update path to include this component
+        path += "/{}".format(oldcomponent.getType())
+
+        # Use two way set difference to find new and removed
+        oldmap = {}
+        for component in oldcomponent.getComponents():
+            oldmap.setdefault(component.getType(), []).append(component)
+        newmap = {}
+        for component in newcomponent.getComponents():
+            newmap.setdefault(component.getType(), []).append(component)
+
+        oldset = set(oldmap.keys())
+        newset = set(newmap.keys())
+
+        # Create and Update patch components can aggregate changes in some cases, so we will have some common objects for those
+        patchComponent = {
+            "create": None,
+            "update": None,
+            "delete": None,
+        }
+
+        def _getPatchComponent(ptype):
+            if patchComponent[ptype] is None:
+                if ptype == "create":
+                    # Use CREATE component in VPATCH
+                    patchComponent[ptype] = Create(parent=vpatch)
+                    patchComponent[ptype].addProperty(Property(definitions.cICalProperty_TARGET, path))
+                    vpatch.addComponent(patchComponent[ptype])
+                elif ptype == "update":
+                    # Use UPDATE component in VPATCH
+                    patchComponent[ptype] = Update(parent=vpatch)
+                    patchComponent[ptype].addProperty(Property(definitions.cICalProperty_TARGET, path))
+                    vpatch.addComponent(patchComponent[ptype])
+                elif ptype == "delete":
+                    # Use UPDATE component in VPATCH
+                    patchComponent[ptype] = vpatch.getDeleteComponent()
+            return patchComponent[ptype]
+
+        # New ones
+        newcompnames = newset - oldset
+        if len(newcompnames) != 0:
+            # Add each component to CREATE
+            for newcompname in newcompnames:
+                for comp in newmap[newcompname]:
+                    _getPatchComponent("create").addComponent(comp.duplicate(parent=_getPatchComponent("create")))
+
+        # Removed ones
+        oldcompnames = oldset - newset
+        if len(oldcompnames) != 0:
+            # Add each component to DELETE
+            for oldcompname in oldcompnames:
+                _getPatchComponent("delete").addProperty(Property(definitions.cICalProperty_TARGET, "{}/{}".format(path, oldcompname)))
+
+        # Ones that exist in both old and new: this is tricky as we now need to find out what is different.
+        # We handle two cases: single occurring properties vs multi-occurring
+        checkcompnames = newset & oldset
+        for compname in checkcompnames:
+            oldcomps = oldcomponent.getComponents(compname)
+            newcomps = newcomponent.getComponents(compname)
+
+            # Look for singletons
+            if len(oldcomps) == 1 and len(newcomps) == 1:
+                # Check for difference
+                if oldcomps[0] != newcomps[0]:
+                    uid = oldcomps[0].getUID()
+                    rid = oldcomps[0].getRecurrenceID() if isinstance(oldcomps[0], ComponentRecur) else None
+                    upath = "{}/{}[UID={}]".format(path, compname, uid)
+                    if rid is not None:
+                        upath = "{}[RID={}]".format(upath, str(rid))
+                    # Use UPDATE component targeting component UID in VPATCH
+                    update = Update(parent=vpatch)
+                    update.addProperty(Property(definitions.cICalProperty_TARGET, upath))
+                    update.addComponent(newcomps[0].duplicate())
+                    vpatch.addComponent(update)
