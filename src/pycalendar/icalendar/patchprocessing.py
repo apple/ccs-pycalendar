@@ -202,15 +202,15 @@ class Command(object):
             for dpath in self.deletes:
                 self.processDelete(dpath, dpath.match(calendar))
 
+            # Process all params second
+            for ppath, params in self.params:
+                self.processParameter(ppath, params, ppath.match(calendar))
+
             # Process sub-components and properties
             # Data is a list of components or properties
             for component in matches:
                 self.processSubComponents(component)
                 self.processProperties(component)
-
-            # Process all params last
-            for ppath, params in self.params:
-                self.processParameter(ppath, params, ppath.match(calendar))
 
         else:
             raise ValueError("create action path is not valid: {}".format(self.path))
