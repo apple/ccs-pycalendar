@@ -18,7 +18,7 @@ from pycalendar.icalendar import definitions
 from pycalendar.icalendar import itipdefinitions
 from pycalendar.icalendar.component import Component
 from pycalendar.icalendar.validation import ICALENDAR_VALUE_CHECKS
-from pycalendar.icalendar.vpatchdelete import Delete
+from pycalendar.icalendar.patch import Patch
 
 
 class VPatch(Component):
@@ -29,6 +29,7 @@ class VPatch(Component):
     )
 
     propertyCardinality_0_1 = (
+        definitions.cICalProperty_PATCH_VERSION,
         definitions.cICalProperty_PATCH_ORDER,
     )
 
@@ -40,40 +41,26 @@ class VPatch(Component):
     def getMimeComponentName(self):
         return itipdefinitions.cICalMIMEComponent_VPATCH
 
-    def sortedPropertyKeyOrder(self):
-        return (
-            definitions.cICalProperty_UID,
-            definitions.cICalProperty_PATCH_ORDER,
-        )
-
-    sortOrder = {
-        definitions.cICalComponent_CREATE: 0,
-        definitions.cICalComponent_UPDATE: 1,
-        definitions.cICalComponent_DELETE: 2
-    }
-
     def sortedComponents(self):
         components = self.mComponents[:]
 
         def _sortKey(subcomponent):
-            return VPatch.sortOrder.get(subcomponent.getType().upper(), 3)
+            if isinstance(subcomponent, Patch):
+                return str(len(subcomponent.getPropertyString(definitions.cICalProperty_PATCH_TARGET).split("/")))
+            else:
+                return subcomponent.getType().upper()
 
         return sorted(components, key=_sortKey)
+
+    def sortedPropertyKeyOrder(self):
+        return (
+            definitions.cICalProperty_UID,
+            definitions.cICalProperty_PATCH_VERSION,
+            definitions.cICalProperty_PATCH_ORDER,
+        )
 
     def addDefaultProperties(self):
         self.setUID()
         self.initDTSTAMP()
-
-    def getDeleteComponent(self):
-        """
-        Get (or create) a L{Delete} component in this VPATCH.
-        """
-        delete = self.getComponents(definitions.cICalComponent_DELETE)
-        if len(delete) == 0:
-            delete = Delete(parent=self)
-            self.addComponent(delete)
-            return delete
-        else:
-            return delete[0]
 
 Component.registerComponent(definitions.cICalComponent_VPATCH, VPatch)

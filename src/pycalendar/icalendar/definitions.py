@@ -359,13 +359,19 @@ cICalComponent_VOTE = "VOTE"
 
 #    Extensions: patch
 cICalComponent_VPATCH = "VPATCH"
-cICalComponent_CREATE = "CREATE"
-cICalComponent_UPDATE = "UPDATE"
-cICalComponent_DELETE = "DELETE"
+cICalComponent_PATCH = "PATCH"
 
+cICalProperty_PATCH_VERSION = "PATCH-VERSION"
 cICalProperty_PATCH_ORDER = "PATCH-ORDER"
-cICalProperty_TARGET = "TARGET"
-cICalProperty_SETPARAMETER = "SETPARAMETER"
+cICalProperty_PATCH_TARGET = "PATCH-TARGET"
+cICalProperty_PATCH_DELETE = "PATCH-DELETE"
+cICalProperty_PATCH_PARAMETER = "PATCH-PARAMETER"
+
+cICalParameter_PATCH_ACTION = "PATCH-ACTION"
+cICalParameter_PATCH_ACTION_CREATE = "CREATE"
+cICalParameter_PATCH_ACTION_BYNAME = "BYNAME"
+cICalParameter_PATCH_ACTION_BYVALUE = "BYVALUE"
+cICalParameter_PATCH_ACTION_BYPARAM = "BYPARAM"
 
 
 #     Mulberry extensions

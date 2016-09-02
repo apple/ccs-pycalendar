@@ -38,15 +38,13 @@ import vcard.orgvalue
 # Import these to register the components
 
 import icalendar.available
+import icalendar.patch
 import icalendar.valarm
 import icalendar.vavailability
 import icalendar.vevent
 import icalendar.vfreebusy
 import icalendar.vjournal
 import icalendar.vpatch
-import icalendar.vpatchcreate
-import icalendar.vpatchdelete
-import icalendar.vpatchupdate
 import icalendar.vpoll
 import icalendar.vote
 import icalendar.vtimezone

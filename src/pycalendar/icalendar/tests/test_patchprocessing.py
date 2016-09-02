@@ -23,7 +23,7 @@ import unittest
 
 from pycalendar.datetime import DateTime
 from pycalendar.icalendar.calendar import Calendar
-from pycalendar.icalendar.patch import Command, Path, PatchDocument, PatchGenerator
+from pycalendar.icalendar.patchprocessing import Command, Path, PatchDocument  # , PatchGenerator
 from pycalendar.icalendar.vpatch import VPatch
 from difflib import unified_diff
 
@@ -59,8 +59,8 @@ PRODID:-//example.com//Example v0.1//EN
 BEGIN:VPATCH
 UID:77CA7115-B195-49FF-8AB9-01A1F3AC4F5C
 DTSTAMP:20160831T102600Z
-BEGIN:CREATE
-TARGET:/VCALENDAR
+BEGIN:PATCH
+PATCH-TARGET:/VCALENDAR
 BEGIN:VEVENT
 UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
 DTSTART;VALUE=DATE:20020101
@@ -69,7 +69,7 @@ DTSTAMP:20020101T000000Z
 RRULE:FREQ=YEARLY;UNTIL=20031231;BYMONTH=1
 SUMMARY:New Year's Day
 END:VEVENT
-END:CREATE
+END:PATCH
 END:VPATCH
 END:VCALENDAR
 """,
@@ -111,8 +111,8 @@ PRODID:-//example.com//Example v0.1//EN
 BEGIN:VPATCH
 UID:77CA7115-B195-49FF-8AB9-01A1F3AC4F5C
 DTSTAMP:20160831T102600Z
-BEGIN:CREATE
-TARGET:/VCALENDAR
+BEGIN:PATCH
+PATCH-TARGET:/VCALENDAR
 BEGIN:VEVENT
 UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
 DTSTART;VALUE=DATE:20020101
@@ -129,7 +129,7 @@ DTSTAMP:20020101T000000Z
 RRULE:FREQ=YEARLY
 SUMMARY:April Fool's Day
 END:VEVENT
-END:CREATE
+END:PATCH
 END:VPATCH
 END:VCALENDAR
 """,
@@ -177,15 +177,15 @@ PRODID:-//example.com//Example v0.1//EN
 BEGIN:VPATCH
 UID:77CA7115-B195-49FF-8AB9-01A1F3AC4F5C
 DTSTAMP:20160831T102600Z
-BEGIN:CREATE
-TARGET:/VCALENDAR/VEVENT
+BEGIN:PATCH
+PATCH-TARGET:/VCALENDAR/VEVENT
 BEGIN:VALARM
 UID:D9D1AC84-F629-4B9D-9B6B-4A6CA9A11FEF
 DESCRIPTION:Event reminder
 TRIGGER:-PT8M
 ACTION:DISPLAY
 END:VALARM
-END:CREATE
+END:PATCH
 END:VPATCH
 END:VCALENDAR
 """,
@@ -229,10 +229,10 @@ PRODID:-//example.com//Example v0.1//EN
 BEGIN:VPATCH
 UID:77CA7115-B195-49FF-8AB9-01A1F3AC4F5C
 DTSTAMP:20160831T102600Z
-BEGIN:CREATE
-TARGET:/VCALENDAR
+BEGIN:PATCH
+PATCH-TARGET:/VCALENDAR
 CALSCALE:GREGORIAN
-END:CREATE
+END:PATCH
 END:VPATCH
 END:VCALENDAR
 """,
@@ -274,11 +274,11 @@ PRODID:-//example.com//Example v0.1//EN
 BEGIN:VPATCH
 UID:77CA7115-B195-49FF-8AB9-01A1F3AC4F5C
 DTSTAMP:20160831T102600Z
-BEGIN:CREATE
-TARGET:/VCALENDAR
+BEGIN:PATCH
+PATCH-TARGET:/VCALENDAR
 CALSCALE:GREGORIAN
 REFRESH-INTERVAL:10
-END:CREATE
+END:PATCH
 END:VPATCH
 END:VCALENDAR
 """,
@@ -321,10 +321,10 @@ PRODID:-//example.com//Example v0.1//EN
 BEGIN:VPATCH
 UID:77CA7115-B195-49FF-8AB9-01A1F3AC4F5C
 DTSTAMP:20160831T102600Z
-BEGIN:CREATE
-TARGET:/VCALENDAR/VEVENT
+BEGIN:PATCH
+PATCH-TARGET:/VCALENDAR/VEVENT
 STATUS:CANCELLED
-END:CREATE
+END:PATCH
 END:VPATCH
 END:VCALENDAR
 """,
@@ -368,11 +368,59 @@ PRODID:-//example.com//Example v0.1//EN
 BEGIN:VPATCH
 UID:77CA7115-B195-49FF-8AB9-01A1F3AC4F5C
 DTSTAMP:20160831T102600Z
-BEGIN:CREATE
-TARGET:/VCALENDAR/VEVENT
+BEGIN:PATCH
+PATCH-TARGET:/VCALENDAR/VEVENT
 STATUS:CANCELLED
 TRANSP:TRANSPARENT
-END:CREATE
+END:PATCH
+END:VPATCH
+END:VCALENDAR
+""",
+        },
+        {
+            "title": "Add one multi-property to an event",
+            "before": """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//example.com//Example v0.1//EN
+BEGIN:VEVENT
+UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
+DTSTART;VALUE=DATE:20020101
+DTEND;VALUE=DATE:20020102
+DTSTAMP:20020101T000000Z
+RRULE:FREQ=YEARLY;UNTIL=20031231;BYMONTH=1
+SUMMARY:New Year's Day
+CATEGORIES:Holiday
+END:VEVENT
+END:VCALENDAR
+""",
+            "after": """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//example.com//Example v0.1//EN
+BEGIN:VEVENT
+UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
+DTSTART;VALUE=DATE:20020101
+DTEND;VALUE=DATE:20020102
+CATEGORIES:Holiday
+CATEGORIES:Party
+DTSTAMP:20020101T000000Z
+RRULE:FREQ=YEARLY;UNTIL=20031231;BYMONTH=1
+SUMMARY:New Year's Day
+END:VEVENT
+END:VCALENDAR
+""",
+            "patch": """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//example.com//Example v0.1//EN
+BEGIN:VPATCH
+UID:77CA7115-B195-49FF-8AB9-01A1F3AC4F5C
+DTSTAMP:20160831T102600Z
+BEGIN:PATCH
+PATCH-TARGET:/VCALENDAR/VEVENT
+CATEGORIES;PATCH-ACTION=CREATE:Party
+END:PATCH
 END:VPATCH
 END:VCALENDAR
 """,
@@ -420,109 +468,15 @@ PRODID:-//example.com//Example v0.1//EN
 BEGIN:VPATCH
 UID:77CA7115-B195-49FF-8AB9-01A1F3AC4F5C
 DTSTAMP:20160831T102600Z
-BEGIN:CREATE
-TARGET:/VCALENDAR/VEVENT
+BEGIN:PATCH
+PATCH-TARGET:/VCALENDAR/VEVENT
 STATUS:CONFIRMED
 BEGIN:VALARM
 TRIGGER:-P1D
 ACTION:DISPLAY
 DESCRIPTION:Get ready for party!
 END:VALARM
-END:CREATE
-END:VPATCH
-END:VCALENDAR
-""",
-        },
-        {
-            "title": "Add one parameter to a property",
-            "before": """BEGIN:VCALENDAR
-VERSION:2.0
-CALSCALE:GREGORIAN
-PRODID:-//example.com//Example v0.1//EN
-BEGIN:VEVENT
-UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
-DTSTART;VALUE=DATE:20020101
-DTEND;VALUE=DATE:20020102
-ATTENDEE:mailto:cyrus@example.com
-DTSTAMP:20020101T000000Z
-RRULE:FREQ=YEARLY;UNTIL=20031231;BYMONTH=1
-SUMMARY:New Year's Day
-END:VEVENT
-END:VCALENDAR
-""",
-            "after": """BEGIN:VCALENDAR
-VERSION:2.0
-CALSCALE:GREGORIAN
-PRODID:-//example.com//Example v0.1//EN
-BEGIN:VEVENT
-UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
-DTSTART;VALUE=DATE:20020101
-DTEND;VALUE=DATE:20020102
-ATTENDEE;PARTSTAT=ACCEPTED:mailto:cyrus@example.com
-DTSTAMP:20020101T000000Z
-RRULE:FREQ=YEARLY;UNTIL=20031231;BYMONTH=1
-SUMMARY:New Year's Day
-END:VEVENT
-END:VCALENDAR
-""",
-            "patch": """BEGIN:VCALENDAR
-VERSION:2.0
-CALSCALE:GREGORIAN
-PRODID:-//example.com//Example v0.1//EN
-BEGIN:VPATCH
-UID:77CA7115-B195-49FF-8AB9-01A1F3AC4F5C
-DTSTAMP:20160831T102600Z
-BEGIN:CREATE
-TARGET:/VCALENDAR/VEVENT#ATTENDEE
-SETPARAMETER;PARTSTAT=ACCEPTED:1
-END:CREATE
-END:VPATCH
-END:VCALENDAR
-""",
-        },
-        {
-            "title": "Add two parameters to a property",
-            "before": """BEGIN:VCALENDAR
-VERSION:2.0
-CALSCALE:GREGORIAN
-PRODID:-//example.com//Example v0.1//EN
-BEGIN:VEVENT
-UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
-DTSTART;VALUE=DATE:20020101
-DTEND;VALUE=DATE:20020102
-ATTENDEE:mailto:cyrus@example.com
-DTSTAMP:20020101T000000Z
-RRULE:FREQ=YEARLY;UNTIL=20031231;BYMONTH=1
-SUMMARY:New Year's Day
-END:VEVENT
-END:VCALENDAR
-""",
-            "after": """BEGIN:VCALENDAR
-VERSION:2.0
-CALSCALE:GREGORIAN
-PRODID:-//example.com//Example v0.1//EN
-BEGIN:VEVENT
-UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
-DTSTART;VALUE=DATE:20020101
-DTEND;VALUE=DATE:20020102
-ATTENDEE;CN=Happy Customer;PARTSTAT=ACCEPTED:mailto:cyrus@example.com
-DTSTAMP:20020101T000000Z
-RRULE:FREQ=YEARLY;UNTIL=20031231;BYMONTH=1
-SUMMARY:New Year's Day
-END:VEVENT
-END:VCALENDAR
-""",
-            "patch": """BEGIN:VCALENDAR
-VERSION:2.0
-CALSCALE:GREGORIAN
-PRODID:-//example.com//Example v0.1//EN
-BEGIN:VPATCH
-UID:77CA7115-B195-49FF-8AB9-01A1F3AC4F5C
-DTSTAMP:20160831T102600Z
-BEGIN:CREATE
-TARGET:/VCALENDAR/VEVENT#ATTENDEE
-SETPARAMETER;PARTSTAT=ACCEPTED;CN=Happy Customer:1
-END:CREATE
+END:PATCH
 END:VPATCH
 END:VCALENDAR
 """,
@@ -565,10 +519,10 @@ PRODID:-//example.com//Example v0.1//EN
 BEGIN:VPATCH
 UID:77CA7115-B195-49FF-8AB9-01A1F3AC4F5C
 DTSTAMP:20160831T102600Z
-BEGIN:CREATE
-TARGET:/VCALENDAR/VEVENT#SUMMARY
-SETPARAMETER;LANGUAGE=en_US:1
-END:CREATE
+BEGIN:PATCH
+PATCH-TARGET:/VCALENDAR/VEVENT
+PATCH-PARAMETER;LANGUAGE=en_US:#SUMMARY
+END:PATCH
 END:VPATCH
 END:VCALENDAR
 """,
@@ -608,10 +562,10 @@ PRODID:-//example.com//Example v0.1//EN
 BEGIN:VPATCH
 UID:77CA7115-B195-49FF-8AB9-01A1F3AC4F5C
 DTSTAMP:20160831T102600Z
-BEGIN:CREATE
-TARGET:/VCALENDAR/VEVENT#SUMMARY
-SETPARAMETER;LANGUAGE=en_US;ALTREP="cid:xyz@example.com":1
-END:CREATE
+BEGIN:PATCH
+PATCH-TARGET:/VCALENDAR/VEVENT
+PATCH-PARAMETER;LANGUAGE=en_US;ALTREP="cid:xyz@example.com":#SUMMARY
+END:PATCH
 END:VPATCH
 END:VCALENDAR
 """,
@@ -656,8 +610,8 @@ PRODID:-//example.com//Example v0.1//EN
 BEGIN:VPATCH
 UID:77CA7115-B195-49FF-8AB9-01A1F3AC4F5C
 DTSTAMP:20160831T102600Z
-BEGIN:UPDATE
-TARGET:/VCALENDAR/VEVENT
+BEGIN:PATCH
+PATCH-TARGET:/VCALENDAR
 BEGIN:VEVENT
 UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
 DTSTART;VALUE=DATE:20020101
@@ -666,7 +620,7 @@ DTSTAMP:20020101T000000Z
 RRULE:FREQ=YEARLY
 SUMMARY:New Year's Day - party time
 END:VEVENT
-END:UPDATE
+END:PATCH
 END:VPATCH
 END:VCALENDAR
 """,
@@ -718,8 +672,8 @@ PRODID:-//example.com//Example v0.1//EN
 BEGIN:VPATCH
 UID:77CA7115-B195-49FF-8AB9-01A1F3AC4F5C
 DTSTAMP:20160831T102600Z
-BEGIN:UPDATE
-TARGET:/VCALENDAR/VEVENT
+BEGIN:PATCH
+PATCH-TARGET:/VCALENDAR
 BEGIN:VEVENT
 UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
 DTSTART;VALUE=DATE:20020101
@@ -738,7 +692,7 @@ RRULE:FREQ=YEARLY
 STATUS:CANCELLED
 SUMMARY:New Year's Day - cancelled
 END:VEVENT
-END:UPDATE
+END:PATCH
 END:VPATCH
 END:VCALENDAR
 """,
@@ -799,8 +753,8 @@ PRODID:-//example.com//Example v0.1//EN
 BEGIN:VPATCH
 UID:77CA7115-B195-49FF-8AB9-01A1F3AC4F5C
 DTSTAMP:20160831T102600Z
-BEGIN:UPDATE
-TARGET:/VCALENDAR/VEVENT[UID=C3184A66-1ED0-11D9-A5E0-000A958A3252][RID=20030101]
+BEGIN:PATCH
+PATCH-TARGET:/VCALENDAR
 BEGIN:VEVENT
 UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
 RECURRENCE-ID;VALUE=DATE:20030101
@@ -810,7 +764,7 @@ DTSTAMP:20020101T000000Z
 RRULE:FREQ=YEARLY
 SUMMARY:New Year's Day - it is on again!
 END:VEVENT
-END:UPDATE
+END:PATCH
 END:VPATCH
 END:VCALENDAR
 """,
@@ -863,10 +817,10 @@ PRODID:-//example.com//Example v0.1//EN
 BEGIN:VPATCH
 UID:77CA7115-B195-49FF-8AB9-01A1F3AC4F5C
 DTSTAMP:20160831T102600Z
-BEGIN:UPDATE
-TARGET:/VCALENDAR/VEVENT[UID=C3184A66-1ED0-11D9-A5E0-000A958A3252][RID=20030101]#SUMMARY
+BEGIN:PATCH
+PATCH-TARGET:/VCALENDAR/VEVENT[UID=C3184A66-1ED0-11D9-A5E0-000A958A3252][RID=20030101]
 SUMMARY:New Year's Day - party time
-END:UPDATE
+END:PATCH
 END:VPATCH
 END:VCALENDAR
 """,
@@ -910,10 +864,10 @@ PRODID:-//example.com//Example v0.1//EN
 BEGIN:VPATCH
 UID:77CA7115-B195-49FF-8AB9-01A1F3AC4F5C
 DTSTAMP:20160831T102600Z
-BEGIN:UPDATE
-TARGET:/VCALENDAR/VEVENT#TRANSP
+BEGIN:PATCH
+PATCH-TARGET:/VCALENDAR/VEVENT
 TRANSP:TRANSPARENT
-END:UPDATE
+END:PATCH
 END:VPATCH
 END:VCALENDAR
 """,
@@ -955,10 +909,10 @@ PRODID:-//example.com//Example v0.1//EN
 BEGIN:VPATCH
 UID:77CA7115-B195-49FF-8AB9-01A1F3AC4F5C
 DTSTAMP:20160831T102600Z
-BEGIN:UPDATE
-TARGET:/VCALENDAR/VEVENT#TRANSP
+BEGIN:PATCH
+PATCH-TARGET:/VCALENDAR/VEVENT
 TRANSP:TRANSPARENT
-END:UPDATE
+END:PATCH
 END:VPATCH
 END:VCALENDAR
 """,
@@ -1018,10 +972,10 @@ PRODID:-//example.com//Example v0.1//EN
 BEGIN:VPATCH
 UID:77CA7115-B195-49FF-8AB9-01A1F3AC4F5C
 DTSTAMP:20160831T102600Z
-BEGIN:UPDATE
-TARGET:/VCALENDAR/VEVENT#STATUS
+BEGIN:PATCH
+PATCH-TARGET:/VCALENDAR/VEVENT
 STATUS:CONFIRMED
-END:UPDATE
+END:PATCH
 END:VPATCH
 END:VCALENDAR
 """,
@@ -1083,10 +1037,10 @@ PRODID:-//example.com//Example v0.1//EN
 BEGIN:VPATCH
 UID:77CA7115-B195-49FF-8AB9-01A1F3AC4F5C
 DTSTAMP:20160831T102600Z
-BEGIN:UPDATE
-TARGET:/VCALENDAR/VEVENT[UID=C3184A66-1ED0-11D9-A5E0-000A958A3252]#STATUS
+BEGIN:PATCH
+PATCH-TARGET:/VCALENDAR/VEVENT[UID=C3184A66-1ED0-11D9-A5E0-000A958A3252]
 STATUS:CONFIRMED
-END:UPDATE
+END:PATCH
 END:VPATCH
 END:VCALENDAR
 """,
@@ -1128,17 +1082,16 @@ PRODID:-//example.com//Example v0.1//EN
 BEGIN:VPATCH
 UID:77CA7115-B195-49FF-8AB9-01A1F3AC4F5C
 DTSTAMP:20160831T102600Z
-BEGIN:UPDATE
-TARGET:/VCALENDAR/VEVENT#
+BEGIN:PATCH
+PATCH-TARGET:/VCALENDAR/VEVENT
 SUMMARY:New Year's Day non blocking
 TRANSP:TRANSPARENT
-END:UPDATE
+END:PATCH
 END:VPATCH
 END:VCALENDAR
 """,
         },
     ],
-
 
     "update_parameter_simple": [
         {
@@ -1176,10 +1129,10 @@ PRODID:-//example.com//Example v0.1//EN
 BEGIN:VPATCH
 UID:77CA7115-B195-49FF-8AB9-01A1F3AC4F5C
 DTSTAMP:20160831T102600Z
-BEGIN:UPDATE
-TARGET:/VCALENDAR/VEVENT#SUMMARY;
-SETPARAMETER;LANGUAGE=en_GB:1
-END:UPDATE
+BEGIN:PATCH
+PATCH-TARGET:/VCALENDAR/VEVENT
+PATCH-PARAMETER;LANGUAGE=en_GB:#SUMMARY
+END:PATCH
 END:VPATCH
 END:VCALENDAR
 """,
@@ -1219,10 +1172,10 @@ PRODID:-//example.com//Example v0.1//EN
 BEGIN:VPATCH
 UID:77CA7115-B195-49FF-8AB9-01A1F3AC4F5C
 DTSTAMP:20160831T102600Z
-BEGIN:UPDATE
-TARGET:/VCALENDAR/VEVENT#SUMMARY;
-SETPARAMETER;LANGUAGE=en_GB;ALTREP="cid:xyz@example.com":1
-END:UPDATE
+BEGIN:PATCH
+PATCH-TARGET:/VCALENDAR/VEVENT
+PATCH-PARAMETER;LANGUAGE=en_GB;ALTREP="cid:xyz@example.com":#SUMMARY
+END:PATCH
 END:VPATCH
 END:VCALENDAR
 """,
@@ -1259,9 +1212,10 @@ PRODID:-//example.com//Example v0.1//EN
 BEGIN:VPATCH
 UID:77CA7115-B195-49FF-8AB9-01A1F3AC4F5C
 DTSTAMP:20160831T102600Z
-BEGIN:DELETE
-TARGET:/VCALENDAR/VEVENT
-END:DELETE
+BEGIN:PATCH
+PATCH-TARGET:/VCALENDAR
+PATCH-DELETE:/VEVENT
+END:PATCH
 END:VPATCH
 END:VCALENDAR
 """,
@@ -1311,9 +1265,10 @@ PRODID:-//example.com//Example v0.1//EN
 BEGIN:VPATCH
 UID:77CA7115-B195-49FF-8AB9-01A1F3AC4F5C
 DTSTAMP:20160831T102600Z
-BEGIN:DELETE
-TARGET:/VCALENDAR/VEVENT[UID=C3184A66-1ED0-11D9-A5E0-000A958A3252]
-END:DELETE
+BEGIN:PATCH
+PATCH-TARGET:/VCALENDAR
+PATCH-DELETE:/VEVENT[UID=C3184A66-1ED0-11D9-A5E0-000A958A3252]
+END:PATCH
 END:VPATCH
 END:VCALENDAR
 """,
@@ -1355,9 +1310,10 @@ PRODID:-//example.com//Example v0.1//EN
 BEGIN:VPATCH
 UID:77CA7115-B195-49FF-8AB9-01A1F3AC4F5C
 DTSTAMP:20160831T102600Z
-BEGIN:DELETE
-TARGET:/VCALENDAR/VEVENT
-END:DELETE
+BEGIN:PATCH
+PATCH-TARGET:/VCALENDAR
+PATCH-DELETE:/VEVENT
+END:PATCH
 END:VPATCH
 END:VCALENDAR
 """,
@@ -1405,9 +1361,10 @@ PRODID:-//example.com//Example v0.1//EN
 BEGIN:VPATCH
 UID:77CA7115-B195-49FF-8AB9-01A1F3AC4F5C
 DTSTAMP:20160831T102600Z
-BEGIN:DELETE
-TARGET:/VCALENDAR/VEVENT/VALARM
-END:DELETE
+BEGIN:PATCH
+PATCH-TARGET:/VCALENDAR/VEVENT
+PATCH-DELETE:/VALARM
+END:PATCH
 END:VPATCH
 END:VCALENDAR
 """,
@@ -1467,9 +1424,10 @@ PRODID:-//example.com//Example v0.1//EN
 BEGIN:VPATCH
 UID:77CA7115-B195-49FF-8AB9-01A1F3AC4F5C
 DTSTAMP:20160831T102600Z
-BEGIN:DELETE
-TARGET:/VCALENDAR/VEVENT/VALARM[UID=D78F6991-DFDD-491B-8334-FA9BF8E4F11C]
-END:DELETE
+BEGIN:PATCH
+PATCH-TARGET:/VCALENDAR/VEVENT
+PATCH-DELETE:/VALARM[UID=D78F6991-DFDD-491B-8334-FA9BF8E4F11C]
+END:PATCH
 END:VPATCH
 END:VCALENDAR
 """,
@@ -1513,9 +1471,10 @@ PRODID:-//example.com//Example v0.1//EN
 BEGIN:VPATCH
 UID:77CA7115-B195-49FF-8AB9-01A1F3AC4F5C
 DTSTAMP:20160831T102600Z
-BEGIN:DELETE
-TARGET:/VCALENDAR#CALSCALE
-END:DELETE
+BEGIN:PATCH
+PATCH-TARGET:/VCALENDAR
+PATCH-DELETE:#CALSCALE
+END:PATCH
 END:VPATCH
 END:VCALENDAR
 """,
@@ -1556,9 +1515,10 @@ PRODID:-//example.com//Example v0.1//EN
 BEGIN:VPATCH
 UID:77CA7115-B195-49FF-8AB9-01A1F3AC4F5C
 DTSTAMP:20160831T102600Z
-BEGIN:DELETE
-TARGET:/VCALENDAR/VEVENT#RRULE
-END:DELETE
+BEGIN:PATCH
+PATCH-TARGET:/VCALENDAR/VEVENT
+PATCH-DELETE:#RRULE
+END:PATCH
 END:VPATCH
 END:VCALENDAR
 """,
@@ -1615,9 +1575,10 @@ PRODID:-//example.com//Example v0.1//EN
 BEGIN:VPATCH
 UID:77CA7115-B195-49FF-8AB9-01A1F3AC4F5C
 DTSTAMP:20160831T102600Z
-BEGIN:DELETE
-TARGET:/VCALENDAR/VEVENT[UID=C3184A66-1ED0-11D9-A5E0-000A958A3252]#RRULE
-END:DELETE
+BEGIN:PATCH
+PATCH-TARGET:/VCALENDAR/VEVENT[UID=C3184A66-1ED0-11D9-A5E0-000A958A3252]
+PATCH-DELETE:#RRULE
+END:PATCH
 END:VPATCH
 END:VCALENDAR
 """,
@@ -1668,9 +1629,10 @@ PRODID:-//example.com//Example v0.1//EN
 BEGIN:VPATCH
 UID:77CA7115-B195-49FF-8AB9-01A1F3AC4F5C
 DTSTAMP:20160831T102600Z
-BEGIN:DELETE
-TARGET:/VCALENDAR/VEVENT#ATTENDEE[=mailto:user03@example.com]
-END:DELETE
+BEGIN:PATCH
+PATCH-TARGET:/VCALENDAR/VEVENT
+PATCH-DELETE:#ATTENDEE[=mailto:user03@example.com]
+END:PATCH
 END:VPATCH
 END:VCALENDAR
 """,
@@ -1747,9 +1709,10 @@ PRODID:-//example.com//Example v0.1//EN
 BEGIN:VPATCH
 UID:77CA7115-B195-49FF-8AB9-01A1F3AC4F5C
 DTSTAMP:20160831T102600Z
-BEGIN:DELETE
-TARGET:/VCALENDAR/VEVENT[RID=20120101]#ATTENDEE[=mailto:user03@example.com]
-END:DELETE
+BEGIN:PATCH
+PATCH-TARGET:/VCALENDAR/VEVENT[RID=20120101]
+PATCH-DELETE:#ATTENDEE[=mailto:user03@example.com]
+END:PATCH
 END:VPATCH
 END:VCALENDAR
 """,
@@ -1793,10 +1756,11 @@ PRODID:-//example.com//Example v0.1//EN
 BEGIN:VPATCH
 UID:77CA7115-B195-49FF-8AB9-01A1F3AC4F5C
 DTSTAMP:20160831T102600Z
-BEGIN:DELETE
-TARGET:/VCALENDAR/VEVENT#DESCRIPTION
-TARGET:/VCALENDAR/VEVENT#LOCATION
-END:DELETE
+BEGIN:PATCH
+PATCH-TARGET:/VCALENDAR/VEVENT
+PATCH-DELETE:#DESCRIPTION
+PATCH-DELETE:#LOCATION
+END:PATCH
 END:VPATCH
 END:VCALENDAR
 """,
@@ -1851,9 +1815,10 @@ PRODID:-//example.com//Example v0.1//EN
 BEGIN:VPATCH
 UID:77CA7115-B195-49FF-8AB9-01A1F3AC4F5C
 DTSTAMP:20160831T102600Z
-BEGIN:DELETE
-TARGET:/VCALENDAR/VEVENT#ATTENDEE;PARTSTAT
-END:DELETE
+BEGIN:PATCH
+PATCH-TARGET:/VCALENDAR/VEVENT
+PATCH-DELETE:#ATTENDEE;PARTSTAT
+END:PATCH
 END:VPATCH
 END:VCALENDAR
 """,
@@ -1905,9 +1870,10 @@ PRODID:-//example.com//Example v0.1//EN
 BEGIN:VPATCH
 UID:77CA7115-B195-49FF-8AB9-01A1F3AC4F5C
 DTSTAMP:20160831T102600Z
-BEGIN:DELETE
-TARGET:/VCALENDAR/VEVENT#ATTENDEE[=mailto:user03@example.com];PARTSTAT
-END:DELETE
+BEGIN:PATCH
+PATCH-TARGET:/VCALENDAR/VEVENT
+PATCH-DELETE:#ATTENDEE[=mailto:user03@example.com];PARTSTAT
+END:PATCH
 END:VPATCH
 END:VCALENDAR
 """,
@@ -1985,9 +1951,10 @@ PRODID:-//example.com//Example v0.1//EN
 BEGIN:VPATCH
 UID:77CA7115-B195-49FF-8AB9-01A1F3AC4F5C
 DTSTAMP:20160831T102600Z
-BEGIN:DELETE
-TARGET:/VCALENDAR/VEVENT[RID=20120101]#ATTENDEE[=mailto:user03@example.com];PARTSTAT
-END:DELETE
+BEGIN:PATCH
+PATCH-TARGET:/VCALENDAR/VEVENT[RID=20120101]
+PATCH-DELETE:#ATTENDEE[=mailto:user03@example.com];PARTSTAT
+END:PATCH
 END:VPATCH
 END:VCALENDAR
 """,
@@ -1997,7 +1964,7 @@ END:VCALENDAR
 
 dataInvalid = [
     {
-        "title": "CREATE component or property - at least one component or property",
+        "title": "PATCH component - multiple targets",
         "patch": """BEGIN:VCALENDAR
 VERSION:2.0
 CALSCALE:GREGORIAN
@@ -2005,32 +1972,18 @@ PRODID:-//example.com//Example v0.1//EN
 BEGIN:VPATCH
 UID:77CA7115-B195-49FF-8AB9-01A1F3AC4F5C
 DTSTAMP:20160831T102600Z
-BEGIN:CREATE
-TARGET:/VCALENDAR
-END:CREATE
-END:VPATCH
-END:VCALENDAR
-""",
-    },
-    {
-        "title": "CREATE component or property - property no name path not allowed",
-        "patch": """BEGIN:VCALENDAR
-VERSION:2.0
-CALSCALE:GREGORIAN
-PRODID:-//example.com//Example v0.1//EN
-BEGIN:VPATCH
-UID:77CA7115-B195-49FF-8AB9-01A1F3AC4F5C
-DTSTAMP:20160831T102600Z
-BEGIN:CREATE
-TARGET:/VCALENDAR/VEVENT#
+BEGIN:PATCH
+PATCH-TARGET:/VCALENDAR/VEVENT
+PATCH-TARGET:/VCALENDAR/VTODO
+SUMMARY:Changed
 SUMMARY:foo
-END:CREATE
+END:PATCH
 END:VPATCH
 END:VCALENDAR
 """,
     },
     {
-        "title": "CREATE property - property with name path not allowed",
+        "title": "PATCH component - no target",
         "patch": """BEGIN:VCALENDAR
 VERSION:2.0
 CALSCALE:GREGORIAN
@@ -2038,16 +1991,16 @@ PRODID:-//example.com//Example v0.1//EN
 BEGIN:VPATCH
 UID:77CA7115-B195-49FF-8AB9-01A1F3AC4F5C
 DTSTAMP:20160831T102600Z
-BEGIN:CREATE
-TARGET:/VCALENDAR/VEVENT#SUMMARY
+BEGIN:PATCH
+SUMMARY:Changed
 SUMMARY:foo
-END:CREATE
+END:PATCH
 END:VPATCH
 END:VCALENDAR
 """,
     },
     {
-        "title": "CREATE parameter - no components",
+        "title": "PATCH component or property - at least one component or property",
         "patch": """BEGIN:VCALENDAR
 VERSION:2.0
 CALSCALE:GREGORIAN
@@ -2055,17 +2008,15 @@ PRODID:-//example.com//Example v0.1//EN
 BEGIN:VPATCH
 UID:77CA7115-B195-49FF-8AB9-01A1F3AC4F5C
 DTSTAMP:20160831T102600Z
-BEGIN:CREATE
-TARGET:/VCALENDAR/VEVENT#ATTENDEE
-BEGIN:VALARM
-END:VALARM
-END:CREATE
+BEGIN:PATCH
+PATCH-TARGET:/VCALENDAR
+END:PATCH
 END:VPATCH
 END:VCALENDAR
 """,
     },
     {
-        "title": "CREATE parameter - no different properties",
+        "title": "PATCH component - property no name path not allowed",
         "patch": """BEGIN:VCALENDAR
 VERSION:2.0
 CALSCALE:GREGORIAN
@@ -2073,17 +2024,16 @@ PRODID:-//example.com//Example v0.1//EN
 BEGIN:VPATCH
 UID:77CA7115-B195-49FF-8AB9-01A1F3AC4F5C
 DTSTAMP:20160831T102600Z
-BEGIN:CREATE
-TARGET:/VCALENDAR/VEVENT#ATTENDEE
+BEGIN:PATCH
+PATCH-TARGET:/VCALENDAR/VEVENT#
 SUMMARY:foo
-SETPARAMETER;RSVP=FALSE:0
-END:CREATE
+END:PATCH
 END:VPATCH
 END:VCALENDAR
 """,
     },
     {
-        "title": "CREATE parameter - no properties",
+        "title": "PATCH component - property with name path not allowed",
         "patch": """BEGIN:VCALENDAR
 VERSION:2.0
 CALSCALE:GREGORIAN
@@ -2091,35 +2041,69 @@ PRODID:-//example.com//Example v0.1//EN
 BEGIN:VPATCH
 UID:77CA7115-B195-49FF-8AB9-01A1F3AC4F5C
 DTSTAMP:20160831T102600Z
-BEGIN:CREATE
-TARGET:/VCALENDAR/VEVENT#ATTENDEE
-END:CREATE
-END:VPATCH
-END:VCALENDAR
-""",
-    },
-
-    {
-        "title": "UPDATE component - no properties",
-        "patch": """BEGIN:VCALENDAR
-VERSION:2.0
-CALSCALE:GREGORIAN
-PRODID:-//example.com//Example v0.1//EN
-BEGIN:VPATCH
-UID:77CA7115-B195-49FF-8AB9-01A1F3AC4F5C
-DTSTAMP:20160831T102600Z
-BEGIN:UPDATE
-TARGET:/VCALENDAR/VEVENT
+BEGIN:PATCH
+PATCH-TARGET:/VCALENDAR/VEVENT#SUMMARY
 SUMMARY:foo
+END:PATCH
+END:VPATCH
+END:VCALENDAR
+""",
+    },
+    {
+        "title": "PATCH component - parameter with no name path not allowed",
+        "patch": """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//example.com//Example v0.1//EN
+BEGIN:VPATCH
+UID:77CA7115-B195-49FF-8AB9-01A1F3AC4F5C
+DTSTAMP:20160831T102600Z
+BEGIN:PATCH
+PATCH-TARGET:/VCALENDAR/VEVENT#DESCRIPTIOPN;
+SUMMARY:foo
+END:PATCH
+END:VPATCH
+END:VCALENDAR
+""",
+    },
+    {
+        "title": "PATCH component - parameter with name path not allowed",
+        "patch": """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//example.com//Example v0.1//EN
+BEGIN:VPATCH
+UID:77CA7115-B195-49FF-8AB9-01A1F3AC4F5C
+DTSTAMP:20160831T102600Z
+BEGIN:PATCH
+PATCH-TARGET:/VCALENDAR/VEVENT#DESCRIPTIOPN;LANGUAGE
+SUMMARY:foo
+END:PATCH
+END:VPATCH
+END:VCALENDAR
+""",
+    },
+    {
+        "title": "PATCH component - delete path property no name not allowed",
+        "patch": """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//example.com//Example v0.1//EN
+BEGIN:VPATCH
+UID:77CA7115-B195-49FF-8AB9-01A1F3AC4F5C
+DTSTAMP:20160831T102600Z
+BEGIN:PATCH
+PATCH-TARGET:/VCALENDAR/VEVENT
+PATCH-DELETE:#
 BEGIN:VEVENT
 END:VEVENT
-END:UPDATE
+END:PATCH
 END:VPATCH
 END:VCALENDAR
 """,
     },
     {
-        "title": "UPDATE component - at least one component",
+        "title": "PATCH component - delete path parameter no name not allowed",
         "patch": """BEGIN:VCALENDAR
 VERSION:2.0
 CALSCALE:GREGORIAN
@@ -2127,362 +2111,12 @@ PRODID:-//example.com//Example v0.1//EN
 BEGIN:VPATCH
 UID:77CA7115-B195-49FF-8AB9-01A1F3AC4F5C
 DTSTAMP:20160831T102600Z
-BEGIN:UPDATE
-TARGET:/VCALENDAR/VEVENT
-END:UPDATE
-END:VPATCH
-END:VCALENDAR
-""",
-    },
-    {
-        "title": "UPDATE component - different component types",
-        "patch": """BEGIN:VCALENDAR
-VERSION:2.0
-CALSCALE:GREGORIAN
-PRODID:-//example.com//Example v0.1//EN
-BEGIN:VPATCH
-UID:77CA7115-B195-49FF-8AB9-01A1F3AC4F5C
-DTSTAMP:20160831T102600Z
-BEGIN:UPDATE
-TARGET:/VCALENDAR/VEVENT
+BEGIN:PATCH
+PATCH-TARGET:/VCALENDAR/VEVENT
+PATCH-DELETE:#DESCRIPTION;
 BEGIN:VEVENT
 END:VEVENT
-BEGIN:VALARM
-END:VALARM
-END:UPDATE
-END:VPATCH
-END:VCALENDAR
-""",
-    },
-    {
-        "title": "UPDATE component - one component type match",
-        "patch": """BEGIN:VCALENDAR
-VERSION:2.0
-CALSCALE:GREGORIAN
-PRODID:-//example.com//Example v0.1//EN
-BEGIN:VPATCH
-UID:77CA7115-B195-49FF-8AB9-01A1F3AC4F5C
-DTSTAMP:20160831T102600Z
-BEGIN:UPDATE
-TARGET:/VCALENDAR/VEVENT
-BEGIN:VALARM
-END:VALARM
-END:UPDATE
-END:VPATCH
-END:VCALENDAR
-""",
-    },
-    {
-        "title": "UPDATE property - no components",
-        "patch": """BEGIN:VCALENDAR
-VERSION:2.0
-CALSCALE:GREGORIAN
-PRODID:-//example.com//Example v0.1//EN
-BEGIN:VPATCH
-UID:77CA7115-B195-49FF-8AB9-01A1F3AC4F5C
-DTSTAMP:20160831T102600Z
-BEGIN:UPDATE
-TARGET:/VCALENDAR/VEVENT#
-SUMMARY:foo
-BEGIN:VALARM
-END:VALARM
-END:UPDATE
-END:VPATCH
-END:VCALENDAR
-""",
-    },
-    {
-        "title": "UPDATE property - at least one property",
-        "patch": """BEGIN:VCALENDAR
-VERSION:2.0
-CALSCALE:GREGORIAN
-PRODID:-//example.com//Example v0.1//EN
-BEGIN:VPATCH
-UID:77CA7115-B195-49FF-8AB9-01A1F3AC4F5C
-DTSTAMP:20160831T102600Z
-BEGIN:UPDATE
-TARGET:/VCALENDAR/VEVENT#
-END:UPDATE
-END:VPATCH
-END:VCALENDAR
-""",
-    },
-    {
-        "title": "UPDATE named property - no components",
-        "patch": """BEGIN:VCALENDAR
-VERSION:2.0
-CALSCALE:GREGORIAN
-PRODID:-//example.com//Example v0.1//EN
-BEGIN:VPATCH
-UID:77CA7115-B195-49FF-8AB9-01A1F3AC4F5C
-DTSTAMP:20160831T102600Z
-BEGIN:UPDATE
-TARGET:/VCALENDAR/VEVENT#SUMMARY
-SUMMARY:foo
-BEGIN:VALARM
-END:VALARM
-END:UPDATE
-END:VPATCH
-END:VCALENDAR
-""",
-    },
-    {
-        "title": "UPDATE property - at least one property",
-        "patch": """BEGIN:VCALENDAR
-VERSION:2.0
-CALSCALE:GREGORIAN
-PRODID:-//example.com//Example v0.1//EN
-BEGIN:VPATCH
-UID:77CA7115-B195-49FF-8AB9-01A1F3AC4F5C
-DTSTAMP:20160831T102600Z
-BEGIN:UPDATE
-TARGET:/VCALENDAR/VEVENT#SUMMARY
-END:UPDATE
-END:VPATCH
-END:VCALENDAR
-""",
-    },
-    {
-        "title": "UPDATE named property - different property names",
-        "patch": """BEGIN:VCALENDAR
-VERSION:2.0
-CALSCALE:GREGORIAN
-PRODID:-//example.com//Example v0.1//EN
-BEGIN:VPATCH
-UID:77CA7115-B195-49FF-8AB9-01A1F3AC4F5C
-DTSTAMP:20160831T102600Z
-BEGIN:UPDATE
-TARGET:/VCALENDAR/VEVENT#SUMMARY
-SUMMARY:foo
-DESCRIPTION:bar
-END:UPDATE
-END:VPATCH
-END:VCALENDAR
-""",
-    },
-    {
-        "title": "UPDATE named property - wrong property name",
-        "patch": """BEGIN:VCALENDAR
-VERSION:2.0
-CALSCALE:GREGORIAN
-PRODID:-//example.com//Example v0.1//EN
-BEGIN:VPATCH
-UID:77CA7115-B195-49FF-8AB9-01A1F3AC4F5C
-DTSTAMP:20160831T102600Z
-BEGIN:UPDATE
-TARGET:/VCALENDAR/VEVENT#SUMMARY
-DESCRIPTION:bar
-END:UPDATE
-END:VPATCH
-END:VCALENDAR
-""",
-    },
-
-    {
-        "title": "UPDATE parameter - no components",
-        "patch": """BEGIN:VCALENDAR
-VERSION:2.0
-CALSCALE:GREGORIAN
-PRODID:-//example.com//Example v0.1//EN
-BEGIN:VPATCH
-UID:77CA7115-B195-49FF-8AB9-01A1F3AC4F5C
-DTSTAMP:20160831T102600Z
-BEGIN:UPDATE
-TARGET:/VCALENDAR/VEVENT#ATTENDEE;
-SETPARAMETER;RSVP=TRUE:1
-BEGIN:VALARM
-END:VALARM
-END:UPDATE
-END:VPATCH
-END:VCALENDAR
-""",
-    },
-    {
-        "title": "UPDATE parameter - at least one property",
-        "patch": """BEGIN:VCALENDAR
-VERSION:2.0
-CALSCALE:GREGORIAN
-PRODID:-//example.com//Example v0.1//EN
-BEGIN:VPATCH
-UID:77CA7115-B195-49FF-8AB9-01A1F3AC4F5C
-DTSTAMP:20160831T102600Z
-BEGIN:UPDATE
-TARGET:/VCALENDAR/VEVENT#ATTENDEE;
-END:UPDATE
-END:VPATCH
-END:VCALENDAR
-""",
-    },
-    {
-        "title": "UPDATE parameter - wrong property name",
-        "patch": """BEGIN:VCALENDAR
-VERSION:2.0
-CALSCALE:GREGORIAN
-PRODID:-//example.com//Example v0.1//EN
-BEGIN:VPATCH
-UID:77CA7115-B195-49FF-8AB9-01A1F3AC4F5C
-DTSTAMP:20160831T102600Z
-BEGIN:UPDATE
-TARGET:/VCALENDAR/VEVENT#ATTENDEE;
-ATTENDEE;RSVP=TRUE:1
-END:UPDATE
-END:VPATCH
-END:VCALENDAR
-""",
-    },
-    {
-        "title": "UPDATE parameter - no parameter name",
-        "patch": """BEGIN:VCALENDAR
-VERSION:2.0
-CALSCALE:GREGORIAN
-PRODID:-//example.com//Example v0.1//EN
-BEGIN:VPATCH
-UID:77CA7115-B195-49FF-8AB9-01A1F3AC4F5C
-DTSTAMP:20160831T102600Z
-BEGIN:UPDATE
-TARGET:/VCALENDAR/VEVENT#ATTENDEE;RSVP
-SETPARAMETER;RSVP=TRUE:1
-END:UPDATE
-END:VPATCH
-END:VCALENDAR
-""",
-    },
-
-    {
-        "title": "DELETE component - no component",
-        "patch": """BEGIN:VCALENDAR
-VERSION:2.0
-CALSCALE:GREGORIAN
-PRODID:-//example.com//Example v0.1//EN
-BEGIN:VPATCH
-UID:77CA7115-B195-49FF-8AB9-01A1F3AC4F5C
-DTSTAMP:20160831T102600Z
-BEGIN:DELETE
-TARGET:/VCALENDAR/VEVENT/VALARM
-BEGIN:VALARM
-END:VALARM
-END:DELETE
-END:VPATCH
-END:VCALENDAR
-""",
-    },
-    {
-        "title": "DELETE component - no properties",
-        "patch": """BEGIN:VCALENDAR
-VERSION:2.0
-CALSCALE:GREGORIAN
-PRODID:-//example.com//Example v0.1//EN
-BEGIN:VPATCH
-UID:77CA7115-B195-49FF-8AB9-01A1F3AC4F5C
-DTSTAMP:20160831T102600Z
-BEGIN:DELETE
-TARGET:/VCALENDAR/VEVENT/VALARM
-SUMMARY:foo
-END:DELETE
-END:VPATCH
-END:VCALENDAR
-""",
-    },
-
-    {
-        "title": "DELETE property - no component",
-        "patch": """BEGIN:VCALENDAR
-VERSION:2.0
-CALSCALE:GREGORIAN
-PRODID:-//example.com//Example v0.1//EN
-BEGIN:VPATCH
-UID:77CA7115-B195-49FF-8AB9-01A1F3AC4F5C
-DTSTAMP:20160831T102600Z
-BEGIN:DELETE
-TARGET:/VCALENDAR/VEVENT#DESCRIPTION
-BEGIN:VALARM
-END:VALARM
-END:DELETE
-END:VPATCH
-END:VCALENDAR
-""",
-    },
-    {
-        "title": "DELETE property - no properties",
-        "patch": """BEGIN:VCALENDAR
-VERSION:2.0
-CALSCALE:GREGORIAN
-PRODID:-//example.com//Example v0.1//EN
-BEGIN:VPATCH
-UID:77CA7115-B195-49FF-8AB9-01A1F3AC4F5C
-DTSTAMP:20160831T102600Z
-BEGIN:DELETE
-TARGET:/VCALENDAR/VEVENT#DESCRIPTION
-SUMMARY:foo
-END:DELETE
-END:VPATCH
-END:VCALENDAR
-""",
-    },
-    {
-        "title": "DELETE property - must be named",
-        "patch": """BEGIN:VCALENDAR
-VERSION:2.0
-CALSCALE:GREGORIAN
-PRODID:-//example.com//Example v0.1//EN
-BEGIN:VPATCH
-UID:77CA7115-B195-49FF-8AB9-01A1F3AC4F5C
-DTSTAMP:20160831T102600Z
-BEGIN:DELETE
-TARGET:/VCALENDAR/VEVENT#
-END:DELETE
-END:VPATCH
-END:VCALENDAR
-""",
-    },
-
-    {
-        "title": "DELETE parameter - no component",
-        "patch": """BEGIN:VCALENDAR
-VERSION:2.0
-CALSCALE:GREGORIAN
-PRODID:-//example.com//Example v0.1//EN
-BEGIN:VPATCH
-UID:77CA7115-B195-49FF-8AB9-01A1F3AC4F5C
-DTSTAMP:20160831T102600Z
-BEGIN:DELETE
-TARGET:/VCALENDAR/VEVENT#ATTENDEE;RSVP
-BEGIN:VALARM
-END:VALARM
-END:DELETE
-END:VPATCH
-END:VCALENDAR
-""",
-    },
-    {
-        "title": "DELETE parameter - no properties",
-        "patch": """BEGIN:VCALENDAR
-VERSION:2.0
-CALSCALE:GREGORIAN
-PRODID:-//example.com//Example v0.1//EN
-BEGIN:VPATCH
-UID:77CA7115-B195-49FF-8AB9-01A1F3AC4F5C
-DTSTAMP:20160831T102600Z
-BEGIN:DELETE
-TARGET:/VCALENDAR/VEVENT#ATTENDEE;RSVP
-SUMMARY:foo
-END:DELETE
-END:VPATCH
-END:VCALENDAR
-""",
-    },
-    {
-        "title": "DELETE parameter - must be named",
-        "patch": """BEGIN:VCALENDAR
-VERSION:2.0
-CALSCALE:GREGORIAN
-PRODID:-//example.com//Example v0.1//EN
-BEGIN:VPATCH
-UID:77CA7115-B195-49FF-8AB9-01A1F3AC4F5C
-DTSTAMP:20160831T102600Z
-BEGIN:DELETE
-TARGET:/VCALENDAR/VEVENT#ATTENDEE;
-END:DELETE
+END:PATCH
 END:VPATCH
 END:VCALENDAR
 """,
@@ -2502,7 +2136,15 @@ class TestPatchDocument(unittest.TestCase):
             except Exception as e:
                 self.fail("Failed test #{}: {}\n{}".format(ctr + 1, items["title"], str(e)))
             else:
-                self.assertEqual(str(calendar), items["after"].replace("\n", "\r\n"), msg="Failed test #{}: {}\n{}".format(ctr + 1, items["title"], str(calendar)))
+                self.assertEqual(
+                    str(calendar),
+                    items["after"].replace("\n", "\r\n"),
+                    msg="Failed test #{}: {}\n{}".format(
+                        ctr + 1,
+                        items["title"],
+                        "\n".join(unified_diff(str(calendar).splitlines(), items["after"].splitlines())),
+                    ),
+                )
 
     def test_createComponent_Simple(self):
         """
@@ -2614,29 +2256,28 @@ class TestCommand(unittest.TestCase):
     def testCreate(self):
         test_data = (
             # Valid
-            (Command.CREATE, "/VCALENDAR", componentData("BEGIN:VEVENT\r\nEND:VEVENT\r\n"), True,),
-            (Command.CREATE, Path("/VCALENDAR"), componentData("BEGIN:VEVENT\r\nEND:VEVENT\r\n"), True,),
-            (Command.UPDATE, "/VCALENDAR#VERSION", componentData("BEGIN:UPDATE\r\nVERSION:2.0\r\nEND:UPDATE\r\n"), True,),
-            (Command.UPDATE, Path("/VCALENDAR#VERSION"), componentData("BEGIN:UPDATE\r\nVERSION:2.0\r\nEND:UPDATE\r\n"), True,),
-            (Command.DELETE, "/VCALENDAR#VERSION", None, True,),
+            ("/VCALENDAR", [], None, componentData("BEGIN:VEVENT\r\nEND:VEVENT\r\n"), True,),
+            (Path("/VCALENDAR"), [], None, componentData("BEGIN:VEVENT\r\nEND:VEVENT\r\n"), True,),
+            ("/VCALENDAR#VERSION", [], None, componentData("BEGIN:PATCH\r\nVERSION:2.0\r\nEND:PATCH\r\n"), True,),
+            (Path("/VCALENDAR#VERSION"), [], None, componentData("BEGIN:PATCH\r\nVERSION:2.0\r\nEND:PATCH\r\n"), True,),
+            ("/VCALENDAR#VERSION", [], None, None, True,),
 
             # Invalid
-            ("foo", "/VCALENDAR", componentData("BEGIN:VEVENT\r\nEND:VEVENT\r\n"), False,),
-            (Command.CREATE, 1, componentData("BEGIN:VEVENT\r\nEND:VEVENT\r\n"), False,),
-            (Command.CREATE, "/VCALENDAR", 1, False,),
-            (Command.CREATE, "/VCALENDAR", None, False,),
-            (Command.UPDATE, "/VCALENDAR#VERSION", None, False,),
-            (Command.DELETE, "/VCALENDAR#VERSION", componentData("BEGIN:UPDATE\r\nVERSION:2.0\r\nEND:UPDATE\r\n"), False,),
+            ("/VCALENDAR", 1, None, componentData("BEGIN:VEVENT\r\nEND:VEVENT\r\n"), False,),
+            ("/VCALENDAR", [], 1, componentData("BEGIN:VEVENT\r\nEND:VEVENT\r\n"), False,),
+            (1, None, None, componentData("BEGIN:VEVENT\r\nEND:VEVENT\r\n"), False,),
+            ("/VCALENDAR", None, None, 1, False,),
         )
 
-        for action, path, data, valid in test_data:
+        for ctr, item in enumerate(test_data):
+            path, deletes, params, data, valid = item
             try:
-                command = Command.create(action, path, data)
-            except ValueError:
-                self.assertFalse(valid)
+                command = Command.create(path, deletes, params, data)
+            except ValueError as e:
+                self.assertFalse(valid, msg="Failed #{}: {}".format(ctr + 1, str(e)))
             else:
-                self.assertTrue(valid)
-                self.assertTrue(isinstance(command, Command))
+                self.assertTrue(valid, msg="Failed #{}".format(ctr + 1))
+                self.assertTrue(isinstance(command, Command), msg="Failed #{}".format(ctr + 1))
 
 
 class TestPath(unittest.TestCase):
@@ -2882,35 +2523,32 @@ class TestPath(unittest.TestCase):
 
     def testParse(self):
 
-        for strpath, valid, components, property, parameter in TestPath.test_data:
+        for ctr, item in enumerate(TestPath.test_data):
+            strpath, valid, components, property, parameter = item
             try:
                 path = Path(strpath)
             except ValueError:
-                self.assertFalse(valid)
+                self.assertFalse(valid, msg="Failed #{}".format(ctr + 1))
             else:
-                self.assertTrue(valid)
-                self.assertEqual(path.components, components)
-                self.assertEqual(path.property, property)
-                self.assertEqual(path.parameter, parameter)
+                self.assertTrue(valid, msg="Failed #{}".format(ctr + 1))
+                self.assertEqual(path.components, components, msg="Failed #{}".format(ctr + 1))
+                self.assertEqual(path.property, property, msg="Failed #{}".format(ctr + 1))
+                self.assertEqual(path.parameter, parameter, msg="Failed #{}".format(ctr + 1))
 
     def testType(self):
 
         data = [
-            ("/VCALENDAR", True, False, False, False, False,),
-            ("/VCALENDAR/VEVENT", True, False, False, False, False,),
-            ("/VCALENDAR/VEVENT#SUMMARY", False, True, False, False, False,),
-            ("/VCALENDAR/VEVENT#", False, False, True, False, False,),
-            ("/VCALENDAR/VEVENT#SUMMARY;X-PARAM", False, False, False, True, False,),
-            ("/VCALENDAR/VEVENT#SUMMARY;", False, False, False, False, True,),
+            ("/VCALENDAR", True, False, False,),
+            ("/VCALENDAR/VEVENT", True, False, False,),
+            ("/VCALENDAR/VEVENT#SUMMARY", False, True, False,),
+            ("/VCALENDAR/VEVENT#SUMMARY;X-PARAM", False, False, True,),
         ]
 
-        for strpath, isComponent, isProperty, isPropertyNoName, isParameter, isParameterNoName in data:
+        for strpath, isComponent, isProperty, isParameter in data:
             path = Path(strpath)
             self.assertEqual(path.targetComponent(), isComponent)
             self.assertEqual(path.targetProperty(), isProperty)
-            self.assertEqual(path.targetPropertyNoName(), isPropertyNoName)
             self.assertEqual(path.targetParameter(), isParameter)
-            self.assertEqual(path.targetParameterNoName(), isParameterNoName)
 
     def testStr(self):
 
@@ -2921,7 +2559,6 @@ class TestPath(unittest.TestCase):
             "/VCALENDAR/VEVENT[UID=ABC][RID=20160830]",
             "/VCALENDAR/VEVENT[UID=ABC][RID=M]",
             "/VCALENDAR/VEVENT[RID=20160830]",
-            "/VCALENDAR/VEVENT#",
             "/VCALENDAR/VEVENT#SUMMARY",
             "/VCALENDAR/VEVENT#SUMMARY[=XYZ]",
             "/VCALENDAR/VEVENT#SUMMARY[!XYZ]",
@@ -3163,14 +2800,6 @@ END:VCALENDAR
             (calendar, calendar.getProperties("VERSION")[0],),
         )
 
-        path = Path("/VCALENDAR#")
-        matched = path.match(calendar)
-        self.assertEqual(len(matched), 1)
-        self.assertEqual(
-            matched[0],
-            calendar,
-        )
-
         path = Path("/VCALENDAR#FOOBAR")
         matched = path.match(calendar)
         self.assertEqual(len(matched), 0)
@@ -3181,14 +2810,6 @@ END:VCALENDAR
         self.assertEqual(
             matched[0],
             (calendar.getComponents()[0], calendar.getComponents()[0].getProperties("SUMMARY")[0],),
-        )
-
-        path = Path("/VCALENDAR/VEVENT#")
-        matched = path.match(calendar)
-        self.assertEqual(len(matched), 1)
-        self.assertEqual(
-            matched[0],
-            calendar.getComponents()[0],
         )
 
         # Non-existent - for_update changes behavior
@@ -3256,14 +2877,6 @@ END:VCALENDAR
             (calendar.getComponents()[0], calendar.getComponents()[0].getProperties("SUMMARY")[0], "X-PARAM",)
         )
 
-        path = Path("/VCALENDAR/VEVENT#SUMMARY;")
-        matched = path.match(calendar)
-        self.assertEqual(len(matched), 1)
-        self.assertEqual(
-            matched[0],
-            (calendar.getComponents()[0], calendar.getComponents()[0].getProperties("SUMMARY")[0], None,)
-        )
-
         path = Path("/VCALENDAR/VEVENT#FOOBAR;X-PARAM")
         matched = path.match(calendar)
         self.assertEqual(len(matched), 0)
@@ -3311,17 +2924,18 @@ class TestComponentSegment(unittest.TestCase):
 
     def testParse(self):
 
-        for segment, valid, name, uid, rid, rid_value in TestComponentSegment.test_data:
+        for ctr, item in enumerate(TestComponentSegment.test_data):
+            segment, valid, name, uid, rid, rid_value = item
             try:
                 component = Path.ComponentSegment(segment)
             except ValueError:
-                self.assertFalse(valid)
+                self.assertFalse(valid, msg="Failed #{}".format(ctr + 1))
             else:
-                self.assertTrue(valid)
-                self.assertEqual(component.name, name)
-                self.assertEqual(component.uid, uid)
-                self.assertEqual(component.rid, rid)
-                self.assertEqual(component.rid_value, DateTime.parseText(rid_value) if rid_value else None)
+                self.assertTrue(valid, msg="Failed #{}".format(ctr + 1))
+                self.assertEqual(component.name, name, msg="Failed #{}".format(ctr + 1))
+                self.assertEqual(component.uid, uid, msg="Failed #{}".format(ctr + 1))
+                self.assertEqual(component.rid, rid, msg="Failed #{}".format(ctr + 1))
+                self.assertEqual(component.rid_value, DateTime.parseText(rid_value) if rid_value else None, msg="Failed #{}".format(ctr + 1))
 
 
 class TestPropertySegment(unittest.TestCase):
@@ -3332,9 +2946,9 @@ class TestPropertySegment(unittest.TestCase):
         ("STATUS[=COMPLETED]", True, "STATUS", ("COMPLETED", operator.eq,),),
         ("STATUS[!COMPLETED]", True, "STATUS", ("COMPLETED", operator.ne,),),
         ("SUMMARY[=a%2Fb]", True, "SUMMARY", ("a/b", operator.eq,),),
-        ("", True, "", None,),
 
         # Invalid
+        ("", False, None, None,),
         ("STATUS[]", False, None, None,),
         ("STATUS[foo]", False, None, None,),
         ("STATUS[=]", False, None, None,),
@@ -3344,15 +2958,16 @@ class TestPropertySegment(unittest.TestCase):
 
     def testParse(self):
 
-        for segment, valid, name, matchCondition in TestPropertySegment.test_data:
+        for ctr, item in enumerate(TestPropertySegment.test_data):
+            segment, valid, name, matchCondition = item
             try:
                 property = Path.PropertySegment(segment)
             except ValueError:
-                self.assertFalse(valid)
+                self.assertFalse(valid, msg="Failed #{}".format(ctr + 1))
             else:
-                self.assertTrue(valid)
-                self.assertEqual(property.name, name)
-                self.assertEqual(property.matchCondition, matchCondition)
+                self.assertTrue(valid, msg="Failed #{}".format(ctr + 1))
+                self.assertEqual(property.name, name, msg="Failed #{}".format(ctr + 1))
+                self.assertEqual(property.matchCondition, matchCondition, msg="Failed #{}".format(ctr + 1))
 
 
 class TestParameterSegment(unittest.TestCase):
@@ -3360,9 +2975,9 @@ class TestParameterSegment(unittest.TestCase):
     test_data = (
         # Valid
         ("PARTSTAT", True, "PARTSTAT",),
-        ("", True, "",),
 
         # Invalid
+        ("", False, None,),
         ("PARTSTAT[]", False, None,),
         ("PARTSTAT[", False, None,),
         ("PARTSTAT[=NEEDS-ACTION]", False, None,),
@@ -3370,353 +2985,353 @@ class TestParameterSegment(unittest.TestCase):
 
     def testParse(self):
 
-        for segment, valid, name in TestParameterSegment.test_data:
+        for ctr, item in enumerate(TestParameterSegment.test_data):
+            segment, valid, name = item
             try:
                 property = Path.ParameterSegment(segment)
             except ValueError:
-                self.assertFalse(valid)
+                self.assertFalse(valid, msg="Failed #{}".format(ctr + 1))
             else:
-                self.assertTrue(valid)
-                self.assertEqual(property.name, name)
+                self.assertTrue(valid, msg="Failed #{}".format(ctr + 1))
+                self.assertEqual(property.name, name, msg="Failed #{}".format(ctr + 1))
 
-
-class TestPatchMaker(unittest.TestCase):
-
-    def test_processSubComponents(self):
-
-        data = [
-            {
-                "title": "Create component",
-                "old" : """BEGIN:VCALENDAR
-VERSION:2.0
-PRODID:-//example.com//Example v0.1//EN
-END:VCALENDAR
-""",
-                "new" : """BEGIN:VCALENDAR
-VERSION:2.0
-PRODID:-//example.com//Example v0.1//EN
-BEGIN:VEVENT
-UID:1234
-END:VEVENT
-END:VCALENDAR
-""",
-                "patch": """BEGIN:VPATCH
-BEGIN:CREATE
-TARGET:/VCALENDAR
-BEGIN:VEVENT
-UID:1234
-END:VEVENT
-END:CREATE
-END:VPATCH
-""",
-            },
-            {
-                "title": "Delete component",
-                "old" : """BEGIN:VCALENDAR
-VERSION:2.0
-PRODID:-//example.com//Example v0.1//EN
-BEGIN:VEVENT
-UID:1234
-END:VEVENT
-END:VCALENDAR
-""",
-                "new" : """BEGIN:VCALENDAR
-VERSION:2.0
-PRODID:-//example.com//Example v0.1//EN
-END:VCALENDAR
-""",
-                "patch": """BEGIN:VPATCH
-BEGIN:DELETE
-TARGET:/VCALENDAR/VEVENT
-END:DELETE
-END:VPATCH
-""",
-            },
-            {
-                "title": "Update component",
-                "old" : """BEGIN:VCALENDAR
-VERSION:2.0
-PRODID:-//example.com//Example v0.1//EN
-BEGIN:VEVENT
-UID:1234
-SUMMARY:old
-END:VEVENT
-END:VCALENDAR
-""",
-                "new" : """BEGIN:VCALENDAR
-VERSION:2.0
-PRODID:-//example.com//Example v0.1//EN
-BEGIN:VEVENT
-UID:1234
-SUMMARY:new
-END:VEVENT
-END:VCALENDAR
-""",
-                "patch": """BEGIN:VPATCH
-BEGIN:UPDATE
-TARGET:/VCALENDAR/VEVENT[UID=1234]
-BEGIN:VEVENT
-UID:1234
-SUMMARY:new
-END:VEVENT
-END:UPDATE
-END:VPATCH
-""",
-            },
-        ]
-
-        for item in data:
-            oldcal = Calendar.parseText(item["old"])
-            newcal = Calendar.parseText(item["new"])
-            vpatch = VPatch()
-            PatchGenerator.processSubComponents(oldcal, newcal, vpatch, "")
-            self.assertEqual(
-                str(vpatch),
-                item["patch"].replace("\n", "\r\n"),
-                "Failed: {}\n{}".format(item["title"], "\n".join(unified_diff(str(vpatch).splitlines(), item["patch"].splitlines())))
-            )
-
-    def test_processProperties(self):
-
-        data = [
-            {
-                "title": "Create property",
-                "old" : """BEGIN:VCALENDAR
-VERSION:2.0
-PRODID:-//example.com//Example v0.1//EN
-END:VCALENDAR
-""",
-                "new" : """BEGIN:VCALENDAR
-VERSION:2.0
-CALSCALE:GREGORIAN
-PRODID:-//example.com//Example v0.1//EN
-END:VCALENDAR
-""",
-                "patch": """BEGIN:VPATCH
-BEGIN:CREATE
-TARGET:/VCALENDAR
-CALSCALE:GREGORIAN
-END:CREATE
-END:VPATCH
-""",
-            },
-            {
-                "title": "Delete property",
-                "old" : """BEGIN:VCALENDAR
-VERSION:2.0
-CALSCALE:GREGORIAN
-PRODID:-//example.com//Example v0.1//EN
-END:VCALENDAR
-""",
-                "new" : """BEGIN:VCALENDAR
-VERSION:2.0
-PRODID:-//example.com//Example v0.1//EN
-END:VCALENDAR
-""",
-                "patch": """BEGIN:VPATCH
-BEGIN:DELETE
-TARGET:/VCALENDAR#CALSCALE
-END:DELETE
-END:VPATCH
-""",
-            },
-            {
-                "title": "Create & Delete property",
-                "old" : """BEGIN:VCALENDAR
-VERSION:2.0
-CALSCALE:GREGORIAN
-PRODID:-//example.com//Example v0.1//EN
-END:VCALENDAR
-""",
-                "new" : """BEGIN:VCALENDAR
-VERSION:2.0
-PRODID:-//example.com//Example v0.1//EN
-DESCRIPTION:Calendar name
-END:VCALENDAR
-""",
-                "patch": """BEGIN:VPATCH
-BEGIN:CREATE
-TARGET:/VCALENDAR
-DESCRIPTION:Calendar name
-END:CREATE
-BEGIN:DELETE
-TARGET:/VCALENDAR#CALSCALE
-END:DELETE
-END:VPATCH
-""",
-            },
-            {
-                "title": "Singleton update property",
-                "old" : """BEGIN:VCALENDAR
-VERSION:2.0
-PRODID:-//example.com//Example v0.1//EN
-END:VCALENDAR
-""",
-                "new" : """BEGIN:VCALENDAR
-VERSION:2.0
-PRODID:-//example.org//Example v0.1//EN
-END:VCALENDAR
-""",
-                "patch": """BEGIN:VPATCH
-BEGIN:UPDATE
-TARGET:/VCALENDAR#
-PRODID:-//example.org//Example v0.1//EN
-END:UPDATE
-END:VPATCH
-""",
-            },
-            {
-                "title": "Create multi-property",
-                "old" : """BEGIN:VCALENDAR
-VERSION:2.0
-PRODID:-//example.com//Example v0.1//EN
-DESCRIPTION:Calendar name 1
-END:VCALENDAR
-""",
-                "new" : """BEGIN:VCALENDAR
-VERSION:2.0
-PRODID:-//example.com//Example v0.1//EN
-DESCRIPTION:Calendar name 1
-DESCRIPTION:Calendar name 2
-END:VCALENDAR
-""",
-                "patch": """BEGIN:VPATCH
-BEGIN:CREATE
-TARGET:/VCALENDAR
-DESCRIPTION:Calendar name 2
-END:CREATE
-END:VPATCH
-""",
-            },
-            {
-                "title": "Delete multi-property",
-                "old" : """BEGIN:VCALENDAR
-VERSION:2.0
-PRODID:-//example.com//Example v0.1//EN
-DESCRIPTION:Calendar name 1
-DESCRIPTION:Calendar name 2
-END:VCALENDAR
-""",
-                "new" : """BEGIN:VCALENDAR
-VERSION:2.0
-PRODID:-//example.com//Example v0.1//EN
-DESCRIPTION:Calendar name 1
-END:VCALENDAR
-""",
-                "patch": """BEGIN:VPATCH
-BEGIN:DELETE
-TARGET:/VCALENDAR#DESCRIPTION[=Calendar name 2]
-END:DELETE
-END:VPATCH
-""",
-            },
-            {
-                "title": "Update multi-property",
-                "old" : """BEGIN:VCALENDAR
-VERSION:2.0
-PRODID:-//example.com//Example v0.1//EN
-DESCRIPTION:Calendar name 1
-DESCRIPTION:Calendar name 2
-END:VCALENDAR
-""",
-                "new" : """BEGIN:VCALENDAR
-VERSION:2.0
-PRODID:-//example.com//Example v0.1//EN
-DESCRIPTION:Calendar name 1
-DESCRIPTION:Calendar name 3
-END:VCALENDAR
-""",
-                "patch": """BEGIN:VPATCH
-BEGIN:CREATE
-TARGET:/VCALENDAR
-DESCRIPTION:Calendar name 3
-END:CREATE
-BEGIN:DELETE
-TARGET:/VCALENDAR#DESCRIPTION[=Calendar name 2]
-END:DELETE
-END:VPATCH
-""",
-            },
-            {
-                "title": "Create parameter",
-                "old" : """BEGIN:VCALENDAR
-VERSION:2.0
-PRODID:-//example.com//Example v0.1//EN
-DESCRIPTION:Calendar name 1
-END:VCALENDAR
-""",
-                "new" : """BEGIN:VCALENDAR
-VERSION:2.0
-PRODID:-//example.com//Example v0.1//EN
-DESCRIPTION;LANGUAGE=en_US:Calendar name 1
-END:VCALENDAR
-""",
-                "patch": """BEGIN:VPATCH
-BEGIN:UPDATE
-TARGET:/VCALENDAR#
-DESCRIPTION;LANGUAGE=en_US:Calendar name 1
-END:UPDATE
-END:VPATCH
-""",
-            },
-            {
-                "title": "Update parameter",
-                "old" : """BEGIN:VCALENDAR
-VERSION:2.0
-PRODID:-//example.com//Example v0.1//EN
-DESCRIPTION;LANGUAGE=en_US:Calendar name 1
-END:VCALENDAR
-""",
-                "new" : """BEGIN:VCALENDAR
-VERSION:2.0
-PRODID:-//example.com//Example v0.1//EN
-DESCRIPTION;LANGUAGE=en_GB:Calendar name 1
-END:VCALENDAR
-""",
-                "patch": """BEGIN:VPATCH
-BEGIN:UPDATE
-TARGET:/VCALENDAR#
-DESCRIPTION;LANGUAGE=en_GB:Calendar name 1
-END:UPDATE
-END:VPATCH
-""",
-            },
-            {
-                "title": "Update multi-parameter",
-                "old" : """BEGIN:VCALENDAR
-VERSION:2.0
-PRODID:-//example.com//Example v0.1//EN
-DESCRIPTION;LANGUAGE=en_US:Calendar name 1
-DESCRIPTION;LANGUAGE=en_GB:Calendar name 2
-END:VCALENDAR
-""",
-                "new" : """BEGIN:VCALENDAR
-VERSION:2.0
-PRODID:-//example.com//Example v0.1//EN
-DESCRIPTION;LANGUAGE=en_US:Calendar name 1
-DESCRIPTION;LANGUAGE=en_CA:Calendar name 2
-END:VCALENDAR
-""",
-                "patch": """BEGIN:VPATCH
-BEGIN:UPDATE
-TARGET:/VCALENDAR#DESCRIPTION[=Calendar name 2]
-DESCRIPTION;LANGUAGE=en_CA:Calendar name 2
-END:UPDATE
-END:VPATCH
-""",
-            },
-        ]
-
-        for item in data:
-            oldcal = Calendar.parseText(item["old"])
-            newcal = Calendar.parseText(item["new"])
-            vpatch = VPatch()
-            PatchGenerator.processProperties(oldcal, newcal, vpatch, "")
-            self.assertEqual(
-                str(vpatch),
-                item["patch"].replace("\n", "\r\n"),
-                "Failed: {}\n{}".format(item["title"], "\n".join(unified_diff(str(vpatch).splitlines(), item["patch"].splitlines())))
-            )
+# class TestPatchMaker(unittest.TestCase):
+#
+#     def test_processSubComponents(self):
+#
+#         data = [
+#             {
+#                 "title": "Create component",
+#                 "old" : """BEGIN:VCALENDAR
+# VERSION:2.0
+# PRODID:-//example.com//Example v0.1//EN
+# END:VCALENDAR
+# """,
+#                 "new" : """BEGIN:VCALENDAR
+# VERSION:2.0
+# PRODID:-//example.com//Example v0.1//EN
+# BEGIN:VEVENT
+# UID:1234
+# END:VEVENT
+# END:VCALENDAR
+# """,
+#                 "patch": """BEGIN:VPATCH
+# BEGIN:PATCH
+# PATCH-TARGET:/VCALENDAR
+# BEGIN:VEVENT
+# UID:1234
+# END:VEVENT
+# END:PATCH
+# END:VPATCH
+# """,
+#             },
+#             {
+#                 "title": "Delete component",
+#                 "old" : """BEGIN:VCALENDAR
+# VERSION:2.0
+# PRODID:-//example.com//Example v0.1//EN
+# BEGIN:VEVENT
+# UID:1234
+# END:VEVENT
+# END:VCALENDAR
+# """,
+#                 "new" : """BEGIN:VCALENDAR
+# VERSION:2.0
+# PRODID:-//example.com//Example v0.1//EN
+# END:VCALENDAR
+# """,
+#                 "patch": """BEGIN:VPATCH
+# BEGIN:PATCH
+# PATCH-TARGET:/VCALENDAR/VEVENT
+# END:PATCH
+# END:VPATCH
+# """,
+#             },
+#             {
+#                 "title": "Update component",
+#                 "old" : """BEGIN:VCALENDAR
+# VERSION:2.0
+# PRODID:-//example.com//Example v0.1//EN
+# BEGIN:VEVENT
+# UID:1234
+# SUMMARY:old
+# END:VEVENT
+# END:VCALENDAR
+# """,
+#                 "new" : """BEGIN:VCALENDAR
+# VERSION:2.0
+# PRODID:-//example.com//Example v0.1//EN
+# BEGIN:VEVENT
+# UID:1234
+# SUMMARY:new
+# END:VEVENT
+# END:VCALENDAR
+# """,
+#                 "patch": """BEGIN:VPATCH
+# BEGIN:PATCH
+# PATCH-TARGET:/VCALENDAR/VEVENT[UID=1234]
+# BEGIN:VEVENT
+# UID:1234
+# SUMMARY:new
+# END:VEVENT
+# END:PATCH
+# END:VPATCH
+# """,
+#             },
+#         ]
+#
+#         for item in data:
+#             oldcal = Calendar.parseText(item["old"])
+#             newcal = Calendar.parseText(item["new"])
+#             vpatch = VPatch()
+#             PatchGenerator.processSubComponents(oldcal, newcal, vpatch, "")
+#             self.assertEqual(
+#                 str(vpatch),
+#                 item["patch"].replace("\n", "\r\n"),
+#                 "Failed: {}\n{}".format(item["title"], "\n".join(unified_diff(str(vpatch).splitlines(), item["patch"].splitlines())))
+#             )
+#
+#     def test_processProperties(self):
+#
+#         data = [
+#             {
+#                 "title": "Create property",
+#                 "old" : """BEGIN:VCALENDAR
+# VERSION:2.0
+# PRODID:-//example.com//Example v0.1//EN
+# END:VCALENDAR
+# """,
+#                 "new" : """BEGIN:VCALENDAR
+# VERSION:2.0
+# CALSCALE:GREGORIAN
+# PRODID:-//example.com//Example v0.1//EN
+# END:VCALENDAR
+# """,
+#                 "patch": """BEGIN:VPATCH
+# BEGIN:PATCH
+# PATCH-TARGET:/VCALENDAR
+# CALSCALE:GREGORIAN
+# END:PATCH
+# END:VPATCH
+# """,
+#             },
+#             {
+#                 "title": "Delete property",
+#                 "old" : """BEGIN:VCALENDAR
+# VERSION:2.0
+# CALSCALE:GREGORIAN
+# PRODID:-//example.com//Example v0.1//EN
+# END:VCALENDAR
+# """,
+#                 "new" : """BEGIN:VCALENDAR
+# VERSION:2.0
+# PRODID:-//example.com//Example v0.1//EN
+# END:VCALENDAR
+# """,
+#                 "patch": """BEGIN:VPATCH
+# BEGIN:PATCH
+# PATCH-TARGET:/VCALENDAR#CALSCALE
+# END:PATCH
+# END:VPATCH
+# """,
+#             },
+#             {
+#                 "title": "Create & Delete property",
+#                 "old" : """BEGIN:VCALENDAR
+# VERSION:2.0
+# CALSCALE:GREGORIAN
+# PRODID:-//example.com//Example v0.1//EN
+# END:VCALENDAR
+# """,
+#                 "new" : """BEGIN:VCALENDAR
+# VERSION:2.0
+# PRODID:-//example.com//Example v0.1//EN
+# DESCRIPTION:Calendar name
+# END:VCALENDAR
+# """,
+#                 "patch": """BEGIN:VPATCH
+# BEGIN:PATCH
+# PATCH-TARGET:/VCALENDAR
+# DESCRIPTION:Calendar name
+# END:PATCH
+# BEGIN:PATCH
+# PATCH-TARGET:/VCALENDAR#CALSCALE
+# END:PATCH
+# END:VPATCH
+# """,
+#             },
+#             {
+#                 "title": "Singleton update property",
+#                 "old" : """BEGIN:VCALENDAR
+# VERSION:2.0
+# PRODID:-//example.com//Example v0.1//EN
+# END:VCALENDAR
+# """,
+#                 "new" : """BEGIN:VCALENDAR
+# VERSION:2.0
+# PRODID:-//example.org//Example v0.1//EN
+# END:VCALENDAR
+# """,
+#                 "patch": """BEGIN:VPATCH
+# BEGIN:PATCH
+# PATCH-TARGET:/VCALENDAR#
+# PRODID:-//example.org//Example v0.1//EN
+# END:PATCH
+# END:VPATCH
+# """,
+#             },
+#             {
+#                 "title": "Create multi-property",
+#                 "old" : """BEGIN:VCALENDAR
+# VERSION:2.0
+# PRODID:-//example.com//Example v0.1//EN
+# DESCRIPTION:Calendar name 1
+# END:VCALENDAR
+# """,
+#                 "new" : """BEGIN:VCALENDAR
+# VERSION:2.0
+# PRODID:-//example.com//Example v0.1//EN
+# DESCRIPTION:Calendar name 1
+# DESCRIPTION:Calendar name 2
+# END:VCALENDAR
+# """,
+#                 "patch": """BEGIN:VPATCH
+# BEGIN:PATCH
+# PATCH-TARGET:/VCALENDAR
+# DESCRIPTION:Calendar name 2
+# END:PATCH
+# END:VPATCH
+# """,
+#             },
+#             {
+#                 "title": "Delete multi-property",
+#                 "old" : """BEGIN:VCALENDAR
+# VERSION:2.0
+# PRODID:-//example.com//Example v0.1//EN
+# DESCRIPTION:Calendar name 1
+# DESCRIPTION:Calendar name 2
+# END:VCALENDAR
+# """,
+#                 "new" : """BEGIN:VCALENDAR
+# VERSION:2.0
+# PRODID:-//example.com//Example v0.1//EN
+# DESCRIPTION:Calendar name 1
+# END:VCALENDAR
+# """,
+#                 "patch": """BEGIN:VPATCH
+# BEGIN:PATCH
+# PATCH-TARGET:/VCALENDAR#DESCRIPTION[=Calendar name 2]
+# END:PATCH
+# END:VPATCH
+# """,
+#             },
+#             {
+#                 "title": "Update multi-property",
+#                 "old" : """BEGIN:VCALENDAR
+# VERSION:2.0
+# PRODID:-//example.com//Example v0.1//EN
+# DESCRIPTION:Calendar name 1
+# DESCRIPTION:Calendar name 2
+# END:VCALENDAR
+# """,
+#                 "new" : """BEGIN:VCALENDAR
+# VERSION:2.0
+# PRODID:-//example.com//Example v0.1//EN
+# DESCRIPTION:Calendar name 1
+# DESCRIPTION:Calendar name 3
+# END:VCALENDAR
+# """,
+#                 "patch": """BEGIN:VPATCH
+# BEGIN:PATCH
+# PATCH-TARGET:/VCALENDAR
+# DESCRIPTION:Calendar name 3
+# END:PATCH
+# BEGIN:PATCH
+# PATCH-TARGET:/VCALENDAR#DESCRIPTION[=Calendar name 2]
+# END:PATCH
+# END:VPATCH
+# """,
+#             },
+#             {
+#                 "title": "Create parameter",
+#                 "old" : """BEGIN:VCALENDAR
+# VERSION:2.0
+# PRODID:-//example.com//Example v0.1//EN
+# DESCRIPTION:Calendar name 1
+# END:VCALENDAR
+# """,
+#                 "new" : """BEGIN:VCALENDAR
+# VERSION:2.0
+# PRODID:-//example.com//Example v0.1//EN
+# DESCRIPTION;LANGUAGE=en_US:Calendar name 1
+# END:VCALENDAR
+# """,
+#                 "patch": """BEGIN:VPATCH
+# BEGIN:PATCH
+# PATCH-TARGET:/VCALENDAR#
+# DESCRIPTION;LANGUAGE=en_US:Calendar name 1
+# END:PATCH
+# END:VPATCH
+# """,
+#             },
+#             {
+#                 "title": "Update parameter",
+#                 "old" : """BEGIN:VCALENDAR
+# VERSION:2.0
+# PRODID:-//example.com//Example v0.1//EN
+# DESCRIPTION;LANGUAGE=en_US:Calendar name 1
+# END:VCALENDAR
+# """,
+#                 "new" : """BEGIN:VCALENDAR
+# VERSION:2.0
+# PRODID:-//example.com//Example v0.1//EN
+# DESCRIPTION;LANGUAGE=en_GB:Calendar name 1
+# END:VCALENDAR
+# """,
+#                 "patch": """BEGIN:VPATCH
+# BEGIN:PATCH
+# PATCH-TARGET:/VCALENDAR#
+# DESCRIPTION;LANGUAGE=en_GB:Calendar name 1
+# END:PATCH
+# END:VPATCH
+# """,
+#             },
+#             {
+#                 "title": "Update multi-parameter",
+#                 "old" : """BEGIN:VCALENDAR
+# VERSION:2.0
+# PRODID:-//example.com//Example v0.1//EN
+# DESCRIPTION;LANGUAGE=en_US:Calendar name 1
+# DESCRIPTION;LANGUAGE=en_GB:Calendar name 2
+# END:VCALENDAR
+# """,
+#                 "new" : """BEGIN:VCALENDAR
+# VERSION:2.0
+# PRODID:-//example.com//Example v0.1//EN
+# DESCRIPTION;LANGUAGE=en_US:Calendar name 1
+# DESCRIPTION;LANGUAGE=en_CA:Calendar name 2
+# END:VCALENDAR
+# """,
+#                 "patch": """BEGIN:VPATCH
+# BEGIN:PATCH
+# PATCH-TARGET:/VCALENDAR#DESCRIPTION[=Calendar name 2]
+# DESCRIPTION;LANGUAGE=en_CA:Calendar name 2
+# END:PATCH
+# END:VPATCH
+# """,
+#             },
+#         ]
+#
+#         for item in data:
+#             oldcal = Calendar.parseText(item["old"])
+#             newcal = Calendar.parseText(item["new"])
+#             vpatch = VPatch()
+#             PatchGenerator.processProperties(oldcal, newcal, vpatch, "")
+#             self.assertEqual(
+#                 str(vpatch),
+#                 item["patch"].replace("\n", "\r\n"),
+#                 "Failed: {}\n{}".format(item["title"], "\n".join(unified_diff(str(vpatch).splitlines(), item["patch"].splitlines())))
+#             )
 
 
 if __name__ == '__main__':
