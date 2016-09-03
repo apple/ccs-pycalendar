@@ -36,6 +36,8 @@ class Patch(Component):
     def sortedPropertyKeyOrder(self):
         return (
             definitions.cICalProperty_PATCH_TARGET,
+            definitions.cICalProperty_PATCH_DELETE,
+            definitions.cICalProperty_PATCH_PARAMETER,
         )
 
 Component.registerComponent(definitions.cICalComponent_PATCH, Patch)

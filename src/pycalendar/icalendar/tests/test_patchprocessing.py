@@ -15,17 +15,19 @@
 #    limitations under the License.
 ##
 
+from difflib import unified_diff
+from pycalendar.datetime import DateTime
+from pycalendar.icalendar import definitions
+from pycalendar.icalendar.calendar import Calendar
+from pycalendar.icalendar.patch import Patch
+from pycalendar.icalendar.patchprocessing import Command, Path, PatchDocument, PatchGenerator
+from pycalendar.icalendar.property import Property
+from pycalendar.icalendar.vpatch import VPatch
 import itertools
 import json
 import operator
 import os
 import unittest
-
-from pycalendar.datetime import DateTime
-from pycalendar.icalendar.calendar import Calendar
-from pycalendar.icalendar.patchprocessing import Command, Path, PatchDocument  # , PatchGenerator
-from pycalendar.icalendar.vpatch import VPatch
-from difflib import unified_diff
 
 
 dataValid = {
@@ -2995,343 +2997,350 @@ class TestParameterSegment(unittest.TestCase):
                 self.assertTrue(valid, msg="Failed #{}".format(ctr + 1))
                 self.assertEqual(property.name, name, msg="Failed #{}".format(ctr + 1))
 
-# class TestPatchMaker(unittest.TestCase):
-#
-#     def test_processSubComponents(self):
-#
-#         data = [
-#             {
-#                 "title": "Create component",
-#                 "old" : """BEGIN:VCALENDAR
-# VERSION:2.0
-# PRODID:-//example.com//Example v0.1//EN
-# END:VCALENDAR
-# """,
-#                 "new" : """BEGIN:VCALENDAR
-# VERSION:2.0
-# PRODID:-//example.com//Example v0.1//EN
-# BEGIN:VEVENT
-# UID:1234
-# END:VEVENT
-# END:VCALENDAR
-# """,
-#                 "patch": """BEGIN:VPATCH
-# BEGIN:PATCH
-# PATCH-TARGET:/VCALENDAR
-# BEGIN:VEVENT
-# UID:1234
-# END:VEVENT
-# END:PATCH
-# END:VPATCH
-# """,
-#             },
-#             {
-#                 "title": "Delete component",
-#                 "old" : """BEGIN:VCALENDAR
-# VERSION:2.0
-# PRODID:-//example.com//Example v0.1//EN
-# BEGIN:VEVENT
-# UID:1234
-# END:VEVENT
-# END:VCALENDAR
-# """,
-#                 "new" : """BEGIN:VCALENDAR
-# VERSION:2.0
-# PRODID:-//example.com//Example v0.1//EN
-# END:VCALENDAR
-# """,
-#                 "patch": """BEGIN:VPATCH
-# BEGIN:PATCH
-# PATCH-TARGET:/VCALENDAR/VEVENT
-# END:PATCH
-# END:VPATCH
-# """,
-#             },
-#             {
-#                 "title": "Update component",
-#                 "old" : """BEGIN:VCALENDAR
-# VERSION:2.0
-# PRODID:-//example.com//Example v0.1//EN
-# BEGIN:VEVENT
-# UID:1234
-# SUMMARY:old
-# END:VEVENT
-# END:VCALENDAR
-# """,
-#                 "new" : """BEGIN:VCALENDAR
-# VERSION:2.0
-# PRODID:-//example.com//Example v0.1//EN
-# BEGIN:VEVENT
-# UID:1234
-# SUMMARY:new
-# END:VEVENT
-# END:VCALENDAR
-# """,
-#                 "patch": """BEGIN:VPATCH
-# BEGIN:PATCH
-# PATCH-TARGET:/VCALENDAR/VEVENT[UID=1234]
-# BEGIN:VEVENT
-# UID:1234
-# SUMMARY:new
-# END:VEVENT
-# END:PATCH
-# END:VPATCH
-# """,
-#             },
-#         ]
-#
-#         for item in data:
-#             oldcal = Calendar.parseText(item["old"])
-#             newcal = Calendar.parseText(item["new"])
-#             vpatch = VPatch()
-#             PatchGenerator.processSubComponents(oldcal, newcal, vpatch, "")
-#             self.assertEqual(
-#                 str(vpatch),
-#                 item["patch"].replace("\n", "\r\n"),
-#                 "Failed: {}\n{}".format(item["title"], "\n".join(unified_diff(str(vpatch).splitlines(), item["patch"].splitlines())))
-#             )
-#
-#     def test_processProperties(self):
-#
-#         data = [
-#             {
-#                 "title": "Create property",
-#                 "old" : """BEGIN:VCALENDAR
-# VERSION:2.0
-# PRODID:-//example.com//Example v0.1//EN
-# END:VCALENDAR
-# """,
-#                 "new" : """BEGIN:VCALENDAR
-# VERSION:2.0
-# CALSCALE:GREGORIAN
-# PRODID:-//example.com//Example v0.1//EN
-# END:VCALENDAR
-# """,
-#                 "patch": """BEGIN:VPATCH
-# BEGIN:PATCH
-# PATCH-TARGET:/VCALENDAR
-# CALSCALE:GREGORIAN
-# END:PATCH
-# END:VPATCH
-# """,
-#             },
-#             {
-#                 "title": "Delete property",
-#                 "old" : """BEGIN:VCALENDAR
-# VERSION:2.0
-# CALSCALE:GREGORIAN
-# PRODID:-//example.com//Example v0.1//EN
-# END:VCALENDAR
-# """,
-#                 "new" : """BEGIN:VCALENDAR
-# VERSION:2.0
-# PRODID:-//example.com//Example v0.1//EN
-# END:VCALENDAR
-# """,
-#                 "patch": """BEGIN:VPATCH
-# BEGIN:PATCH
-# PATCH-TARGET:/VCALENDAR#CALSCALE
-# END:PATCH
-# END:VPATCH
-# """,
-#             },
-#             {
-#                 "title": "Create & Delete property",
-#                 "old" : """BEGIN:VCALENDAR
-# VERSION:2.0
-# CALSCALE:GREGORIAN
-# PRODID:-//example.com//Example v0.1//EN
-# END:VCALENDAR
-# """,
-#                 "new" : """BEGIN:VCALENDAR
-# VERSION:2.0
-# PRODID:-//example.com//Example v0.1//EN
-# DESCRIPTION:Calendar name
-# END:VCALENDAR
-# """,
-#                 "patch": """BEGIN:VPATCH
-# BEGIN:PATCH
-# PATCH-TARGET:/VCALENDAR
-# DESCRIPTION:Calendar name
-# END:PATCH
-# BEGIN:PATCH
-# PATCH-TARGET:/VCALENDAR#CALSCALE
-# END:PATCH
-# END:VPATCH
-# """,
-#             },
-#             {
-#                 "title": "Singleton update property",
-#                 "old" : """BEGIN:VCALENDAR
-# VERSION:2.0
-# PRODID:-//example.com//Example v0.1//EN
-# END:VCALENDAR
-# """,
-#                 "new" : """BEGIN:VCALENDAR
-# VERSION:2.0
-# PRODID:-//example.org//Example v0.1//EN
-# END:VCALENDAR
-# """,
-#                 "patch": """BEGIN:VPATCH
-# BEGIN:PATCH
-# PATCH-TARGET:/VCALENDAR#
-# PRODID:-//example.org//Example v0.1//EN
-# END:PATCH
-# END:VPATCH
-# """,
-#             },
-#             {
-#                 "title": "Create multi-property",
-#                 "old" : """BEGIN:VCALENDAR
-# VERSION:2.0
-# PRODID:-//example.com//Example v0.1//EN
-# DESCRIPTION:Calendar name 1
-# END:VCALENDAR
-# """,
-#                 "new" : """BEGIN:VCALENDAR
-# VERSION:2.0
-# PRODID:-//example.com//Example v0.1//EN
-# DESCRIPTION:Calendar name 1
-# DESCRIPTION:Calendar name 2
-# END:VCALENDAR
-# """,
-#                 "patch": """BEGIN:VPATCH
-# BEGIN:PATCH
-# PATCH-TARGET:/VCALENDAR
-# DESCRIPTION:Calendar name 2
-# END:PATCH
-# END:VPATCH
-# """,
-#             },
-#             {
-#                 "title": "Delete multi-property",
-#                 "old" : """BEGIN:VCALENDAR
-# VERSION:2.0
-# PRODID:-//example.com//Example v0.1//EN
-# DESCRIPTION:Calendar name 1
-# DESCRIPTION:Calendar name 2
-# END:VCALENDAR
-# """,
-#                 "new" : """BEGIN:VCALENDAR
-# VERSION:2.0
-# PRODID:-//example.com//Example v0.1//EN
-# DESCRIPTION:Calendar name 1
-# END:VCALENDAR
-# """,
-#                 "patch": """BEGIN:VPATCH
-# BEGIN:PATCH
-# PATCH-TARGET:/VCALENDAR#DESCRIPTION[=Calendar name 2]
-# END:PATCH
-# END:VPATCH
-# """,
-#             },
-#             {
-#                 "title": "Update multi-property",
-#                 "old" : """BEGIN:VCALENDAR
-# VERSION:2.0
-# PRODID:-//example.com//Example v0.1//EN
-# DESCRIPTION:Calendar name 1
-# DESCRIPTION:Calendar name 2
-# END:VCALENDAR
-# """,
-#                 "new" : """BEGIN:VCALENDAR
-# VERSION:2.0
-# PRODID:-//example.com//Example v0.1//EN
-# DESCRIPTION:Calendar name 1
-# DESCRIPTION:Calendar name 3
-# END:VCALENDAR
-# """,
-#                 "patch": """BEGIN:VPATCH
-# BEGIN:PATCH
-# PATCH-TARGET:/VCALENDAR
-# DESCRIPTION:Calendar name 3
-# END:PATCH
-# BEGIN:PATCH
-# PATCH-TARGET:/VCALENDAR#DESCRIPTION[=Calendar name 2]
-# END:PATCH
-# END:VPATCH
-# """,
-#             },
-#             {
-#                 "title": "Create parameter",
-#                 "old" : """BEGIN:VCALENDAR
-# VERSION:2.0
-# PRODID:-//example.com//Example v0.1//EN
-# DESCRIPTION:Calendar name 1
-# END:VCALENDAR
-# """,
-#                 "new" : """BEGIN:VCALENDAR
-# VERSION:2.0
-# PRODID:-//example.com//Example v0.1//EN
-# DESCRIPTION;LANGUAGE=en_US:Calendar name 1
-# END:VCALENDAR
-# """,
-#                 "patch": """BEGIN:VPATCH
-# BEGIN:PATCH
-# PATCH-TARGET:/VCALENDAR#
-# DESCRIPTION;LANGUAGE=en_US:Calendar name 1
-# END:PATCH
-# END:VPATCH
-# """,
-#             },
-#             {
-#                 "title": "Update parameter",
-#                 "old" : """BEGIN:VCALENDAR
-# VERSION:2.0
-# PRODID:-//example.com//Example v0.1//EN
-# DESCRIPTION;LANGUAGE=en_US:Calendar name 1
-# END:VCALENDAR
-# """,
-#                 "new" : """BEGIN:VCALENDAR
-# VERSION:2.0
-# PRODID:-//example.com//Example v0.1//EN
-# DESCRIPTION;LANGUAGE=en_GB:Calendar name 1
-# END:VCALENDAR
-# """,
-#                 "patch": """BEGIN:VPATCH
-# BEGIN:PATCH
-# PATCH-TARGET:/VCALENDAR#
-# DESCRIPTION;LANGUAGE=en_GB:Calendar name 1
-# END:PATCH
-# END:VPATCH
-# """,
-#             },
-#             {
-#                 "title": "Update multi-parameter",
-#                 "old" : """BEGIN:VCALENDAR
-# VERSION:2.0
-# PRODID:-//example.com//Example v0.1//EN
-# DESCRIPTION;LANGUAGE=en_US:Calendar name 1
-# DESCRIPTION;LANGUAGE=en_GB:Calendar name 2
-# END:VCALENDAR
-# """,
-#                 "new" : """BEGIN:VCALENDAR
-# VERSION:2.0
-# PRODID:-//example.com//Example v0.1//EN
-# DESCRIPTION;LANGUAGE=en_US:Calendar name 1
-# DESCRIPTION;LANGUAGE=en_CA:Calendar name 2
-# END:VCALENDAR
-# """,
-#                 "patch": """BEGIN:VPATCH
-# BEGIN:PATCH
-# PATCH-TARGET:/VCALENDAR#DESCRIPTION[=Calendar name 2]
-# DESCRIPTION;LANGUAGE=en_CA:Calendar name 2
-# END:PATCH
-# END:VPATCH
-# """,
-#             },
-#         ]
-#
-#         for item in data:
-#             oldcal = Calendar.parseText(item["old"])
-#             newcal = Calendar.parseText(item["new"])
-#             vpatch = VPatch()
-#             PatchGenerator.processProperties(oldcal, newcal, vpatch, "")
-#             self.assertEqual(
-#                 str(vpatch),
-#                 item["patch"].replace("\n", "\r\n"),
-#                 "Failed: {}\n{}".format(item["title"], "\n".join(unified_diff(str(vpatch).splitlines(), item["patch"].splitlines())))
-#             )
+
+class TestPatchMaker(unittest.TestCase):
+
+    def test_processSubComponents(self):
+
+        data = [
+            {
+                "title": "Create component",
+                "old" : """BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//example.com//Example v0.1//EN
+END:VCALENDAR
+""",
+                "new" : """BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//example.com//Example v0.1//EN
+BEGIN:VEVENT
+UID:1234
+END:VEVENT
+END:VCALENDAR
+""",
+                "patch": """BEGIN:VPATCH
+BEGIN:PATCH
+PATCH-TARGET:/VCALENDAR
+BEGIN:VEVENT
+UID:1234
+END:VEVENT
+END:PATCH
+END:VPATCH
+""",
+            },
+            {
+                "title": "Delete component",
+                "old" : """BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//example.com//Example v0.1//EN
+BEGIN:VEVENT
+UID:1234
+END:VEVENT
+END:VCALENDAR
+""",
+                "new" : """BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//example.com//Example v0.1//EN
+END:VCALENDAR
+""",
+                "patch": """BEGIN:VPATCH
+BEGIN:PATCH
+PATCH-TARGET:/VCALENDAR
+PATCH-DELETE:/VEVENT
+END:PATCH
+END:VPATCH
+""",
+            },
+            {
+                "title": "Update component",
+                "old" : """BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//example.com//Example v0.1//EN
+BEGIN:VEVENT
+UID:1234
+SUMMARY:old
+END:VEVENT
+END:VCALENDAR
+""",
+                "new" : """BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//example.com//Example v0.1//EN
+BEGIN:VEVENT
+UID:1234
+SUMMARY:new
+END:VEVENT
+END:VCALENDAR
+""",
+                "patch": """BEGIN:VPATCH
+BEGIN:PATCH
+PATCH-TARGET:/VCALENDAR/VEVENT
+SUMMARY:new
+END:PATCH
+END:VPATCH
+""",
+            },
+        ]
+
+        for item in data:
+            oldcal = Calendar.parseText(item["old"])
+            newcal = Calendar.parseText(item["new"])
+            vpatch = VPatch()
+            patchComponent = Patch(parent=vpatch)
+            patchComponent.addProperty(Property(definitions.cICalProperty_PATCH_TARGET, "/VCALENDAR"))
+
+            PatchGenerator.processSubComponents(oldcal, newcal, vpatch, "/VCALENDAR", patchComponent)
+
+            if len(patchComponent.getProperties()) + len(patchComponent.getComponents()) > 1:
+                vpatch.addComponent(patchComponent)
+
+            self.assertEqual(
+                str(vpatch),
+                item["patch"].replace("\n", "\r\n"),
+                "Failed: {}\n{}".format(item["title"], "\n".join(unified_diff(str(vpatch).splitlines(), item["patch"].splitlines())))
+            )
+
+    def test_processProperties(self):
+
+        data = [
+            {
+                "title": "Create property",
+                "old" : """BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//example.com//Example v0.1//EN
+END:VCALENDAR
+""",
+                "new" : """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//example.com//Example v0.1//EN
+END:VCALENDAR
+""",
+                "patch": """BEGIN:VPATCH
+BEGIN:PATCH
+PATCH-TARGET:/VCALENDAR
+CALSCALE:GREGORIAN
+END:PATCH
+END:VPATCH
+""",
+            },
+            {
+                "title": "Delete property",
+                "old" : """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//example.com//Example v0.1//EN
+END:VCALENDAR
+""",
+                "new" : """BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//example.com//Example v0.1//EN
+END:VCALENDAR
+""",
+                "patch": """BEGIN:VPATCH
+BEGIN:PATCH
+PATCH-TARGET:/VCALENDAR
+PATCH-DELETE:#CALSCALE
+END:PATCH
+END:VPATCH
+""",
+            },
+            {
+                "title": "Create & Delete property",
+                "old" : """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//example.com//Example v0.1//EN
+END:VCALENDAR
+""",
+                "new" : """BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//example.com//Example v0.1//EN
+DESCRIPTION:Calendar name
+END:VCALENDAR
+""",
+                "patch": """BEGIN:VPATCH
+BEGIN:PATCH
+PATCH-TARGET:/VCALENDAR
+PATCH-DELETE:#CALSCALE
+DESCRIPTION:Calendar name
+END:PATCH
+END:VPATCH
+""",
+            },
+            {
+                "title": "Singleton update property",
+                "old" : """BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//example.com//Example v0.1//EN
+END:VCALENDAR
+""",
+                "new" : """BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//example.org//Example v0.1//EN
+END:VCALENDAR
+""",
+                "patch": """BEGIN:VPATCH
+BEGIN:PATCH
+PATCH-TARGET:/VCALENDAR
+PRODID:-//example.org//Example v0.1//EN
+END:PATCH
+END:VPATCH
+""",
+            },
+            {
+                "title": "Create multi-property",
+                "old" : """BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//example.com//Example v0.1//EN
+DESCRIPTION:Calendar name 1
+END:VCALENDAR
+""",
+                "new" : """BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//example.com//Example v0.1//EN
+DESCRIPTION:Calendar name 1
+DESCRIPTION:Calendar name 2
+END:VCALENDAR
+""",
+                "patch": """BEGIN:VPATCH
+BEGIN:PATCH
+PATCH-TARGET:/VCALENDAR
+DESCRIPTION;PATCH-ACTION=CREATE:Calendar name 2
+END:PATCH
+END:VPATCH
+""",
+            },
+            {
+                "title": "Delete multi-property",
+                "old" : """BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//example.com//Example v0.1//EN
+DESCRIPTION:Calendar name 1
+DESCRIPTION:Calendar name 2
+END:VCALENDAR
+""",
+                "new" : """BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//example.com//Example v0.1//EN
+DESCRIPTION:Calendar name 1
+END:VCALENDAR
+""",
+                "patch": """BEGIN:VPATCH
+BEGIN:PATCH
+PATCH-TARGET:/VCALENDAR
+PATCH-DELETE:#DESCRIPTION[=Calendar name 2]
+END:PATCH
+END:VPATCH
+""",
+            },
+            {
+                "title": "Update multi-property",
+                "old" : """BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//example.com//Example v0.1//EN
+DESCRIPTION:Calendar name 1
+DESCRIPTION:Calendar name 2
+END:VCALENDAR
+""",
+                "new" : """BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//example.com//Example v0.1//EN
+DESCRIPTION:Calendar name 1
+DESCRIPTION:Calendar name 3
+END:VCALENDAR
+""",
+                "patch": """BEGIN:VPATCH
+BEGIN:PATCH
+PATCH-TARGET:/VCALENDAR
+PATCH-DELETE:#DESCRIPTION[=Calendar name 2]
+DESCRIPTION;PATCH-ACTION=CREATE:Calendar name 3
+END:PATCH
+END:VPATCH
+""",
+            },
+            {
+                "title": "Create parameter",
+                "old" : """BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//example.com//Example v0.1//EN
+DESCRIPTION:Calendar name 1
+END:VCALENDAR
+""",
+                "new" : """BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//example.com//Example v0.1//EN
+DESCRIPTION;LANGUAGE=en_US:Calendar name 1
+END:VCALENDAR
+""",
+                "patch": """BEGIN:VPATCH
+BEGIN:PATCH
+PATCH-TARGET:/VCALENDAR
+DESCRIPTION;LANGUAGE=en_US:Calendar name 1
+END:PATCH
+END:VPATCH
+""",
+            },
+            {
+                "title": "Update parameter",
+                "old" : """BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//example.com//Example v0.1//EN
+DESCRIPTION;LANGUAGE=en_US:Calendar name 1
+END:VCALENDAR
+""",
+                "new" : """BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//example.com//Example v0.1//EN
+DESCRIPTION;LANGUAGE=en_GB:Calendar name 1
+END:VCALENDAR
+""",
+                "patch": """BEGIN:VPATCH
+BEGIN:PATCH
+PATCH-TARGET:/VCALENDAR
+DESCRIPTION;LANGUAGE=en_GB:Calendar name 1
+END:PATCH
+END:VPATCH
+""",
+            },
+            {
+                "title": "Update multi-parameter",
+                "old" : """BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//example.com//Example v0.1//EN
+DESCRIPTION;LANGUAGE=en_US:Calendar name 1
+DESCRIPTION;LANGUAGE=en_GB:Calendar name 2
+END:VCALENDAR
+""",
+                "new" : """BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//example.com//Example v0.1//EN
+DESCRIPTION;LANGUAGE=en_US:Calendar name 1
+DESCRIPTION;LANGUAGE=en_CA:Calendar name 2
+END:VCALENDAR
+""",
+                "patch": """BEGIN:VPATCH
+BEGIN:PATCH
+PATCH-TARGET:/VCALENDAR
+DESCRIPTION;LANGUAGE=en_CA;PATCH-ACTION=BYVALUE:Calendar name 2
+END:PATCH
+END:VPATCH
+""",
+            },
+        ]
+
+        for item in data:
+            oldcal = Calendar.parseText(item["old"])
+            newcal = Calendar.parseText(item["new"])
+            vpatch = VPatch()
+            patchComponent = Patch(parent=vpatch)
+            patchComponent.addProperty(Property(definitions.cICalProperty_PATCH_TARGET, "/VCALENDAR"))
+            vpatch.addComponent(patchComponent)
+            PatchGenerator.processProperties(oldcal, newcal, vpatch, "", patchComponent)
+            self.assertEqual(
+                str(vpatch),
+                item["patch"].replace("\n", "\r\n"),
+                "Failed: {}\n{}".format(item["title"], "\n".join(unified_diff(str(vpatch).splitlines(), item["patch"].splitlines())))
+            )
 
 
 if __name__ == '__main__':

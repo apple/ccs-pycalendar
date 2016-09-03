@@ -60,7 +60,7 @@ class VPatch(Component):
         )
 
     def addDefaultProperties(self):
-        self.setUID()
+        self.setUID("")
         self.initDTSTAMP()
 
 Component.registerComponent(definitions.cICalComponent_VPATCH, VPatch)
