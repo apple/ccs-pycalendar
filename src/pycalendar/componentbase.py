@@ -109,6 +109,9 @@ class ComponentBase(object):
         compname = compname.upper() if compname else None
         return [component for component in self.mComponents if compname is None or component.getType().upper() == compname]
 
+    def getComponentsByUID(self, uid):
+        return [component for component in self.mComponents if component.getUID() == uid]
+
     def getComponentByKey(self, key):
         for component in self.mComponents:
             if component.getMapKey() == key:
@@ -117,7 +120,6 @@ class ComponentBase(object):
             return None
 
     def removeComponentByKey(self, key):
-
         for component in self.mComponents:
             if component.getMapKey() == key:
                 self.removeComponent(component)

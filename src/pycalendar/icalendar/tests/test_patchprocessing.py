@@ -25,7 +25,6 @@ from pycalendar.icalendar.property import Property
 from pycalendar.icalendar.vpatch import VPatch
 import itertools
 import json
-import operator
 import os
 import unittest
 
@@ -1093,6 +1092,100 @@ END:VPATCH
 END:VCALENDAR
 """,
         },
+        {
+            "title": "Update property by value",
+            "before": """BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//example.com//Example v0.1//EN
+BEGIN:VEVENT
+UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
+DTSTART;VALUE=DATE:20020101
+DTEND;VALUE=DATE:20020102
+DTSTAMP:20020101T000000Z
+RRULE:FREQ=YEARLY
+SUMMARY:New Year's Day
+DESCRIPTION;LANGUAGE=en_US:Times Square\\, New York
+DESCRIPTION:Trafalgar Square\\, London
+END:VEVENT
+END:VCALENDAR
+""",
+            "after": """BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//example.com//Example v0.1//EN
+BEGIN:VEVENT
+UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
+DTSTART;VALUE=DATE:20020101
+DTEND;VALUE=DATE:20020102
+DESCRIPTION;LANGUAGE=en_US:Times Square\\, New York
+DESCRIPTION;LANGUAGE=en_GB:Trafalgar Square\\, London
+DTSTAMP:20020101T000000Z
+RRULE:FREQ=YEARLY
+SUMMARY:New Year's Day
+END:VEVENT
+END:VCALENDAR
+""",
+            "patch": """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//example.com//Example v0.1//EN
+BEGIN:VPATCH
+UID:77CA7115-B195-49FF-8AB9-01A1F3AC4F5C
+DTSTAMP:20160831T102600Z
+BEGIN:PATCH
+PATCH-TARGET:/VCALENDAR/VEVENT
+DESCRIPTION;PATCH-ACTION=BYVALUE;LANGUAGE=en_GB:Trafalgar Square\\, London
+END:PATCH
+END:VPATCH
+END:VCALENDAR
+""",
+        },
+        {
+            "title": "Update property by parameter value",
+            "before": """BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//example.com//Example v0.1//EN
+BEGIN:VEVENT
+UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
+DTSTART;VALUE=DATE:20020101
+DTEND;VALUE=DATE:20020102
+DTSTAMP:20020101T000000Z
+RRULE:FREQ=YEARLY
+SUMMARY:New Year's Day
+DESCRIPTION;LANGUAGE=en_US:Times Square\\, New York
+DESCRIPTION;LANGUAGE=en_GB:Trafalgar Square
+END:VEVENT
+END:VCALENDAR
+""",
+            "after": """BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//example.com//Example v0.1//EN
+BEGIN:VEVENT
+UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
+DTSTART;VALUE=DATE:20020101
+DTEND;VALUE=DATE:20020102
+DESCRIPTION;LANGUAGE=en_US:Times Square\\, New York
+DESCRIPTION;LANGUAGE=en_GB:Trafalgar Square\\, London
+DTSTAMP:20020101T000000Z
+RRULE:FREQ=YEARLY
+SUMMARY:New Year's Day
+END:VEVENT
+END:VCALENDAR
+""",
+            "patch": """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//example.com//Example v0.1//EN
+BEGIN:VPATCH
+UID:77CA7115-B195-49FF-8AB9-01A1F3AC4F5C
+DTSTAMP:20160831T102600Z
+BEGIN:PATCH
+PATCH-TARGET:/VCALENDAR/VEVENT
+DESCRIPTION;PATCH-ACTION="BYPARAM@LANGUAGE=en_GB";LANGUAGE=en_GB:Trafalgar Square\\, London
+END:PATCH
+END:VPATCH
+END:VCALENDAR
+""",
+        },
     ],
 
     "update_parameter_simple": [
@@ -1767,6 +1860,98 @@ END:VPATCH
 END:VCALENDAR
 """,
         },
+        {
+            "title": "Delete one property by parameter from VEVENT",
+            "before": """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//example.com//Example v0.1//EN
+BEGIN:VEVENT
+UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
+DTSTART;VALUE=DATE:20020101
+DTEND;VALUE=DATE:20020102
+DTSTAMP:20020101T000000Z
+DESCRIPTION;LANGUAGE=en_US:Times Square\\, New York
+DESCRIPTION:Trafalgar Square\\, London
+SUMMARY:New Year's Day
+END:VEVENT
+END:VCALENDAR
+""",
+            "after": """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//example.com//Example v0.1//EN
+BEGIN:VEVENT
+UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
+DTSTART;VALUE=DATE:20020101
+DTEND;VALUE=DATE:20020102
+DESCRIPTION:Trafalgar Square\\, London
+DTSTAMP:20020101T000000Z
+SUMMARY:New Year's Day
+END:VEVENT
+END:VCALENDAR
+""",
+            "patch": """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//example.com//Example v0.1//EN
+BEGIN:VPATCH
+UID:77CA7115-B195-49FF-8AB9-01A1F3AC4F5C
+DTSTAMP:20160831T102600Z
+BEGIN:PATCH
+PATCH-TARGET:/VCALENDAR/VEVENT
+PATCH-DELETE:#DESCRIPTION[@LANGUAGE]
+END:PATCH
+END:VPATCH
+END:VCALENDAR
+""",
+        },
+        {
+            "title": "Delete one property by parameter value from VEVENT",
+            "before": """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//example.com//Example v0.1//EN
+BEGIN:VEVENT
+UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
+DTSTART;VALUE=DATE:20020101
+DTEND;VALUE=DATE:20020102
+DTSTAMP:20020101T000000Z
+DESCRIPTION;LANGUAGE=en_US:Times Square\\, New York
+DESCRIPTION;LANGUAGE=en_GB:Trafalgar Square\\, London
+SUMMARY:New Year's Day
+END:VEVENT
+END:VCALENDAR
+""",
+            "after": """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//example.com//Example v0.1//EN
+BEGIN:VEVENT
+UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
+DTSTART;VALUE=DATE:20020101
+DTEND;VALUE=DATE:20020102
+DESCRIPTION;LANGUAGE=en_GB:Trafalgar Square\\, London
+DTSTAMP:20020101T000000Z
+SUMMARY:New Year's Day
+END:VEVENT
+END:VCALENDAR
+""",
+            "patch": """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//example.com//Example v0.1//EN
+BEGIN:VPATCH
+UID:77CA7115-B195-49FF-8AB9-01A1F3AC4F5C
+DTSTAMP:20160831T102600Z
+BEGIN:PATCH
+PATCH-TARGET:/VCALENDAR/VEVENT
+PATCH-DELETE:#DESCRIPTION[@LANGUAGE=en_US]
+END:PATCH
+END:VPATCH
+END:VCALENDAR
+""",
+        },
     ],
 
     "delete_parameter_simple": [
@@ -2296,6 +2481,7 @@ class TestPath(unittest.TestCase):
             ],
             None,
             None,
+            None,
         ),
         (
             "/VCALENDAR/VEVENT",
@@ -2304,6 +2490,7 @@ class TestPath(unittest.TestCase):
                 Path.ComponentSegment("VCALENDAR"),
                 Path.ComponentSegment("VEVENT"),
             ],
+            None,
             None,
             None,
         ),
@@ -2316,14 +2503,16 @@ class TestPath(unittest.TestCase):
             ],
             None,
             None,
+            None,
         ),
         (
-            "/VCALENDAR/VEVENT[UID=1234%2F4567]",
+            "/VCALENDAR/VEVENT[UID=1234%5D4567]",
             True,
             [
                 Path.ComponentSegment("VCALENDAR"),
-                Path.ComponentSegment("VEVENT[UID=1234/4567]"),
+                Path.ComponentSegment("VEVENT[UID=1234]4567]"),
             ],
+            None,
             None,
             None,
         ),
@@ -2334,6 +2523,7 @@ class TestPath(unittest.TestCase):
                 Path.ComponentSegment("VCALENDAR"),
                 Path.ComponentSegment("VEVENT[UID=1234][RID=20150907T120000Z]"),
             ],
+            None,
             None,
             None,
         ),
@@ -2347,6 +2537,7 @@ class TestPath(unittest.TestCase):
             ],
             Path.PropertySegment("VERSION"),
             None,
+            None,
         ),
         (
             "/VCALENDAR/VEVENT#SUMMARY",
@@ -2357,6 +2548,7 @@ class TestPath(unittest.TestCase):
             ],
             Path.PropertySegment("SUMMARY"),
             None,
+            None,
         ),
         (
             "/VCALENDAR/VEVENT#SUMMARY[=abc]",
@@ -2365,17 +2557,19 @@ class TestPath(unittest.TestCase):
                 Path.ComponentSegment("VCALENDAR"),
                 Path.ComponentSegment("VEVENT"),
             ],
-            Path.PropertySegment("SUMMARY[=abc]"),
+            Path.PropertySegment("SUMMARY", "=abc"),
+            None,
             None,
         ),
         (
-            "/VCALENDAR/VEVENT#SUMMARY[=a%2Fc]",
+            "/VCALENDAR/VEVENT#SUMMARY[=a%5Dc]",
             True,
             [
                 Path.ComponentSegment("VCALENDAR"),
                 Path.ComponentSegment("VEVENT"),
             ],
-            Path.PropertySegment("SUMMARY[=a/c]"),
+            Path.PropertySegment("SUMMARY", "=a]c"),
+            None,
             None,
         ),
         (
@@ -2385,7 +2579,8 @@ class TestPath(unittest.TestCase):
                 Path.ComponentSegment("VCALENDAR"),
                 Path.ComponentSegment("VEVENT"),
             ],
-            Path.PropertySegment("SUMMARY[!abc]"),
+            Path.PropertySegment("SUMMARY", "!abc"),
+            None,
             None,
         ),
         (
@@ -2397,6 +2592,7 @@ class TestPath(unittest.TestCase):
             ],
             Path.PropertySegment("SUMMARY"),
             None,
+            None,
         ),
         (
             "/VCALENDAR/VEVENT[UID=1234]#SUMMARY[=abc]",
@@ -2405,7 +2601,8 @@ class TestPath(unittest.TestCase):
                 Path.ComponentSegment("VCALENDAR"),
                 Path.ComponentSegment("VEVENT[UID=1234]"),
             ],
-            Path.PropertySegment("SUMMARY[=abc]"),
+            Path.PropertySegment("SUMMARY", "=abc"),
+            None,
             None,
         ),
         (
@@ -2417,6 +2614,7 @@ class TestPath(unittest.TestCase):
             ],
             Path.PropertySegment("SUMMARY"),
             None,
+            None,
         ),
         (
             "/VCALENDAR/VEVENT[UID=1234][RID=20150907T120000Z]#SUMMARY[=abc]",
@@ -2425,8 +2623,53 @@ class TestPath(unittest.TestCase):
                 Path.ComponentSegment("VCALENDAR"),
                 Path.ComponentSegment("VEVENT[UID=1234][RID=20150907T120000Z]"),
             ],
-            Path.PropertySegment("SUMMARY[=abc]"),
+            Path.PropertySegment("SUMMARY", "=abc"),
             None,
+            None,
+        ),
+        (
+            "/VCALENDAR/VEVENT[UID=1234][RID=20150907T120000Z]#DESCRIPTION[@LANGUAGE]",
+            True,
+            [
+                Path.ComponentSegment("VCALENDAR"),
+                Path.ComponentSegment("VEVENT[UID=1234][RID=20150907T120000Z]"),
+            ],
+            Path.PropertySegment("DESCRIPTION", "@LANGUAGE"),
+            None,
+            None,
+        ),
+        (
+            "/VCALENDAR/VEVENT[UID=1234][RID=20150907T120000Z]#DESCRIPTION[@LANGUAGE=en_US]",
+            True,
+            [
+                Path.ComponentSegment("VCALENDAR"),
+                Path.ComponentSegment("VEVENT[UID=1234][RID=20150907T120000Z]"),
+            ],
+            Path.PropertySegment("DESCRIPTION", "@LANGUAGE=en_US"),
+            None,
+            None,
+        ),
+        (
+            "/VCALENDAR/VEVENT[UID=1234][RID=20150907T120000Z]#DESCRIPTION[@LANGUAGE!en_US]",
+            True,
+            [
+                Path.ComponentSegment("VCALENDAR"),
+                Path.ComponentSegment("VEVENT[UID=1234][RID=20150907T120000Z]"),
+            ],
+            Path.PropertySegment("DESCRIPTION", "@LANGUAGE!en_US"),
+            None,
+            None,
+        ),
+        (
+            "/VCALENDAR/VEVENT#EXDATE=20160903",
+            True,
+            [
+                Path.ComponentSegment("VCALENDAR"),
+                Path.ComponentSegment("VEVENT"),
+            ],
+            Path.PropertySegment("EXDATE"),
+            None,
+            "20160903",
         ),
 
         # Parameters
@@ -2438,6 +2681,7 @@ class TestPath(unittest.TestCase):
             ],
             Path.PropertySegment("VERSION"),
             Path.ParameterSegment("VALUE"),
+            None,
         ),
         (
             "/VCALENDAR/VEVENT#ATTENDEE;PARTSTAT",
@@ -2448,6 +2692,7 @@ class TestPath(unittest.TestCase):
             ],
             Path.PropertySegment("ATTENDEE"),
             Path.ParameterSegment("PARTSTAT"),
+            None,
         ),
         (
             "/VCALENDAR/VEVENT#ATTENDEE[=abc];PARTSTAT",
@@ -2456,18 +2701,20 @@ class TestPath(unittest.TestCase):
                 Path.ComponentSegment("VCALENDAR"),
                 Path.ComponentSegment("VEVENT"),
             ],
-            Path.PropertySegment("ATTENDEE[=abc]"),
+            Path.PropertySegment("ATTENDEE", "=abc"),
             Path.ParameterSegment("PARTSTAT"),
+            None,
         ),
         (
-            "/VCALENDAR/VEVENT#ATTENDEE[=a%2Fc];PARTSTAT",
+            "/VCALENDAR/VEVENT#ATTENDEE[=a%5Dc];PARTSTAT",
             True,
             [
                 Path.ComponentSegment("VCALENDAR"),
                 Path.ComponentSegment("VEVENT"),
             ],
-            Path.PropertySegment("ATTENDEE[=a/c]"),
+            Path.PropertySegment("ATTENDEE", "=a]c"),
             Path.ParameterSegment("PARTSTAT"),
+            None,
         ),
         (
             "/VCALENDAR/VEVENT#ATTENDEE[!abc];PARTSTAT",
@@ -2476,8 +2723,9 @@ class TestPath(unittest.TestCase):
                 Path.ComponentSegment("VCALENDAR"),
                 Path.ComponentSegment("VEVENT"),
             ],
-            Path.PropertySegment("ATTENDEE[!abc]"),
+            Path.PropertySegment("ATTENDEE", "!abc"),
             Path.ParameterSegment("PARTSTAT"),
+            None,
         ),
         (
             "/VCALENDAR/VEVENT[UID=1234]#ATTENDEE;PARTSTAT",
@@ -2488,6 +2736,7 @@ class TestPath(unittest.TestCase):
             ],
             Path.PropertySegment("ATTENDEE"),
             Path.ParameterSegment("PARTSTAT"),
+            None,
         ),
         (
             "/VCALENDAR/VEVENT[UID=1234]#ATTENDEE[=abc];PARTSTAT",
@@ -2496,8 +2745,9 @@ class TestPath(unittest.TestCase):
                 Path.ComponentSegment("VCALENDAR"),
                 Path.ComponentSegment("VEVENT[UID=1234]"),
             ],
-            Path.PropertySegment("ATTENDEE[=abc]"),
+            Path.PropertySegment("ATTENDEE", "=abc"),
             Path.ParameterSegment("PARTSTAT"),
+            None,
         ),
         (
             "/VCALENDAR/VEVENT[UID=1234][RID=20150907T120000Z]#ATTENDEE;PARTSTAT",
@@ -2508,6 +2758,7 @@ class TestPath(unittest.TestCase):
             ],
             Path.PropertySegment("ATTENDEE"),
             Path.ParameterSegment("PARTSTAT"),
+            None,
         ),
         (
             "/VCALENDAR/VEVENT[UID=1234][RID=20150907T120000Z]#ATTENDEE[=abc];PARTSTAT",
@@ -2516,8 +2767,20 @@ class TestPath(unittest.TestCase):
                 Path.ComponentSegment("VCALENDAR"),
                 Path.ComponentSegment("VEVENT[UID=1234][RID=20150907T120000Z]"),
             ],
-            Path.PropertySegment("ATTENDEE[=abc]"),
+            Path.PropertySegment("ATTENDEE", "=abc"),
             Path.ParameterSegment("PARTSTAT"),
+            None,
+        ),
+        (
+            "/VCALENDAR/VEVENT#ATTENDEE;MEMBER=mailto:cyrus@example.com",
+            True,
+            [
+                Path.ComponentSegment("VCALENDAR"),
+                Path.ComponentSegment("VEVENT"),
+            ],
+            Path.PropertySegment("ATTENDEE"),
+            Path.ParameterSegment("MEMBER"),
+            "mailto:cyrus@example.com",
         ),
 
         # Invalid
@@ -2526,31 +2789,37 @@ class TestPath(unittest.TestCase):
     def testParse(self):
 
         for ctr, item in enumerate(TestPath.test_data):
-            strpath, valid, components, property, parameter = item
+            strpath, valid, components, property, parameter, value = item
             try:
                 path = Path(strpath)
             except ValueError:
-                self.assertFalse(valid, msg="Failed #{}".format(ctr + 1))
+                self.assertFalse(valid, msg="Failed #{} {}".format(ctr + 1, strpath))
             else:
-                self.assertTrue(valid, msg="Failed #{}".format(ctr + 1))
-                self.assertEqual(path.components, components, msg="Failed #{}".format(ctr + 1))
-                self.assertEqual(path.property, property, msg="Failed #{}".format(ctr + 1))
-                self.assertEqual(path.parameter, parameter, msg="Failed #{}".format(ctr + 1))
+                self.assertTrue(valid, msg="Failed #{} {}".format(ctr + 1, strpath))
+                self.assertEqual(path.components, components, msg="Failed #{} {}".format(ctr + 1, strpath))
+                self.assertEqual(path.property, property, msg="Failed #{} {}".format(ctr + 1, strpath))
+                self.assertEqual(path.parameter, parameter, msg="Failed #{} {}".format(ctr + 1, strpath))
+                self.assertEqual(path.value, value, msg="Failed #{} {}".format(ctr + 1, strpath))
+                self.assertEqual(str(path), strpath, msg="Failed #{}: {}".format(ctr + 1, strpath))
 
     def testType(self):
 
         data = [
-            ("/VCALENDAR", True, False, False,),
-            ("/VCALENDAR/VEVENT", True, False, False,),
-            ("/VCALENDAR/VEVENT#SUMMARY", False, True, False,),
-            ("/VCALENDAR/VEVENT#SUMMARY;X-PARAM", False, False, True,),
+            ("/VCALENDAR", True, False, False, False, False,),
+            ("/VCALENDAR/VEVENT", True, False, False, False, False,),
+            ("/VCALENDAR/VEVENT#SUMMARY", False, True, False, False, False,),
+            ("/VCALENDAR/VEVENT#SUMMARY;X-PARAM", False, False, True, False, False,),
+            ("/VCALENDAR/VEVENT#SUMMARY=FOO", False, False, False, True, False,),
+            ("/VCALENDAR/VEVENT#SUMMARY;X-PARAM=BAR", False, False, False, False, True,),
         ]
 
-        for strpath, isComponent, isProperty, isParameter in data:
+        for strpath, isComponent, isProperty, isParameter, isPropertyValue, isParameterValue in data:
             path = Path(strpath)
             self.assertEqual(path.targetComponent(), isComponent)
             self.assertEqual(path.targetProperty(), isProperty)
             self.assertEqual(path.targetParameter(), isParameter)
+            self.assertEqual(path.targetPropertyValue(), isPropertyValue)
+            self.assertEqual(path.targetParameterValue(), isParameterValue)
 
     def testStr(self):
 
@@ -2910,7 +3179,7 @@ class TestComponentSegment(unittest.TestCase):
         # Valid
         ("VCALENDAR", True, "VCALENDAR", None, None, None,),
         ("VCALENDAR[UID=1234]", True, "VCALENDAR", "1234", None, None,),
-        ("VCALENDAR[UID=1234%2F4567]", True, "VCALENDAR", "1234/4567", None, None,),
+        ("VCALENDAR[UID=1234%5D4567]", True, "VCALENDAR", "1234]4567", None, None,),
         ("VCALENDAR[UID=1234][RID=M]", True, "VCALENDAR", "1234", True, None,),
         ("VCALENDAR[UID=1234][RID=20150907T120000Z]", True, "VCALENDAR", "1234", True, "20150907T120000Z",),
 
@@ -2944,26 +3213,27 @@ class TestPropertySegment(unittest.TestCase):
 
     test_data = (
         # Valid
-        ("STATUS", True, "STATUS", None,),
-        ("STATUS[=COMPLETED]", True, "STATUS", ("COMPLETED", operator.eq,),),
-        ("STATUS[!COMPLETED]", True, "STATUS", ("COMPLETED", operator.ne,),),
-        ("SUMMARY[=a%2Fb]", True, "SUMMARY", ("a/b", operator.eq,),),
+        ("STATUS", None, True, "STATUS", None,),
+        ("STATUS", "=COMPLETED", True, "STATUS", ("=", "COMPLETED",),),
+        ("STATUS", "!COMPLETED", True, "STATUS", ("!", "COMPLETED",),),
+        ("SUMMARY", "=a%5Db", True, "SUMMARY", ("=", "a]b",),),
+        ("STATUS", "@RSVP", True, "STATUS", ("@", "RSVP", None, None, ),),
+        ("STATUS", "@RSVP=TRUE", True, "STATUS", ("@", "RSVP", "=", "TRUE",),),
+        ("STATUS", "@RSVP!TRUE", True, "STATUS", ("@", "RSVP", "!", "TRUE",),),
 
         # Invalid
-        ("", False, None, None,),
-        ("STATUS[]", False, None, None,),
-        ("STATUS[foo]", False, None, None,),
-        ("STATUS[=]", False, None, None,),
-        ("STATUS[=COMPLETED", False, None, None,),
-        ("STATUS[=COMPLETED][=FAILED]", False, None, None,),
+        ("", None, False, None, None,),
+        ("STATUS", "", False, None, None,),
+        ("STATUS", "foo", False, None, None,),
+        ("STATUS", "=", False, None, None,),
     )
 
     def testParse(self):
 
         for ctr, item in enumerate(TestPropertySegment.test_data):
-            segment, valid, name, matchCondition = item
+            segment, match, valid, name, matchCondition = item
             try:
-                property = Path.PropertySegment(segment)
+                property = Path.PropertySegment(segment, match)
             except ValueError:
                 self.assertFalse(valid, msg="Failed #{}".format(ctr + 1))
             else:
@@ -3342,6 +3612,514 @@ END:VPATCH
                 "Failed: {}\n{}".format(item["title"], "\n".join(unified_diff(str(vpatch).splitlines(), item["patch"].splitlines())))
             )
 
+    def test_patchGenerator(self):
+
+        data = [
+            # Simple component changes
+            {
+                "title": "Create component",
+                "old" : """BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//example.com//Example v0.1//EN
+END:VCALENDAR
+""",
+                "new" : """BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//example.com//Example v0.1//EN
+BEGIN:VEVENT
+UID:1234
+END:VEVENT
+END:VCALENDAR
+""",
+                "patch": """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//calendarserver.org//PyCalendar v1//EN
+BEGIN:VPATCH
+BEGIN:PATCH
+PATCH-TARGET:/VCALENDAR
+BEGIN:VEVENT
+UID:1234
+END:VEVENT
+END:PATCH
+END:VPATCH
+END:VCALENDAR
+""",
+            },
+            {
+                "title": "Delete component",
+                "old" : """BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//example.com//Example v0.1//EN
+BEGIN:VEVENT
+UID:1234
+END:VEVENT
+END:VCALENDAR
+""",
+                "new" : """BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//example.com//Example v0.1//EN
+END:VCALENDAR
+""",
+                "patch": """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//calendarserver.org//PyCalendar v1//EN
+BEGIN:VPATCH
+BEGIN:PATCH
+PATCH-TARGET:/VCALENDAR
+PATCH-DELETE:/VEVENT
+END:PATCH
+END:VPATCH
+END:VCALENDAR
+""",
+            },
+            {
+                "title": "Update component",
+                "old" : """BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//example.com//Example v0.1//EN
+BEGIN:VEVENT
+UID:1234
+SUMMARY:old
+END:VEVENT
+END:VCALENDAR
+""",
+                "new" : """BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//example.com//Example v0.1//EN
+BEGIN:VEVENT
+UID:1234
+SUMMARY:new
+END:VEVENT
+END:VCALENDAR
+""",
+                "patch": """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//calendarserver.org//PyCalendar v1//EN
+BEGIN:VPATCH
+BEGIN:PATCH
+PATCH-TARGET:/VCALENDAR/VEVENT
+SUMMARY:new
+END:PATCH
+END:VPATCH
+END:VCALENDAR
+""",
+            },
+
+            # Simple property changes
+            {
+                "title": "Create property",
+                "old" : """BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//example.com//Example v0.1//EN
+END:VCALENDAR
+""",
+                "new" : """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//example.com//Example v0.1//EN
+END:VCALENDAR
+""",
+                "patch": """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//calendarserver.org//PyCalendar v1//EN
+BEGIN:VPATCH
+BEGIN:PATCH
+PATCH-TARGET:/VCALENDAR
+CALSCALE:GREGORIAN
+END:PATCH
+END:VPATCH
+END:VCALENDAR
+""",
+            },
+            {
+                "title": "Delete property",
+                "old" : """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//example.com//Example v0.1//EN
+END:VCALENDAR
+""",
+                "new" : """BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//example.com//Example v0.1//EN
+END:VCALENDAR
+""",
+                "patch": """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//calendarserver.org//PyCalendar v1//EN
+BEGIN:VPATCH
+BEGIN:PATCH
+PATCH-TARGET:/VCALENDAR
+PATCH-DELETE:#CALSCALE
+END:PATCH
+END:VPATCH
+END:VCALENDAR
+""",
+            },
+            {
+                "title": "Create & Delete property",
+                "old" : """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//example.com//Example v0.1//EN
+END:VCALENDAR
+""",
+                "new" : """BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//example.com//Example v0.1//EN
+DESCRIPTION:Calendar name
+END:VCALENDAR
+""",
+                "patch": """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//calendarserver.org//PyCalendar v1//EN
+BEGIN:VPATCH
+BEGIN:PATCH
+PATCH-TARGET:/VCALENDAR
+PATCH-DELETE:#CALSCALE
+DESCRIPTION:Calendar name
+END:PATCH
+END:VPATCH
+END:VCALENDAR
+""",
+            },
+            {
+                "title": "Singleton update property",
+                "old" : """BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//calendarserver.org//PyCalendar v1//EN
+END:VCALENDAR
+""",
+                "new" : """BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//example.org//Example v0.1//EN
+END:VCALENDAR
+""",
+                "patch": """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//calendarserver.org//PyCalendar v1//EN
+BEGIN:VPATCH
+BEGIN:PATCH
+PATCH-TARGET:/VCALENDAR
+PRODID:-//example.org//Example v0.1//EN
+END:PATCH
+END:VPATCH
+END:VCALENDAR
+""",
+            },
+            {
+                "title": "Create multi-property",
+                "old" : """BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//example.com//Example v0.1//EN
+DESCRIPTION:Calendar name 1
+END:VCALENDAR
+""",
+                "new" : """BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//example.com//Example v0.1//EN
+DESCRIPTION:Calendar name 1
+DESCRIPTION:Calendar name 2
+END:VCALENDAR
+""",
+                "patch": """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//calendarserver.org//PyCalendar v1//EN
+BEGIN:VPATCH
+BEGIN:PATCH
+PATCH-TARGET:/VCALENDAR
+DESCRIPTION;PATCH-ACTION=CREATE:Calendar name 2
+END:PATCH
+END:VPATCH
+END:VCALENDAR
+""",
+            },
+            {
+                "title": "Delete multi-property",
+                "old" : """BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//example.com//Example v0.1//EN
+DESCRIPTION:Calendar name 1
+DESCRIPTION:Calendar name 2
+END:VCALENDAR
+""",
+                "new" : """BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//example.com//Example v0.1//EN
+DESCRIPTION:Calendar name 1
+END:VCALENDAR
+""",
+                "patch": """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//calendarserver.org//PyCalendar v1//EN
+BEGIN:VPATCH
+BEGIN:PATCH
+PATCH-TARGET:/VCALENDAR
+PATCH-DELETE:#DESCRIPTION[=Calendar name 2]
+END:PATCH
+END:VPATCH
+END:VCALENDAR
+""",
+            },
+            {
+                "title": "Update multi-property",
+                "old" : """BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//example.com//Example v0.1//EN
+DESCRIPTION:Calendar name 1
+DESCRIPTION:Calendar name 2
+END:VCALENDAR
+""",
+                "new" : """BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//example.com//Example v0.1//EN
+DESCRIPTION:Calendar name 1
+DESCRIPTION:Calendar name 3
+END:VCALENDAR
+""",
+                "patch": """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//calendarserver.org//PyCalendar v1//EN
+BEGIN:VPATCH
+BEGIN:PATCH
+PATCH-TARGET:/VCALENDAR
+PATCH-DELETE:#DESCRIPTION[=Calendar name 2]
+DESCRIPTION;PATCH-ACTION=CREATE:Calendar name 3
+END:PATCH
+END:VPATCH
+END:VCALENDAR
+""",
+            },
+            {
+                "title": "Create parameter",
+                "old" : """BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//example.com//Example v0.1//EN
+DESCRIPTION:Calendar name 1
+END:VCALENDAR
+""",
+                "new" : """BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//example.com//Example v0.1//EN
+DESCRIPTION;LANGUAGE=en_US:Calendar name 1
+END:VCALENDAR
+""",
+                "patch": """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//calendarserver.org//PyCalendar v1//EN
+BEGIN:VPATCH
+BEGIN:PATCH
+PATCH-TARGET:/VCALENDAR
+DESCRIPTION;LANGUAGE=en_US:Calendar name 1
+END:PATCH
+END:VPATCH
+END:VCALENDAR
+""",
+            },
+            {
+                "title": "Update parameter",
+                "old" : """BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//example.com//Example v0.1//EN
+DESCRIPTION;LANGUAGE=en_US:Calendar name 1
+END:VCALENDAR
+""",
+                "new" : """BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//example.com//Example v0.1//EN
+DESCRIPTION;LANGUAGE=en_GB:Calendar name 1
+END:VCALENDAR
+""",
+                "patch": """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//calendarserver.org//PyCalendar v1//EN
+BEGIN:VPATCH
+BEGIN:PATCH
+PATCH-TARGET:/VCALENDAR
+DESCRIPTION;LANGUAGE=en_GB:Calendar name 1
+END:PATCH
+END:VPATCH
+END:VCALENDAR
+""",
+            },
+            {
+                "title": "Update multi-parameter",
+                "old" : """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//example.com//Example v0.1//EN
+DESCRIPTION;LANGUAGE=en_US:Calendar name 1
+DESCRIPTION;LANGUAGE=en_GB:Calendar name 2
+END:VCALENDAR
+""",
+                "new" : """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//example.com//Example v0.1//EN
+DESCRIPTION;LANGUAGE=en_US:Calendar name 1
+DESCRIPTION;LANGUAGE=en_CA:Calendar name 2
+END:VCALENDAR
+""",
+                "patch": """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//calendarserver.org//PyCalendar v1//EN
+BEGIN:VPATCH
+BEGIN:PATCH
+PATCH-TARGET:/VCALENDAR
+DESCRIPTION;LANGUAGE=en_CA;PATCH-ACTION=BYVALUE:Calendar name 2
+END:PATCH
+END:VPATCH
+END:VCALENDAR
+""",
+            },
+
+            # More complex scenarios
+            {
+                "title": "Update one property in an instance",
+                "old": """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//example.com//Example v0.1//EN
+BEGIN:VEVENT
+UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
+DTSTART;VALUE=DATE:20020101
+DTEND;VALUE=DATE:20020102
+DTSTAMP:20020101T000000Z
+RRULE:FREQ=YEARLY
+SUMMARY:New Year's Day
+END:VEVENT
+END:VCALENDAR
+""",
+                "new": """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//example.com//Example v0.1//EN
+BEGIN:VEVENT
+UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
+DTSTART;VALUE=DATE:20020101
+DTEND;VALUE=DATE:20020102
+DTSTAMP:20020101T000000Z
+RRULE:FREQ=YEARLY
+SUMMARY:New Year's Day
+END:VEVENT
+BEGIN:VEVENT
+UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
+RECURRENCE-ID;VALUE=DATE:20030101
+DTSTART;VALUE=DATE:20030101
+DTEND;VALUE=DATE:20030102
+DTSTAMP:20020101T000000Z
+SUMMARY:New Year's Day - party time
+END:VEVENT
+END:VCALENDAR
+""",
+                "patch": """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//calendarserver.org//PyCalendar v1//EN
+BEGIN:VPATCH
+BEGIN:PATCH
+PATCH-TARGET:/VCALENDAR/VEVENT[RID=20030101]
+SUMMARY:New Year's Day - party time
+END:PATCH
+END:VPATCH
+END:VCALENDAR
+""",
+            },
+            {
+                "title": "Update one property in an instance with multiple events present",
+                "old": """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//example.com//Example v0.1//EN
+BEGIN:VEVENT
+UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
+DTSTART;VALUE=DATE:20020101
+DTEND;VALUE=DATE:20020102
+DTSTAMP:20020101T000000Z
+RRULE:FREQ=YEARLY
+SUMMARY:New Year's Day
+END:VEVENT
+BEGIN:VEVENT
+UID:165EF135-BA92-435A-88C9-562F95030908
+DTSTART;VALUE=DATE:20020401
+DURATION:P1D
+DTSTAMP:20020101T000000Z
+RRULE:FREQ=YEARLY
+SUMMARY:April Fool's Day
+END:VEVENT
+END:VCALENDAR
+""",
+                "new": """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//example.com//Example v0.1//EN
+BEGIN:VEVENT
+UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
+DTSTART;VALUE=DATE:20020101
+DTEND;VALUE=DATE:20020102
+DTSTAMP:20020101T000000Z
+RRULE:FREQ=YEARLY
+SUMMARY:New Year's Day
+END:VEVENT
+BEGIN:VEVENT
+UID:165EF135-BA92-435A-88C9-562F95030908
+DTSTART;VALUE=DATE:20020401
+DURATION:P1D
+DTSTAMP:20020101T000000Z
+RRULE:FREQ=YEARLY
+SUMMARY:April Fool's Day
+END:VEVENT
+BEGIN:VEVENT
+UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
+RECURRENCE-ID;VALUE=DATE:20030101
+DTSTART;VALUE=DATE:20030101
+DTEND;VALUE=DATE:20030102
+DTSTAMP:20020101T000000Z
+SUMMARY:New Year's Day - party time
+END:VEVENT
+END:VCALENDAR
+""",
+                "patch": """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//calendarserver.org//PyCalendar v1//EN
+BEGIN:VPATCH
+BEGIN:PATCH
+PATCH-TARGET:/VCALENDAR/VEVENT[UID=C3184A66-1ED0-11D9-A5E0-000A958A3252][RID=20030101]
+SUMMARY:New Year's Day - party time
+END:PATCH
+END:VPATCH
+END:VCALENDAR
+""",
+            },
+        ]
+
+        for item in data:
+            oldcal = Calendar.parseText(item["old"])
+            newcal = Calendar.parseText(item["new"])
+
+            patchcal = PatchGenerator.createPatch(oldcal, newcal)
+            patchcal.getComponents(definitions.cICalComponent_VPATCH)[0].removeProperties(definitions.cICalProperty_UID)
+            patchcal.getComponents(definitions.cICalComponent_VPATCH)[0].removeProperties(definitions.cICalProperty_DTSTAMP)
+
+            self.assertEqual(
+                str(patchcal).replace("\r\n ", ""),
+                item["patch"].replace("\n", "\r\n"),
+                "Failed: {}\n{}".format(item["title"], "\n".join(unified_diff(str(patchcal).splitlines(), item["patch"].splitlines())))
+            )
 
 if __name__ == '__main__':
     order = [

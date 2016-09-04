@@ -15,7 +15,6 @@
 ##
 
 from calendar import Calendar
-from collections import Counter
 from pycalendar.componentbase import ComponentBase
 from pycalendar.datetime import DateTime
 from pycalendar.icalendar import definitions
@@ -26,7 +25,7 @@ from pycalendar.icalendar.property import Property
 from pycalendar.icalendar.vpatch import VPatch
 from pycalendar.parameter import Parameter
 from urlparse import unquote
-import operator
+from pycalendar import stringutils
 
 
 class PatchDocument(object):
@@ -289,11 +288,11 @@ class Command(object):
 
                 # Replace property with the same param value
                 elif action.startswith(definitions.cICalParameter_PATCH_ACTION_BYPARAM):
-                    parammatch = action.split(";", 1)[1]
+                    parammatch = action.split("@", 1)[1]
                     paramname, paramvalue = parammatch.split("=", 1)
                     oldprops = component.getProperties(newproperty.getName())
                     for oldprop in oldprops:
-                        if oldprop.hasParameter(paramname) and paramvalue in oldprop.getParameterValues():
+                        if oldprop.hasParameter(paramname) and paramvalue in oldprop.getParameterValues(paramname):
                             component.removeProperty(oldprop)
                     component.addProperty(newproperty.duplicate())
 
@@ -343,6 +342,7 @@ class Path(object):
         self.components = []
         self.property = None
         self.parameter = None
+        self.value = None
         self._parsePath(path)
 
     def __str__(self):
@@ -351,6 +351,8 @@ class Path(object):
             path += str(self.property)
             if self.parameter:
                 path += str(self.parameter)
+            if self.value:
+                path += "=" + self.value
         return path
 
     def targetComponent(self):
@@ -371,7 +373,8 @@ class Path(object):
         """
         return (
             self.property is not None and
-            self.parameter is None
+            self.parameter is None and
+            self.value is None
         )
 
     def targetParameter(self):
@@ -383,7 +386,34 @@ class Path(object):
         """
         return (
             self.property is not None and
-            self.parameter is not None
+            self.parameter is not None and
+            self.value is None
+        )
+
+    def targetPropertyValue(self):
+        """
+        Indicate whether the path targets a property.
+
+        @return: L{True} for a property target, L{False} otherwise.
+        @rtype: L{bool}
+        """
+        return (
+            self.property is not None and
+            self.parameter is None and
+            self.value is not None
+        )
+
+    def targetParameterValue(self):
+        """
+        Indicate whether the path targets a parameter.
+
+        @return: L{True} for a parameter target, L{False} otherwise.
+        @rtype: L{bool}
+        """
+        return (
+            self.property is not None and
+            self.parameter is not None and
+            self.value is not None
         )
 
     def _parsePath(self, path):
@@ -394,23 +424,36 @@ class Path(object):
         @type path: L{str}
         """
 
-        segments = path.split("/")
-        property_segment = None
-        parameter_segment = None
-        if segments[0] != "":
-            raise ValueError("Invalid path: {}".format(path))
-        del segments[0]
-        if "#" in segments[-1]:
-            segments[-1], property_segment = segments[-1].split("#", 1)
-            if ";" in property_segment:
-                property_segment, parameter_segment = property_segment.split(";", 1)
-
-        for item in range(len(segments)):
-            self.components.append(Path.ComponentSegment(segments[item]))
-        if property_segment is not None:
-            self.property = Path.PropertySegment(property_segment)
-        if parameter_segment is not None:
-            self.parameter = Path.ParameterSegment(parameter_segment)
+        rest = path
+        while rest:
+            if rest[0] == "/":
+                # Parse a component
+                compname, rest = stringutils.strduptokenstr(rest[1:], "/#")
+                self.components.append(Path.ComponentSegment(compname))
+            elif rest[0] == "#":
+                # Parse a property
+                propname, rest = stringutils.strduptokenstr(rest[1:], "[;=")
+                propmatch = None
+                if rest and rest[0] == "[":
+                    propmatch, rest = stringutils.strduptokenstr(rest[1:], "]")
+                    rest = rest[1:]
+                self.property = Path.PropertySegment(propname, propmatch)
+            elif rest[0] == ";":
+                # Can only follow a property
+                if self.property is None:
+                    raise ValueError("Invalid path: {}".format(path))
+                # Parse a parameter
+                paramname, rest = stringutils.strduptokenstr(rest[1:], "=")
+                self.parameter = Path.ParameterSegment(paramname)
+            elif rest[0] == "=":
+                # Can only follow a property or parameter
+                if self.property is None and self.parameter is None:
+                    raise ValueError("Invalid path: {}".format(path))
+                # Parse a value
+                self.value = rest[1:]
+                rest = None
+            else:
+                raise ValueError("Invalid path: {}".format(path))
 
     class ComponentSegment(object):
         """
@@ -434,7 +477,7 @@ class Path(object):
         def __str__(self):
             path = "/" + self.name
             if self.uid:
-                path += "[UID={}]".format(self.uid)
+                path += "[UID={}]".format(self.uid.replace("]", "%5D"))
             if self.rid:
                 path += "[RID={}]".format(self.rid_value if self.rid_value is not None else "M")
             return path
@@ -530,7 +573,7 @@ class Path(object):
         Represents a property segment of an L{Path}.
         """
 
-        def __init__(self, segment):
+        def __init__(self, segment, match=None):
             """
             Create a property segment of a path by parsing the text.
 
@@ -539,12 +582,29 @@ class Path(object):
             """
             self.name = None
             self.matchCondition = None
-            self._parseSegment(segment)
+            self._parseSegment(segment, match)
 
         def __str__(self):
             path = "#" + self.name
             if self.matchCondition:
-                path += "[{}{}]".format("=" if self.matchCondition[1] == operator.eq else "!", self.matchCondition[0])
+                if self.matchCondition[0] in "=!":
+                    path += "[{}{}]".format(
+                        self.matchCondition[0],
+                        self.matchCondition[1].replace("]", "%5D"),
+                    )
+                elif self.matchCondition[0] == "@":
+                    if self.matchCondition[2] is None:
+                        path += "[{}{}]".format(
+                            self.matchCondition[0],
+                            self.matchCondition[1].replace("]", "%5D"),
+                        )
+                    else:
+                        path += "[{}{}{}{}]".format(
+                            self.matchCondition[0],
+                            self.matchCondition[1],
+                            self.matchCondition[2],
+                            self.matchCondition[3].replace("]", "%5D"),
+                        )
             return path
 
         def __repr__(self):
@@ -554,31 +614,52 @@ class Path(object):
             return (self.name == other.name) and \
                 (self.matchCondition == other.matchCondition)
 
-        def _parseSegment(self, segment):
+        def _parseSegment(self, segment, match):
             """
             Parse a property segment of a path into its constituent parts.
 
             @param path: the segment to parse
             @type path: L{str}
             """
-            if "[" in segment:
-                self.name, segment_rest = segment.split("[", 1)
-                matches = segment_rest.split("[")
-                if len(matches) != 1:
-                    raise ValueError("Invalid property match {}".format(segment))
-                if matches[0][-1] != "]" or len(matches[0]) < 4:
-                    raise ValueError("Invalid property match {}".format(segment))
-                if matches[0][0] == "=":
-                    op = operator.eq
-                elif matches[0][0] == "!":
-                    op = operator.ne
+            self.name = segment
+            if match is not None:
+                if len(match) > 1 and match[0] in "=!@":
+                    if match[0] in "=!":
+                        self.matchCondition = (match[0], unquote(match[1:]),)
+                    else:
+                        if "=" in match:
+                            match, mvalue = match.split("=", 1)
+                            self.matchCondition = (match[0], match[1:], "=", unquote(mvalue),)
+                        elif "!" in match:
+                            match, mvalue = match.split("!", 1)
+                            self.matchCondition = (match[0], match[1:], "!", unquote(mvalue),)
+                        else:
+                            self.matchCondition = (match[0], match[1:], None, None,)
                 else:
                     raise ValueError("Invalid property match {}".format(segment))
-                self.matchCondition = (unquote(matches[0][1:-1]), op,)
-            else:
-                self.name = segment
+
             if not self.name:
                 raise ValueError("Invalid property match - name required {}".format(segment))
+
+        @staticmethod
+        def _op_eq(prop, match):
+            return prop.getValue().getTextValue() == match
+
+        @staticmethod
+        def _op_ne(prop, match):
+            return prop.getValue().getTextValue() != match
+
+        @staticmethod
+        def _op_param(prop, match):
+            return prop.hasParameter(match)
+
+        @staticmethod
+        def _op_param_eq(prop, match):
+            return prop.hasParameter(match[0]) and prop.getParameterValue(match[0]) == match[1]
+
+        @staticmethod
+        def _op_param_ne(prop, match):
+            return not prop.hasParameter(match[0]) or prop.getParameterValue(match[0]) != match[1]
 
         def match(self, components, for_update):
             """
@@ -592,11 +673,30 @@ class Path(object):
             @rtype: L{list}
             """
 
+            # Create function callables and data for matching
+            if self.matchCondition:
+                if self.matchCondition[0] == "=":
+                    matcher = Path.PropertySegment._op_eq
+                    match = self.matchCondition[1]
+                elif self.matchCondition[0] == "!":
+                    matcher = Path.PropertySegment._op_ne
+                    match = self.matchCondition[1]
+                elif self.matchCondition[0] == "@":
+                    if self.matchCondition[2] == "=":
+                        match = (self.matchCondition[1], self.matchCondition[3])
+                        matcher = Path.PropertySegment._op_param_eq
+                    elif self.matchCondition[2] == "!":
+                        match = (self.matchCondition[1], self.matchCondition[3])
+                        matcher = Path.PropertySegment._op_param_ne
+                    else:
+                        match = self.matchCondition[1]
+                        matcher = Path.PropertySegment._op_param
+
             results = []
             for component in components:
                 assert(isinstance(component, ComponentBase))
                 if self.matchCondition is not None:
-                    matches = [(component, prop,) for prop in component.getProperties(self.name) if self.matchCondition[1](prop.getValue().getTextValue(), self.matchCondition[0])]
+                    matches = [(component, prop,) for prop in component.getProperties(self.name) if matcher(prop, match)]
                 else:
                     matches = [(component, prop,) for prop in component.getProperties(self.name)]
                     if len(matches) == 0 and for_update:
@@ -726,7 +826,42 @@ class PatchGenerator(object):
         return patchcal
 
     @staticmethod
-    def diffComponents(oldcomponent, newcomponent, vpatch, path):
+    def getComponentPathSegment(oldcomponent, path, derived):
+        """
+        Update the path segment to include this component. Decide whether to include
+        UID= or RID= match items based on the uniqueness of this component in its
+        parent.
+
+        @param oldcomponent: component to process
+        @type oldcomponent: L{Component}
+        @param path: path to add a segment to
+        @type path: L{str}
+        @param derived: L{True} if C{oldcomponent} was derived from its master during
+            the course of this patch operation
+        @type derived: L{bool}
+        """
+
+        newpath = "{}/{}".format(path, oldcomponent.getType())
+        if oldcomponent.getParentComponent() is None:
+            return newpath
+
+        olduid = oldcomponent.getUID()
+        oldtype = oldcomponent.getType()
+        olduidcount = len([component.getUID() for component in oldcomponent.getParentComponent().getComponents() if component.getUID() == olduid])
+        oldnamescount = len([component.getType() for component in oldcomponent.getParentComponent().getComponents() if component.getType() == oldtype])
+
+        # Only add UID= if there was more than one component of this type in the old data and some have different UIDs
+        if oldnamescount > 1 and oldnamescount != olduidcount:
+            newpath = "{}[UID={}]".format(newpath, oldcomponent.getUID())
+
+        # Only add RID= if there was more than one component with the same UID
+        if derived or isinstance(oldcomponent, ComponentRecur) and oldnamescount > 1 and olduidcount > 1:
+            newpath = "{}[RID={}]".format(newpath, str(oldcomponent.getRecurrenceID()) if oldcomponent.getRecurrenceID() is not None else "M")
+
+        return newpath
+
+    @staticmethod
+    def diffComponents(oldcomponent, newcomponent, vpatch, path, derived=False):
         """
         Recursively traverse the differences between two components, adding
         appropriate items to the VPATCH to describe the differences.
@@ -737,10 +872,13 @@ class PatchGenerator(object):
         @type newcomponent: L{Component}
         @param vpatch: the patch to use
         @type vpatch: L{VPatch}
+        @param derived: L{True} if C{oldcomponent} was derived from its master during
+            the course of this patch operation
+        @type derived: L{bool}
         """
 
         # Update path to include this component
-        path += "/{}".format(oldcomponent.getType())
+        path = PatchGenerator.getComponentPathSegment(oldcomponent, path, derived)
 
         # Create a PATCH component - but don't add it until the end when we know
         # whether anything was added to it or not
@@ -853,8 +991,6 @@ class PatchGenerator(object):
 
         # Use two way set difference to find new and removed (based on the component mapKey)
         oldset = set([component.getMapKey() for component in oldcomponent.getComponents()])
-        olduidcount = Counter([component.getUID() for component in oldcomponent.getComponents()])
-        oldnamescount = Counter([component.getType() for component in oldcomponent.getComponents()])
         newset = set([component.getMapKey() for component in newcomponent.getComponents()])
 
         # New ones
@@ -863,6 +999,20 @@ class PatchGenerator(object):
             # Add each component to PATCH
             for newcompkey in newcompkeys:
                 newcomp = newcomponent.getComponentByKey(newcompkey)
+
+                # Check to see if we have a recurrence override and special case that
+                # as a sub-component diff
+                if newcomp.hasProperty(definitions.cICalProperty_RECURRENCE_ID):
+                    # Check whether the master exists
+                    olduidcomps = oldcomponent.getComponentsByUID(newcomp.getUID())
+                    master = [comp for comp in olduidcomps if not comp.hasProperty(definitions.cICalProperty_RECURRENCE_ID)]
+                    if len(master) == 1:
+                        # Derive an instance from the old master and use that to diff with the new one
+                        derived = master[0].deriveComponent(newcomp.getRecurrenceID())
+                        PatchGenerator.diffComponents(derived, newcomp, vpatch, path, True)
+                        continue
+
+                # Just treat as an entire component add
                 patchComponent.addComponent(newcomp.duplicate(parent=patchComponent))
 
         # Removed ones
@@ -871,13 +1021,7 @@ class PatchGenerator(object):
             # Add each component to a PATCH-DELETE
             for oldcompkey in oldcompkeys:
                 oldcomp = oldcomponent.getComponentByKey(oldcompkey)
-                deletepath = "/{}".format(oldcomp.getType())
-                # Only add UID= if there was more than one component of this type in the old data and some have different UIDs
-                if oldnamescount[oldcomp.getType()] > 1 and oldnamescount[oldcomp.getType()] != olduidcount[oldcomp.getUID()]:
-                    deletepath = "{}[UID={}]".format(deletepath, oldcomp.getUID())
-                # Only add RID= if there was more than one component with the same UID
-                if isinstance(oldcomp, ComponentRecur) and oldnamescount[oldcomp.getType()] > 1 and olduidcount[oldcomp.getUID()] > 1:
-                    deletepath = "{}[RID={}]".format(deletepath, str(oldcomp.getRecurrenceID()) if oldcomp.getRecurrenceID() is not None else "M")
+                deletepath = PatchGenerator.getComponentPathSegment(oldcomp, "", False)
                 patchComponent.addProperty(Property(definitions.cICalProperty_PATCH_DELETE, deletepath))
 
         # Ones that exist in both old and new: recurse to have a new PATCH

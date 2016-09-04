@@ -684,7 +684,7 @@ class ComponentRecur(Component):
         """
 
         # Create the derived instance
-        newcomp = self.duplicate()
+        newcomp = self.duplicate(parent=self.getParentComponent())
 
         # Strip out unwanted recurrence properties
         for propname in (
