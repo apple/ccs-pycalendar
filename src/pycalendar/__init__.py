@@ -43,6 +43,7 @@ import icalendar.valarm
 import icalendar.vavailability
 import icalendar.vevent
 import icalendar.vfreebusy
+import icalendar.vinstance
 import icalendar.vjournal
 import icalendar.vpatch
 import icalendar.vpoll

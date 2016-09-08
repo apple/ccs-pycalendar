@@ -179,6 +179,9 @@ class ComponentRecur(Component):
     def useDuration(self):
         return self.mDuration
 
+    def isMasterInstance(self):
+        return not self.mHasRecurrenceID
+
     def isRecurrenceInstance(self):
         return self.mHasRecurrenceID
 

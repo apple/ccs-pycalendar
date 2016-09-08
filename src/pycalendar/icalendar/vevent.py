@@ -67,8 +67,8 @@ class VEvent(ComponentRecur):
         return itipdefinitions.cICalMIMEComponent_VEVENT
 
     def addComponent(self, comp):
-        # We can embed the alarm components only
-        if comp.getType() == definitions.cICalComponent_VALARM:
+        # We can embed the alarm/instance components only
+        if comp.getType() in (definitions.cICalComponent_VALARM, definitions.cICalComponent_VINSTANCE):
             super(VEvent, self).addComponent(comp)
         else:
             raise ValueError("Only 'VALARM' components allowed in 'VEVENT'")

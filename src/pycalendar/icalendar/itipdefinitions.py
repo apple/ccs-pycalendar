@@ -50,3 +50,6 @@ cICalMIMEComponent_VPOLL = "vpoll"
 
 # VPATCH
 cICalMIMEComponent_VPATCH = "vpatch"
+
+# VINSTANCE
+cICalMIMEComponent_VINSTANCE = "vinstance"

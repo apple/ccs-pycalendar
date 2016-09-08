@@ -454,7 +454,7 @@ class VAlarm(Component):
             self.mRepeatInterval = temp
 
         # Set a map key for sorting
-        self.mMapKey = "%s:%s" % (self.mAction, self.mTriggerOn if self.mTriggerAbsolute else self.mTriggerBy,)
+        self.mMapKey = self.mUID if self.mUID else "%s:%s" % (self.mAction, self.mTriggerOn if self.mTriggerAbsolute else self.mTriggerBy,)
 
         # Alarm status - private to Mulberry
         status = self.loadValueString(definitions.cICalProperty_ALARM_X_ALARMSTATUS)
