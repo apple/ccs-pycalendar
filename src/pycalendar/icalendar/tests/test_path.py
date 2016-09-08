@@ -82,6 +82,18 @@ class TestPath(unittest.TestCase):
             None,
         ),
 
+        # Relative Components
+        (
+            "/VEVENT[UID=1234%5D4567]",
+            True,
+            [
+                Path.ComponentSegment("VEVENT[UID=1234]4567]"),
+            ],
+            None,
+            None,
+            None,
+        ),
+
         # Properties
         (
             "/VCALENDAR#VERSION",
@@ -598,6 +610,45 @@ END:VCALENDAR
         matched = path.match(calendar)
         self.assertEqual(len(matched), 1)
         self.assertIs(matched[0], components_by_rid[None])
+
+    def testMatch_Components_Relative(self):
+
+        icalendar = """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//example.com//Example v0.1//EN
+BEGIN:VEVENT
+UID:C3184A66-1ED0-11D9-A5E0-000A958A3252
+DTSTART;VALUE=DATE:20020101
+DTEND;VALUE=DATE:20020102
+DTSTAMP:20020101T000000Z
+RRULE:FREQ=YEARLY;UNTIL=20031231;BYMONTH=1
+SUMMARY:New Year's Day
+BEGIN:VALARM
+UID:4567
+ACTION:DISPLAY
+TRIGGER:-PT30M
+DESCRIPTION:Time to leave (30 mins)
+END:VALARM
+BEGIN:VALARM
+UID:89AB
+ACTION:DISPLAY
+TRIGGER:-PT5M
+DESCRIPTION:Time to leave (5 mins)
+END:VALARM
+END:VEVENT
+END:VCALENDAR
+"""
+
+        calendar = Calendar.parseText(icalendar.replace("\n", "\r\n"))
+        path = Path("/VEVENT")
+        matched = path.match(calendar)
+        self.assertEqual(len(matched), 1)
+        self.assertIs(matched[0], calendar.getComponents("VEVENT")[0])
+
+        path = Path("/VEVENT/VALARM")
+        matched = path.match(calendar)
+        self.assertEqual(len(matched), 2)
 
     def testMatch_Properties_Simple(self):
 

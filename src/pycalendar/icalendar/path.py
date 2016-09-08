@@ -475,13 +475,18 @@ class Path(object):
         @rtype: L{list}
         """
 
-        # First segment of path is always assumed to be VCALENDAR - we double check that
-        if self.components[0].name != "VCALENDAR" or calendar.getType().upper() != "VCALENDAR":
-            return []
+        # Absolute path starts with VCALENDAR - we double check that
+        start_segment = 0
+        if self.components and self.components[0].name == "VCALENDAR":
+            if calendar.getType().upper() == "VCALENDAR":
+                # Skip the first segment since we know it matches
+                start_segment = 1
+            else:
+                return []
 
-        # Start with the VCALENDAR object as the initial match
+        # Start with the root object as the initial match
         results = [calendar]
-        for component_segment in self.components[1:]:
+        for component_segment in self.components[start_segment:]:
             results = component_segment.match(results)
 
         if self.property is not None:
