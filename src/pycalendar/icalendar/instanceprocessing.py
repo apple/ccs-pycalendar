@@ -149,7 +149,7 @@ class InstanceExpander(object):
                     action = None
 
                 # Always replace
-                if action is None:
+                if action is None or action == definitions.cICalParameter_INSTANCE_ACTION_BYNAME:
                     derived.removeProperties(newproperty.getName())
                     derived.addProperty(newproperty.duplicate())
 
@@ -157,14 +157,19 @@ class InstanceExpander(object):
                 elif action == definitions.cICalParameter_INSTANCE_ACTION_CREATE:
                     derived.addProperty(newproperty.duplicate())
 
-                # Replace property with the same value
-                elif action == definitions.cICalParameter_INSTANCE_ACTION_BYVALUE:
+                # Parameter updates
+                elif action.startswith(definitions.cICalParameter_INSTANCE_ACTION_UPDATE):
+                    removals = action.split("~")[1:]
                     oldprops = derived.getProperties(newproperty.getName())
                     newvalue = newproperty.getValue()
                     for oldprop in oldprops:
                         if oldprop.getValue() == newvalue:
-                            derived.removeProperty(oldprop)
-                    derived.addProperty(newproperty.duplicate())
+                            for removename in removals:
+                                oldprop.removeParameters(removename)
+                            for newparamname, newparams in newproperty.getParameters().items():
+                                if newparamname == definitions.cICalParameter_INSTANCE_ACTION:
+                                    continue
+                                oldprop.replaceParameter(newparams[0])
 
                 # Replace property with the same param value
                 elif action.startswith(definitions.cICalParameter_INSTANCE_ACTION_BYPARAM):
@@ -286,9 +291,13 @@ class InstanceCompactor(object):
 
             # Look for singletons
             if len(oldprops) == 1 and len(newprops) == 1:
-                # Check for difference
-                if oldprops[0] != newprops[0]:
+                # If values are different replace entire property
+                if oldprops[0].getValue() != newprops[0].getValue():
                     vinstance.addProperty(newprops[0].duplicate())
+
+                # If parameters are different just update those
+                elif oldprops[0].getParameters() != newprops[0].getParameters():
+                    InstanceCompactor.processParameters(oldprops[0], newprops[0], vinstance)
 
             # Rest are multi-occurring
             else:
@@ -312,11 +321,38 @@ class InstanceCompactor(object):
                     newprop.addParameter(Parameter(definitions.cICalParameter_INSTANCE_ACTION, definitions.cICalParameter_INSTANCE_ACTION_CREATE))
                     vinstance.addProperty(newprop)
 
-                # Ones with the same value - check if parameters are different. Add as INSTANCE-ACTION=BYVALUE.
+                # Ones with the same value - parameters are different. Add as INSTANCE-ACTION=PARAM,XXXX.
                 for sameval in set(oldvalues.keys()) & set(newvalues.keys()):
-                    newprop = newvalues[sameval].duplicate()
-                    newprop.addParameter(Parameter(definitions.cICalParameter_INSTANCE_ACTION, definitions.cICalParameter_INSTANCE_ACTION_BYVALUE))
-                    vinstance.addProperty(newprop)
+                    # Diff the parameters
+                    InstanceCompactor.processParameters(oldvalues[sameval], newvalues[sameval], vinstance)
+
+    @staticmethod
+    def processParameters(oldprop, newprop, vinstance):
+        # Diff the parameters
+        oldparams = oldprop.getParameters()
+        newparams = newprop.getParameters()
+        changes = {definitions.cICalParameter_INSTANCE_ACTION: [Parameter(definitions.cICalParameter_INSTANCE_ACTION, definitions.cICalParameter_INSTANCE_ACTION_UPDATE)]}
+
+        # Ones to remove (ones that only exist in the old set)
+        for paramname in set(oldparams.keys()) - set(newparams.keys()):
+            newparamval = "{}~{}".format(changes[definitions.cICalParameter_INSTANCE_ACTION][0].getFirstValue(), paramname)
+            changes[definitions.cICalParameter_INSTANCE_ACTION][0] = Parameter(definitions.cICalParameter_INSTANCE_ACTION, newparamval)
+
+        # Ones to add (ones that only exist in the new set)
+        for paramname in set(newparams.keys()) - set(oldparams.keys()):
+            changes[paramname] = [newparams[paramname][0].duplicate()]
+
+        # Ones with the same name but whose value may be different
+        for paramname in set(newparams.keys()) & set(oldparams.keys()):
+            oldparam = oldparams[paramname][0]
+            newparam = newparams[paramname][0]
+            if oldparam != newparam:
+                changes[paramname] = [newparams[paramname][0].duplicate()]
+
+        # Add the property but use the changed paramaters
+        newprop = newprop.duplicate()
+        newprop.setParameters(changes)
+        vinstance.addProperty(newprop)
 
     @staticmethod
     def processSubComponents(derived, override, vinstance):
