@@ -30,12 +30,12 @@ class VInstance(Component):
 
     def __init__(self, parent=None):
 
-        super(Component, self).__init__(parent)
+        super(VInstance, self).__init__(parent)
         self.mRecurrenceID = None
 
     def duplicate(self, parent=None, **args):
 
-        other = super(Component, self).duplicate(parent=parent, **args)
+        other = super(VInstance, self).duplicate(parent=parent, **args)
         other.mRecurrenceID = self.mRecurrenceID.duplicate()
         return other
 

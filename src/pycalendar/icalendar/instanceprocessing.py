@@ -15,8 +15,12 @@
 ##
 
 from pycalendar.icalendar import definitions
+from pycalendar.icalendar.calendar import Calendar
 from pycalendar.icalendar.componentrecur import ComponentRecur
 from pycalendar.icalendar.path import Path
+from pycalendar.icalendar.property import Property
+from pycalendar.icalendar.vinstance import VInstance
+from pycalendar.parameter import Parameter
 
 
 class InstanceExpander(object):
@@ -175,3 +179,193 @@ class InstanceExpander(object):
                 # Invalid parameter value
                 else:
                     raise ValueError("INSTANCE-ACTION value is not valid: {}".format(action))
+
+
+class InstanceCompactor(object):
+    """
+    Class that converts a traditional overridden component representation to the
+    new more compact VINSTANCE style.
+    """
+
+    @staticmethod
+    def compact(calendar):
+        """
+        Turn overridden components into VINSTANCEs. This mutates the supplied
+        L{Calendar} into the result.
+
+        @param calendar: the calendar to compact
+        @type calendar: L{Calendar}
+        """
+
+        # Process sets of components by UID
+        byuid = {}
+        for component in calendar.getComponents():
+            if isinstance(component, ComponentRecur):
+                uid = component.getUID()
+                rid = component.getRecurrenceID()
+                if uid not in byuid:
+                    byuid[uid] = [None, []]
+                if rid is None:
+                    byuid[uid][0] = component
+                else:
+                    byuid[uid][1].append(component)
+
+        vinstances = []
+        for uid, items in byuid.items():
+            master, overrides = items
+            for override in overrides:
+                vinstances.append(InstanceCompactor.processMasterOverride(master, override))
+
+        for vinstance in vinstances:
+            master.addComponent(vinstance)
+
+    @staticmethod
+    def processMasterOverride(master, override):
+        """
+        Compact the override into the master as a VINSTANCE component.
+
+        @param master: master component
+        @type master: L{ComponentRecur}
+        @param override: override to compact
+        @type override: L{ComponentRecur}
+        """
+
+        # Need to diff the derived instance with the override
+        derived = master.deriveComponent(override.getRecurrenceID())
+        vinstance = VInstance(parent=master)
+        vinstance.addProperty(override.findFirstProperty(definitions.cICalProperty_RECURRENCE_ID).duplicate())
+
+        # Process properties then sub-components
+        InstanceCompactor.processProperties(derived, override, vinstance)
+        InstanceCompactor.processSubComponents(derived, override, vinstance)
+
+        # Remove/add components
+        override.getParentComponent().removeComponent(override)
+        return vinstance
+
+    @staticmethod
+    def processProperties(derived, override, vinstance):
+        """
+        Determine the property differences between two components and create
+        appropriate VINSTANCE entries.
+
+        @param derived: the derived component
+        @type derived: L{Component}
+        @param override: the overridden component
+        @type override: L{Component}
+        @param vinstance: the vinstance to update
+        @type vinstance: L{VInstance}
+        """
+
+        # Use two way set difference to find new and removed
+        oldset = set(derived.getProperties().keys())
+        newset = set(override.getProperties().keys())
+
+        # New ones. Add each property to VINSTANCE. Note that if we are adding more
+        # than one we need to include INSTANCE-ACTION=CREATE parameter on each one.
+        newpropnames = newset - oldset
+        for newpropname in newpropnames:
+            actionRequired = len(override.getProperties(newpropname)) > 1
+            for prop in override.getProperties(newpropname):
+                newprop = prop.duplicate()
+                if actionRequired:
+                    newprop.addParameter(Parameter(definitions.cICalParameter_INSTANCE_ACTION, definitions.cICalParameter_INSTANCE_ACTION_CREATE))
+                vinstance.addProperty(newprop)
+
+        # Removed ones. Add each property to a INSTANCE-DELETE
+        oldpropnames = oldset - newset
+        for oldpropname in oldpropnames:
+            vinstance.addProperty(Property(definitions.cICalProperty_INSTANCE_DELETE, "#{}".format(oldpropname)))
+
+        # Ones that exist in both old and new: this is tricky as we now need to find out what is different.
+        # We handle two cases: single occurring properties vs multi-occurring
+        checkpropnames = newset & oldset
+        for propname in checkpropnames:
+            oldprops = derived.getProperties(propname)
+            newprops = override.getProperties(propname)
+
+            # Look for singletons
+            if len(oldprops) == 1 and len(newprops) == 1:
+                # Check for difference
+                if oldprops[0] != newprops[0]:
+                    vinstance.addProperty(newprops[0].duplicate())
+
+            # Rest are multi-occurring
+            else:
+                # Remove ones that are exactly the same
+                oldset = set(oldprops)
+                newset = set(newprops)
+                oldsetchanged = oldset - newset
+                newsetchanged = newset - oldset
+
+                # Need to check for ones that have the same value, but different parameters
+                oldvalues = dict([(prop.getValue().getTextValue(), prop) for prop in oldsetchanged])
+                newvalues = dict([(prop.getValue().getTextValue(), prop) for prop in newsetchanged])
+
+                # Ones to remove by value (ones whose value only exists in the old set)
+                for removeval in set(oldvalues.keys()) - set(newvalues.keys()):
+                    vinstance.addProperty(Property(definitions.cICalProperty_INSTANCE_DELETE, "#{}[={}]".format(propname, removeval)))
+
+                # Ones to create (ones whose value only exists in the new set). Add as INSTANCE-ACTION=CREATE.
+                for createval in set(newvalues.keys()) - set(oldvalues.keys()):
+                    newprop = newvalues[createval].duplicate()
+                    newprop.addParameter(Parameter(definitions.cICalParameter_INSTANCE_ACTION, definitions.cICalParameter_INSTANCE_ACTION_CREATE))
+                    vinstance.addProperty(newprop)
+
+                # Ones with the same value - check if parameters are different. Add as INSTANCE-ACTION=BYVALUE.
+                for sameval in set(oldvalues.keys()) & set(newvalues.keys()):
+                    newprop = newvalues[sameval].duplicate()
+                    newprop.addParameter(Parameter(definitions.cICalParameter_INSTANCE_ACTION, definitions.cICalParameter_INSTANCE_ACTION_BYVALUE))
+                    vinstance.addProperty(newprop)
+
+    @staticmethod
+    def processSubComponents(derived, override, vinstance):
+        """
+        Determine the sub-component differences between two components and create
+        appropriate VINSTANCE entries.
+
+        @param derived: the derived component
+        @type derived: L{Component}
+        @param override: the overridden component
+        @type override: L{Component}
+        @param vinstance: the vinstance to update
+        @type vinstance: L{VInstance}
+        """
+
+        # Use two way set difference to find new and removed (based on the component mapKey)
+        oldset = set([component.getMapKey() for component in derived.getComponents()])
+        newset = set([component.getMapKey() for component in override.getComponents()])
+
+        # New ones
+        newcompkeys = newset - oldset
+        if len(newcompkeys) != 0:
+            # Add each component to VINSTANCE
+            for newcompkey in newcompkeys:
+                newcomp = override.getComponentByKey(newcompkey)
+                vinstance.addComponent(newcomp.duplicate(parent=vinstance))
+
+        # Removed ones
+        oldcompkeys = oldset - newset
+        if len(oldcompkeys) != 0:
+            # Add each component to an INSTANCE-DELETE
+            for oldcompkey in oldcompkeys:
+                oldcomp = derived.getComponentByKey(oldcompkey)
+                deletepath = "/{}[UID={}]".format(oldcomp.getType(), oldcomp.getUID())
+                vinstance.addProperty(Property(definitions.cICalProperty_INSTANCE_DELETE, deletepath))
+
+        # Ones that exist in both old and new: add to VINSTANCE if different
+        for compkey in newset & oldset:
+            oldcomp = derived.getComponentByKey(compkey)
+            newcomp = override.getComponentByKey(compkey)
+            if oldcomp != newcomp:
+                vinstance.addComponent(newcomp.duplicate(parent=vinstance))
+
+
+if __name__ == '__main__':
+
+    import os
+    olddata = os.path.expanduser("~/Desktop/overridden.ics")  # sys.argv[1])
+    with open(olddata) as f:
+        oldcal = Calendar.parseText(f.read())
+    InstanceCompactor.compact(oldcal)
+    print(str(oldcal))

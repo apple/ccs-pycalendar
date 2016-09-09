@@ -31,7 +31,7 @@ class Patch(Component):
         return definitions.cICalComponent_PATCH
 
     def duplicate(self, parent=None):
-        return super(Component, self).duplicate(parent=parent)
+        return super(Patch, self).duplicate(parent=parent)
 
     def sortedPropertyKeyOrder(self):
         return (

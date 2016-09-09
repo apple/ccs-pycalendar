@@ -440,25 +440,21 @@ class PatchGenerator(object):
         oldset = set(oldcomponent.getProperties().keys())
         newset = set(newcomponent.getProperties().keys())
 
-        # New ones
+        # New ones. Add each property to PATCH. Note that if we are adding more
+        # than one we need to include PATCH-ACTION=CREATE parameter on each one.
         newpropnames = newset - oldset
-        if len(newpropnames) != 0:
-            # Add each property to PATCH. Note that if we are adding more than one we need to include
-            # PATCH-ACTION=CREATE parameter on each one.
-            for newpropname in newpropnames:
-                actionRequired = len(newcomponent.getProperties(newpropname)) > 1
-                for prop in newcomponent.getProperties(newpropname):
-                    newprop = prop.duplicate()
-                    if actionRequired:
-                        newprop.addParameter(Parameter(definitions.cICalParameter_PATCH_ACTION, definitions.cICalParameter_PATCH_ACTION_CREATE))
-                    patchComponent.addProperty(newprop)
+        for newpropname in newpropnames:
+            actionRequired = len(newcomponent.getProperties(newpropname)) > 1
+            for prop in newcomponent.getProperties(newpropname):
+                newprop = prop.duplicate()
+                if actionRequired:
+                    newprop.addParameter(Parameter(definitions.cICalParameter_PATCH_ACTION, definitions.cICalParameter_PATCH_ACTION_CREATE))
+                patchComponent.addProperty(newprop)
 
-        # Removed ones
+        # Removed ones. Add each property to a PATCH-DELETE
         oldpropnames = oldset - newset
-        if len(oldpropnames) != 0:
-            # Add each property to a PATCH-DELETE
-            for oldpropname in oldpropnames:
-                patchComponent.addProperty(Property(definitions.cICalProperty_PATCH_DELETE, "#{}".format(oldpropname)))
+        for oldpropname in oldpropnames:
+            patchComponent.addProperty(Property(definitions.cICalProperty_PATCH_DELETE, "#{}".format(oldpropname)))
 
         # Ones that exist in both old and new: this is tricky as we now need to find out what is different.
         # We handle two cases: single occurring properties vs multi-occurring
@@ -475,7 +471,7 @@ class PatchGenerator(object):
 
             # Rest are multi-occurring
             else:
-                # Removes ones that are exactly the same
+                # Remove ones that are exactly the same
                 oldset = set(oldprops)
                 newset = set(newprops)
                 oldsetchanged = oldset - newset

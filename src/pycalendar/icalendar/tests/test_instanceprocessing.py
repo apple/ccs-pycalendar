@@ -17,7 +17,7 @@
 
 from difflib import unified_diff
 from pycalendar.icalendar.calendar import Calendar
-from pycalendar.icalendar.instanceprocessing import InstanceExpander
+from pycalendar.icalendar.instanceprocessing import InstanceExpander, InstanceCompactor
 import json
 import os
 import unittest
@@ -556,6 +556,34 @@ class TestInstanceExpand(unittest.TestCase):
                 pass
             else:
                 self.fail("Failed test #{} - no exception raised: {}".format(ctr + 1, items["title"]))
+
+
+class TestInstanceCompact(unittest.TestCase):
+
+    def test_compact(self):
+        """
+        Test that instance expansion works.
+        """
+
+        for ctr, items in enumerate(dataValid):
+            if "BYPARAM" in items["compact"]:
+                continue
+            compact = Calendar.parseText(items["compact"])
+            expanded = Calendar.parseText(items["expanded"])
+            try:
+                InstanceCompactor.compact(expanded)
+            except Exception as e:
+                self.fail("Failed test #{}: {}\n{}".format(ctr + 1, items["title"], str(e)))
+            else:
+                self.assertEqual(
+                    str(expanded),
+                    str(compact),
+                    msg="Failed test #{}: {}\n{}".format(
+                        ctr + 1,
+                        items["title"],
+                        "\n".join(unified_diff(str(expanded).splitlines(), str(compact).splitlines())),
+                    ),
+                )
 
 if __name__ == '__main__':
     with open(os.path.join(os.path.dirname(__file__), "vinstance_examples.json"), "w") as f:
