@@ -215,14 +215,15 @@ class InstanceCompactor(object):
                 else:
                     byuid[uid][1].append(component)
 
-        vinstances = []
         for uid, items in byuid.items():
+            vinstances = []
             master, overrides = items
-            for override in overrides:
-                vinstances.append(InstanceCompactor.processMasterOverride(master, override))
+            if master is not None:
+                for override in overrides:
+                    vinstances.append(InstanceCompactor.processMasterOverride(master, override))
 
-        for vinstance in vinstances:
-            master.addComponent(vinstance)
+                for vinstance in vinstances:
+                    master.addComponent(vinstance)
 
     @staticmethod
     def processMasterOverride(master, override):
