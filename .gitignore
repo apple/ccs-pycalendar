@@ -8,3 +8,4 @@ dropin.cache
 *~
 *.lock
 .develop/
+/.settings/
