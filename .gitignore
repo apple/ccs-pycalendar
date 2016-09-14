@@ -9,3 +9,5 @@ dropin.cache
 *.lock
 .develop/
 /.settings/
+/.coverage
+/MANIFEST
