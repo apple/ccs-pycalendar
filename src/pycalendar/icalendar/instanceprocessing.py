@@ -401,7 +401,8 @@ class InstanceCompactor(object):
 if __name__ == '__main__':
 
     import os
-    olddata = os.path.expanduser("~/Desktop/overridden.ics")  # sys.argv[1])
+    import sys
+    olddata = os.path.expanduser(sys.argv[1])
     with open(olddata) as f:
         oldcal = Calendar.parseText(f.read())
     InstanceCompactor.compact(oldcal)
