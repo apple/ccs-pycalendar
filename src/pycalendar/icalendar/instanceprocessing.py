@@ -18,6 +18,7 @@ from pycalendar.icalendar import definitions
 from pycalendar.icalendar.calendar import Calendar
 from pycalendar.icalendar.componentrecur import ComponentRecur
 from pycalendar.icalendar.path import Path
+from pycalendar.icalendar.patchprocessing import PatchGenerator, Command
 from pycalendar.icalendar.property import Property
 from pycalendar.icalendar.vinstance import VInstance
 from pycalendar.parameter import Parameter
@@ -124,9 +125,14 @@ class InstanceExpander(object):
         @type derived: L{Component}
         """
         for newcomponent in instance.getComponents():
-            mapkey = newcomponent.getMapKey()
-            derived.removeComponentByKey(mapkey)
-            derived.addComponent(newcomponent.duplicate(parent=derived))
+            # Special case PATCH
+            if newcomponent.getType().upper() == definitions.cICalComponent_PATCH:
+                patch = Command.parseFromComponent(newcomponent)[0]
+                patch.applyPatch(derived)
+            else:
+                mapkey = newcomponent.getMapKey()
+                derived.removeComponentByKey(mapkey)
+                derived.addComponent(newcomponent.duplicate(parent=derived))
 
     @staticmethod
     def processProperties(instance, derived):
@@ -387,15 +393,15 @@ class InstanceCompactor(object):
             # Add each component to an INSTANCE-DELETE
             for oldcompkey in oldcompkeys:
                 oldcomp = derived.getComponentByKey(oldcompkey)
-                deletepath = "/{}[UID={}]".format(oldcomp.getType(), oldcomp.getUID())
+                deletepath = "/{}[UID={}]".format(oldcomp.getType().upper(), oldcomp.getUID())
                 vinstance.addProperty(Property(definitions.cICalProperty_INSTANCE_DELETE, deletepath))
 
-        # Ones that exist in both old and new: add to VINSTANCE if different
+        # Ones that exist in both old and new: create a PATCH
         for compkey in newset & oldset:
             oldcomp = derived.getComponentByKey(compkey)
             newcomp = override.getComponentByKey(compkey)
             if oldcomp != newcomp:
-                vinstance.addComponent(newcomp.duplicate(parent=vinstance))
+                PatchGenerator.diffComponents(oldcomp, newcomp, vinstance, "", force_path_uid=True)
 
 
 if __name__ == '__main__':

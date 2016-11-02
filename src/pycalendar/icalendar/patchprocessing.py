@@ -354,7 +354,7 @@ class PatchGenerator(object):
         return patchcal
 
     @staticmethod
-    def getComponentPathSegment(oldcomponent, path, derived):
+    def getComponentPathSegment(oldcomponent, path, derived, force_path_uid=False):
         """
         Update the path segment to include this component. Decide whether to include
         UID= or RID= match items based on the uniqueness of this component in its
@@ -367,19 +367,21 @@ class PatchGenerator(object):
         @param derived: L{True} if C{oldcomponent} was derived from its master during
             the course of this patch operation
         @type derived: L{bool}
+        @param force_path_uid: L{True} to always have the [UID=...] term in the path
+        @type force_path_uid: L{bool}
         """
 
-        newpath = "{}/{}".format(path, oldcomponent.getType())
+        newpath = "{}/{}".format(path, oldcomponent.getType().upper())
         if oldcomponent.getParentComponent() is None:
             return newpath
 
         olduid = oldcomponent.getUID()
-        oldtype = oldcomponent.getType()
+        oldtype = oldcomponent.getType().upper()
         olduidcount = len([component.getUID() for component in oldcomponent.getParentComponent().getComponents() if component.getUID() == olduid])
-        oldnamescount = len([component.getType() for component in oldcomponent.getParentComponent().getComponents() if component.getType() == oldtype])
+        oldnamescount = len([component.getType().upper() for component in oldcomponent.getParentComponent().getComponents() if component.getType().upper() == oldtype])
 
         # Only add UID= if there was more than one component of this type in the old data and some have different UIDs
-        if oldnamescount > 1 and oldnamescount != olduidcount:
+        if oldnamescount > 1 and oldnamescount != olduidcount or force_path_uid:
             newpath = "{}[UID={}]".format(newpath, oldcomponent.getUID())
 
         # Only add RID= if there was more than one component with the same UID
@@ -389,7 +391,7 @@ class PatchGenerator(object):
         return newpath
 
     @staticmethod
-    def diffComponents(oldcomponent, newcomponent, vpatch, path, derived=False):
+    def diffComponents(oldcomponent, newcomponent, vpatch, path, derived=False, force_path_uid=False):
         """
         Recursively traverse the differences between two components, adding
         appropriate items to the VPATCH to describe the differences.
@@ -406,7 +408,7 @@ class PatchGenerator(object):
         """
 
         # Update path to include this component
-        path = PatchGenerator.getComponentPathSegment(oldcomponent, path, derived)
+        path = PatchGenerator.getComponentPathSegment(oldcomponent, path, derived, force_path_uid)
 
         # Create a PATCH component - but don't add it until the end when we know
         # whether anything was added to it or not
