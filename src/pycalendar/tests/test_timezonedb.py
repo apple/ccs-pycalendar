@@ -18,6 +18,8 @@ from cStringIO import StringIO
 from pycalendar.icalendar.calendar import Calendar
 from pycalendar.tests.utils import TestPyCalendar
 from pycalendar.timezonedb import TimezoneDatabase
+import os
+import tempfile
 
 StandardTZs = (
     """BEGIN:VCALENDAR
@@ -400,3 +402,53 @@ class TestTimezoneDB(TestPyCalendar):
 
         for tzid, result in data:
             self.assertEqual(TimezoneDatabase.isStandardTimezone(tzid), result, "Failed {}".format(tzid))
+
+
+class TestTimezoneDBCache(TestPyCalendar):
+
+    def setUp(self):
+        super(TestTimezoneDBCache, self).setUp()
+
+        # Use temp dbpath
+        tmpdir = tempfile.mkdtemp()
+        TimezoneDatabase.createTimezoneDatabase(tmpdir)
+
+        # Save standard components to temp directory
+        for vtz in StandardTZs:
+            cal = Calendar()
+            tz = cal.parseComponent(StringIO(vtz))
+            tzid_parts = tz.getID().split("/")
+            if not os.path.exists(os.path.join(tmpdir, tzid_parts[0])):
+                os.makedirs(os.path.join(tmpdir, tzid_parts[0]))
+            with open(os.path.join(tmpdir, "{}.ics".format(tz.getID())), "w") as f:
+                f.write(vtz)
+
+    def test_isStandardTimezone(self):
+        """
+        L{TimezoneDatabase.isStandardTimezone} returns correct result when the database
+        cache is initially empty.
+        """
+
+        data = (
+            ("America/New_York", True),
+            ("America/Los_Angeles", True),
+            ("America/Cupertino", False),
+            ("America/FooBar", False),
+        )
+
+        TimezoneDatabase.getTimezoneDatabase().clear()
+
+        # Do twice to excersise the cache
+        for _ in range(2):
+            for tzid, result in data:
+                self.assertEqual(TimezoneDatabase.isStandardTimezone(tzid), result, "Failed {}".format(tzid))
+
+        self.assertTrue("America/New_York" in TimezoneDatabase.getTimezoneDatabase().stdtzcache)
+        self.assertTrue("America/Los_Angeles" in TimezoneDatabase.getTimezoneDatabase().stdtzcache)
+        self.assertFalse("America/Cupertino" in TimezoneDatabase.getTimezoneDatabase().stdtzcache)
+        self.assertFalse("America/FooBar" in TimezoneDatabase.getTimezoneDatabase().stdtzcache)
+
+        self.assertFalse("America/New_York" in TimezoneDatabase.getTimezoneDatabase().notstdtzcache)
+        self.assertFalse("America/Los_Angeles" in TimezoneDatabase.getTimezoneDatabase().notstdtzcache)
+        self.assertTrue("America/Cupertino" in TimezoneDatabase.getTimezoneDatabase().notstdtzcache)
+        self.assertTrue("America/FooBar" in TimezoneDatabase.getTimezoneDatabase().notstdtzcache)

@@ -43,6 +43,7 @@ class TimezoneDatabase(object):
         self.calendar = Calendar()
         self.tzcache = {}
         self.stdtzcache = set()
+        self.notstdtzcache = set()
 
     def setPath(self, dbpath):
         self.dbpath = dbpath
@@ -52,6 +53,7 @@ class TimezoneDatabase(object):
         self.calendar = Calendar()
         self.tzcache.clear()
         self.stdtzcache.clear()
+        self.notstdtzcache.clear()
 
     @staticmethod
     def getTimezoneDatabase():
@@ -138,7 +140,7 @@ class TimezoneDatabase(object):
     def _addStandardTimezone(self, tz):
         """
         Same as L{addTimezone} except that the timezone is marked as a standard timezone. This
-        is only meant to be used for testing which happens int he absence of a real standard
+        is only meant to be used for testing which happens in the absence of a real standard
         timezone database.
 
         @param tz: the VTIMEZONE component to add
@@ -150,13 +152,21 @@ class TimezoneDatabase(object):
 
     def _isStandardTimezone(self, tzid):
         """
-        Add the specified VTIMEZONE component to this object's L{Calendar} cache. This component
-        is assumed to be a non-standard timezone - i.e., not loaded from the timezone database.
+        Check whether the specified time zone id corresponds to a standard time zone.
 
-        @param tzid: the timezone identifier to lookup
+        @param tzid: the time zone id to test
         @type tzid: L{str}
+
+        @return: whether the timezone identifier is known
+        @rtype: L{bool}
         """
-        return tzid in self.stdtzcache
+        if tzid in self.stdtzcache:
+            return True
+        elif tzid in self.notstdtzcache:
+            return False
+        else:
+            self._getTimezone(tzid)
+            return tzid in self.stdtzcache
 
     def _getTimezone(self, tzid):
         """
@@ -178,6 +188,8 @@ class TimezoneDatabase(object):
             self.tzcache[tzid] = tz
             if tz is not None and tzid is not None:
                 self.stdtzcache.add(tzid)
+            else:
+                self.notstdtzcache.add(tzid)
 
         return self.tzcache[tzid]
 
