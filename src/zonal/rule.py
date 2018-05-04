@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 ##
 #    Copyright (c) 2007-2013 Cyrus Daboo. All rights reserved.
 #
@@ -22,7 +23,12 @@ from pycalendar.icalendar.vtimezonedaylight import Daylight
 from pycalendar.icalendar.vtimezonestandard import Standard
 from pycalendar.utcoffsetvalue import UTCOffsetValue
 from pycalendar.utils import daysInMonth
-import utils
+from . import utils
+
+try:
+    xrange          # Python 2
+except NameError:
+    xrange = range  # Python 3
 
 """
 Class that maintains a TZ data Rule.

@@ -24,6 +24,11 @@ from pycalendar import xmldefinitions, xmlutils
 from pycalendar.utils import encodeParameterValue
 import xml.etree.cElementTree as XML
 
+try:
+    basestring        # Python 2
+except NameError:
+    basestring = str  # Python 3
+
 
 class Parameter(object):
 

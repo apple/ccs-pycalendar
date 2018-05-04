@@ -19,6 +19,11 @@
 from pycalendar import utils
 from pycalendar.valueutils import ValueMixin
 
+try:
+    basestring        # Python 2
+except NameError:
+    basestring = str  # Python 3
+
 
 class N(ValueMixin):
     """

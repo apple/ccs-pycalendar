@@ -17,18 +17,19 @@
 
 from __future__ import with_statement
 from __future__ import print_function
+from __future__ import absolute_import
 
 from pycalendar.icalendar.calendar import Calendar
 from xml.etree.cElementTree import ParseError as XMLParseError
 import cStringIO as StringIO
 import getopt
 import os
-import rule
+from . import rule
 import sys
 import tarfile
 import urllib
 import xml.etree.cElementTree as XML
-import zone
+from . import zone
 
 """
 Classes to parse a tzdata files and generate VTIMEZONE data.

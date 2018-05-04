@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 ##
 #    Copyright (c) 2007-2015 Cyrus Daboo. All rights reserved.
 #
@@ -16,38 +17,38 @@
 
 # Import these to register the values
 
-import binaryvalue
-import caladdressvalue
-import datetimevalue
-import durationvalue
-import floatvalue
-import geovalue
-import icalendar.recurrencevalue
-import icalendar.requeststatusvalue
-import integervalue
-import multivalue
-import periodvalue
-import textvalue
-import unknownvalue
-import urivalue
-import utcoffsetvalue
-import vcard.adrvalue
-import vcard.nvalue
-import vcard.orgvalue
+from . import binaryvalue
+from . import caladdressvalue
+from . import datetimevalue
+from . import durationvalue
+from . import floatvalue
+from . import geovalue
+from .icalendar import recurrencevalue
+from .icalendar import requeststatusvalue
+from . import integervalue
+from . import multivalue
+from . import periodvalue
+from . import textvalue
+from . import unknownvalue
+from . import urivalue
+from . import utcoffsetvalue
+from .vcard import adrvalue
+from .vcard import nvalue
+from .vcard import orgvalue
 
 # Import these to register the components
 
-import icalendar.available
-import icalendar.valarm
-import icalendar.vavailability
-import icalendar.vevent
-import icalendar.vfreebusy
-import icalendar.vjournal
-import icalendar.vpoll
-import icalendar.vote
-import icalendar.vtimezone
-import icalendar.vtimezonedaylight
-import icalendar.vtimezonestandard
-import icalendar.vtodo
-import icalendar.vunknown
-import icalendar.vvoter
+from .icalendar import available
+from .icalendar import valarm
+from .icalendar import vavailability
+from .icalendar import vevent
+from .icalendar import vfreebusy
+from .icalendar import vjournal
+from .icalendar import vpoll
+from .icalendar import vote
+from .icalendar import vtimezone
+from .icalendar import vtimezonedaylight
+from .icalendar import vtimezonestandard
+from .icalendar import vtodo
+from .icalendar import vunknown
+from .icalendar import vvoter

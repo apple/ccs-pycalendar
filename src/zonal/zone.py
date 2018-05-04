@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 ##
 #    Copyright (c) 2007-2013 Cyrus Daboo. All rights reserved.
 #
@@ -20,8 +21,13 @@ from pycalendar.icalendar.property import Property
 from pycalendar.icalendar.vtimezone import VTimezone
 from pycalendar.icalendar.vtimezonestandard import Standard
 from pycalendar.utcoffsetvalue import UTCOffsetValue
-import rule
-import utils
+from . import rule
+from . import utils
+
+try:
+    xrange          # Python 2
+except NameError:
+    xrange = range  # Python 3
 
 """
 Class that maintains a TZ data Zone.

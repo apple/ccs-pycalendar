@@ -23,6 +23,11 @@ from pycalendar.valueutils import ValueMixin
 import cStringIO as StringIO
 import xml.etree.cElementTree as XML
 
+try:
+    unicode        # Python 2
+except NameError:
+    unicode = str  # Python 3
+
 
 def WeekDayNumCompare_compare(w1, w2):
 

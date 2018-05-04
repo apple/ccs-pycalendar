@@ -17,6 +17,11 @@
 from pycalendar.parser import ParserContext
 import cStringIO as StringIO
 
+try:
+    basestring        # Python 2
+except NameError:
+    basestring = str  # Python 3
+
 
 def readFoldedLine(ins, lines):
 

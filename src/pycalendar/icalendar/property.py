@@ -30,6 +30,11 @@ from pycalendar.property import PropertyBase
 from pycalendar.utcoffsetvalue import UTCOffsetValue
 from pycalendar.value import Value
 
+try:
+    unicode        # Python 2
+except NameError:
+    unicode = str  # Python 3
+
 
 class Property(PropertyBase):
 
