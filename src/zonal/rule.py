@@ -1,5 +1,5 @@
 ##
-#    Copyright (c) 2007-2013 Cyrus Daboo. All rights reserved.
+#    Copyright (c) 2007-2019 Cyrus Daboo. All rights reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -70,7 +70,7 @@ class RuleSet(object):
             assert name, "Must have a zone name: '%s'" % (lines,)
             if not self.name:
                 self.name = name
-            assert self.name == name, "Different zone names %s and %s: %s" % (self.name, name,)
+            assert self.name == name, "Different zone names %s and %s: %s" % (self.name, name, line,)
             rule = Rule()
             rule.parse(line)
             self.rules.append(rule)
@@ -174,6 +174,8 @@ class Rule(object):
         self.atTime = 0
         self.saveTime = 0
         self.letter = ""
+
+        self.dt_cache = None
 
     def __str__(self):
         return self.generate()
@@ -407,22 +409,21 @@ class Rule(object):
 
     def fullExpand(self, maxYear):
         """
-        Do a full recurrence expansion for each year in the Rule's range, upto
+        Do a full recurrence expansion for each year in the Rule's range, up to
         a specified maximum.
 
         @param maxYear: maximum year to expand to
         @type maxYear: C{int}
         """
-        if hasattr(self, "dt_cache"):
-            return self.dt_cache
-        start = self.startYear()
-        end = self.endYear()
-        if end > maxYear:
-            end = maxYear - 1
-        self.dt_cache = []
-        for year in xrange(start, end + 1):
-            dt = utils.DateTime(*self.datetimeForYear(year))
-            self.dt_cache.append(dt)
+        if self.dt_cache is None:
+            start = self.startYear()
+            end = self.endYear()
+            if end > maxYear:
+                end = maxYear - 1
+            self.dt_cache = []
+            for year in xrange(start, end + 1):
+                dt = utils.DateTime(*self.datetimeForYear(year))
+                self.dt_cache.append(dt)
 
     def vtimezone(self, vtz, zonerule, start, end, offsetfrom, offsetto, instanceCount):
         """
@@ -461,6 +462,9 @@ class Rule(object):
         # Do TZNAME
         if zonerule.format.find("%") != -1:
             tzname = zonerule.format % (self.letter if self.letter != "-" else "",)
+        elif "/" in zonerule.format:
+            split_format = zonerule.format.split("/")
+            tzname = split_format[0] if dstoffset == 0 else split_format[1]
         else:
             tzname = zonerule.format
         comp.addProperty(Property(definitions.cICalProperty_TZNAME, tzname))

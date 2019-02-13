@@ -1,5 +1,5 @@
 ##
-#    Copyright (c) 2007-2013 Cyrus Daboo. All rights reserved.
+#    Copyright (c) 2007-2019 Cyrus Daboo. All rights reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -301,6 +301,9 @@ class ZoneRule(object):
         self.format = ""
         self.until = None
 
+        self._cached_until = None
+        self._cached_utc_offset = None
+
     def __str__(self):
         return self.generate()
 
@@ -347,77 +350,77 @@ class ZoneRule(object):
 
     def getUntilDate(self):
 
-        if hasattr(self, "_cached_until"):
-            return self._cached_until
-
-        year = 9999
-        month = 12
-        day = 1
-        hours = 0
-        minutes = 0
-        seconds = 0
-        mode = None
-        if self.until and not self.until.startswith("#"):
-            splits = self.until.split(" ")
-            year = int(splits[0])
-            month = 1
+        if self._cached_until is None:
+            year = 9999
+            month = 12
             day = 1
             hours = 0
             minutes = 0
             seconds = 0
             mode = None
-            if len(splits) > 1 and not splits[1].startswith("#"):
-                month = int(rule.Rule.MONTH_NAME_TO_POS[splits[1]])
-                if len(splits) > 2 and not splits[2].startswith("#"):
-                    if splits[2] == "lastSun":
-                        dt = DateTime(year=year, month=month, day=1)
-                        dt.setDayOfWeekInMonth(-1, DateTime.SUNDAY)
-                        splits[2] = dt.getDay()
-                    elif splits[2] == "lastSat":
-                        dt = DateTime(year=year, month=month, day=1)
-                        dt.setDayOfWeekInMonth(-1, DateTime.SATURDAY)
-                        splits[2] = dt.getDay()
-                    elif splits[2] == "Sun>=1":
-                        dt = DateTime(year=year, month=month, day=1)
-                        dt.setDayOfWeekInMonth(1, DateTime.SUNDAY)
-                        splits[2] = dt.getDay()
-                    day = int(splits[2])
-                    if len(splits) > 3 and not splits[3].startswith("#"):
-                        splits = splits[3].split(":")
-                        hours = int(splits[0])
-                        minutes = int(splits[1][:2])
-                        if len(splits[1]) > 2:
-                            mode = splits[1][2:]
-                        else:
-                            mode = None
-                        if len(splits) > 2:
-                            seconds = int(splits[2])
+            if self.until and not self.until.startswith("#"):
+                splits = self.until.split(" ")
+                year = int(splits[0])
+                month = 1
+                day = 1
+                hours = 0
+                minutes = 0
+                seconds = 0
+                mode = None
+                if len(splits) > 1 and not splits[1].startswith("#"):
+                    month = int(rule.Rule.MONTH_NAME_TO_POS[splits[1]])
+                    if len(splits) > 2 and not splits[2].startswith("#"):
+                        if splits[2] == "lastSun":
+                            dt = DateTime(year=year, month=month, day=1)
+                            dt.setDayOfWeekInMonth(-1, DateTime.SUNDAY)
+                            splits[2] = dt.getDay()
+                        elif splits[2] == "lastSat":
+                            dt = DateTime(year=year, month=month, day=1)
+                            dt.setDayOfWeekInMonth(-1, DateTime.SATURDAY)
+                            splits[2] = dt.getDay()
+                        elif splits[2] == "Sun>=1":
+                            dt = DateTime(year=year, month=month, day=1)
+                            dt.setNextDayOfWeek(1, DateTime.SUNDAY)
+                            splits[2] = dt.getDay()
+                        elif splits[2] == "Sun>=8":
+                            dt = DateTime(year=year, month=month, day=1)
+                            dt.setNextDayOfWeek(8, DateTime.SUNDAY)
+                            splits[2] = dt.getDay()
+                        day = int(splits[2])
+                        if len(splits) > 3 and not splits[3].startswith("#"):
+                            splits = splits[3].split(":")
+                            hours = int(splits[0])
+                            minutes = int(splits[1][:2])
+                            if len(splits[1]) > 2:
+                                mode = splits[1][2:]
+                            else:
+                                mode = None
+                            if len(splits) > 2:
+                                seconds = int(splits[2])
 
-        dt = DateTime(year=year, month=month, day=day, hours=hours, minutes=minutes, seconds=seconds)
-        self._cached_until = utils.DateTime(dt, mode)
+            dt = DateTime(year=year, month=month, day=day, hours=hours, minutes=minutes, seconds=seconds)
+            self._cached_until = utils.DateTime(dt, mode)
         return self._cached_until
 
     def getUTCOffset(self):
 
-        if hasattr(self, "_cached_utc_offset"):
-            return self._cached_uutc_offset
+        if self._cached_utc_offset is None:
+            splits = self.gmtoff.split(":")
 
-        splits = self.gmtoff.split(":")
-
-        hours = int(splits[0] if splits[0][0] != "-" else splits[0][1:])
-        minutes = int(splits[1]) if len(splits) > 1 else 0
-        seconds = int(splits[2]) if len(splits) > 2 else 0
-        negative = splits[0][0] == "-"
-        self._cached_uutc_offset = ((hours * 60) + minutes) * 60 + seconds
-        if negative:
-            self._cached_uutc_offset = -self._cached_uutc_offset
-        return self._cached_uutc_offset
+            hours = int(splits[0] if splits[0][0] != "-" else splits[0][1:])
+            minutes = int(splits[1]) if len(splits) > 1 else 0
+            seconds = int(splits[2]) if len(splits) > 2 else 0
+            negative = splits[0][0] == "-"
+            self._cached_utc_offset = ((hours * 60) + minutes) * 60 + seconds
+            if negative:
+                self._cached_utc_offset = -1 * self._cached_utc_offset
+        return self._cached_utc_offset
 
     def expand(self, rules, results, lastUntilUTC, lastOffset, lastStdOffset, maxYear):
 
         # Expand the rule
-        assert self.rule == "-" or self.rule[0].isdigit() or self.rule in rules, "No rule '%s' found in cache. %s for %s" % (self.rule, self, self.zone,)
-        if self.rule == "-" or self.rule[0].isdigit():
+        assert self.isNumericOffset() or self.rule in rules, "No rule '%s' found in cache. %s for %s" % (self.rule, self, self.zone,)
+        if self.isNumericOffset():
             return self.expand_norule(results, lastUntilUTC, maxYear)
         else:
             tempresults = []
@@ -461,7 +464,7 @@ class ZoneRule(object):
 
     def expand_norule(self, results, lastUntil, maxYear):
         to_offset = 0
-        if self.rule[0].isdigit():
+        if self.rule != "-":
             splits = self.rule.split(":")
             to_offset = 60 * 60 * int(splits[0])
             if len(splits) > 1:
@@ -470,6 +473,14 @@ class ZoneRule(object):
         # Always add a transition for the start of this rule
         results.append((lastUntil, self.getUTCOffset() + to_offset, self, None))
         return (self.getUTCOffset() + to_offset, self.getUTCOffset())
+
+    def isNumericOffset(self):
+        if self.rule == "-":
+            return True
+        elif self.rule[0].isdigit() or (self.rule[0] == "-" and self.rule[1].isdigit()):
+            return True
+        else:
+            return False
 
     def vtimezone(self, vtz, zonerule, start, end, offsetfrom, offsetto):
 
