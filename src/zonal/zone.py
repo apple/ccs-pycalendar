@@ -18,6 +18,7 @@ from pycalendar.datetime import DateTime
 from pycalendar.icalendar import definitions
 from pycalendar.icalendar.property import Property
 from pycalendar.icalendar.vtimezone import VTimezone
+from pycalendar.icalendar.vtimezonedaylight import Daylight
 from pycalendar.icalendar.vtimezonestandard import Standard
 from pycalendar.utcoffsetvalue import UTCOffsetValue
 import rule
@@ -435,6 +436,7 @@ class ZoneRule(object):
             found_start = False
             last_offset = lastOffset
             last_stdoffset = lastStdOffset
+            last_tzrule = None
             finalUntil = self.getUntilDate()
             for dt, to_offset, tzrule in tempresults:
                 dtutc = dt.getUTC(last_offset, last_stdoffset)
@@ -445,7 +447,7 @@ class ZoneRule(object):
                             last_offset = self.getUTCOffset()
                             last_stdoffset = self.getUTCOffset()
                             dtutc = dt.getUTC(last_offset, last_stdoffset)
-                        results.append((lastUntilUTC, last_offset, self, None))
+                        results.append((lastUntilUTC, last_offset, self, last_tzrule))
                     found_start = True
 
                     if dtutc >= finalUntil.getUTC(last_offset, last_stdoffset):
@@ -455,6 +457,7 @@ class ZoneRule(object):
 
                 last_offset = to_offset
                 last_stdoffset = self.getUTCOffset()
+                last_tzrule = tzrule
                 found_one = True
 
             if found_start == 0:
@@ -463,12 +466,7 @@ class ZoneRule(object):
             return last_offset, last_stdoffset
 
     def expand_norule(self, results, lastUntil, maxYear):
-        to_offset = 0
-        if self.rule != "-":
-            splits = self.rule.split(":")
-            to_offset = 60 * 60 * int(splits[0])
-            if len(splits) > 1:
-                to_offset += 60 * int(splits[1])
+        to_offset = self.getNumericOffset()
 
         # Always add a transition for the start of this rule
         results.append((lastUntil, self.getUTCOffset() + to_offset, self, None))
@@ -482,10 +480,22 @@ class ZoneRule(object):
         else:
             return False
 
+    def getNumericOffset(self):
+        offset = 0
+        if self.rule != "-":
+            splits = self.rule.split(":")
+            offset = 60 * 60 * int(splits[0])
+            if len(splits) > 1:
+                offset += 60 * int(splits[1])
+        return offset
+
     def vtimezone(self, vtz, zonerule, start, end, offsetfrom, offsetto):
 
         # Determine type of component based on offset
-        comp = Standard(parent=vtz)
+        if self.isNumericOffset() and self.getNumericOffset() != 0:
+            comp = Daylight(parent=vtz)
+        else:
+            comp = Standard(parent=vtz)
 
         # Do offsets
         tzoffsetfrom = UTCOffsetValue(offsetfrom)

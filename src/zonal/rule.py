@@ -354,6 +354,8 @@ class Rule(object):
             elif difference in (-1, 6,):
                 assert indicatedOffset != 1, "Bad RRULE adjustment"
                 indicatedOffset -= 1
+            elif difference in (-5,):
+                pass
             else:
                 assert False, "Unknown RRULE adjustment"
 
@@ -471,6 +473,8 @@ class Rule(object):
 
         # Do DTSTART
         comp.addProperty(Property(definitions.cICalProperty_DTSTART, start))
+        if start == end:
+            instanceCount = 1
 
         # Now determine the recurrences (use RDATE if only one year or
         # number of instances is one)
