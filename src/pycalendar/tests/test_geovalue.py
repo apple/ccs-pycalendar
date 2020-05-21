@@ -14,9 +14,10 @@
 #    limitations under the License.
 ##
 
+import unittest
+
 from pycalendar.geovalue import GeoValue
 from pycalendar.icalendar.property import Property
-import unittest
 
 
 class TestURIValue(unittest.TestCase):

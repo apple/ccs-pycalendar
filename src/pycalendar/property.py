@@ -14,15 +14,19 @@
 #    limitations under the License.
 ##
 
-from pycalendar import stringutils, xmlutils, xmldefinitions
-from pycalendar.parameter import Parameter
+import io as StringIO
+import xml.etree.cElementTree as XML
+
+from pycalendar import stringutils, xmldefinitions, xmlutils
 from pycalendar.binaryvalue import BinaryValue
 from pycalendar.caladdressvalue import CalAddressValue
 from pycalendar.datetimevalue import DateTimeValue
 from pycalendar.durationvalue import DurationValue
 from pycalendar.exceptions import InvalidProperty
+from pycalendar.geovalue import GeoValue
 from pycalendar.integervalue import IntegerValue
 from pycalendar.multivalue import MultiValue
+from pycalendar.parameter import Parameter
 from pycalendar.periodvalue import PeriodValue
 from pycalendar.plaintextvalue import PlainTextValue
 from pycalendar.unknownvalue import UnknownValue
@@ -30,11 +34,9 @@ from pycalendar.urivalue import URIValue
 from pycalendar.utcoffsetvalue import UTCOffsetValue
 from pycalendar.utils import decodeParameterValue
 from pycalendar.value import Value
-import cStringIO as StringIO
-import xml.etree.cElementTree as XML
 
 
-class PropertyBase(object):
+class PropertyBase():
 
     # Mappings between various tokens and internal definitions
 
@@ -123,7 +125,7 @@ class PropertyBase(object):
         return self.mParameters
 
     def setParameters(self, parameters):
-        self.mParameters = dict([(k.upper(), v) for k, v in parameters.iteritems()])
+        self.mParameters = dict([(k.upper(), v) for k, v in parameters.items()])
 
     def hasParameter(self, attr):
         return attr.upper() in self.mParameters
@@ -375,10 +377,11 @@ class PropertyBase(object):
                     os.write(line)
                     written = len(temp)
                 else:
-                    # Check whether next char is valid utf8 lead byte
-                    while (temp[offset] > 0x7F) and ((ord(temp[offset]) & 0xC0) == 0x80):
-                        # Step back until we have a valid char
-                        offset -= 1
+                    # TODO: Current generating a str rather than bytes
+                    # # Check whether next char is valid utf8 lead byte
+                    # while (temp[offset] > 0x7F) and ((ord(temp[offset]) & 0xC0) == 0x80):
+                    #     # Step back until we have a valid char
+                    #     offset -= 1
 
                     line = temp[start:offset]
                     os.write(line)
@@ -433,21 +436,21 @@ class PropertyBase(object):
             prop = cls()
 
             # Get the name
-            prop.mName = jobject[0].encode("utf-8").upper()
+            prop.mName = jobject[0].upper()
 
             # Get the parameters
             if jobject[1]:
                 for name, value in jobject[1].items():
                     # Now add parameter value
                     name = name.upper()
-                    attrvalue = Parameter(name=name.encode("utf-8"), value=value.encode("utf-8"))
+                    attrvalue = Parameter(name=name, value=value)
                     prop.mParameters.setdefault(name, []).append(attrvalue)
 
             # Get default value type from property name and insert a VALUE parameter if current value type is not default
             value_type = cls.sValueTypeMap.get(jobject[2].upper(), Value.VALUETYPE_UNKNOWN)
             default_type = cls.sDefaultValueTypeMap.get(prop.mName.upper(), Value.VALUETYPE_UNKNOWN)
             if default_type != value_type:
-                attrvalue = Parameter(name=cls.sValue, value=jobject[2].encode("utf-8").upper())
+                attrvalue = Parameter(name=cls.sValue, value=jobject[2].upper())
                 prop.mParameters.setdefault(cls.sValue, []).append(attrvalue)
 
             # Get value type from property name
@@ -610,6 +613,14 @@ class PropertyBase(object):
         # Parameters
         self.setupValueParameter()
 
+    def _init_attr_value_text_list(self, items):
+        # Value
+        self.mValue = MultiValue(Value.VALUETYPE_TEXT)
+        self.mValue.setValue(items)
+
+        # Parameters
+        self.setupValueParameter()
+
     def _init_attr_value_datetime(self, dt):
         # Value
         self.mValue = DateTimeValue(value=dt)
@@ -621,6 +632,13 @@ class PropertyBase(object):
         # Value
         self.mValue = UTCOffsetValue()
         self.mValue.setValue(utcoffset.getValue())
+
+        # Parameters
+        self.setupValueParameter()
+
+    def _init_attr_value_geo(self, geo):
+        # Value
+        self.mValue = GeoValue(value=geo)
 
         # Parameters
         self.setupValueParameter()

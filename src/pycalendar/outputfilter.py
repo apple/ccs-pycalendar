@@ -15,10 +15,10 @@
 ##
 
 
-class OutputFilter(object):
+class OutputFilter():
 
-    def __init__(self, type):
-        self.mType = type
+    def __init__(self, oftype):
+        self.mType = oftype
         self.mAllSubComponents = False
         self.mSubComponents = None
         self.mAllProperties = False
@@ -52,9 +52,9 @@ class OutputFilter(object):
     def hasSubComponentFilters(self):
         return self.mSubComponents is not None
 
-    def getSubComponentFilter(self, type):
+    def getSubComponentFilter(self, stype):
         if self.mSubComponents is not None:
-            return self.mSubComponents.get(type, None)
+            return self.mSubComponents.get(stype, None)
         else:
             return None
 

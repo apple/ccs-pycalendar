@@ -15,7 +15,7 @@
 ##
 
 from pycalendar.parser import ParserContext
-import cStringIO as StringIO
+import io as StringIO
 
 
 def readFoldedLine(ins, lines):
@@ -40,7 +40,7 @@ def readFoldedLine(ins, lines):
                 lines[0] = myline
         except IndexError:
             lines[0] = ""
-        except:
+        except Exception:
             lines[0] = None
             return False
 
@@ -62,7 +62,7 @@ def readFoldedLine(ins, lines):
                 lines[1] = myline
         except IndexError:
             lines[1] = ""
-        except:
+        except Exception:
             lines[1] = None
             return True
 
@@ -127,7 +127,7 @@ def writeTextValue(os, value):
         else:
             os.write(value)
 
-    except:
+    except Exception:
         pass
 
 
@@ -285,11 +285,11 @@ def generateTextList(os, data, sep=';'):
     Each element of the list must be separately escaped
     """
     try:
-        if isinstance(data, basestring):
+        if isinstance(data, str):
             data = (data,)
         results = [escapeTextValue(value) for value in data]
         os.write(sep.join(results))
-    except:
+    except Exception:
         pass
 
 
@@ -337,7 +337,7 @@ def parseDoubleNestedList(data, maxsize):
 def generateDoubleNestedList(os, data):
     try:
         def _writeElement(item):
-            if isinstance(item, basestring):
+            if isinstance(item, str):
                 writeTextValue(os, item)
             else:
                 if item:
@@ -351,8 +351,9 @@ def generateDoubleNestedList(os, data):
             os.write(";")
         _writeElement(data[-1])
 
-    except:
+    except Exception:
         pass
+
 
 # Date/time calcs
 days_in_month = (0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31)
@@ -367,6 +368,7 @@ def daysInMonth(month, year):
     else:
         return days_in_month[month]
 
+
 days_upto_month = (0, 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334)
 days_upto_month_leap = (0, 0, 31, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335)
 
@@ -378,6 +380,7 @@ def daysUptoMonth(month, year):
         return days_upto_month_leap[month]
     else:
         return days_upto_month[month]
+
 
 cachedLeapYears = {}
 
@@ -394,6 +397,7 @@ def isLeapYear(year):
         cachedLeapYears[year] = result
         return result
 
+
 cachedLeapDaysSince1970 = {}
 
 
@@ -403,11 +407,11 @@ def leapDaysSince1970(year_offset):
         return cachedLeapDaysSince1970[year_offset]
     except KeyError:
         if year_offset > 2:
-            result = (year_offset + 1) / 4
+            result = (year_offset + 1) // 4
         elif year_offset < -1:
             # Python will round down negative numbers (i.e. -5/4 = -2, but we want -1), so
             # what is (year_offset - 2) in C code is actually (year_offset - 2 + 3) in Python.
-            result = (year_offset + 1) / 4
+            result = (year_offset + 1) // 4
         else:
             result = 0
         cachedLeapDaysSince1970[year_offset] = result

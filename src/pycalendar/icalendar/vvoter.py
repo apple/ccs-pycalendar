@@ -36,10 +36,10 @@ class VVoter(Component):
     propertyValueChecks = ICALENDAR_VALUE_CHECKS
 
     def __init__(self, parent=None):
-        super(VVoter, self).__init__(parent=parent)
+        super().__init__(parent=parent)
 
     def duplicate(self, parent=None):
-        return super(VVoter, self).duplicate(parent=parent)
+        return super().duplicate(parent=parent)
 
     def getType(self):
         return definitions.cICalComponent_VVOTER
@@ -47,7 +47,7 @@ class VVoter(Component):
     def addComponent(self, comp):
         # We can embed the available components only
         if comp.getType() == definitions.cICalComponent_VOTE:
-            super(VVoter, self).addComponent(comp)
+            super().addComponent(comp)
         else:
             raise ValueError("Only 'VOTE' components allowed in 'VVOTER'")
 
@@ -63,5 +63,6 @@ class VVoter(Component):
 
         components = self.mComponents[:]
         return sorted(components, key=lambda x: x.loadValueInteger(definitions.cICalProperty_POLL_ITEM_ID))
+
 
 Component.registerComponent(definitions.cICalComponent_VVOTER, VVoter)

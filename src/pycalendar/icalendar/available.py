@@ -45,10 +45,10 @@ class Available(ComponentRecur):
     propertyValueChecks = ICALENDAR_VALUE_CHECKS
 
     def __init__(self, parent=None):
-        super(Available, self).__init__(parent=parent)
+        super().__init__(parent=parent)
 
     def duplicate(self, parent=None):
-        return super(Available, self).duplicate(parent=parent)
+        return super().duplicate(parent=parent)
 
     def getType(self):
         return definitions.cICalComponent_AVAILABLE
@@ -60,7 +60,7 @@ class Available(ComponentRecur):
         to that.
         """
 
-        fixed, unfixed = super(Available, self).validate(doFix)
+        fixed, unfixed = super().validate(doFix)
 
         # Extra constraint: only one of DTEND or DURATION
         if self.hasProperty(definitions.cICalProperty_DTEND) and self.hasProperty(definitions.cICalProperty_DURATION):
@@ -86,4 +86,6 @@ class Available(ComponentRecur):
             definitions.cICalProperty_DURATION,
             definitions.cICalProperty_DTEND,
         )
+
+
 Component.registerComponent(definitions.cICalComponent_AVAILABLE, Available)

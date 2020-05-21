@@ -20,18 +20,19 @@ ICalendar parameter.
 The parameter can consist of one or more values, all string.
 """
 
-from pycalendar import xmldefinitions, xmlutils
-from pycalendar.utils import encodeParameterValue
 import xml.etree.cElementTree as XML
 
+from pycalendar import xmldefinitions, xmlutils
+from pycalendar.utils import encodeParameterValue
 
-class Parameter(object):
+
+class Parameter():
 
     def __init__(self, name, value=None):
         self.mName = name
         if value is None:
             self.mValues = []
-        elif isinstance(value, basestring):
+        elif isinstance(value, str):
             self.mValues = [value]
         else:
             self.mValues = value
@@ -92,7 +93,7 @@ class Parameter(object):
                     # Write with quotation if required
                     self.generateValue(os, s)
 
-        except:
+        except Exception:
             # We ignore errors
             pass
 

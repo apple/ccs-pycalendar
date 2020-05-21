@@ -14,8 +14,7 @@
 #    limitations under the License.
 ##
 
-from pycalendar.icalendar import definitions
-from pycalendar.icalendar import itipdefinitions
+from pycalendar.icalendar import definitions, itipdefinitions
 from pycalendar.icalendar.component import Component
 from pycalendar.icalendar.validation import ICALENDAR_VALUE_CHECKS
 
@@ -46,10 +45,10 @@ class VAvailability(Component):
     propertyValueChecks = ICALENDAR_VALUE_CHECKS
 
     def __init__(self, parent=None):
-        super(VAvailability, self).__init__(parent=parent)
+        super().__init__(parent=parent)
 
     def duplicate(self, parent=None):
-        return super(VAvailability, self).duplicate(parent=parent)
+        return super().duplicate(parent=parent)
 
     def getType(self):
         return definitions.cICalComponent_VAVAILABILITY
@@ -58,7 +57,7 @@ class VAvailability(Component):
         return itipdefinitions.cICalMIMEComponent_VAVAILABILITY
 
     def finalise(self):
-        super(VAvailability, self).finalise()
+        super().finalise()
 
     def validate(self, doFix=False):
         """
@@ -67,7 +66,7 @@ class VAvailability(Component):
         to that.
         """
 
-        fixed, unfixed = super(VAvailability, self).validate(doFix)
+        fixed, unfixed = super().validate(doFix)
 
         # Extra constraint: only one of DTEND or DURATION
         if self.hasProperty(definitions.cICalProperty_DTEND) and self.hasProperty(definitions.cICalProperty_DURATION):
@@ -88,7 +87,7 @@ class VAvailability(Component):
     def addComponent(self, comp):
         # We can embed the available components only
         if comp.getType() == definitions.cICalComponent_AVAILABLE:
-            super(VAvailability, self).addComponent(comp)
+            super().addComponent(comp)
         else:
             raise ValueError("Only 'AVAILABLE' components allowed in 'VAVAILABILITY'")
 
@@ -109,8 +108,9 @@ class VAvailability(Component):
         @type tzids: L{set}
         """
 
-        super(VAvailability, self).getTimezones(tzids)
+        super().getTimezones(tzids)
         for available in self.getComponents(definitions.cICalComponent_AVAILABLE):
             available.getTimezones(tzids)
+
 
 Component.registerComponent(definitions.cICalComponent_VAVAILABILITY, VAvailability)

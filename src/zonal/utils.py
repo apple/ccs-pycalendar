@@ -15,7 +15,7 @@
 ##
 
 
-class DateTime(object):
+class DateTime():
     """
     A date-time object that wraps the tzdb wall-clock/utc style date-time information
     and that can generate appropriate localtime or UTC offsets based on Zone/Rule offsets.
@@ -30,6 +30,9 @@ class DateTime(object):
 
     def compareDateTime(self, other):
         return self.dt.compareDateTime(other.dt)
+
+    def getPosixTime(self):
+        return self.dt.getPosixTime()
 
     def getLocaltime(self, offset, stdoffset):
         new_dt = self.dt.duplicate()

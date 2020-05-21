@@ -38,14 +38,14 @@ class VTimezone(Component):
     sortSubComponents = False
 
     def __init__(self, parent=None):
-        super(VTimezone, self).__init__(parent=parent)
+        super().__init__(parent=parent)
         self.mID = ""
         self.mUTCOffsetSortKey = None
         self.mCachedExpandAllMaxYear = None
         self.mCachedOffsets = None
 
     def duplicate(self, parent=None):
-        other = super(VTimezone, self).duplicate(parent=parent)
+        other = super().duplicate(parent=parent)
         other.mID = self.mID
         other.mUTCOffsetSortKey = self.mUTCOffsetSortKey
         return other
@@ -61,7 +61,7 @@ class VTimezone(Component):
         # We can embed the timezone components only
         if ((comp.getType() == definitions.cICalComponent_STANDARD) or
                 (comp.getType() == definitions.cICalComponent_DAYLIGHT)):
-            super(VTimezone, self).addComponent(comp)
+            super().addComponent(comp)
         else:
             raise ValueError("Only 'STANDARD' or 'DAYLIGHT' components allowed in 'VTIMEZONE'")
 
@@ -78,7 +78,7 @@ class VTimezone(Component):
         self.mComponents.sort(key=lambda x: x.getStart())
 
         # Do inherited
-        super(VTimezone, self).finalise()
+        super().finalise()
 
     def validate(self, doFix=False):
         """
@@ -87,7 +87,7 @@ class VTimezone(Component):
         to that.
         """
 
-        fixed, unfixed = super(VTimezone, self).validate(doFix)
+        fixed, unfixed = super().validate(doFix)
 
         # Must have at least one STANDARD or DAYLIGHT sub-component
         for component in self.mComponents:
@@ -120,7 +120,7 @@ class VTimezone(Component):
                     utc_offset2 = self.mComponents[1].getUTCOffset()
 
                 # Create key
-                self.mUTCOffsetSortKey = (utc_offset1 + utc_offset2) / 2
+                self.mUTCOffsetSortKey = (utc_offset1 + utc_offset2) // 2
             else:
                 self.mUTCOffsetSortKey = 0
 
@@ -190,11 +190,11 @@ class VTimezone(Component):
                     tzoffset = -tzoffset
                     negative = True
                 result = ("+", "-")[negative]
-                hours_offset = tzoffset / (60 * 60)
+                hours_offset = tzoffset // (60 * 60)
                 if hours_offset < 10:
                     result += "0"
                 result += str(hours_offset)
-                mins_offset = (tzoffset / 60) % 60
+                mins_offset = (tzoffset // 60) % 60
                 if mins_offset < 10:
                     result += "0"
                 result += str(mins_offset)
@@ -286,5 +286,6 @@ class VTimezone(Component):
             return tz1.getID().compareToIgnoreCase(tz2.getID())
         else:
             return (1, -1)[sort1 < sort2]
+
 
 Component.registerComponent(definitions.cICalComponent_VTIMEZONE, VTimezone)

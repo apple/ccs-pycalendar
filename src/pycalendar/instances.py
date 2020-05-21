@@ -15,11 +15,12 @@
 #    limitations under the License.
 ##
 
-from __future__ import print_function
+
+import sys
+
 from pycalendar.datetime import DateTime
 from pycalendar.icalendar.recurrence import Recurrence
 from pycalendar.period import Period
-import sys
 
 
 def instances(start, rrule):
@@ -33,8 +34,8 @@ def instances(start, rrule):
     end = start.duplicate()
     end.offsetYear(100)
     items = []
-    range = Period(start, end)
-    recur.expand(start, range, items)
+    prange = Period(start, end)
+    recur.expand(start, prange, items)
     print("DTSTART:{}".format(start))
     print("RRULE:{}".format(rrule))
     print("Instances: {}".format(", ".join(map(str, items))))

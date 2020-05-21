@@ -14,16 +14,18 @@
 #    limitations under the License.
 ##
 
-from cStringIO import StringIO
+import xml.etree.cElementTree as XML
+
+from io import StringIO
+
 from pycalendar import xmldefinitions, xmlutils
 from pycalendar.datetimevalue import DateTimeValue
+from pycalendar.exceptions import ErrorBase, InvalidComponent
 from pycalendar.periodvalue import PeriodValue
 from pycalendar.value import Value
-import xml.etree.cElementTree as XML
-from pycalendar.exceptions import InvalidComponent, ErrorBase
 
 
-class ComponentBase(object):
+class ComponentBase():
 
     # These are class attributes for sets of properties for testing cardinality constraints. The sets
     # must contain property names.
@@ -52,6 +54,9 @@ class ComponentBase(object):
             self.check_cardinality_1_More,
         )
 
+    def __hash__(self):
+        return hash(str(self))
+
     def duplicate(self, **args):
         other = self.__class__(**args)
 
@@ -59,7 +64,7 @@ class ComponentBase(object):
             other.addComponent(component.duplicate(parent=other))
 
         other.mProperties = {}
-        for propname, props in self.mProperties.iteritems():
+        for propname, props in self.mProperties.items():
             other.mProperties[propname] = [i.duplicate() for i in props]
         return other
 
@@ -113,8 +118,7 @@ class ComponentBase(object):
         for component in self.mComponents:
             if component.getMapKey() == key:
                 return component
-        else:
-            return None
+        return None
 
     def removeComponentByKey(self, key):
 
@@ -184,17 +188,17 @@ class ComponentBase(object):
         if propname.upper() in self.mProperties:
             del self.mProperties[propname.upper()]
 
-    def getPropertyInteger(self, prop, type=None):
-        return self.loadValueInteger(prop, type)
+    def getPropertyInteger(self, prop, itype=None):
+        return self.loadValueInteger(prop, itype)
 
     def getPropertyString(self, prop):
         return self.loadValueString(prop)
 
-    def getProperty(self, prop, value):
-        return self.loadValue(prop, value)
+    def getProperty(self, prop):
+        return self.loadValue(prop)
 
     def finalise(self):
-        raise NotImplemented
+        raise NotImplementedError
 
     def validate(self, doFix=False):
         """
@@ -214,10 +218,10 @@ class ComponentBase(object):
         # Value constraints - these tests come from class specific attributes
         if self.propertyValueChecks is not None:
             for properties in self.mProperties.values():
-                for property in properties:
-                    propname = property.getName().upper()
+                for prop in properties:
+                    propname = prop.getName().upper()
                     if propname in self.propertyValueChecks:
-                        if not self.propertyValueChecks[propname](property):
+                        if not self.propertyValueChecks[propname](prop):
                             # Cannot fix a bad property value
                             logProblem = "[%s] Property value incorrect: %s" % (self.getType(), propname,)
                             unfixed.append(logProblem)
@@ -407,7 +411,7 @@ class ComponentBase(object):
         if filter.isAllSubComponents():
             self.writeComponents(os)
         elif filter.hasSubComponentFilters():
-            for subcomp in self.sortedcomponents():
+            for subcomp in self.sortedComponents():
                 subfilter = filter.getSubComponentFilter(subcomp.getType())
                 if subfilter is not None:
                     subcomp.generateFiltered(os, subfilter)
@@ -430,7 +434,7 @@ class ComponentBase(object):
             if filter.isAllSubComponents():
                 self.writeXML(comps, namespace)
             elif filter.hasSubComponentFilters():
-                for subcomp in self.sortedcomponents():
+                for subcomp in self.sortedComponents():
                     subfilter = filter.getSubComponentFilter(subcomp.getType())
                     if subfilter is not None:
                         subcomp.writeXMLFiltered(comps, namespace, subfilter)
@@ -449,7 +453,7 @@ class ComponentBase(object):
             if filter.isAllSubComponents():
                 self.writeJSON(jobject)
             elif filter.hasSubComponentFilters():
-                for subcomp in self.sortedcomponents():
+                for subcomp in self.sortedComponents():
                     subfilter = filter.getSubComponentFilter(subcomp.getType())
                     if subfilter is not None:
                         subcomp.writeJSONFiltered(jobject, subfilter)
@@ -479,7 +483,7 @@ class ComponentBase(object):
     def loadValueString(self, value_name):
         if self.hasProperty(value_name):
             tvalue = self.findFirstProperty(value_name).getTextValue()
-            if (tvalue is not None):
+            if tvalue is not None:
                 return tvalue.getValue()
 
         return None
@@ -495,7 +499,7 @@ class ComponentBase(object):
     def loadValueDuration(self, value_name):
         if self.hasProperty(value_name):
             dvalue = self.findFirstProperty(value_name).getDurationValue()
-            if (dvalue is not None):
+            if dvalue is not None:
                 return dvalue.getValue()
 
         return None
@@ -503,7 +507,7 @@ class ComponentBase(object):
     def loadValuePeriod(self, value_name):
         if self.hasProperty(value_name):
             pvalue = self.findFirstProperty(value_name).getPeriodValue()
-            if (pvalue is not None):
+            if pvalue is not None:
                 return pvalue.getValue()
 
         return None
@@ -512,9 +516,9 @@ class ComponentBase(object):
         # Get RRULEs
         if self.hasProperty(value_name):
             items = self.getProperties()[value_name]
-            for iter in items:
-                rvalue = iter.getRecurrenceValue()
-                if (rvalue is not None):
+            for item in items:
+                rvalue = item.getRecurrenceValue()
+                if rvalue is not None:
                     if add:
                         value.addRule(rvalue.getValue())
                     else:
@@ -526,9 +530,9 @@ class ComponentBase(object):
     def loadValueRDATE(self, value_name, value, add):
         # Get RDATEs
         if self.hasProperty(value_name):
-            for iter in self.getProperties(value_name):
-                mvalue = iter.getMultiValue()
-                if (mvalue is not None):
+            for item in self.getProperties(value_name):
+                mvalue = item.getMultiValue()
+                if mvalue is not None:
                     for obj in mvalue.getValues():
                         # cast to date-time
                         if isinstance(obj, DateTimeValue):
@@ -547,7 +551,7 @@ class ComponentBase(object):
             return False
 
     def sortedPropertyKeys(self):
-        keys = self.mProperties.keys()
+        keys = list(self.mProperties.keys())
         keys.sort()
 
         results = []

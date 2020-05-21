@@ -14,12 +14,12 @@
 #    limitations under the License.
 ##
 
-from pycalendar.exceptions import NoTimezoneInDatabase, \
-    InvalidData
 import os
 
+from pycalendar.exceptions import InvalidData, NoTimezoneInDatabase
 
-class TimezoneDatabase(object):
+
+class TimezoneDatabase():
     """
     On demand timezone database cache. This scans a TZdb directory for .ics files matching a
     TZID and caches the component data in a calendar from whence the actual component is returned.

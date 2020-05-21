@@ -32,10 +32,10 @@ class Vote(Component):
     propertyValueChecks = ICALENDAR_VALUE_CHECKS
 
     def __init__(self, parent=None):
-        super(Vote, self).__init__(parent=parent)
+        super().__init__(parent=parent)
 
     def duplicate(self, parent=None):
-        return super(Vote, self).duplicate(parent=parent)
+        return super().duplicate(parent=parent)
 
     def getType(self):
         return definitions.cICalComponent_VOTE
@@ -45,5 +45,6 @@ class Vote(Component):
             definitions.cICalProperty_POLL_ITEM_ID,
             definitions.cICalProperty_RESPONSE,
         )
+
 
 Component.registerComponent(definitions.cICalComponent_VOTE, Vote)

@@ -14,9 +14,10 @@
 #    limitations under the License.
 ##
 
-from pycalendar.icalendar.property import Property
-from pycalendar.validation import partial, PropertyValueChecks
 import unittest
+
+from pycalendar.icalendar.property import Property
+from pycalendar.validation import PropertyValueChecks, partial
 
 
 class TestValidation(unittest.TestCase):

@@ -14,11 +14,12 @@
 #    limitations under the License.
 ##
 
-from pycalendar.parameter import Parameter
+import unittest
+
 from pycalendar.exceptions import InvalidProperty
+from pycalendar.parameter import Parameter
 from pycalendar.parser import ParserContext
 from pycalendar.vcard.property import Property
-import unittest
 
 
 class TestProperty(unittest.TestCase):

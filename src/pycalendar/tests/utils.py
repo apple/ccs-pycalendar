@@ -14,8 +14,9 @@
 #    limitations under the License.
 ##
 
-from pycalendar.timezonedb import TimezoneDatabase
 import unittest
+
+from pycalendar.timezonedb import TimezoneDatabase
 
 
 class TestPyCalendar(unittest.TestCase):

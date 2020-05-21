@@ -21,8 +21,9 @@ from pycalendar.icalendar.vtimezone import VTimezone
 from pycalendar.icalendar.vtimezonedaylight import Daylight
 from pycalendar.icalendar.vtimezonestandard import Standard
 from pycalendar.utcoffsetvalue import UTCOffsetValue
-import rule
-import utils
+
+from .rule import Rule, RuleSet
+from .utils import DateTime as UtilsDataTime
 
 """
 Class that maintains a TZ data Zone.
@@ -34,7 +35,7 @@ __all__ = (
 )
 
 
-class Zone(object):
+class Zone():
     """
     A tzdata Zone object containing a set of ZoneRules
     """
@@ -147,7 +148,7 @@ class Zone(object):
                 first = False
 
         # Sort the results by date
-        transitions.sort(cmp=lambda x, y: x[0].compareDateTime(y[0]))
+        transitions.sort(key=lambda x: x[0].getPosixTime())
 
         # Now scan transitions looking for real changes and note those
         results = []
@@ -202,7 +203,7 @@ class Zone(object):
                     # Accumulate tzrule portions with the same offset pairs
                     lastOffsetPair = (rulemap[tzrule][0][1], rulemap[tzrule][0][2],)
                     startIndex = 0
-                    for index in xrange(len(rulemap[tzrule])):
+                    for index in range(len(rulemap[tzrule])):
                         offsetPair = (rulemap[tzrule][index][1], rulemap[tzrule][index][2],)
                         if offsetPair != lastOffsetPair:
                             tzrule.vtimezone(
@@ -280,7 +281,7 @@ class Zone(object):
                 similarMap.setdefault(key, []).append(item)
 
         # Merge similar
-        for values in similarMap.itervalues():
+        for values in similarMap.values():
             if len(values) > 1:
                 mergeTo = values[0]
                 for mergeFrom in values[1:]:
@@ -290,7 +291,7 @@ class Zone(object):
                     vtz.mComponents.remove(mergeFrom)
 
 
-class ZoneRule(object):
+class ZoneRule():
     """
     A specific rule for a portion of a Zone
     """
@@ -369,7 +370,7 @@ class ZoneRule(object):
                 seconds = 0
                 mode = None
                 if len(splits) > 1 and not splits[1].startswith("#"):
-                    month = int(rule.Rule.MONTH_NAME_TO_POS[splits[1]])
+                    month = int(Rule.MONTH_NAME_TO_POS[splits[1]])
                     if len(splits) > 2 and not splits[2].startswith("#"):
                         if splits[2] == "lastSun":
                             dt = DateTime(year=year, month=month, day=1)
@@ -400,7 +401,7 @@ class ZoneRule(object):
                                 seconds = int(splits[2])
 
             dt = DateTime(year=year, month=month, day=day, hours=hours, minutes=minutes, seconds=seconds)
-            self._cached_until = utils.DateTime(dt, mode)
+            self._cached_until = UtilsDataTime(dt, mode)
         return self._cached_until
 
     def getUTCOffset(self):
@@ -430,7 +431,7 @@ class ZoneRule(object):
             ruleset.expand(tempresults, self, maxYear)
 
             # Sort the results by date
-            tempresults.sort(cmp=lambda x, y: x[0].compareDateTime(y[0]))
+            tempresults.sort(key=lambda x: x[0].getPosixTime())
 
             found_one = False
             found_start = False
@@ -535,7 +536,7 @@ Rule\tUS\t1987\t2006\t-\tApr\tSun>=1\t2:00\t1:00\tD
 Rule\tUS\t2007\tmax\t-\tMar\tSun>=8\t2:00\t1:00\tD
 Rule\tUS\t2007\tmax\t-\tNov\tSun>=1\t2:00\t0\tS"""
     rules = {}
-    ruleset = rule.RuleSet()
+    ruleset = RuleSet()
     ruleset.parse(rulesdef)
     rules[ruleset.name] = ruleset
 

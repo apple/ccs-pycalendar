@@ -14,8 +14,7 @@
 #    limitations under the License.
 ##
 
-from pycalendar.icalendar import definitions
-from pycalendar.icalendar import itipdefinitions
+from pycalendar.icalendar import definitions, itipdefinitions
 from pycalendar.icalendar.component import Component
 from pycalendar.icalendar.componentrecur import ComponentRecur
 from pycalendar.icalendar.property import Property
@@ -52,11 +51,11 @@ class VEvent(ComponentRecur):
     propertyValueChecks = ICALENDAR_VALUE_CHECKS
 
     def __init__(self, parent=None):
-        super(VEvent, self).__init__(parent=parent)
+        super().__init__(parent=parent)
         self.mStatus = definitions.eStatus_VEvent_None
 
     def duplicate(self, parent=None):
-        other = super(VEvent, self).duplicate(parent=parent)
+        other = super().duplicate(parent=parent)
         other.mStatus = self.mStatus
         return other
 
@@ -69,7 +68,7 @@ class VEvent(ComponentRecur):
     def addComponent(self, comp):
         # We can embed the alarm components only
         if comp.getType() == definitions.cICalComponent_VALARM:
-            super(VEvent, self).addComponent(comp)
+            super().addComponent(comp)
         else:
             raise ValueError("Only 'VALARM' components allowed in 'VEVENT'")
 
@@ -81,7 +80,7 @@ class VEvent(ComponentRecur):
 
     def finalise(self):
         # Do inherited
-        super(VEvent, self).finalise()
+        super().finalise()
 
         temp = self.loadValueString(definitions.cICalProperty_STATUS)
         if temp is not None:
@@ -99,7 +98,7 @@ class VEvent(ComponentRecur):
         to that.
         """
 
-        fixed, unfixed = super(VEvent, self).validate(doFix)
+        fixed, unfixed = super().validate(doFix)
 
         # Extra constraint: if METHOD not present, DTSTART must be
         if self.mParentComponent and not self.mParentComponent.hasProperty(definitions.cICalProperty_METHOD):
@@ -159,5 +158,6 @@ class VEvent(ComponentRecur):
             definitions.cICalProperty_DURATION,
             definitions.cICalProperty_DTEND,
         )
+
 
 Component.registerComponent(definitions.cICalComponent_VEVENT, VEvent)

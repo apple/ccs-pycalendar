@@ -14,8 +14,7 @@
 #    limitations under the License.
 ##
 
-from pycalendar.icalendar import definitions
-from pycalendar.icalendar import itipdefinitions
+from pycalendar.icalendar import definitions, itipdefinitions
 from pycalendar.icalendar.component import Component
 from pycalendar.icalendar.validation import ICALENDAR_VALUE_CHECKS
 

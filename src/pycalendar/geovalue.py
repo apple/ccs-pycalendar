@@ -16,12 +16,13 @@
 
 # iCalendar REQUEST-STATUS value
 
+import xml.etree.cElementTree as XML
+
+from pycalendar import xmldefinitions as xmldefinitions_top
 from pycalendar import xmlutils
 from pycalendar.exceptions import InvalidData
 from pycalendar.icalendar import xmldefinitions
 from pycalendar.value import Value
-from pycalendar import xmldefinitions as xmldefinitions_top
-import xml.etree.cElementTree as XML
 
 
 class GeoValue(Value):
@@ -81,5 +82,6 @@ class GeoValue(Value):
 
     def setValue(self, value):
         self.mValue = value
+
 
 Value.registerType(Value.VALUETYPE_GEO, GeoValue, xmldefinitions.geo, xmldefinitions_top.value_float)

@@ -19,9 +19,9 @@ from pycalendar.value import Value
 
 class MultiValue(Value):
 
-    def __init__(self, type):
+    def __init__(self, mtype):
 
-        self.mType = type
+        self.mType = mtype
         self.mValues = []
 
     def __hash__(self):
@@ -70,18 +70,18 @@ class MultiValue(Value):
     def generate(self, os):
         try:
             first = True
-            for iter in self.mValues:
+            for item in self.mValues:
                 if first:
                     first = False
                 else:
                     os.write(",")
-                iter.generate(os)
-        except:
+                item.generate(os)
+        except Exception:
             pass
 
     def writeXML(self, node, namespace):
-        for iter in self.mValues:
-            iter.writeXML(node, namespace)
+        for item in self.mValues:
+            item.writeXML(node, namespace)
 
     def parseJSONValue(self, jobject):
         for jvalue in jobject:
@@ -90,7 +90,8 @@ class MultiValue(Value):
             self.mValues.append(value)
 
     def writeJSONValue(self, jobject):
-        for iter in self.mValues:
-            iter.writeJSONValue(jobject)
+        for item in self.mValues:
+            item.writeJSONValue(jobject)
+
 
 Value.registerType(Value.VALUETYPE_MULTIVALUE, MultiValue, None)

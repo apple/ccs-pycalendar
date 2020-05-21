@@ -25,4 +25,5 @@ class DurationValue(WrapperValue, Value):
     _wrappedClass = Duration
     _wrappedType = Value.VALUETYPE_DURATION
 
+
 Value.registerType(Value.VALUETYPE_DURATION, DurationValue, xmldefinitions.value_duration)

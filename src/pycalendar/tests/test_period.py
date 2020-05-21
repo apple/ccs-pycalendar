@@ -14,10 +14,11 @@
 #    limitations under the License.
 ##
 
+import unittest
+
 from pycalendar.datetime import DateTime
 from pycalendar.duration import Duration
 from pycalendar.period import Period
-import unittest
 
 
 class TestPeriod(unittest.TestCase):

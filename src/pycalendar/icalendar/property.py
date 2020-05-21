@@ -14,7 +14,6 @@
 #    limitations under the License.
 ##
 
-from pycalendar.parameter import Parameter
 from pycalendar.datetime import DateTime
 from pycalendar.datetimevalue import DateTimeValue
 from pycalendar.duration import Duration
@@ -24,6 +23,7 @@ from pycalendar.icalendar.recurrence import Recurrence
 from pycalendar.icalendar.recurrencevalue import RecurrenceValue
 from pycalendar.icalendar.requeststatusvalue import RequestStatusValue
 from pycalendar.multivalue import MultiValue
+from pycalendar.parameter import Parameter
 from pycalendar.period import Period
 from pycalendar.periodvalue import PeriodValue
 from pycalendar.property import PropertyBase
@@ -186,7 +186,7 @@ class Property(PropertyBase):
 
     def __init__(self, name=None, value=None, valuetype=None):
 
-        super(Property, self).__init__(name, value, valuetype)
+        super().__init__(name, value, valuetype)
 
         # The None check speeds up .duplicate()
         if value is None:
@@ -194,10 +194,6 @@ class Property(PropertyBase):
 
         # Order these based on most likely occurrence to speed up this method
         elif isinstance(value, str):
-            self._init_attr_value_text(value, valuetype if valuetype else self.sDefaultValueTypeMap.get(self.mName.upper(), Value.VALUETYPE_UNKNOWN))
-
-        elif isinstance(value, unicode):
-            value = value.encode("utf-8")
             self._init_attr_value_text(value, valuetype if valuetype else self.sDefaultValueTypeMap.get(self.mName.upper(), Value.VALUETYPE_UNKNOWN))
 
         elif isinstance(value, DateTime):

@@ -14,9 +14,10 @@
 #    limitations under the License.
 ##
 
+import unittest
+
 from pycalendar.exceptions import ValidationError
 from pycalendar.vcard.card import Card
-import unittest
 
 
 class TestValidation(unittest.TestCase):
@@ -213,7 +214,7 @@ END:VCARD
             else:
                 try:
                     fixed, unfixed = card.validate(doFix=False, doRaise=False)
-                except:
+                except Exception:
                     self.fail(msg="Failed test: %s" % (title,))
                 self.assertEqual(str(card), test_new, msg="Failed test: %s" % (title,))
                 self.assertEqual(set(fixed), test_fixed, msg="Failed test: %s" % (title,))

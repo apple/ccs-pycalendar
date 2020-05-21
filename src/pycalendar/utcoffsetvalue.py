@@ -16,7 +16,7 @@
 
 # iCalendar UTC Offset value
 
-from cStringIO import StringIO
+from io import StringIO
 from pycalendar import xmldefinitions
 from pycalendar.value import Value
 
@@ -75,15 +75,15 @@ class UTCOffsetValue(Value):
                 sign = "+"
 
             secs = abs_value % 60
-            mins = (abs_value / 60) % 60
-            hours = abs_value / (60 * 60)
+            mins = (abs_value // 60) % 60
+            hours = abs_value // (60 * 60)
 
             s = ("%s%02d:%02d" if fullISO else "%s%02d%02d") % (sign, hours, mins,)
             if (secs != 0):
                 s = ("%s:%02d" if fullISO else "%s%02d") % (s, secs,)
 
             os.write(s)
-        except:
+        except Exception:
             pass
 
     def writeXML(self, node, namespace):
@@ -111,5 +111,6 @@ class UTCOffsetValue(Value):
 
     def setValue(self, value):
         self.mValue = value
+
 
 Value.registerType(Value.VALUETYPE_UTC_OFFSET, UTCOffsetValue, xmldefinitions.value_utc_offset)

@@ -14,7 +14,7 @@
 #    limitations under the License.
 ##
 
-from pycalendar.validation import partial, PropertyValueChecks
+from pycalendar.validation import PropertyValueChecks, partial
 from pycalendar.vcard import definitions
 
 VCARD_VALUE_CHECKS = {

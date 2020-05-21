@@ -22,7 +22,8 @@ from pycalendar.icalendar.vtimezonedaylight import Daylight
 from pycalendar.icalendar.vtimezonestandard import Standard
 from pycalendar.utcoffsetvalue import UTCOffsetValue
 from pycalendar.utils import daysInMonth
-import utils
+
+from .utils import DateTime as UtilsDateTime
 
 """
 Class that maintains a TZ data Rule.
@@ -34,7 +35,7 @@ __all__ = (
 )
 
 
-class RuleSet(object):
+class RuleSet():
     """
     A set of tzdata rules tied to a specific Rule name
     """
@@ -100,7 +101,7 @@ class RuleSet(object):
             rule.expand(results, zoneinfo, maxYear)
 
 
-class Rule(object):
+class Rule():
     """
     A tzdata Rule
     """
@@ -179,6 +180,9 @@ class Rule(object):
 
     def __str__(self):
         return self.generate()
+
+    def __hash__(self):
+        return hash(self.generate())
 
     def __eq__(self, other):
         return other and (
@@ -423,8 +427,8 @@ class Rule(object):
             if end > maxYear:
                 end = maxYear - 1
             self.dt_cache = []
-            for year in xrange(start, end + 1):
-                dt = utils.DateTime(*self.datetimeForYear(year))
+            for year in range(start, end + 1):
+                dt = UtilsDateTime(*self.datetimeForYear(year))
                 self.dt_cache.append(dt)
 
     def vtimezone(self, vtz, zonerule, start, end, offsetfrom, offsetto, instanceCount):

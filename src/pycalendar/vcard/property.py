@@ -14,10 +14,12 @@
 #    limitations under the License.
 ##
 
+import io as StringIO
+
 from pycalendar import stringutils
-from pycalendar.parameter import Parameter
 from pycalendar.datetime import DateTime
 from pycalendar.exceptions import InvalidProperty
+from pycalendar.parameter import Parameter
 from pycalendar.parser import ParserContext
 from pycalendar.property import PropertyBase
 from pycalendar.utcoffsetvalue import UTCOffsetValue
@@ -29,7 +31,6 @@ from pycalendar.vcard.adrvalue import AdrValue
 from pycalendar.vcard.n import N
 from pycalendar.vcard.nvalue import NValue
 from pycalendar.vcard.orgvalue import OrgValue
-import cStringIO as StringIO
 
 handleOptions = ("allow", "ignore", "fix", "raise")
 missingParameterValues = "fix"
@@ -87,6 +88,19 @@ class Property(PropertyBase):
         #     2426 Section 3.7
         definitions.Property_CLASS: Value.VALUETYPE_TEXT,
         definitions.Property_KEY: Value.VALUETYPE_BINARY,
+
+        #     6350 Section 6.1.4
+        definitions.Property_KIND: Value.VALUETYPE_TEXT,
+
+        #     6350 Section 6.4.3
+        definitions.Property_IMPP: Value.VALUETYPE_URI,
+
+        #     6350 Section 6.6.5 - but use TEXT
+        definitions.Property_MEMBER: Value.VALUETYPE_TEXT,
+
+        #     6350 Section 6.9
+        definitions.Property_CALADRURI: Value.VALUETYPE_URI,
+        definitions.Property_CALURI: Value.VALUETYPE_URI,
     }
 
     sValueTypeMap = {
@@ -142,7 +156,7 @@ class Property(PropertyBase):
 
     def __init__(self, group=None, name=None, value=None, valuetype=None):
 
-        super(Property, self).__init__(name, value, valuetype)
+        super().__init__(name, value, valuetype)
 
         self.mGroup = group
 
@@ -202,6 +216,29 @@ class Property(PropertyBase):
             self.mValue == other.mValue and
             self.mParameters == other.mParameters
         )
+
+    def getParameterValues(self, attr):
+        """
+        vCard supports multiple parameters with the same name, so merge all those into one.
+        """
+        result = []
+        for parameter in self.mParameters[attr.upper()]:
+            result.extend(parameter.getValues())
+        return result
+
+    def getAddressValue(self):
+
+        if isinstance(self.mValue, AdrValue):
+            return self.mValue
+        else:
+            return None
+
+    def getNameValue(self):
+
+        if isinstance(self.mValue, NValue):
+            return self.mValue
+        else:
+            return None
 
     def parseTextParameters(self, txt, data):
         """
@@ -301,7 +338,7 @@ class Property(PropertyBase):
             os.write(sout.getvalue())
             os.write("\r\n")
         else:
-            super(Property, self).generateValue(os, novalue)
+            super().generateValue(os, novalue)
 
     # Creation
     def _init_attr_value_adr(self, reqstatus):

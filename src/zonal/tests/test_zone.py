@@ -15,9 +15,11 @@
 ##
 
 import unittest
-from zonal.zone import Zone
-from zonal.rule import RuleSet
+
 from pycalendar.icalendar.calendar import Calendar
+
+from ..rule import RuleSet
+from ..zone import Zone
 
 
 class TestZone(unittest.TestCase):

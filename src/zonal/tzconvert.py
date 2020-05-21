@@ -15,20 +15,21 @@
 #    limitations under the License.
 ##
 
-from __future__ import with_statement
-from __future__ import print_function
-
-from pycalendar.icalendar.calendar import Calendar
-from xml.etree.cElementTree import ParseError as XMLParseError
-import cStringIO as StringIO
 import getopt
+import io as StringIO
 import os
-import rule
 import sys
 import tarfile
-import urllib
+import urllib.error
+import urllib.parse
+import urllib.request
 import xml.etree.cElementTree as XML
-import zone
+from xml.etree.cElementTree import ParseError as XMLParseError
+
+from pycalendar.icalendar.calendar import Calendar
+
+from .rule import Rule, RuleSet
+from .zone import Zone
 
 """
 Classes to parse a tzdata files and generate VTIMEZONE data.
@@ -39,7 +40,7 @@ __all__ = (
 )
 
 
-class tzconvert(object):
+class tzconvert():
 
     def __init__(self, verbose=False):
         self.rules = {}
@@ -50,9 +51,9 @@ class tzconvert(object):
     def getZoneNames(self):
         return set(self.zones.keys())
 
-    def parse(self, file):
+    def parse(self, filepath):
         try:
-            with open(file, "r") as f:
+            with open(filepath, "r") as f:
                 ctr = 0
                 for line in f:
                     ctr += 1
@@ -75,13 +76,13 @@ class tzconvert(object):
                         else:
                             break
         except:
-            print("Failed to parse file %s" % (file,))
+            print("Failed to parse file %s" % (filepath,))
             raise
 
     def parseRule(self, line):
-        ruleitem = rule.Rule()
+        ruleitem = Rule()
         ruleitem.parse(line)
-        self.rules.setdefault(ruleitem.name, rule.RuleSet()).rules.append(ruleitem)
+        self.rules.setdefault(ruleitem.name, RuleSet()).rules.append(ruleitem)
 
     def parseZone(self, line, f):
         os = StringIO.StringIO()
@@ -98,7 +99,7 @@ class tzconvert(object):
                 last_line = nextline
                 break
 
-        zoneitem = zone.Zone()
+        zoneitem = Zone()
         zoneitem.parse(os.getvalue())
         self.zones[zoneitem.name] = zoneitem
 
@@ -144,7 +145,7 @@ class tzconvert(object):
         """
 
         cal = Calendar()
-        for tzzone in self.zones.itervalues():
+        for tzzone in self.zones.values():
             if filterzones and tzzone.name not in filterzones:
                 continue
             vtz = tzzone.vtimezone(cal, self.rules, minYear, maxYear)
@@ -164,7 +165,7 @@ class tzconvert(object):
         except OSError:
             pass
 
-        for tzzone in self.zones.itervalues():
+        for tzzone in self.zones.values():
             if filterzones and tzzone.name not in filterzones:
                 continue
             cal = Calendar()
@@ -185,7 +186,7 @@ class tzconvert(object):
                 self.parseWindowsAliases(windowsAliases)
 
             link_list = []
-            for linkTo, linkFrom in sorted(self.links.iteritems(), key=lambda x: x[0]):
+            for linkTo, linkFrom in sorted(iter(self.links.items()), key=lambda x: x[0]):
 
                 # Check for existing output file
                 fromPath = os.path.join(outputdir, linkFrom + ".ics")
@@ -274,7 +275,7 @@ if __name__ == '__main__':
         print("Downloading and extracting IANA timezone database")
         os.mkdir(zonedir)
         iana = "https://www.iana.org/time-zones/repository/tzdata-latest.tar.gz"
-        data = urllib.urlretrieve(iana)
+        data = urllib.request.urlretrieve(iana)
         print("Extract data at: %s" % (data[0]))
         with tarfile.open(data[0], "r:gz") as t:
             t.extractall(zonedir)
@@ -283,8 +284,8 @@ if __name__ == '__main__':
         windowsAliases = os.path.join(rootdir, "windowsZones.xml")
     if not os.path.exists(windowsAliases):
         print("Downloading Unicode database")
-        unicode = "http://unicode.org/repos/cldr/tags/latest/common/supplemental/windowsZones.xml"
-        data = urllib.urlretrieve(unicode, windowsAliases)
+        url = "http://unicode.org/repos/cldr/tags/latest/common/supplemental/windowsZones.xml"
+        data = urllib.request.urlretrieve(url, windowsAliases)
 
     Calendar.sProdID = prodid
 

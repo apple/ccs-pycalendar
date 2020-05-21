@@ -14,10 +14,11 @@
 #    limitations under the License.
 ##
 
+import uuid
+
 from pycalendar.icalendar import definitions
 from pycalendar.icalendar.component import Component
 from pycalendar.icalendar.validation import ICALENDAR_VALUE_CHECKS
-import uuid
 
 
 class UnknownComponent(Component):
@@ -25,12 +26,12 @@ class UnknownComponent(Component):
     propertyValueChecks = ICALENDAR_VALUE_CHECKS
 
     def __init__(self, parent=None, comptype=""):
-        super(UnknownComponent, self).__init__(parent=parent)
+        super().__init__(parent=parent)
         self.mType = comptype
         self.mMapKey = str(uuid.uuid4())
 
     def duplicate(self, parent=None):
-        return super(UnknownComponent, self).duplicate(parent=parent, comptype=self.mType)
+        return super().duplicate(parent=parent, comptype=self.mType)
 
     def getType(self):
         return self.mType
@@ -57,5 +58,6 @@ class UnknownComponent(Component):
         return (
             definitions.cICalProperty_UID,
         )
+
 
 Component.registerComponent(definitions.cICalComponent_UNKNOWN, UnknownComponent)

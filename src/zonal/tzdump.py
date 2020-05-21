@@ -15,24 +15,25 @@
 #    limitations under the License.
 ##
 
-from pycalendar.datetime import DateTime
-from pycalendar.exceptions import InvalidData
-from pycalendar.icalendar.calendar import Calendar
 import getopt
 import os
 import sys
 
+from pycalendar.datetime import DateTime
+from pycalendar.exceptions import InvalidData
+from pycalendar.icalendar.calendar import Calendar
 
-def loadCalendar(file, verbose):
+
+def loadCalendar(filepath, verbose):
 
     cal = Calendar()
     if verbose:
-        print "Parsing calendar data: %s" % (file,)
-    with open(file, "r") as fin:
+        print("Parsing calendar data: %s" % (filepath,))
+    with open(filepath, "r") as fin:
         try:
             cal.parse(fin)
-        except InvalidData, e:
-            print "Failed to parse bad data: %s" % (e.mData,)
+        except InvalidData as e:
+            print("Failed to parse bad data: %s" % (e.mData,))
             raise
     return cal
 
@@ -41,13 +42,13 @@ def getExpandedDates(cal, start, end):
 
     vtz = cal.getComponents()[0]
     expanded = vtz.expandAll(start, end)
-    expanded.sort(cmp=lambda x, y: DateTime.sort(x[0], y[0]))
+    expanded.sort(key=lambda x: x[0].getPosixTime())
     return expanded
 
 
 def sortedList(setdata):
     l = list(setdata)
-    l.sort(cmp=lambda x, y: DateTime.sort(x[0], y[0]))
+    l.sort(key=lambda x: x[0].getPosixTime())
     return l
 
 
@@ -73,9 +74,9 @@ def secondsToTime(seconds):
 
 def usage(error_msg=None):
     if error_msg:
-        print error_msg
+        print(error_msg)
 
-    print """Usage: tzdump [options] FILE
+    print("""Usage: tzdump [options] FILE
 Options:
     -h            Print this help and exit
     -v            Be verbose
@@ -89,7 +90,7 @@ Description:
     This utility will dump the transitions in a VTIMEZONE over
     the request time range.
 
-"""
+""")
 
     if error_msg:
         raise ValueError(error_msg)
@@ -128,4 +129,4 @@ if __name__ == '__main__':
 
     cal = loadCalendar(fpath, verbose)
     dates = getExpandedDates(cal, start, end)
-    print formattedExpandedDates(dates)
+    print(formattedExpandedDates(dates))

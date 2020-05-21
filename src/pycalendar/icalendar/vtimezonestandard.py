@@ -22,12 +22,13 @@ from pycalendar.icalendar.vtimezoneelement import VTimezoneElement
 class Standard(VTimezoneElement):
 
     def __init__(self, parent=None):
-        super(Standard, self).__init__(parent=parent)
+        super().__init__(parent=parent)
 
     def duplicate(self, parent=None):
-        return super(Standard, self).duplicate(parent=parent)
+        return super().duplicate(parent=parent)
 
     def getType(self):
         return definitions.cICalComponent_STANDARD
+
 
 Component.registerComponent(definitions.cICalComponent_STANDARD, Standard)

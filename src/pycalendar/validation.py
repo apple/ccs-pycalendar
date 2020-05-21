@@ -30,7 +30,7 @@ def partial(func, *args, **keywords):
     return newfunc
 
 
-class PropertyValueChecks(object):
+class PropertyValueChecks():
 
     @staticmethod
     def stringValue(text, property):

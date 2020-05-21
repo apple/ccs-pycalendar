@@ -38,7 +38,7 @@ class FloatValue(Value):
     def generate(self, os):
         try:
             os.write(str(self.mValue))
-        except:
+        except Exception:
             pass
 
     def writeXML(self, node, namespace):
@@ -56,5 +56,6 @@ class FloatValue(Value):
 
     def setValue(self, value):
         self.mValue = value
+
 
 Value.registerType(Value.VALUETYPE_FLOAT, FloatValue, xmldefinitions.value_float)

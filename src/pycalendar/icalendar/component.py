@@ -14,14 +14,15 @@
 #    limitations under the License.
 ##
 
+import os
+import time
+import uuid
+
 from pycalendar import stringutils
 from pycalendar.componentbase import ComponentBase
 from pycalendar.datetime import DateTime
 from pycalendar.icalendar import definitions
 from pycalendar.icalendar.property import Property
-import os
-import time
-import uuid
 
 
 class Component(ComponentBase):
@@ -46,15 +47,16 @@ class Component(ComponentBase):
 
     def __init__(self, parent=None):
 
-        super(Component, self).__init__(parent)
+        super().__init__(parent)
         self.mUID = ""
         self.mSeq = 0
         self.mOriginalSeq = 0
         self.mChanged = False
+        self.mMapKey = None
 
     def duplicate(self, parent=None, **args):
 
-        other = super(Component, self).duplicate(parent=parent, **args)
+        other = super().duplicate(parent=parent, **args)
         other.mUID = self.mUID
         other.mSeq = self.mSeq
         other.mOriginalSeq = self.mOriginalSeq
@@ -67,10 +69,10 @@ class Component(ComponentBase):
         return "%s: UID: %s" % (self.getType(), self.getMapKey(),)
 
     def getMimeComponentName(self):
-        raise NotImplementedError
+        return ""
 
     def getMapKey(self):
-        if hasattr(self, "mMapKey"):
+        if self.mMapKey is not None:
             return self.mMapKey
         elif self.mUID:
             return self.mUID
@@ -179,7 +181,7 @@ class Component(ComponentBase):
 
     def getTimezones(self, tzids):
         # Look for all date-time properties
-        for props in self.mProperties.itervalues():
+        for props in self.mProperties.values():
             for prop in props:
                 # Try to get a date-time value from the property
                 dtv = prop.getDateTimeValue()
@@ -187,5 +189,6 @@ class Component(ComponentBase):
                     # Add timezone id if appropriate
                     if dtv.getValue().getTimezoneID():
                         tzids.add(dtv.getValue().getTimezoneID())
+
 
 Component.sComponentType = Component

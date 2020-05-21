@@ -32,7 +32,7 @@ class N(ValueMixin):
         PREFIX,
         SUFFIX,
         MAXITEMS
-    ) = range(6)
+    ) = list(range(6))
 
     def __init__(self, last="", first="", middle="", prefix="", suffix=""):
         self.mValue = (last, first, middle, prefix, suffix)
@@ -82,7 +82,7 @@ class N(ValueMixin):
     def getFullName(self):
 
         def _stringOrList(item):
-            return item if isinstance(item, basestring) else " ".join(item)
+            return item if isinstance(item, str) else " ".join(item)
 
         results = []
         for i in (N.PREFIX, N.FIRST, N.MIDDLE, N.LAST, N.SUFFIX):
@@ -99,7 +99,7 @@ class N(ValueMixin):
         utils.generateDoubleNestedList(os, self.mValue)
 
     def parseJSON(self, jobject):
-        self.mValue = tuple(map(lambda x: x.encode("utf-8"), jobject))
+        self.mValue = tuple([x for x in jobject])
 
     def writeJSON(self, jobject):
         jobject.append(list(self.mValue))

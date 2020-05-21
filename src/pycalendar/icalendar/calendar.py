@@ -14,7 +14,12 @@
 #    limitations under the License.
 ##
 
-from cStringIO import StringIO
+import collections
+import json
+import xml.etree.cElementTree as XML
+
+from io import StringIO
+
 from pycalendar import xmlutils
 from pycalendar.containerbase import ContainerBase
 from pycalendar.datetime import DateTime
@@ -29,9 +34,6 @@ from pycalendar.icalendar.validation import ICALENDAR_VALUE_CHECKS
 from pycalendar.parser import ParserContext
 from pycalendar.period import Period
 from pycalendar.utils import readFoldedLine
-import collections
-import json
-import xml.etree.cElementTree as XML
 
 
 class Calendar(ContainerBase):
@@ -68,7 +70,7 @@ class Calendar(ContainerBase):
     propertyValueChecks = ICALENDAR_VALUE_CHECKS
 
     def __init__(self, parent=None, add_defaults=True):
-        super(Calendar, self).__init__(add_defaults=add_defaults)
+        super().__init__(add_defaults=add_defaults)
 
         self.mName = ""
         self.mDescription = ""
@@ -83,7 +85,7 @@ class Calendar(ContainerBase):
         return self.getText(includeTimezones=Calendar.NO_TIMEZONES)
 
     def duplicate(self):
-        other = super(Calendar, self).duplicate()
+        other = super().duplicate()
         other.mName = self.mName
         other.mDescription = self.mDescription
         return other
@@ -107,7 +109,7 @@ class Calendar(ContainerBase):
 
             # Now create properties
             if len(name):
-                self.ddProperty(Property(definitions.cICalProperty_XWRCALNAME, name))
+                self.addProperty(Property(definitions.cICalProperty_XWRCALNAME, name))
 
     def getDescription(self):
         return self.mDescription
@@ -192,7 +194,7 @@ class Calendar(ContainerBase):
 
     def parse(self, ins):
 
-        result = super(Calendar, self).parse(ins)
+        result = super().parse(ins)
 
         # We need to store all timezones in the static object so they can be accessed by any date object
         from pycalendar.timezonedb import TimezoneDatabase
@@ -247,7 +249,7 @@ class Calendar(ContainerBase):
                     componentstack.append((comp, compend,))
 
                     # Start a new component
-                    comp = self.sComponentType.makeComponent(line[6:], comp)
+                    comp = self.sComponentType.makeComponent(line[6:], comp)  # pylint: disable=unsubscriptable-object
                     compend = comp.getEndDelimiter()
 
                     # Cache as result - but only the first one, we ignore the rest
@@ -309,7 +311,7 @@ class Calendar(ContainerBase):
         """
         Override to track components by UID.
         """
-        super(Calendar, self).addComponent(component)
+        super().addComponent(component)
 
         if isinstance(component, ComponentRecur):
             uid = component.getUID()
@@ -323,7 +325,7 @@ class Calendar(ContainerBase):
         """
         Override to track components by UID.
         """
-        super(Calendar, self).removeComponent(component)
+        super().removeComponent(component)
 
         if isinstance(component, ComponentRecur):
             uid = component.getUID()
@@ -402,8 +404,7 @@ class Calendar(ContainerBase):
                 rid = component.getRecurrenceID()
                 if rid is None:
                     return component
-        else:
-            return None
+        return None
 
     def getText(self, includeTimezones=None, format=None):
 
@@ -413,11 +414,13 @@ class Calendar(ContainerBase):
             return s.getvalue()
         elif format == self.sFormatJSON:
             return self.getTextJSON(includeTimezones=includeTimezones)
+        else:
+            return None
 
     def generate(self, os, includeTimezones=None):
         # Make sure all required timezones are in this object
         self.includeMissingTimezones(includeTimezones=includeTimezones)
-        super(Calendar, self).generate(os)
+        super().generate(os)
 
     def getTextXML(self, includeTimezones=None):
         node = self.writeXML(includeTimezones)
@@ -429,7 +432,7 @@ class Calendar(ContainerBase):
 
         # Root node structure
         root = XML.Element(xmlutils.makeTag(xmldefinitions.iCalendar20_namespace, xmldefinitions.icalendar))
-        super(Calendar, self).writeXML(root, xmldefinitions.iCalendar20_namespace)
+        super().writeXML(root, xmldefinitions.iCalendar20_namespace)
         return root
 
     def getTextJSON(self, includeTimezones=None, sort_keys=False):
@@ -442,7 +445,7 @@ class Calendar(ContainerBase):
         self.includeMissingTimezones(includeTimezones=includeTimezones)
 
         # Root node structure
-        super(Calendar, self).writeJSON(jobject)
+        super().writeJSON(jobject)
 
     # Get expanded components
     def getVEvents(self, period, list, all_day_at_top=True):
@@ -451,9 +454,9 @@ class Calendar(ContainerBase):
             vevent.expandPeriod(period, list)
 
         if (all_day_at_top):
-            list.sort(ComponentExpanded.sort_by_dtstart_allday)
+            list.sort(key=ComponentExpanded.sort_by_dtstart_allday)
         else:
-            list.sort(ComponentExpanded.sort_by_dtstart)
+            list.sort(key=ComponentExpanded.sort_by_dtstart)
 
     def getVToDos(self, only_due, all_dates, upto_due_date, list):
         # Get current date-time less one day to test for completed events during the last day
@@ -504,66 +507,67 @@ class Calendar(ContainerBase):
     def getVFreeBusyFB(self, period, fb):
         # First create expanded set
         # TODO: fix this
-        # list = ExpandedComponents()
-        self.getVEvents(period, list)
-        if len(list) == 0:
-            return
+        # expanded_list = ExpandedComponents()
+        # self.getVEvents(period, expanded_list)
+        # if len(expanded_list) == 0:
+        #     return
 
-        # Get start/end list for each non-all-day expanded components
-        dtstart = []
-        dtend = []
-        for dt in list:
+        # # Get start/end list for each non-all-day expanded components
+        # dtstart = []
+        # dtend = []
+        # for dt in expanded_list:
 
-            # Ignore if all-day
-            if dt.getInstanceStart().isDateOnly():
-                continue
+        #     # Ignore if all-day
+        #     if dt.getInstanceStart().isDateOnly():
+        #         continue
 
-            # Ignore if transparent to free-busy
-            transp = ""
-            if dt.getOwner().getProperty(definitions.cICalProperty_TRANSP, transp) and (transp == definitions.cICalProperty_TRANSPARENT):
-                continue
+        #     # Ignore if transparent to free-busy
+        #     transp = ""
+        #     if dt.getOwner().getProperty(definitions.cICalProperty_TRANSP, transp) and (transp == definitions.cICalProperty_TRANSPARENT):
+        #         continue
 
-            # Add start/end to list
-            dtstart.append(dt.getInstanceStart())
-            dtend.append(dt.getInstanceEnd())
+        #     # Add start/end to list
+        #     dtstart.append(dt.getInstanceStart())
+        #     dtend.append(dt.getInstanceEnd())
 
-        # No longer need the expanded items
-        list.clear()
+        # # No longer need the expanded items
+        # expanded_list.clear()
 
-        # Create non-overlapping periods as properties in the freebusy component
-        temp = Period(dtstart.front(), dtend.front())
-        dtstart_iter = dtstart.iter()
-        dtstart_iter.next()
-        dtend_iter = dtend.iter()
-        dtend_iter.next()
-        for _ignore in (None,):
+        # # Create non-overlapping periods as properties in the freebusy component
+        # temp = Period(dtstart[0], dtend[0])
+        # dtstart_iter = iter(dtstart)
+        # next(dtstart_iter)
+        # dtend_iter = iter(dtend)
+        # next(dtend_iter)
+        # for _ignore in (None,):
 
-            # Check for non-overlap
-            if dtstart_iter > temp.getEnd():
+        #     # Check for non-overlap
+        #     if dtstart_iter > temp.getEnd():
 
-                # Current period is complete
-                fb.addProperty(Property(definitions.cICalProperty_FREEBUSY, temp))
+        #         # Current period is complete
+        #         fb.addProperty(Property(definitions.cICalProperty_FREEBUSY, temp))
 
-                # Reset period to new range
-                temp = Period(dtstart_iter, dtend_iter)
+        #         # Reset period to new range
+        #         temp = Period(dtstart_iter, dtend_iter)
 
-            # They overlap - check for extended end
-            if dtend_iter > temp.getEnd():
+        #     # They overlap - check for extended end
+        #     if dtend_iter > temp.getEnd():
 
-                # Extend the end
-                temp = Period(temp.getStart(), dtend_iter)
+        #         # Extend the end
+        #         temp = Period(temp.getStart(), dtend_iter)
 
-        # Add remaining period as property
-        fb.addProperty(Property(definitions.cICalProperty_FREEBUSY, temp))
+        # # Add remaining period as property
+        # fb.addProperty(Property(definitions.cICalProperty_FREEBUSY, temp))
+        pass
 
     def getFreeBusy(self, period, fb):
         # First create expanded set
 
-        list = []
-        self.getVEvents(period, list)
+        fblist = []
+        self.getVEvents(period, fblist)
 
         # Get start/end list for each non-all-day expanded components
-        for comp in list:
+        for comp in fblist:
 
             # Ignore if all-day
             if comp.getInstanceStart().isDateOnly():
@@ -587,7 +591,7 @@ class Calendar(ContainerBase):
 
         # Now get the VFREEBUSY info
         list2 = []
-        self.getVFreeBusy(period, list2)
+        self.getVFreeBusyFB(period, list2)
 
         # Get start/end list for each free-busy
         for comp in list2:

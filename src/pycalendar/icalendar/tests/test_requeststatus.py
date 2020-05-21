@@ -14,10 +14,11 @@
 #    limitations under the License.
 ##
 
-from pycalendar.parser import ParserContext
+import unittest
+
 from pycalendar.icalendar.property import Property
 from pycalendar.icalendar.requeststatusvalue import RequestStatusValue
-import unittest
+from pycalendar.parser import ParserContext
 
 
 class TestRequestStatus(unittest.TestCase):

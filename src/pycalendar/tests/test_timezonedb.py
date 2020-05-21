@@ -14,12 +14,14 @@
 #    limitations under the License.
 ##
 
-from cStringIO import StringIO
+import os
+import tempfile
+
+from io import StringIO
+
 from pycalendar.icalendar.calendar import Calendar
 from pycalendar.tests.utils import TestPyCalendar
 from pycalendar.timezonedb import TimezoneDatabase
-import os
-import tempfile
 
 StandardTZs = (
     """BEGIN:VCALENDAR
@@ -337,7 +339,7 @@ END:VCALENDAR
 class TestTimezoneDB(TestPyCalendar):
 
     def setUp(self):
-        super(TestTimezoneDB, self).setUp()
+        super().setUp()
 
         # Standard components explicitly added
         for vtz in StandardTZs:
@@ -407,7 +409,7 @@ class TestTimezoneDB(TestPyCalendar):
 class TestTimezoneDBCache(TestPyCalendar):
 
     def setUp(self):
-        super(TestTimezoneDBCache, self).setUp()
+        super().setUp()
 
         # Use temp dbpath
         tmpdir = tempfile.mkdtemp()

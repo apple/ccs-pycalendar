@@ -14,8 +14,7 @@
 #    limitations under the License.
 ##
 
-from pycalendar.icalendar import definitions
-from pycalendar.icalendar import itipdefinitions
+from pycalendar.icalendar import definitions, itipdefinitions
 from pycalendar.icalendar.component import Component
 from pycalendar.icalendar.componentrecur import ComponentRecur
 from pycalendar.icalendar.validation import ICALENDAR_VALUE_CHECKS
@@ -45,10 +44,10 @@ class VJournal(ComponentRecur):
     propertyValueChecks = ICALENDAR_VALUE_CHECKS
 
     def __init__(self, parent=None):
-        super(VJournal, self).__init__(parent=parent)
+        super().__init__(parent=parent)
 
     def duplicate(self, parent=None):
-        return super(VJournal, self).duplicate(parent=parent)
+        return super().duplicate(parent=parent)
 
     def getType(self):
         return definitions.cICalComponent_VJOURNAL
@@ -57,7 +56,7 @@ class VJournal(ComponentRecur):
         return itipdefinitions.cICalMIMEComponent_VJOURNAL
 
     def finalise(self):
-        super(VJournal, self).finalise()
+        super().finalise()
 
     def sortedPropertyKeyOrder(self):
         return (
@@ -65,5 +64,6 @@ class VJournal(ComponentRecur):
             definitions.cICalProperty_RECURRENCE_ID,
             definitions.cICalProperty_DTSTART,
         )
+
 
 Component.registerComponent(definitions.cICalComponent_VJOURNAL, VJournal)

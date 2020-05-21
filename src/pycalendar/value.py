@@ -47,7 +47,7 @@ class Value(ValueMixin):
         VALUETYPE_VCARD,
         VALUETYPE_MULTIVALUE,
         VALUETYPE_XNAME,
-    ) = range(23)
+    ) = list(range(23))
 
     _typeMap = {}
     _xmlMap = {}

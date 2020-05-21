@@ -99,4 +99,4 @@ def compareStringsSafe(s1, s2):
 
 
 def md5digest(txt):
-    return md5.new(txt).hexdigest()
+    return md5(txt).hexdigest()

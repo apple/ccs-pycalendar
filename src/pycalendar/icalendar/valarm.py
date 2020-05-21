@@ -14,13 +14,13 @@
 #    limitations under the License.
 ##
 
-from pycalendar.parameter import Parameter
 from pycalendar.datetime import DateTime
 from pycalendar.duration import Duration
 from pycalendar.icalendar import definitions
 from pycalendar.icalendar.component import Component
 from pycalendar.icalendar.property import Property
 from pycalendar.icalendar.validation import ICALENDAR_VALUE_CHECKS
+from pycalendar.parameter import Parameter
 from pycalendar.value import Value
 
 
@@ -45,7 +45,7 @@ class VAlarm(Component):
     }
 
     # Classes for each action encapsulating action-specific data
-    class VAlarmAction(object):
+    class VAlarmAction():
 
         propertyCardinality_1 = ()
         propertyCardinality_1_Fix_Empty = ()
@@ -85,7 +85,7 @@ class VAlarm(Component):
         )
 
         def __init__(self, speak=None):
-            super(VAlarm.VAlarmAudio, self).__init__(type=definitions.eAction_VAlarm_Audio)
+            super().__init__(type=definitions.eAction_VAlarm_Audio)
             self.mSpeakText = speak
 
         def duplicate(self):
@@ -129,7 +129,7 @@ class VAlarm(Component):
         )
 
         def __init__(self, description=None):
-            super(VAlarm.VAlarmDisplay, self).__init__(type=definitions.eAction_VAlarm_Display)
+            super().__init__(type=definitions.eAction_VAlarm_Display)
             self.mDescription = description
 
         def duplicate(self):
@@ -175,7 +175,7 @@ class VAlarm(Component):
         )
 
         def __init__(self, description=None, summary=None, attendees=None):
-            super(VAlarm.VAlarmEmail, self).__init__(type=definitions.eAction_VAlarm_Email)
+            super().__init__(type=definitions.eAction_VAlarm_Email)
             self.mDescription = description
             self.mSummary = summary
             self.mAttendees = attendees
@@ -192,9 +192,9 @@ class VAlarm(Component):
             if valarm.hasProperty(definitions.cICalProperty_ATTENDEE):
                 # Get each attendee
                 range = valarm.getProperties().get(definitions.cICalProperty_ATTENDEE, ())
-                for iter in range:
+                for item in range:
                     # Get the attendee value
-                    attendee = iter.getCalAddressValue()
+                    attendee = item.getCalAddressValue()
                     if attendee is not None:
                         self.mAttendees.append(attendee.getValue())
 
@@ -208,8 +208,8 @@ class VAlarm(Component):
             prop = Property(definitions.cICalProperty_SUMMARY, self.mSummary)
             valarm.addProperty(prop)
 
-            for iter in self.mAttendees:
-                prop = Property(definitions.cICalProperty_ATTENDEE, iter, Value.VALUETYPE_CALADDRESS)
+            for item in self.mAttendees:
+                prop = Property(definitions.cICalProperty_ATTENDEE, item, Value.VALUETYPE_CALADDRESS)
                 valarm.addProperty(prop)
 
         def remove(self, valarm):
@@ -240,7 +240,7 @@ class VAlarm(Component):
         )
 
         def __init__(self):
-            super(VAlarm.VAlarmUnknown, self).__init__(type=definitions.eAction_VAlarm_Unknown)
+            super().__init__(type=definitions.eAction_VAlarm_Unknown)
 
         def duplicate(self):
             return VAlarm.VAlarmUnknown()
@@ -260,7 +260,7 @@ class VAlarm(Component):
         )
 
         def __init__(self, uri=None):
-            super(VAlarm.VAlarmURI, self).__init__(type=definitions.eAction_VAlarm_URI)
+            super().__init__(type=definitions.eAction_VAlarm_URI)
             self.mURI = uri
 
         def duplicate(self):
@@ -290,7 +290,7 @@ class VAlarm(Component):
         )
 
         def __init__(self):
-            super(VAlarm.VAlarmNone, self).__init__(type=definitions.eAction_VAlarm_None)
+            super().__init__(type=definitions.eAction_VAlarm_None)
 
         def duplicate(self):
             return VAlarm.VAlarmNone()
@@ -311,7 +311,7 @@ class VAlarm(Component):
 
     def __init__(self, parent=None):
 
-        super(VAlarm, self).__init__(parent=parent)
+        super().__init__(parent=parent)
 
         self.mAction = definitions.eAction_VAlarm_Display
         self.mTriggerAbsolute = False
@@ -338,7 +338,7 @@ class VAlarm(Component):
         self.mActionData = VAlarm.VAlarmDisplay("")
 
     def duplicate(self, parent=None):
-        other = super(VAlarm, self).duplicate(parent=parent)
+        other = super().duplicate(parent=parent)
         other.mAction = self.mAction
         other.mTriggerAbsolute = self.mTriggerAbsolute
         other.mTriggerOn = self.mTriggerOn.duplicate()
@@ -390,14 +390,14 @@ class VAlarm(Component):
         # calstore::CCalendarNotifier::sCalendarNotifier.AddAlarm(this)
 
         # Do inherited
-        super(VAlarm, self).added()
+        super().added()
 
     def removed(self):
         # Removed from calendar so add to calendar notifier
         # calstore::CCalendarNotifier::sCalendarNotifier.RemoveAlarm(this)
 
         # Do inherited
-        super(VAlarm, self).removed()
+        super().removed()
 
     def changed(self):
         # Always force recalc of trigger status
@@ -412,7 +412,7 @@ class VAlarm(Component):
 
     def finalise(self):
         # Do inherited
-        super(VAlarm, self).finalise()
+        super().finalise()
 
         # Get the ACTION
         temp = self.loadValueString(definitions.cICalProperty_ACTION)
@@ -486,7 +486,7 @@ class VAlarm(Component):
         self.propertyCardinality_0_1 = self.mActionData.propertyCardinality_0_1
         self.propertyCardinality_1_More = self.mActionData.propertyCardinality_1_More
 
-        fixed, unfixed = super(VAlarm, self).validate(doFix)
+        fixed, unfixed = super().validate(doFix)
 
         # Extra constraint: both DURATION and REPEAT must be present togethe
         if self.hasProperty(definitions.cICalProperty_DURATION) ^ self.hasProperty(definitions.cICalProperty_REPEAT):
@@ -675,5 +675,6 @@ class VAlarm(Component):
 
                 # Offset by duration
                 dt.copy(trigger + self.getTriggerDuration())
+
 
 Component.registerComponent(definitions.cICalComponent_VALARM, VAlarm)

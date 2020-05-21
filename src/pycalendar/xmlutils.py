@@ -29,10 +29,9 @@ def toString(root):
 
     # Generate indentation
     def _indentNode(node, level=0):
-
         if node.text is not None and node.text.strip():
             return
-        elif len(node.getchildren()):
+        elif node.getchildren():
             indent = "\n" + " " * (level + 1) * INDENT
             node.text = indent
             for child in node.getchildren():
@@ -42,6 +41,6 @@ def toString(root):
                 node.getchildren()[-1].tail = "\n" + " " * level * INDENT
 
     _indentNode(root, 0)
-    data += XML.tostring(root) + "\n"
+    data += XML.tostring(root).decode() + "\n"
 
     return data

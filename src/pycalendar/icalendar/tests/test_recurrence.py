@@ -14,13 +14,14 @@
 #    limitations under the License.
 ##
 
-from pycalendar.datetime import DateTime
-from pycalendar.period import Period
-from pycalendar.icalendar.recurrence import Recurrence
-import unittest
-from pycalendar.timezone import Timezone
-import os
 import json
+import os
+import unittest
+
+from pycalendar.datetime import DateTime
+from pycalendar.icalendar.recurrence import Recurrence
+from pycalendar.period import Period
+from pycalendar.timezone import Timezone
 
 
 class TestRecurrence(unittest.TestCase):
@@ -193,7 +194,7 @@ class TestRecurrence(unittest.TestCase):
             recur.parse(i["rule"])
             start = DateTime.parseText(i["start"])
             end = DateTime.parseText(i["end"])
-            results = map(DateTime.parseText, i["results"])
+            results = list(map(DateTime.parseText, i["results"]))
 
             items = []
             range = Period(start, end)

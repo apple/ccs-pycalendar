@@ -14,18 +14,18 @@
 #    limitations under the License.
 ##
 
+import io as StringIO
+import xml.etree.cElementTree as XML
+
 from pycalendar import xmlutils
 from pycalendar.datetime import DateTime
 from pycalendar.icalendar import definitions, xmldefinitions
 from pycalendar.icalendar.exceptions import TooManyInstancesError
 from pycalendar.period import Period
 from pycalendar.valueutils import ValueMixin
-import cStringIO as StringIO
-import xml.etree.cElementTree as XML
 
 
 def WeekDayNumCompare_compare(w1, w2):
-
     if w1[0] < w2[0]:
         return -1
     elif w1[0] > w2[0]:
@@ -39,7 +39,6 @@ def WeekDayNumCompare_compare(w1, w2):
 
 
 def WeekDayNumSort_less_than(w1, w2):
-
     return (w1[0] < w2[0]) or (w1[0] == w2[0]) and (w1[1] < w2[1])
 
 
@@ -557,33 +556,33 @@ class Recurrence(ValueMixin):
                 os.write(definitions.cICalValue_RECUR_BYDAY)
                 os.write("=")
                 comma = False
-                for iter in self.mByDay:
+                for item in self.mByDay:
                     if comma:
                         os.write(",")
                     comma = True
 
-                    if iter[0] != 0:
-                        os.write(str(iter[0]))
+                    if item[0] != 0:
+                        os.write(str(item[0]))
 
-                    if iter[1] == definitions.eRecurrence_WEEKDAY_SU:
+                    if item[1] == definitions.eRecurrence_WEEKDAY_SU:
                         os.write(definitions.cICalValue_RECUR_WEEKDAY_SU)
 
-                    elif iter[1] == definitions.eRecurrence_WEEKDAY_MO:
+                    elif item[1] == definitions.eRecurrence_WEEKDAY_MO:
                         os.write(definitions.cICalValue_RECUR_WEEKDAY_MO)
 
-                    elif iter[1] == definitions.eRecurrence_WEEKDAY_TU:
+                    elif item[1] == definitions.eRecurrence_WEEKDAY_TU:
                         os.write(definitions.cICalValue_RECUR_WEEKDAY_TU)
 
-                    elif iter[1] == definitions.eRecurrence_WEEKDAY_WE:
+                    elif item[1] == definitions.eRecurrence_WEEKDAY_WE:
                         os.write(definitions.cICalValue_RECUR_WEEKDAY_WE)
 
-                    elif iter[1] == definitions.eRecurrence_WEEKDAY_TH:
+                    elif item[1] == definitions.eRecurrence_WEEKDAY_TH:
                         os.write(definitions.cICalValue_RECUR_WEEKDAY_TH)
 
-                    elif iter[1] == definitions.eRecurrence_WEEKDAY_FR:
+                    elif item[1] == definitions.eRecurrence_WEEKDAY_FR:
                         os.write(definitions.cICalValue_RECUR_WEEKDAY_FR)
 
-                    elif iter[1] == definitions.eRecurrence_WEEKDAY_SA:
+                    elif item[1] == definitions.eRecurrence_WEEKDAY_SA:
                         os.write(definitions.cICalValue_RECUR_WEEKDAY_SA)
 
             self.generateList(os, definitions.cICalValue_RECUR_BYMONTHDAY, self.mByMonthDay)
@@ -619,7 +618,7 @@ class Recurrence(ValueMixin):
                 elif self.mWeekstart == definitions.eRecurrence_WEEKDAY_SA:
                     os.write(definitions.cICalValue_RECUR_WEEKDAY_SA)
 
-        except:
+        except Exception:
             pass
 
     def generateList(self, os, title, items):
@@ -658,12 +657,12 @@ class Recurrence(ValueMixin):
         self.writeXMLList(recur, namespace, xmldefinitions.recur_byhour, self.mByHours)
 
         if self.mByDay is not None and len(self.mByDay) != 0:
-            for iter in self.mByDay:
+            for item in self.mByDay:
                 byday = XML.SubElement(recur, xmlutils.makeTag(namespace, xmldefinitions.recur_byday))
                 data = ""
-                if iter[0] != 0:
-                    data = str(iter[0])
-                data += self.cWeekdayRecurMap.get(iter[1], "")
+                if item[0] != 0:
+                    data = str(item[0])
+                data += self.cWeekdayRecurMap.get(item[1], "")
                 byday.text = data
 
         self.writeXMLList(recur, namespace, xmldefinitions.recur_bymonthday, self.mByMonthDay)
@@ -696,7 +695,7 @@ class Recurrence(ValueMixin):
                 "bymonthday", "byyearday", "byweekno",
                 "bymonth", "bysetpos", "byday",
             ):
-                if not isinstance(value, str) and not isinstance(value, unicode) and not isinstance(value, int):
+                if not isinstance(value, str) and not isinstance(value, int):
                     value = ",".join(map(str, value))
             elif name == "until":
                 value = value.replace("-", "").replace(":", "")
@@ -729,11 +728,11 @@ class Recurrence(ValueMixin):
 
         if self.mByDay is not None and len(self.mByDay) != 0:
             items = []
-            for iter in self.mByDay:
+            for item in self.mByDay:
                 data = ""
-                if iter[0] != 0:
-                    data = str(iter[0])
-                data += self.cWeekdayRecurMap.get(iter[1], "")
+                if item[0] != 0:
+                    data = str(item[0])
+                data += self.cWeekdayRecurMap.get(item[1], "")
                 items.append(data)
             jdict[xmldefinitions.recur_byday] = items
 
@@ -791,19 +790,19 @@ class Recurrence(ValueMixin):
 
         # Check BYMONTHDAY numbers (we can handle -7...-1, 1..31)
         if self.mByMonthDay is not None:
-            for iter in self.mByMonthDay:
-                if (iter < -7) or (iter > 31) or (iter == 0):
+            for item in self.mByMonthDay:
+                if (item < -7) or (item > 31) or (item == 0):
                     return False
 
         # Check BYDAY numbers
         if self.mByDay is not None:
             number = 0
             first = True
-            for iter in self.mByDay:
+            for item in self.mByDay:
 
                 # Get the first number
                 if (first):
-                    number = iter[0]
+                    number = item[0]
                     first = False
 
                     # Check number range
@@ -811,7 +810,7 @@ class Recurrence(ValueMixin):
                         return False
 
                 # If current differs from last, then we have an error
-                elif number != iter[0]:
+                elif number != item[0]:
                     return False
 
         # Check BYSETPOS numbers
@@ -827,10 +826,10 @@ class Recurrence(ValueMixin):
     def getUIDescription(self):
         try:
             # For now just use iCal item
-            sout = StringIO()
+            sout = StringIO.StringIO()
             self.generate(sout)
             result = sout.getvalue()
-        except:
+        except Exception:
             result = ""
 
         return result
@@ -872,9 +871,9 @@ class Recurrence(ValueMixin):
 
         # Just return the cached items in the requested range
         limited = not self.mFullyCached
-        for iter in self.mRecurrences:
-            if range.isDateWithinPeriod(iter):
-                items.append(iter)
+        for item in self.mRecurrences:
+            if range.isDateWithinPeriod(item):
+                items.append(item)
             else:
                 limited = True
         return limited
@@ -964,33 +963,33 @@ class Recurrence(ValueMixin):
             set_items.sort(key=lambda x: x.getPosixTime())
 
             # Process each one in the generated set
-            for iter in set_items:
+            for item in set_items:
 
                 # Ignore if it is before the actual start - we need this
                 # because the expansion
                 # can go back in time from the real start, but we must exclude
                 # those when counting
                 # even if they are not within the requested range
-                if iter < start:
+                if item < start:
                     continue
 
                 # Exit if after period we want
-                if range.isDateAfterPeriod(iter):
+                if range.isDateAfterPeriod(item):
                     return False
 
                 # Exit if beyond the UNTIL limit
                 if self.mUseUntil:
                     # Exit if next item is after until (its OK if its the same
                     # as UNTIL as UNTIL is inclusive)
-                    if iter > float_until:
+                    if item > float_until:
                         return True
 
                 # Special for start instance
-                if (ctr == 1) and (start == iter):
+                if (ctr == 1) and (start == item):
                     continue
 
                 # Add current one to list
-                items.append(iter)
+                items.append(item)
                 if maxInstances and len(items) > maxInstances:
                     raise TooManyInstancesError("Too many instances")
 
@@ -1024,8 +1023,7 @@ class Recurrence(ValueMixin):
     def excludeFutureRecurrence(self, exclude):
         # Expand the rule up to the exclude date
         items = []
-        period = Period()
-        period.init(self.mCacheStart, exclude)
+        period = Period(self.mCacheStart, exclude)
         self.expand(self.mCacheStart, period, items)
 
         # Adjust UNTIL or add one if no COUNT
@@ -1090,7 +1088,7 @@ class Recurrence(ValueMixin):
             items[:] = self.bySecondExpand(items)
 
         # Remove invalid items before BYSETPOS
-        items[:] = filter(lambda x: not x.invalid(), items)
+        items[:] = [x for x in items if not x.invalid()]
 
         if (self.mBySetPos is not None) and (len(self.mBySetPos) != 0):
             items[:] = self.bySetPosLimit(items)
@@ -1137,7 +1135,7 @@ class Recurrence(ValueMixin):
             items[:] = self.bySecondExpand(items)
 
         # Remove invalid items before BYSETPOS
-        items[:] = filter(lambda x: not x.invalid(), items)
+        items[:] = [x for x in items if not x.invalid()]
 
         if ((self.mBySetPos is not None) and (len(self.mBySetPos) != 0)):
             items[:] = self.bySetPosLimit(items)
@@ -1176,7 +1174,7 @@ class Recurrence(ValueMixin):
             items[:] = self.bySecondExpand(items)
 
         # Remove invalid items before BYSETPOS
-        items[:] = filter(lambda x: not x.invalid(), items)
+        items[:] = [x for x in items if not x.invalid()]
 
         if (self.mBySetPos is not None) and (len(self.mBySetPos) != 0):
             items[:] = self.bySetPosLimit(items)
@@ -1220,7 +1218,7 @@ class Recurrence(ValueMixin):
             items[:] = self.bySecondExpand(items)
 
         # Remove invalid items before BYSETPOS
-        items[:] = filter(lambda x: not x.invalid(), items)
+        items[:] = [x for x in items if not x.invalid()]
 
         if (self.mBySetPos is not None) and (len(self.mBySetPos) != 0):
             items[:] = self.bySetPosLimit(items)
@@ -1266,7 +1264,7 @@ class Recurrence(ValueMixin):
             items[:] = self.bySecondExpand(items)
 
         # Remove invalid items before BYSETPOS
-        items[:] = filter(lambda x: not x.invalid(), items)
+        items[:] = [x for x in items if not x.invalid()]
 
         if (self.mBySetPos is not None) and (len(self.mBySetPos) != 0):
             items[:] = self.bySetPosLimit(items)
@@ -1314,7 +1312,7 @@ class Recurrence(ValueMixin):
             items[:] = self.bySecondExpand(items)
 
         # Remove invalid items before BYSETPOS
-        items[:] = filter(lambda x: not x.invalid(), items)
+        items[:] = [x for x in items if not x.invalid()]
 
         if (self.mBySetPos is not None) and (len(self.mBySetPos) != 0):
             items[:] = self.bySetPosLimit(items)
@@ -1364,7 +1362,7 @@ class Recurrence(ValueMixin):
                 return
 
         # Remove invalid items before BYSETPOS
-        items[:] = filter(lambda x: not x.invalid(), items)
+        items[:] = [x for x in items if not x.invalid()]
 
         if (self.mBySetPos is not None) and (len(self.mBySetPos) != 0):
             items[:] = self.bySetPosLimit(items)
@@ -1657,14 +1655,14 @@ class Recurrence(ValueMixin):
         # input array and add to the output
         output = []
         input_size = len(dates)
-        for iter in self.mBySetPos:
-            if iter > 0:
+        for item in self.mBySetPos:
+            if item > 0:
                 # Positive values are offset from the start
-                if iter <= input_size:
-                    output.append(dates[iter - 1])
-            elif iter < 0:
+                if item <= input_size:
+                    output.append(dates[item - 1])
+            elif item < 0:
                 # Negative values are offset from the end
-                if -iter <= input_size:
-                    output.append(dates[input_size + iter])
+                if -item <= input_size:
+                    output.append(dates[input_size + item])
 
         return output

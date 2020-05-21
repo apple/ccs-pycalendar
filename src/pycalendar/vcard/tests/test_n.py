@@ -14,8 +14,9 @@
 #    limitations under the License.
 ##
 
-from pycalendar.vcard.n import N
 import unittest
+
+from pycalendar.vcard.n import N
 
 
 class TestAdrValue(unittest.TestCase):

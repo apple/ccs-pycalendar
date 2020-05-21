@@ -16,10 +16,10 @@
 
 # iCalendar URI value
 
-from pycalendar import xmldefinitions, utils
+from pycalendar import utils, xmldefinitions
+from pycalendar.parser import ParserContext
 from pycalendar.plaintextvalue import PlainTextValue
 from pycalendar.value import Value
-from pycalendar.parser import ParserContext
 
 
 class URIValue(PlainTextValue):
@@ -46,9 +46,10 @@ class URIValue(PlainTextValue):
             try:
                 # No encoding required
                 os.write(self.mValue.replace("\n", "\\n"))
-            except:
+            except Exception:
                 pass
         else:
-            super(URIValue, self).generate(os)
+            super().generate(os)
+
 
 Value.registerType(Value.VALUETYPE_URI, URIValue, xmldefinitions.value_uri)

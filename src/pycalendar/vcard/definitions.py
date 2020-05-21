@@ -67,6 +67,23 @@ Property_VERSION = "VERSION"
 Property_CLASS = "CLASS"
 Property_KEY = "KEY"
 
+#     6350 Section 6.1.4
+Property_KIND = "KIND"
+PropertyValue_KIND_individual = "individual"
+PropertyValue_KIND_group = "group"
+PropertyValue_KIND_org = "org"
+PropertyValue_KIND_location = "location"
+
+#     6350 Section 6.4.3
+Property_IMPP = "IMPP"
+
+#     6350 Section 6.6.5
+Property_MEMBER = "MEMBER"
+
+#     6350 Section 6.9
+Property_CALADRURI = "CALADRURI"
+Property_CALURI = "CALURI"
+
 #     2426 Value Types
 Value_BINARY = "BINARY"
 Value_BOOLEAN = "BOOLEAN"
@@ -86,3 +103,9 @@ Parameter_TYPE = "TYPE"
 Parameter_VALUE = "VALUE"
 
 Parameter_Value_ENCODING_B = "B"
+Parameter_Value_TYPE_HOME = "HOME"
+Parameter_Value_TYPE_WORK = "WORK"
+Parameter_Value_TYPE_MOBILE = "CELL"
+Parameter_Value_TYPE_FAX = "FAX"
+Parameter_Value_TYPE_PAGER = "PAGER"
+Parameter_Value_TYPE_PREF = "PREF"

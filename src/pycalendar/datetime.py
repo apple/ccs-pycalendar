@@ -14,16 +14,25 @@
 #    limitations under the License.
 ##
 
-from pycalendar import locale, xmldefinitions, xmlutils
-from pycalendar import utils
+import io as StringIO
+import time
+import xml.etree.cElementTree as XML
+
+from pycalendar import locale, utils, xmldefinitions, xmlutils
 from pycalendar.duration import Duration
 from pycalendar.icalendar import definitions
 from pycalendar.parser import ParserContext
 from pycalendar.timezone import Timezone
 from pycalendar.valueutils import ValueMixin
-import cStringIO as StringIO
-import time
-import xml.etree.cElementTree as XML
+
+
+def cmp(a, b):
+    if a == b:
+        return 0
+    elif a < b:
+        return -1
+    else:
+        return 1
 
 
 class DateTime(ValueMixin):
@@ -226,13 +235,13 @@ class DateTime(ValueMixin):
         # Look for cached value (or floating time which has to be calculated
         # each time)
         if (not self.mPosixTimeCached) or self.floating():
-            result = 0L
+            result = 0
 
             # Add hour/mins/secs
-            result = (self.mHours * 60L + self.mMinutes) * 60L + self.mSeconds
+            result = (self.mHours * 60 + self.mMinutes) * 60 + self.mSeconds
 
             # Number of days since 1970
-            result += self.daysSince1970() * 24L * 60L * 60L
+            result += self.daysSince1970() * 24 * 60 * 60
 
             # Adjust for timezone offset
             result -= self.timeZoneSecondsOffset()
@@ -412,7 +421,7 @@ class DateTime(ValueMixin):
             current_day = 7
 
         # This arithmetic uses the ISO day of week (1-7) and the year day to get the week number
-        week_no = (self.getYearDay() - current_day + 10) / 7
+        week_no = (self.getYearDay() - current_day + 10) // 7
 
         # Might need to adjust forward/backwards based on year boundaries
         if week_no == 0:
@@ -717,7 +726,7 @@ class DateTime(ValueMixin):
 
             # Normalise month
             normalised_month = ((self.mMonth - 1) % 12) + 1
-            adjustment_year = (self.mMonth - 1) / 12
+            adjustment_year = (self.mMonth - 1) // 12
             if (normalised_month - 1) < 0:
                 normalised_month += 12
                 adjustment_year -= 1
@@ -846,8 +855,8 @@ class DateTime(ValueMixin):
                 return "%04d%02d%02dT%02d%02d%02dZ" % (self.mYear, self.mMonth, self.mDay, self.mHours, self.mMinutes, self.mSeconds)
             elif isinstance(self.mTZID, int):
                 sign = "-" if self.mTZID < 0 else "+"
-                hours = abs(self.mTZID) / 3600
-                minutes = divmod(abs(self.mTZID) / 60, 60)[1]
+                hours = abs(self.mTZID) // 3600
+                minutes = divmod(abs(self.mTZID) // 60, 60)[1]
                 return "%04d%02d%02dT%02d%02d%02d%s%02d%02d" % (self.mYear, self.mMonth, self.mDay, self.mHours, self.mMinutes, self.mSeconds, sign, hours, minutes)
             else:
                 return "%04d%02d%02dT%02d%02d%02d" % (self.mYear, self.mMonth, self.mDay, self.mHours, self.mMinutes, self.mSeconds)
@@ -861,8 +870,8 @@ class DateTime(ValueMixin):
                 return "%04d-%02d-%02dT%02d:%02d:%02dZ" % (self.mYear, self.mMonth, self.mDay, self.mHours, self.mMinutes, self.mSeconds)
             elif isinstance(self.mTZID, int):
                 sign = "-" if self.mTZID < 0 else "+"
-                hours = abs(self.mTZID) / 3600
-                minutes = divmod(abs(self.mTZID) / 60, 60)[1]
+                hours = abs(self.mTZID) // 3600
+                minutes = divmod(abs(self.mTZID) // 60, 60)[1]
                 return "%04d-%02d-%02dT%02d:%02d:%02d%s%02d:%02d" % (self.mYear, self.mMonth, self.mDay, self.mHours, self.mMinutes, self.mSeconds, sign, hours, minutes)
             else:
                 return "%04d-%02d-%02dT%02d:%02d:%02d" % (self.mYear, self.mMonth, self.mDay, self.mHours, self.mMinutes, self.mSeconds)
@@ -1003,7 +1012,7 @@ class DateTime(ValueMixin):
     def generate(self, os):
         try:
             os.write(self.getText())
-        except:
+        except Exception:
             pass
 
     def generateRFC2822(self, os):
@@ -1041,7 +1050,7 @@ class DateTime(ValueMixin):
     def normalise(self):
         # Normalise seconds
         normalised_secs = self.mSeconds % 60
-        adjustment_mins = self.mSeconds / 60
+        adjustment_mins = self.mSeconds // 60
         if normalised_secs < 0:
             normalised_secs += 60
             adjustment_mins -= 1
@@ -1050,7 +1059,7 @@ class DateTime(ValueMixin):
 
         # Normalise minutes
         normalised_mins = self.mMinutes % 60
-        adjustment_hours = self.mMinutes / 60
+        adjustment_hours = self.mMinutes // 60
         if normalised_mins < 0:
             normalised_mins += 60
             adjustment_hours -= 1
@@ -1059,7 +1068,7 @@ class DateTime(ValueMixin):
 
         # Normalise hours
         normalised_hours = self.mHours % 24
-        adjustment_days = self.mHours / 24
+        adjustment_days = self.mHours // 24
         if normalised_hours < 0:
             normalised_hours += 24
             adjustment_days -= 1
@@ -1074,7 +1083,7 @@ class DateTime(ValueMixin):
 
         # Normalise month
         normalised_month = ((self.mMonth - 1) % 12) + 1
-        adjustment_year = (self.mMonth - 1) / 12
+        adjustment_year = (self.mMonth - 1) // 12
         if (normalised_month - 1) < 0:
             normalised_month += 12
             adjustment_year -= 1

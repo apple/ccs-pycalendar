@@ -15,7 +15,7 @@
 ##
 
 
-class ParserContext(object):
+class ParserContext():
     """
     Ultimately want to have these states as per-object so we can pass a context down
     through the entire parse call chain so that we can use different error handling for
@@ -27,7 +27,7 @@ class ParserContext(object):
         PARSER_IGNORE,  # Ignore the "suspect" data
         PARSER_FIX,  # Fix (or if not possible ignore) the "suspect" data
         PARSER_RAISE,  # Raise an exception
-    ) = range(4)
+    ) = list(range(4))
 
     # Some clients escape ":" - fix
     INVALID_COLON_ESCAPE_SEQUENCE = PARSER_FIX

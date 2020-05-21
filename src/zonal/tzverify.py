@@ -15,20 +15,22 @@
 #    limitations under the License.
 ##
 
-from pycalendar.datetime import DateTime
-from pycalendar.exceptions import InvalidData
-from pycalendar.icalendar.calendar import Calendar
-from tzconvert import tzconvert
 import getopt
 import os
 import sys
+
+from pycalendar.datetime import DateTime
+from pycalendar.exceptions import InvalidData
 from pycalendar.icalendar import definitions
+from pycalendar.icalendar.calendar import Calendar
+
+from .tzconvert import tzconvert
 
 
 def loadCalendarFromZoneinfo(zoneinfopath, skips=(), only=(), verbose=False, quiet=False):
 
     if not quiet:
-        print "Scanning for calendar data in: %s" % (zoneinfopath,)
+        print("Scanning for calendar data in: %s" % (zoneinfopath,))
     paths = []
 
     def scanForICS(dirpath):
@@ -41,7 +43,7 @@ def loadCalendarFromZoneinfo(zoneinfopath, skips=(), only=(), verbose=False, qui
                     for item in only:
                         if item in fpath:
                             if verbose:
-                                print "Found calendar data: %s" % (fpath,)
+                                print("Found calendar data: %s" % (fpath,))
                             paths.append(fpath)
                 else:
                     for skip in skips:
@@ -49,12 +51,12 @@ def loadCalendarFromZoneinfo(zoneinfopath, skips=(), only=(), verbose=False, qui
                             break
                     else:
                         if verbose:
-                            print "Found calendar data: %s" % (fpath,)
+                            print("Found calendar data: %s" % (fpath,))
                         paths.append(fpath)
     scanForICS(zoneinfopath)
 
     if not quiet:
-        print "Parsing calendar data in: %s" % (zoneinfopath,)
+        print("Parsing calendar data in: %s" % (zoneinfopath,))
     return loadCalendar(paths, verbose)
 
 
@@ -63,12 +65,12 @@ def loadCalendar(files, verbose):
     cal = Calendar()
     for file in files:
         if verbose:
-            print "Parsing calendar data: %s" % (file,)
+            print("Parsing calendar data: %s" % (file,))
         with open(file, "r") as fin:
             try:
                 cal.parse(fin)
-            except InvalidData, e:
-                print "Failed to parse bad data: %s" % (e.mData,)
+            except InvalidData as e:
+                print("Failed to parse bad data: %s" % (e.mData,))
                 raise
     return CalendarZonesWrapper(calendar=cal)
 
@@ -78,12 +80,12 @@ def parseTZData(zonedir, zonefiles):
     for file in zonefiles:
         zonefile = os.path.join(zonedir, file)
         if not os.path.exists(zonefile):
-            print "Zone file '%s' does not exist." % (zonefile,)
+            print("Zone file '%s' does not exist." % (zonefile,))
         parser.parse(zonefile)
     return CalendarZonesWrapper(zones=parser)
 
 
-class CalendarZonesWrapper(object):
+class CalendarZonesWrapper():
 
     def __init__(self, calendar=None, zones=None):
         self.calendar = calendar
@@ -112,19 +114,19 @@ def compareCalendars(calendar1, calendar2, start, end, filterTzids=(), verbose=F
     # Find TZIDs that do not have a corresponding zone
     missing = tzids1.difference(tzids2)
     if missing:
-        print """TZIDs in calendar 1 not in calendar 2 files: %s
-These cannot be checked.""" % (", ".join(sorted(missing)),)
+        print("""TZIDs in calendar 1 not in calendar 2 files: %s
+These cannot be checked.""" % (", ".join(sorted(missing)),))
 
     for tzid in sorted(tzids1.intersection(tzids2)):
         if filterTzids and tzid not in filterTzids:
             continue
         if not quiet:
-            print "\nChecking TZID: %s" % (tzid,)
+            print("\nChecking TZID: %s" % (tzid,))
         calendardates1 = calendar1.expandTransitions(tzid, start, end)
         calendardates2 = calendar2.expandTransitions(tzid, start, end)
         if verbose:
-            print "Calendar 1 dates: %s" % (formattedExpandedDates(calendardates1),)
-            print "Calendar 2 dates: %s" % (formattedExpandedDates(calendardates2),)
+            print("Calendar 1 dates: %s" % (formattedExpandedDates(calendardates1),))
+            print("Calendar 2 dates: %s" % (formattedExpandedDates(calendardates2),))
         set1 = set(calendardates1)
         set2 = set(calendardates2)
         d1 = set1.difference(set2)
@@ -139,11 +141,11 @@ These cannot be checked.""" % (", ".join(sorted(missing)),)
             if i[2] == i[3]:
                 d2.discard(i)
         if d1:
-            print "In calendar 1 but not in calendar 2 tzid=%s: %s" % (tzid, formattedExpandedDates(d1),)
+            print("In calendar 1 but not in calendar 2 tzid=%s: %s" % (tzid, formattedExpandedDates(d1),))
         if d2:
-            print "In calendar 2 but not in calendar 1 tzid=%s: %s" % (tzid, formattedExpandedDates(d2),)
+            print("In calendar 2 but not in calendar 1 tzid=%s: %s" % (tzid, formattedExpandedDates(d2),))
         if not d1 and not d2 and not quiet:
-            print "Matched: %s" % (tzid,)
+            print("Matched: %s" % (tzid,))
 
 
 def getTZIDs(cal):
@@ -163,7 +165,7 @@ def getExpandedDates(cal, tzid, start, end):
 
 def sortedList(setdata):
     l = list(setdata)
-    l.sort(cmp=lambda x, y: DateTime.sort(x[0], y[0]))
+    l.sort(key=lambda x: x[0].getPosixTime())
     return l
 
 
@@ -189,9 +191,9 @@ def secondsToTime(seconds):
 
 def usage(error_msg=None):
     if error_msg:
-        print error_msg
+        print(error_msg)
 
-    print """Usage: tzverify [options] DIR1 DIR2
+    print("""Usage: tzverify [options] DIR1 DIR2
 Options:
     -h            Print this help and exit
     -v            Be verbose
@@ -207,12 +209,13 @@ Description:
     This utility will compare iCalendar zoneinfo hierarchies by expanding
     timezone transitions and comparing.
 
-"""
+""")
 
     if error_msg:
         raise ValueError(error_msg)
     else:
         sys.exit(0)
+
 
 if __name__ == '__main__':
 

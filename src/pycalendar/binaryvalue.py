@@ -26,4 +26,5 @@ class BinaryValue(PlainTextValue):
     def getType(self):
         return Value.VALUETYPE_BINARY
 
+
 Value.registerType(Value.VALUETYPE_BINARY, BinaryValue, xmldefinitions.value_binary)

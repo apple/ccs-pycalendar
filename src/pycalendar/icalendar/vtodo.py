@@ -14,14 +14,14 @@
 #    limitations under the License.
 ##
 
+import io as StringIO
+
 from pycalendar.datetime import DateTime
-from pycalendar.icalendar import definitions
-from pycalendar.icalendar import itipdefinitions
+from pycalendar.icalendar import definitions, itipdefinitions
 from pycalendar.icalendar.component import Component
 from pycalendar.icalendar.componentrecur import ComponentRecur
 from pycalendar.icalendar.property import Property
 from pycalendar.icalendar.validation import ICALENDAR_VALUE_CHECKS
-import cStringIO as StringIO
 
 
 class VToDo(ComponentRecur):
@@ -115,7 +115,7 @@ class VToDo(ComponentRecur):
     propertyValueChecks = ICALENDAR_VALUE_CHECKS
 
     def __init__(self, parent=None):
-        super(VToDo, self).__init__(parent=parent)
+        super().__init__(parent=parent)
         self.mPriority = 0
         self.mStatus = definitions.eStatus_VToDo_None
         self.mPercentComplete = 0
@@ -123,7 +123,7 @@ class VToDo(ComponentRecur):
         self.mHasCompleted = False
 
     def duplicate(self, parent=None):
-        other = super(VToDo, self).duplicate(parent=parent)
+        other = super().duplicate(parent=parent)
         other.mPriority = self.mPriority
         other.mStatus = self.mStatus
         other.mPercentComplete = self.mPercentComplete
@@ -140,7 +140,7 @@ class VToDo(ComponentRecur):
     def addComponent(self, comp):
         # We can embed the alarm components only
         if comp.getType() == definitions.cICalComponent_VALARM:
-            super(VToDo, self).addComponent(comp)
+            super().addComponent(comp)
         else:
             raise ValueError("Only 'VALARM' components allowed in 'VTODO'")
 
@@ -151,7 +151,7 @@ class VToDo(ComponentRecur):
         self.mStatus = status
 
     def getStatusText(self):
-        sout = StringIO()
+        sout = StringIO.StringIO()
 
         if self.mStatus in (definitions.eStatus_VToDo_NeedsAction, definitions.eStatus_VToDo_InProcess):
             if self.hasEnd():
@@ -159,7 +159,7 @@ class VToDo(ComponentRecur):
                 today = DateTime()
                 today.setToday()
                 if self.getEnd() > today:
-                    sout.append("Due: ")
+                    sout.write("Due: ")
                     whendue = self.getEnd() - today
                     if (whendue.getDays() > 0) and (whendue.getDays() <= 7):
                         sout.write(whendue.getDays())
@@ -188,7 +188,7 @@ class VToDo(ComponentRecur):
         elif definitions.eStatus_VToDo_Cancelled:
             sout.write("Cancelled")
 
-        return sout.toString()
+        return sout.getvalue()
 
     def getCompletionState(self):
         if self.mStatus in (definitions.eStatus_VToDo_NeedsAction, definitions.eStatus_VToDo_InProcess):
@@ -223,7 +223,7 @@ class VToDo(ComponentRecur):
 
     def finalise(self):
         # Do inherited
-        super(VToDo, self).finalise()
+        super().finalise()
 
         # Get DUE
         temp = self.loadValueDateTime(definitions.cICalProperty_DUE)
@@ -270,7 +270,7 @@ class VToDo(ComponentRecur):
         to that.
         """
 
-        fixed, unfixed = super(VToDo, self).validate(doFix)
+        fixed, unfixed = super().validate(doFix)
 
         # Extra constraint: only one of DUE or DURATION
         if self.hasProperty(definitions.cICalProperty_DUE) and self.hasProperty(definitions.cICalProperty_DURATION):
@@ -349,5 +349,6 @@ class VToDo(ComponentRecur):
             definitions.cICalProperty_DUE,
             definitions.cICalProperty_COMPLETED,
         )
+
 
 Component.registerComponent(definitions.cICalComponent_VTODO, VToDo)

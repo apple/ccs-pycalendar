@@ -15,8 +15,10 @@
 ##
 
 import unittest
-from zonal.rule import Rule, RuleSet
+
 from pycalendar.datetime import DateTime
+
+from ..rule import Rule, RuleSet
 
 
 class TestRule(unittest.TestCase):

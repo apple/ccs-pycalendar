@@ -16,10 +16,10 @@
 
 # Helpers for value classes
 
-from cStringIO import StringIO
+from io import StringIO
 
 
-class ValueMixin(object):
+class ValueMixin():
     """
     Mix-in for operations common to Value's and value-specific classes.
     """
@@ -54,7 +54,7 @@ class ValueMixin(object):
         raise NotImplementedError
 
 
-class WrapperValue(object):
+class WrapperValue():
     """
     Mix-in for Value derived classes that wrap a value-specific class.
     """

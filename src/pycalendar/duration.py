@@ -74,7 +74,7 @@ class Duration(ValueMixin):
         # Is it an exact number of weeks - if so use the weeks value, otherwise
         # days, hours, minutes, seconds
         if remainder % (7 * 24 * 60 * 60) == 0:
-            self.mWeeks = remainder / (7 * 24 * 60 * 60)
+            self.mWeeks = remainder // (7 * 24 * 60 * 60)
             self.mDays = 0
 
             self.mHours = 0
@@ -92,7 +92,7 @@ class Duration(ValueMixin):
             self.mHours = remainder % 24
             remainder -= self.mHours
 
-            self.mDays = remainder / 24
+            self.mDays = remainder // 24
 
             self.mWeeks = 0
 
@@ -249,7 +249,7 @@ class Duration(ValueMixin):
                         os.write("%dS" % (self.mSeconds,))
                 elif self.mDays == 0:
                     os.write("T0S")
-        except:
+        except Exception:
             pass
 
     def writeXML(self, node, namespace):

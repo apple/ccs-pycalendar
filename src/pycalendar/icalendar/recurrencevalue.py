@@ -28,4 +28,5 @@ class RecurrenceValue(WrapperValue, Value):
     def writeXML(self, node, namespace):
         self.mValue.writeXML(node, namespace)
 
+
 Value.registerType(Value.VALUETYPE_RECUR, RecurrenceValue, xmldefinitions.value_recur)

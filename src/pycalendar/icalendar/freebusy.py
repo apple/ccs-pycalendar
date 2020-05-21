@@ -15,23 +15,23 @@
 ##
 
 
-class FreeBusy(object):
+class FreeBusy():
 
     FREE = 0
     BUSYTENTATIVE = 1
     BUSYUNAVAILABLE = 2
     BUSY = 3
 
-    def __init__(self, type=None, period=None):
+    def __init__(self, fbtype=None, period=None):
 
-        self.mType = type if type else FreeBusy.FREE
+        self.mType = fbtype if fbtype else FreeBusy.FREE
         self.mPeriod = period.duplicate() if period is not None else None
 
     def duplicate(self):
         return FreeBusy(self.mType, self.mPeriod)
 
-    def setType(self, type):
-        self.mType = type
+    def setType(self, fbtype):
+        self.mType = fbtype
 
     def getType(self):
         return self.mType
@@ -45,6 +45,7 @@ class FreeBusy(object):
     def isPeriodOverlap(self, period):
         return self.mPeriod.isPeriodOverlap(period)
 
-    def resolveOverlaps(self, fb):
+    @staticmethod
+    def resolveOverlaps(fb):
         # TODO:
         pass

@@ -14,6 +14,10 @@
 #    limitations under the License.
 ##
 
+import difflib
+import io as StringIO
+import unittest
+
 from pycalendar.datetime import DateTime
 from pycalendar.exceptions import InvalidData
 from pycalendar.icalendar.calendar import Calendar
@@ -21,9 +25,6 @@ from pycalendar.icalendar.property import Property
 from pycalendar.parser import ParserContext
 from pycalendar.period import Period
 from pycalendar.timezone import Timezone
-import cStringIO as StringIO
-import difflib
-import unittest
 
 
 class TestCalendar(unittest.TestCase):

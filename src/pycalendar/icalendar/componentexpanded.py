@@ -17,39 +17,15 @@
 from pycalendar.datetime import DateTime
 
 
-class ComponentExpanded(object):
+class ComponentExpanded():
 
     @staticmethod
-    def sort_by_dtstart_allday(e1, e2):
-
-        if e1.mInstanceStart.isDateOnly() and e2.mInstanceStart.isDateOnly():
-            return e1.mInstanceStart < e2.mInstanceStart
-        elif e1.mInstanceStart.isDateOnly():
-            return True
-        elif e2.mInstanceStart.isDateOnly():
-            return False
-        elif e1.mInstanceStart == e2.mInstanceStart:
-            if e1.mInstanceEnd == e2.mInstanceEnd:
-                # Put ones created earlier in earlier columns in day view
-                return e1.getOwner().getStamp() < e2.getOwner().getStamp()
-            else:
-                # Put ones that end later in earlier columns in day view
-                return e1.mInstanceEnd > e2.mInstanceEnd
-        else:
-            return e1.mInstanceStart < e2.mInstanceStart
+    def sort_by_dtstart_allday(comp):
+        return (not comp.mInstanceStart.isDateOnly(), comp.mInstanceStart, comp.mInstanceEnd, comp.getOwner().getStamp(),)
 
     @staticmethod
-    def sort_by_dtstart(e1, e2):
-        if e1.mInstanceStart == e2.mInstanceStart:
-            if (
-                e1.mInstanceStart.isDateOnly() and not e2.mInstanceStart.isDateOnly() or
-                not e1.mInstanceStart.isDateOnly() and e2.mInstanceStart.isDateOnly()
-            ):
-                return e1.mInstanceStart.isDateOnly()
-            else:
-                return False
-        else:
-            return e1.mInstanceStart < e2.mInstanceStart
+    def sort_by_dtstart(comp):
+        return (comp.mInstanceStart, not comp.mInstanceStart.isDateOnly(),)
 
     def __init__(self, owner, rid):
 

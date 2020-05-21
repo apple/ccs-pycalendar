@@ -14,9 +14,10 @@
 #    limitations under the License.
 ##
 
+import unittest
+
 from pycalendar.vcard.orgvalue import OrgValue
 from pycalendar.vcard.property import Property
-import unittest
 
 
 class TestNValue(unittest.TestCase):

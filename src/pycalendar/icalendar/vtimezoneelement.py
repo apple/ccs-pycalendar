@@ -15,6 +15,7 @@
 ##
 
 from bisect import bisect_right
+
 from pycalendar.datetime import DateTime
 from pycalendar.icalendar import definitions
 from pycalendar.icalendar.component import Component
@@ -39,7 +40,7 @@ class VTimezoneElement(Component):
     propertyValueChecks = ICALENDAR_VALUE_CHECKS
 
     def __init__(self, parent=None, dt=None, offset=None):
-        super(VTimezoneElement, self).__init__(parent=parent)
+        super().__init__(parent=parent)
         self.mStart = dt if dt is not None else DateTime()
         self.mTZName = ""
         self.mUTCOffset = offset if offset is not None else 0
@@ -49,7 +50,7 @@ class VTimezoneElement(Component):
         self.mCachedExpandBelowItems = None
 
     def duplicate(self, parent=None):
-        other = super(VTimezoneElement, self).duplicate(parent=parent)
+        other = super().duplicate(parent=parent)
         other.mStart = self.mStart.duplicate()
         other.mTZName = self.mTZName
         other.mUTCOffset = self.mUTCOffset
@@ -87,7 +88,7 @@ class VTimezoneElement(Component):
         self.loadValueRDATE(definitions.cICalProperty_RDATE, self.mRecurrences, True)
 
         # Do inherited
-        super(VTimezoneElement, self).finalise()
+        super().finalise()
 
     def getSortKey(self):
         """

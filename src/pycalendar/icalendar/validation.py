@@ -15,7 +15,7 @@
 ##
 
 from pycalendar.icalendar import definitions
-from pycalendar.validation import partial, PropertyValueChecks
+from pycalendar.validation import PropertyValueChecks, partial
 
 ICALENDAR_VALUE_CHECKS = {
     definitions.cICalProperty_CALSCALE: partial(PropertyValueChecks.stringValue, "GREGORIAN"),

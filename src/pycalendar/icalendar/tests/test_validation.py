@@ -527,7 +527,7 @@ END:VCALENDAR
             else:
                 try:
                     fixed, unfixed = cal.validate(doFix=False, doRaise=False)
-                except:
+                except Exception:
                     self.fail(msg="Failed test: %s" % (title,))
                 self.assertEqual(str(cal), test_new, msg="Failed test: %s" % (title,))
                 self.assertEqual(set(fixed), test_fixed, msg="Failed test: %s" % (title,))
@@ -688,7 +688,7 @@ END:VCALENDAR
             else:
                 try:
                     fixed, unfixed = cal.validate(doFix=True, doRaise=False)
-                except:
+                except Exception:
                     self.fail(msg="Failed test: %s" % (title,))
                 self.assertEqual(str(cal), test_new, msg="Failed test: %s" % (title,))
                 self.assertEqual(set(fixed), test_fixed, msg="Failed test: %s" % (title,))

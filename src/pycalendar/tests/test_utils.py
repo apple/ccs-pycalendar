@@ -15,7 +15,8 @@
 ##
 
 import unittest
-from pycalendar.utils import encodeParameterValue, decodeParameterValue
+
+from pycalendar.utils import decodeParameterValue, encodeParameterValue
 
 
 class TestUtils(unittest.TestCase):

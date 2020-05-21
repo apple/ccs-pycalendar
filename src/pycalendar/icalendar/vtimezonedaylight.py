@@ -22,12 +22,13 @@ from pycalendar.icalendar.vtimezoneelement import VTimezoneElement
 class Daylight(VTimezoneElement):
 
     def __init__(self, parent=None):
-        super(Daylight, self).__init__(parent=parent)
+        super().__init__(parent=parent)
 
     def duplicate(self, parent=None):
-        return super(Daylight, self).duplicate(parent=parent)
+        return super().duplicate(parent=parent)
 
     def getType(self):
         return definitions.cICalComponent_DAYLIGHT
+
 
 Component.registerComponent(definitions.cICalComponent_DAYLIGHT, Daylight)

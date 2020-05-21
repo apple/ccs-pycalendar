@@ -14,6 +14,8 @@
 #    limitations under the License.
 ##
 
+import uuid
+
 from pycalendar.datetime import DateTime
 from pycalendar.icalendar import definitions
 from pycalendar.icalendar.component import Component
@@ -22,7 +24,6 @@ from pycalendar.icalendar.property import Property
 from pycalendar.icalendar.recurrenceset import RecurrenceSet
 from pycalendar.timezone import Timezone
 from pycalendar.utils import set_difference
-import uuid
 
 
 class ComponentRecur(Component):
@@ -74,7 +75,7 @@ class ComponentRecur(Component):
             return e1.self.mStart < e2.self.mStart
 
     def __init__(self, parent=None):
-        super(ComponentRecur, self).__init__(parent=parent)
+        super().__init__(parent=parent)
         self.mMaster = self
         self.mMapKey = None
         self.mSummary = None
@@ -97,7 +98,7 @@ class ComponentRecur(Component):
         )
 
     def duplicate(self, parent=None):
-        other = super(ComponentRecur, self).duplicate(parent=parent)
+        other = super().duplicate(parent=parent)
 
         # Special determination of master
         other.mMaster = self.mMaster if self.recurring() else self
@@ -150,7 +151,7 @@ class ComponentRecur(Component):
 
     def initDTSTAMP(self):
         # Save new one
-        super(ComponentRecur, self).initDTSTAMP()
+        super().initDTSTAMP()
 
         # Get the new one
         temp = self.loadValueDateTime(definitions.cICalProperty_DTSTAMP)
@@ -198,7 +199,7 @@ class ComponentRecur(Component):
         return self.mRecurrences
 
     def setUID(self, uid):
-        super(ComponentRecur, self).setUID(uid)
+        super().setUID(uid)
 
         # Update the map key
         if self.mHasRecurrenceID:
@@ -229,7 +230,7 @@ class ComponentRecur(Component):
             return ""
 
     def finalise(self):
-        super(ComponentRecur, self).finalise()
+        super().finalise()
 
         # Get DTSTAMP
         temp = self.loadValueDateTime(definitions.cICalProperty_DTSTAMP)
@@ -301,7 +302,7 @@ class ComponentRecur(Component):
         """
 
         # Do normal checks
-        fixed, unfixed = super(ComponentRecur, self).validate(doFix)
+        fixed, unfixed = super().validate(doFix)
 
         # Check that any UNTIL value matches that for DTSTART
         if self.mHasStart and self.mRecurrences:
@@ -415,17 +416,17 @@ class ComponentRecur(Component):
                     # Get list of each ones with RANGE
                     prior = []
                     future = []
-                    for iter in instances:
-                        if iter.isAdjustPrior():
-                            prior.append(iter)
-                        if iter.isAdjustFuture():
-                            future.append(iter)
+                    for item in instances:
+                        if item.isAdjustPrior():
+                            prior.append(item)
+                        if item.isAdjustFuture():
+                            future.append(item)
 
                     # Check for special behaviour
                     if len(prior) + len(future) == 0:
                         # Add each expanded item
-                        for iter in items:
-                            results.append(self.createExpanded(self, iter))
+                        for item in items:
+                            results.append(self.createExpanded(self, item))
                     else:
                         # Sort each list first
                         prior.sort(self.sort_by_dtstart)
@@ -447,7 +448,7 @@ class ComponentRecur(Component):
 
                             # Find most appropriate THISANDFUTURE item
                             for i in range(len(future) - 1, 0, -1):
-                                riter2 = future.elementAt(i)
+                                riter2 = future[i]
                                 if riter2.getStart() < iter1:
                                     slave = riter2
                                     break
@@ -457,8 +458,8 @@ class ComponentRecur(Component):
                             results.append(self.createExpanded(slave, iter1))
                 else:
                     # Add each expanded item
-                    for iter in items:
-                        results.append(self.createExpanded(self, iter))
+                    for item in items:
+                        results.append(self.createExpanded(self, item))
 
         elif self.withinPeriod(period):
             if self.isRecurrenceInstance():
@@ -594,17 +595,17 @@ class ComponentRecur(Component):
         self.removeProperties(definitions.cICalProperty_EXDATE)
 
         # Now create properties
-        for iter in self.mRecurrences.getRules():
-            prop = Property(definitions.cICalProperty_RRULE, iter)
+        for item in self.mRecurrences.getRules():
+            prop = Property(definitions.cICalProperty_RRULE, item)
             self.addProperty(prop)
-        for iter in self.getExrules():
-            prop = Property(definitions.cICalProperty_EXRULE, iter)
+        for item in self.mRecurrences.getExrules():
+            prop = Property(definitions.cICalProperty_EXRULE, item)
             self.addProperty(prop)
-        for iter in self.mRecurrences.getDates():
-            prop = Property(definitions.cICalProperty_RDATE, iter)
+        for item in self.mRecurrences.getDates():
+            prop = Property(definitions.cICalProperty_RDATE, item)
             self.addProperty(prop)
-        for iter in self.mRecurrences.getExdates():
-            prop = Property(definitions.cICalProperty_EXDATE, iter)
+        for item in self.mRecurrences.getExdates():
+            prop = Property(definitions.cICalProperty_EXDATE, item)
             self.addProperty(prop)
 
     def excludeRecurrence(self, start):
@@ -632,11 +633,11 @@ class ComponentRecur(Component):
         self.removeProperties(definitions.cICalProperty_RDATE)
 
         # Now create properties
-        for iter in self.mRecurrences.getRules():
-            prop = Property(definitions.cICalProperty_RRULE, iter)
+        for item in self.mRecurrences.getRules():
+            prop = Property(definitions.cICalProperty_RRULE, item)
             self.addProperty(prop)
-        for iter in self.mRecurrences.getDates():
-            prop = Property(definitions.cICalProperty_RDATE, iter)
+        for item in self.mRecurrences.getDates():
+            prop = Property(definitions.cICalProperty_RDATE, item)
             self.addProperty(prop)
 
     def initFromMaster(self):

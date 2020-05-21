@@ -17,7 +17,7 @@
 from pycalendar.timezone import Timezone
 
 
-class CalendarManager(object):
+class CalendarManager():
 
     sICalendarManager = None
 
@@ -51,5 +51,6 @@ class CalendarManager(object):
 
     def getDefaultTimezone(self):
         return Timezone.sDefaultTimezone
+
 
 CalendarManager.sICalendarManager = CalendarManager()

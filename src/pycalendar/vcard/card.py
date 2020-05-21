@@ -14,17 +14,18 @@
 #    limitations under the License.
 ##
 
-from cStringIO import StringIO
+import json
+
+from io import StringIO
+
 from pycalendar.containerbase import ContainerBase
 from pycalendar.exceptions import InvalidData
 from pycalendar.parser import ParserContext
 from pycalendar.utils import readFoldedLine
 from pycalendar.vcard import definitions
-from pycalendar.vcard.definitions import VCARD, Property_VERSION, \
-    Property_PRODID, Property_UID
+from pycalendar.vcard.definitions import VCARD, Property_PRODID, Property_UID, Property_VERSION
 from pycalendar.vcard.property import Property
 from pycalendar.vcard.validation import VCARD_VALUE_CHECKS
-import json
 
 
 class Card(ContainerBase):
@@ -43,6 +44,7 @@ class Card(ContainerBase):
 
     propertyCardinality_0_1 = (
         definitions.Property_BDAY,
+        definitions.Property_KIND,
         definitions.Property_PRODID,
         definitions.Property_REV,
         definitions.Property_UID,
@@ -54,8 +56,8 @@ class Card(ContainerBase):
 
     propertyValueChecks = VCARD_VALUE_CHECKS
 
-    def duplicate(self):
-        return super(Card, self).duplicate()
+    # def duplicate(self):
+    #     return super().duplicate()
 
     def getType(self):
         return VCARD
@@ -68,16 +70,14 @@ class Card(ContainerBase):
         )
 
     @classmethod
-    def parseMultipleData(cls, data, format):
-
-        if format == cls.sFormatText:
+    def parseMultipleData(cls, data, pformat):
+        if pformat == cls.sFormatText:
             return cls.parseMultipleTextData(data)
-        elif format == cls.sFormatJSON:
+        elif pformat == cls.sFormatJSON:
             return cls.parseMultipleJSONData(data)
 
     @classmethod
     def parseMultipleTextData(cls, ins):
-
         if isinstance(ins, str):
             ins = StringIO(ins)
 
@@ -97,14 +97,13 @@ class Card(ContainerBase):
 
             line = lines[0]
             if state == LOOK_FOR_VCARD:
-
                 # Look for start
                 if line == card.getBeginDelimiter():
                     # Next state
                     state = GET_PROPERTY
 
                 # Handle blank line
-                elif len(line) == 0:
+                elif not line:
                     # Raise if requested, otherwise just ignore
                     if ParserContext.BLANK_LINES_IN_DATA == ParserContext.PARSER_RAISE:
                         raise InvalidData("vCard data has blank lines")
@@ -114,10 +113,8 @@ class Card(ContainerBase):
                     raise InvalidData("vCard data not recognized", line)
 
             elif state == GET_PROPERTY:
-
                 # Look for end of object
                 if line == card.getEndDelimiter():
-
                     # Finalise the current calendar
                     card.finalise()
 
@@ -132,14 +129,13 @@ class Card(ContainerBase):
                     state = LOOK_FOR_VCARD
 
                 # Blank line
-                elif len(line) == 0:
+                elif not line:
                     # Raise if requested, otherwise just ignore
                     if ParserContext.BLANK_LINES_IN_DATA == ParserContext.PARSER_RAISE:
                         raise InvalidData("vCard data has blank lines")
 
                 # Must be a property
                 else:
-
                     # Parse parameter/value for top-level calendar item
                     prop = Property.parseText(line)
 
@@ -157,7 +153,6 @@ class Card(ContainerBase):
 
     @classmethod
     def parseMultipleJSONData(cls, data):
-
         if not isinstance(data, str):
             data = data.read()
         try:
@@ -175,7 +170,6 @@ class Card(ContainerBase):
 
     def validProperty(self, prop):
         if prop.getName() == definitions.Property_VERSION:
-
             tvalue = prop.getValue()
             if ((tvalue is None) or (tvalue.getValue() != "3.0")):
                 return False

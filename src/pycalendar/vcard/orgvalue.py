@@ -41,7 +41,7 @@ class OrgValue(Value):
         utils.generateTextList(os, self.mValue, ';')
 
     def parseJSONValue(self, jobject):
-        self.mValue = tuple(map(lambda x: x.encode("utf-8"), jobject))
+        self.mValue = tuple([x for x in jobject])
 
     def writeJSONValue(self, jobject):
         jobject.append(list(self.mValue))
@@ -51,5 +51,6 @@ class OrgValue(Value):
 
     def setValue(self, value):
         self.mValue = value
+
 
 Value.registerType(Value.VALUETYPE_ORG, OrgValue, None)

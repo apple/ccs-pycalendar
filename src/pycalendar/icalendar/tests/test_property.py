@@ -14,12 +14,13 @@
 #    limitations under the License.
 ##
 
-from pycalendar.parameter import Parameter
+import unittest
+
 from pycalendar.exceptions import InvalidProperty
 from pycalendar.icalendar.property import Property
+from pycalendar.parameter import Parameter
 from pycalendar.parser import ParserContext
 from pycalendar.value import Value
-import unittest
 
 
 class TestProperty(unittest.TestCase):
@@ -111,7 +112,6 @@ class TestProperty(unittest.TestCase):
 
         test_data = (
             ("ATTENDEE", "mailto:attendee@example.com", "ATTENDEE:mailto:attendee@example.com\r\n"),
-            ("ATTENDEE", u"mailto:attendee@example.com", "ATTENDEE:mailto:attendee@example.com\r\n"),
             ("attendee", "mailto:attendee@example.com", "attendee:mailto:attendee@example.com\r\n"),
             ("ORGANIZER", "mailto:organizer@example.com", "ORGANIZER:mailto:organizer@example.com\r\n"),
             ("ORGANizer", "mailto:organizer@example.com", "ORGANizer:mailto:organizer@example.com\r\n"),

@@ -16,12 +16,14 @@
 
 # iCalendar REQUEST-STATUS value
 
-from pycalendar import utils, xmlutils
+import xml.etree.cElementTree as XML
+
+from pycalendar import utils
+from pycalendar import xmldefinitions as xmldefinitions_top
+from pycalendar import xmlutils
 from pycalendar.icalendar import xmldefinitions
 from pycalendar.parser import ParserContext
 from pycalendar.value import Value
-from pycalendar import xmldefinitions as xmldefinitions_top
-import xml.etree.cElementTree as XML
 
 
 class RequestStatusValue(Value):
@@ -91,7 +93,7 @@ class RequestStatusValue(Value):
             data.text = self.mValue[2]
 
     def parseJSONValue(self, jobject):
-        self.mValue = map(lambda x: x.encode("utf-8"), jobject)
+        self.mValue = [x for x in jobject]
 
     def writeJSONValue(self, jobject):
         value = [self.mValue[0], self.mValue[1]]
@@ -104,5 +106,6 @@ class RequestStatusValue(Value):
 
     def setValue(self, value):
         self.mValue = value
+
 
 Value.registerType(Value.VALUETYPE_REQUEST_STATUS, RequestStatusValue, None, xmldefinitions_top.value_text)

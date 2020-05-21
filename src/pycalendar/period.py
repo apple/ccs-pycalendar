@@ -14,11 +14,12 @@
 #    limitations under the License.
 ##
 
+import xml.etree.cElementTree as XML
+
 from pycalendar import xmldefinitions, xmlutils
 from pycalendar.datetime import DateTime
 from pycalendar.duration import Duration
 from pycalendar.valueutils import ValueMixin
-import xml.etree.cElementTree as XML
 
 
 class Period(ValueMixin):
@@ -101,7 +102,7 @@ class Period(ValueMixin):
                 self.mDuration.generate(os)
             else:
                 self.mEnd.generate(os)
-        except:
+        except Exception:
             pass
 
     def writeXML(self, node, namespace):

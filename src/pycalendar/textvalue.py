@@ -35,7 +35,8 @@ class TextValue(PlainTextValue):
         try:
             # Encoding required
             utils.writeTextValue(os, self.mValue)
-        except:
+        except Exception:
             pass
+
 
 Value.registerType(Value.VALUETYPE_TEXT, TextValue, xmldefinitions.value_text)

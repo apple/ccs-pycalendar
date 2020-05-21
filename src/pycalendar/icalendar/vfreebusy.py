@@ -15,8 +15,7 @@
 ##
 
 from pycalendar.datetime import DateTime
-from pycalendar.icalendar import definitions
-from pycalendar.icalendar import itipdefinitions
+from pycalendar.icalendar import definitions, itipdefinitions
 from pycalendar.icalendar.component import Component
 from pycalendar.icalendar.freebusy import FreeBusy
 from pycalendar.icalendar.property import Property
@@ -44,7 +43,7 @@ class VFreeBusy(Component):
     propertyValueChecks = ICALENDAR_VALUE_CHECKS
 
     def __init__(self, parent=None):
-        super(VFreeBusy, self).__init__(parent=parent)
+        super().__init__(parent=parent)
         self.mStart = DateTime()
         self.mHasStart = False
         self.mEnd = DateTime()
@@ -55,7 +54,7 @@ class VFreeBusy(Component):
         self.mBusyTime = None
 
     def duplicate(self, parent=None):
-        other = super(VFreeBusy, self).duplicate(parent=parent)
+        other = super().duplicate(parent=parent)
         other.mStart = self.mStart.duplicate()
         other.mHasStart = self.mHasStart
         other.mEnd = self.mEnd.duplicate()
@@ -73,7 +72,7 @@ class VFreeBusy(Component):
 
     def finalise(self):
         # Do inherited
-        super(VFreeBusy, self).finalise()
+        super().finalise()
 
         # Get DTSTART
         temp = self.loadValueDateTime(definitions.cICalProperty_DTSTART)
@@ -199,16 +198,16 @@ class VFreeBusy(Component):
             self.addProperty(prop)
 
     # Generating info
-    def expandPeriodComp(self, period, list):
+    def expandPeriodComp(self, period, elist):
         # Cache the busy-time details if not done already
         if not self.mCachedBusyTime:
             self.cacheBusyTime()
 
         # See if period intersects the busy time span range
         if (self.mBusyTime is not None) and period.isPeriodOverlap(self.mSpanPeriod):
-            list.append(self)
+            elist.append(self)
 
-    def expandPeriodFB(self, period, list):
+    def expandPeriodFB(self, period, elist):
         # Cache the busy-time details if not done already
         if not self.mCachedBusyTime:
             self.cacheBusyTime()
@@ -216,7 +215,7 @@ class VFreeBusy(Component):
         # See if period intersects the busy time span range
         if (self.mBusyTime is not None) and period.isPeriodOverlap(self.mSpanPeriod):
             for fb in self.mBusyTime:
-                list.append(FreeBusy(fb))
+                elist.append(FreeBusy(fb))
 
     def cacheBusyTime(self):
 
@@ -228,44 +227,44 @@ class VFreeBusy(Component):
         max_end = DateTime()
         props = self.getProperties()
         result = props.get(definitions.cICalProperty_FREEBUSY, ())
-        for iter in result:
+        for item in result:
 
             # Check the properties FBTYPE parameter
-            type = 0
+            type_num = 0
             is_busy = False
-            if iter.hasParameter(definitions.cICalParameter_FBTYPE):
+            if item.hasParameter(definitions.cICalParameter_FBTYPE):
 
-                fbyype = iter.getParameterValue(definitions.cICalParameter_FBTYPE)
+                fbyype = item.getParameterValue(definitions.cICalParameter_FBTYPE)
                 if fbyype.upper() == definitions.cICalParameter_FBTYPE_BUSY:
 
                     is_busy = True
-                    type = FreeBusy.BUSY
+                    type_num = FreeBusy.BUSY
 
                 elif fbyype.upper() == definitions.cICalParameter_FBTYPE_BUSYUNAVAILABLE:
 
                     is_busy = True
-                    type = FreeBusy.BUSYUNAVAILABLE
+                    type_num = FreeBusy.BUSYUNAVAILABLE
 
                 elif fbyype.upper() == definitions.cICalParameter_FBTYPE_BUSYTENTATIVE:
 
                     is_busy = True
-                    type = FreeBusy.BUSYTENTATIVE
+                    type_num = FreeBusy.BUSYTENTATIVE
 
                 else:
 
                     is_busy = False
-                    type = FreeBusy.FREE
+                    type_num = FreeBusy.FREE
 
             else:
 
                 # Default is busy when no parameter
                 is_busy = True
-                type = FreeBusy.BUSY
+                type_num = FreeBusy.BUSY
 
             # Add this period
             if is_busy:
 
-                multi = iter.getMultiValue()
+                multi = item.getMultiValue()
                 if (multi is not None) and (multi.getType() == Value.VALUETYPE_PERIOD):
 
                     for o in multi.getValues():
@@ -278,7 +277,7 @@ class VFreeBusy(Component):
                         # Double-check type
                         if period is not None:
 
-                            self.mBusyTime.append(FreeBusy(type, period.getValue()))
+                            self.mBusyTime.append(FreeBusy(type_num, period.getValue()))
 
                             if len(self.mBusyTime) == 1:
 
@@ -300,7 +299,7 @@ class VFreeBusy(Component):
         else:
 
             # Sort the list by period
-            self.mBusyTime.sort(cmp=lambda x, y: x.getPeriod().getStart().compareDateTime(y.getPeriod().getStart()))
+            self.mBusyTime.sort(key=lambda x: x.getPeriod().getStart().getPosixTime())
 
             # Determine range
             start = DateTime()
@@ -325,5 +324,6 @@ class VFreeBusy(Component):
             definitions.cICalProperty_DURATION,
             definitions.cICalProperty_DTEND,
         )
+
 
 Component.registerComponent(definitions.cICalComponent_VFREEBUSY, VFreeBusy)

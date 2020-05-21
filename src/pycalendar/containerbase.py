@@ -14,12 +14,14 @@
 #    limitations under the License.
 ##
 
-from cStringIO import StringIO
+import json
+
+from io import StringIO
+
 from pycalendar.componentbase import ComponentBase
 from pycalendar.exceptions import InvalidData, ValidationError
 from pycalendar.parser import ParserContext
 from pycalendar.utils import readFoldedLine
-import json
 
 
 class ContainerBase(ComponentBase):
@@ -47,13 +49,13 @@ class ContainerBase(ComponentBase):
         cls.sDomain = domain
 
     def __init__(self, add_defaults=True):
-        super(ContainerBase, self).__init__()
+        super().__init__()
 
         if add_defaults:
             self.addDefaultProperties()
 
     def duplicate(self):
-        return super(ContainerBase, self).duplicate()
+        return super().duplicate()
 
     def getType(self):
         raise NotImplementedError
@@ -70,7 +72,7 @@ class ContainerBase(ComponentBase):
         """
 
         # Optional raise behavior
-        fixed, unfixed = super(ContainerBase, self).validate(doFix)
+        fixed, unfixed = super().validate(doFix)
         if doRaise and unfixed:
             raise ValidationError(";".join(unfixed))
         return fixed, unfixed

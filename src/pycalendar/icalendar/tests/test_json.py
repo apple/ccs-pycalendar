@@ -16,11 +16,12 @@
 ##
 
 
+import difflib
+import json
+import unittest
+
 from pycalendar.icalendar.calendar import Calendar
 from pycalendar.icalendar.property import Property
-import difflib
-import unittest
-import json
 
 
 class TestJSON(unittest.TestCase):

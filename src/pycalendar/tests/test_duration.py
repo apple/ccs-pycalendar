@@ -14,10 +14,12 @@
 #    limitations under the License.
 ##
 
-from cStringIO import StringIO
+import unittest
+
+from io import StringIO
+
 from pycalendar.duration import Duration
 from pycalendar.parser import ParserContext
-import unittest
 
 
 class TestDuration(unittest.TestCase):

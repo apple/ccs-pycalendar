@@ -13,9 +13,10 @@
 #    limitations under the License.
 ##
 
-from pycalendar.icalendar.calendar import Calendar
-import cStringIO as StringIO
+import io as StringIO
 import unittest
+
+from pycalendar.icalendar.calendar import Calendar
 
 
 class TestCalendar(unittest.TestCase):

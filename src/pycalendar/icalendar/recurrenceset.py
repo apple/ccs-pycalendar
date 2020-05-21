@@ -18,7 +18,7 @@ from pycalendar.icalendar.exceptions import TooManyInstancesError
 from pycalendar.utils import set_difference
 
 
-class RecurrenceSet(object):
+class RecurrenceSet():
 
     def __init__(self):
         self.mRrules = []
@@ -179,21 +179,21 @@ class RecurrenceSet(object):
             limited = True
 
         # RRULES
-        for iter in self.mRrules:
-            if iter.expand(start, range, include, float_offset=float_offset, maxInstances=maxInstances):
+        for item in self.mRrules:
+            if item.expand(start, range, include, float_offset=float_offset, maxInstances=maxInstances):
                 limited = True
 
         # RDATES
-        for iter in self.mRdates:
-            if range.isDateWithinPeriod(iter):
-                include.append(iter)
+        for item in self.mRdates:
+            if range.isDateWithinPeriod(item):
+                include.append(item)
                 if maxInstances and len(include) > maxInstances:
                     raise TooManyInstancesError("Too many instances")
             else:
                 limited = True
-        for iter in self.mRperiods:
-            if range.isPeriodOverlap(iter):
-                include.append(iter.getStart())
+        for item in self.mRperiods:
+            if range.isPeriodOverlap(item):
+                include.append(item.getStart())
                 if maxInstances and len(include) > maxInstances:
                     raise TooManyInstancesError("Too many instances")
             else:
@@ -207,16 +207,16 @@ class RecurrenceSet(object):
         exclude = []
 
         # EXRULES
-        for iter in self.mExrules:
-            iter.expand(start, range, exclude, float_offset=float_offset)
+        for item in self.mExrules:
+            item.expand(start, range, exclude, float_offset=float_offset)
 
         # EXDATES
-        for iter in self.mExdates:
-            if range.isDateWithinPeriod(iter):
-                exclude.append(iter)
-        for iter in self.mExperiods:
-            if range.isPeriodOverlap(iter):
-                exclude.append(iter.getStart())
+        for item in self.mExdates:
+            if range.isDateWithinPeriod(item):
+                exclude.append(item)
+        for item in self.mExperiods:
+            if range.isPeriodOverlap(item):
+                exclude.append(item.getStart())
 
         # Make sure the list is unique
         exclude = [x for x in set(exclude)]
@@ -229,23 +229,23 @@ class RecurrenceSet(object):
 
     def changed(self):
         # RRULES
-        for iter in self.mRrules:
-            iter.clear()
+        for item in self.mRrules:
+            item.clear()
 
         # EXRULES
-        for iter in self.mExrules:
-            iter.clear()
+        for item in self.mExrules:
+            item.clear()
 
     def excludeFutureRecurrence(self, exclude):
         # Adjust RRULES to end before start
-        for iter in self.mRrules:
-            iter.excludeFutureRecurrence(exclude)
+        for item in self.mRrules:
+            item.excludeFutureRecurrence(exclude)
 
         # Remove RDATES on or after start
         self.mRdates.removeOnOrAfter(exclude)
-        for iter in self.mRperiods:
-            if iter > exclude:
-                self.mRperiods.remove(iter)
+        for item in self.mRperiods:
+            if item > exclude:
+                self.mRperiods.remove(item)
 
     # UI operations
     def isSimpleUI(self):

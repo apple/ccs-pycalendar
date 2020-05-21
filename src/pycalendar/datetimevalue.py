@@ -34,5 +34,6 @@ class DateTimeValue(WrapperValue, Value):
     def writeXML(self, node, namespace):
         self.mValue.writeXML(node, namespace)
 
+
 Value.registerType(Value.VALUETYPE_DATE, DateTimeValue, xmldefinitions.value_date)
 Value.registerType(Value.VALUETYPE_DATETIME, DateTimeValue, xmldefinitions.value_date_time)

@@ -36,7 +36,7 @@ class PlainTextValue(Value):
         try:
             # No encoding required
             os.write(self.mValue)
-        except:
+        except Exception:
             pass
 
     def writeXML(self, node, namespace):
@@ -44,7 +44,7 @@ class PlainTextValue(Value):
         value.text = self.mValue
 
     def parseJSONValue(self, jobject):
-        self.mValue = jobject.encode("utf-8")
+        self.mValue = jobject
 
     def writeJSONValue(self, jobject):
         jobject.append(self.mValue)

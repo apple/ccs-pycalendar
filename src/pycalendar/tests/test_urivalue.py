@@ -14,10 +14,11 @@
 #    limitations under the License.
 ##
 
+import unittest
+
+from pycalendar.icalendar.property import Property
 from pycalendar.parser import ParserContext
 from pycalendar.urivalue import URIValue
-from pycalendar.icalendar.property import Property
-import unittest
 
 
 class TestURIValue(unittest.TestCase):
