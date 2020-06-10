@@ -16,7 +16,7 @@
 
 # iCalendar REQUEST-STATUS value
 
-import xml.etree.cElementTree as XML
+import xml.etree.ElementTree as XML
 
 from pycalendar import utils
 from pycalendar import xmldefinitions as xmldefinitions_top

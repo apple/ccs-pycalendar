@@ -20,7 +20,7 @@ ICalendar parameter.
 The parameter can consist of one or more values, all string.
 """
 
-import xml.etree.cElementTree as XML
+import xml.etree.ElementTree as XML
 
 from pycalendar import xmldefinitions, xmlutils
 from pycalendar.utils import encodeParameterValue

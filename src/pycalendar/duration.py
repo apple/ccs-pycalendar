@@ -83,11 +83,11 @@ class Duration(ValueMixin):
         else:
             self.mSeconds = remainder % 60
             remainder -= self.mSeconds
-            remainder /= 60
+            remainder //= 60
 
             self.mMinutes = remainder % 60
             remainder -= self.mMinutes
-            remainder /= 60
+            remainder //= 60
 
             self.mHours = remainder % 24
             remainder -= self.mHours

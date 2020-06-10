@@ -27,6 +27,8 @@ def readFoldedLine(ins, lines):
         # Fill first line
         try:
             myline = ins.readline()
+            if isinstance(myline, bytes):
+                myline = myline.decode()
             if len(myline) == 0:
                 raise ValueError("Folding: empty first line")
             if myline[-1] == "\n":
@@ -49,6 +51,8 @@ def readFoldedLine(ins, lines):
         # Get next line
         try:
             myline = ins.readline()
+            if isinstance(myline, bytes):
+                myline = myline.decode()
             if len(myline) == 0:
                 raise ValueError("Folding: empty next line")
             if myline[-1] == "\n":

@@ -18,7 +18,7 @@
 
 from pycalendar import xmlutils
 from pycalendar.valueutils import ValueMixin
-import xml.etree.cElementTree as XML
+import xml.etree.ElementTree as XML
 
 
 class Value(ValueMixin):

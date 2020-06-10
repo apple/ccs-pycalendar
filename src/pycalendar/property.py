@@ -15,7 +15,7 @@
 ##
 
 import io as StringIO
-import xml.etree.cElementTree as XML
+import xml.etree.ElementTree as XML
 
 from pycalendar import stringutils, xmldefinitions, xmlutils
 from pycalendar.binaryvalue import BinaryValue

@@ -16,7 +16,7 @@
 
 import io as StringIO
 import time
-import xml.etree.cElementTree as XML
+import xml.etree.ElementTree as XML
 
 from pycalendar import locale, utils, xmldefinitions, xmlutils
 from pycalendar.duration import Duration

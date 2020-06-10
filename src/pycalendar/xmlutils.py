@@ -14,7 +14,7 @@
 #    limitations under the License.
 ##
 
-import xml.etree.cElementTree as XML
+import xml.etree.ElementTree as XML
 
 
 def makeTag(namespace, name):

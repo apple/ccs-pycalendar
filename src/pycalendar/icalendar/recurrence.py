@@ -15,7 +15,7 @@
 ##
 
 import io as StringIO
-import xml.etree.cElementTree as XML
+import xml.etree.ElementTree as XML
 
 from pycalendar import xmlutils
 from pycalendar.datetime import DateTime

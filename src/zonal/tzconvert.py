@@ -23,8 +23,8 @@ import tarfile
 import urllib.error
 import urllib.parse
 import urllib.request
-import xml.etree.cElementTree as XML
-from xml.etree.cElementTree import ParseError as XMLParseError
+import xml.etree.ElementTree as XML
+from xml.etree.ElementTree import ParseError as XMLParseError
 
 from pycalendar.icalendar.calendar import Calendar
 

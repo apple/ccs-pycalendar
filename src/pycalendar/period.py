@@ -14,7 +14,7 @@
 #    limitations under the License.
 ##
 
-import xml.etree.cElementTree as XML
+import xml.etree.ElementTree as XML
 
 from pycalendar import xmldefinitions, xmlutils
 from pycalendar.datetime import DateTime
