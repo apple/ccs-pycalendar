@@ -23,7 +23,7 @@ from pycalendar.icalendar.vtimezonestandard import Standard
 from pycalendar.utcoffsetvalue import UTCOffsetValue
 from pycalendar.utils import daysInMonth
 
-from .utils import DateTime as UtilsDateTime
+from zonal.utils import DateTime as UtilsDateTime
 
 """
 Class that maintains a TZ data Rule.
@@ -317,6 +317,9 @@ class Rule():
         elif self.onDay.find(">=") != -1:
             splits = self.onDay.split(">=")
             dt.setNextDayOfWeek(int(splits[1]), Rule.DAY_NAME_TO_DAY[splits[0]])
+        elif self.onDay.find("<=") != -1:
+            splits = self.onDay.split("<=")
+            dt.setNextDayOfWeek(int(splits[1]), Rule.DAY_NAME_TO_DAY[splits[0]])
         else:
             try:
                 day = int(self.onDay)
@@ -516,6 +519,36 @@ class Rule():
 
             elif self.onDay.find(">=") != -1:
                 indicatedDay, dayoffset = self.onDay.split(">=")
+
+                # Need to check whether day has changed due to time shifting
+                dayOfWeek = start.getDayOfWeek()
+                indicatedDay = Rule.DAY_NAME_TO_DAY[indicatedDay]
+
+                if dayOfWeek == indicatedDay:
+                    offset, rday, bymday = self.getOnDayDetails(start, indicatedDay, int(dayoffset))
+                    if bymday:
+                        rrule.setByMonthDay(bymday)
+                    rrule.setByDay(((offset, rday),))
+                elif dayoffset == 1 and divmod(dayoffset - indicatedDay, 7)[1] == 6:
+                    # This is bad news as we have moved backward a day possibly into the next month
+                    # What we do is switch to using a BYYEARDAY rule with offset from the end of the year
+                    rrule.setByMonth(())
+                    daysBackStartOfMonth = (
+                        365, 334, 306, 275, 245, 214, 184, 153, 122, 92, 61, 31, 0     # Does not account for leap year
+                    )
+                    rrule.setByYearDay([-(daysBackStartOfMonth[Rule.MONTH_NAME_TO_POS[self.inMonth]] + i) for i in range(7)])
+                    rrule.setByDay(
+                        ((0, divmod(indicatedDay + 1, 7)[1]),),
+                    )
+                else:
+                    # This is OK as we have moved forward a day and thus no month transition
+                    # could have occurred
+                    offset, rday, bymday = self.getOnDayDetails(start, indicatedDay, int(dayoffset))
+                    if bymday:
+                        rrule.setByMonthDay(bymday)
+                    rrule.setByDay(((offset, rday),))
+            elif self.onDay.find("<=") != -1:
+                indicatedDay, dayoffset = self.onDay.split("<=")
 
                 # Need to check whether day has changed due to time shifting
                 dayOfWeek = start.getDayOfWeek()

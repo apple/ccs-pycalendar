@@ -28,8 +28,8 @@ from xml.etree.ElementTree import ParseError as XMLParseError
 
 from pycalendar.icalendar.calendar import Calendar
 
-from .rule import Rule, RuleSet
-from .zone import Zone
+from zonal.rule import Rule, RuleSet
+from zonal.zone import Zone
 
 """
 Classes to parse a tzdata files and generate VTIMEZONE data.
@@ -247,7 +247,7 @@ if __name__ == '__main__':
     prodid = "-//mulberrymail.com//Zonal//EN"
     rootdir = "../../temp"
     startYear = 1800
-    endYear = 2018
+    endYear = 2020
     windowsAliases = None
 
     options, args = getopt.getopt(sys.argv[1:], "h", ["prodid=", "root=", "start=", "end=", "windows="])

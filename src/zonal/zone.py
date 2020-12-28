@@ -22,8 +22,8 @@ from pycalendar.icalendar.vtimezonedaylight import Daylight
 from pycalendar.icalendar.vtimezonestandard import Standard
 from pycalendar.utcoffsetvalue import UTCOffsetValue
 
-from .rule import Rule, RuleSet
-from .utils import DateTime as UtilsDataTime
+from zonal.rule import Rule, RuleSet
+from zonal.utils import DateTime as UtilsDataTime
 
 """
 Class that maintains a TZ data Zone.
