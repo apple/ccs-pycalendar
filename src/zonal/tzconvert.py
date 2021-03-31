@@ -284,7 +284,7 @@ if __name__ == '__main__':
         windowsAliases = os.path.join(rootdir, "windowsZones.xml")
     if not os.path.exists(windowsAliases):
         print("Downloading Unicode database")
-        url = "http://unicode.org/repos/cldr/tags/latest/common/supplemental/windowsZones.xml"
+        url = "https://raw.githubusercontent.com/unicode-org/cldr/latest/common/supplemental/windowsZones.xml"
         data = urllib.request.urlretrieve(url, windowsAliases)
 
     Calendar.sProdID = prodid
